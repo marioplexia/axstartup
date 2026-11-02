@@ -1,0 +1,34 @@
+'use strict';
+const path = require('path');
+const express = require('express');
+const cors = require('cors');
+const { db } = require('./db');
+const { router: auth } = require('./routes/auth');
+const garantias = require('./routes/garantias');
+
+const app = express();
+app.set('trust proxy', 1);
+app.use(cors());
+app.use(express.json({ limit: '1mb' }));
+
+app.get('/health', (_req, res) => {
+  db.prepare('SELECT 1').get();
+  res.json({ ok: true });
+});
+
+app.use('/api/auth', auth);
+app.get('/api/agencias', (req, res, next) => { req.url = '/agencias'; auth(req, res, next); });
+app.use('/api/garantias', garantias);
+
+// Pantallas de acceso y la app
+app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/', (_req, res) => res.sendFile(path.join(__dirname, '..', 'index.html')));
+
+app.use('/api', (_req, res) => res.status(404).json({ error: 'No encontrado.' }));
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Error interno.' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Ax AI Garantías en http://localhost:${PORT}  (login: /login)`));

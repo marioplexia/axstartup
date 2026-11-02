@@ -12,6 +12,15 @@ if (process.argv.includes('--reset')) {
   return require('child_process').spawnSync(process.execPath, [__filename], { stdio: 'inherit' });
 }
 
+const REGION = 'Región Morelia (Sede Principal)';
+const AGENCIES = [
+  ['Chevrolet FAME Morelia', 'Morelia'],
+  ['Chevrolet Uruapan FAME', 'Uruapan'],
+  ['Chevrolet Apatzingán FAME', 'Apatzingán'],
+  ['Chevrolet FAME Zamora', 'Zamora'],
+  ['Chevrolet FAME Lázaro Cárdenas', 'Lázaro Cárdenas']
+];
+
 const ADVISORS = [
   { id: 'a1', name: 'mariogarantias', role: 'admin' },
   { id: 'a2', name: 'Heriberto Castañeda' },
@@ -54,8 +63,12 @@ const DAY = 864e5;
 const now = Date.now();
 
 const seed = db.transaction(() => {
-  const insAdv = db.prepare('INSERT OR IGNORE INTO advisors (id, name, role, created_at) VALUES (?,?,?,?)');
-  ADVISORS.forEach(a => insAdv.run(a.id, a.name, a.role || 'asesor', now));
+  const insAg = db.prepare('INSERT OR IGNORE INTO agencies (name, brand, region, city) VALUES (?,?,?,?)');
+  AGENCIES.forEach(([name, city]) => insAg.run(name, 'Chevrolet', REGION, city));
+  const morelia = db.prepare('SELECT id FROM agencies WHERE name = ?').get('Chevrolet FAME Morelia').id;
+
+  const insAdv = db.prepare('INSERT OR IGNORE INTO advisors (id, name, agency_id, role, created_at) VALUES (?,?,?,?,?)');
+  ADVISORS.forEach(a => insAdv.run(a.id, a.name, morelia, a.role || 'asesor', now));
 
   const insRule = db.prepare(`INSERT OR IGNORE INTO rules
     (id, sys, q_code, q_text, c_code, c_text, r_code, r_text, op, op_desc, hours, hours_sum, n, rej, status,
@@ -88,4 +101,4 @@ const seed = db.transaction(() => {
 seed();
 const c = t => db.prepare(`SELECT COUNT(*) n FROM ${t}`).get().n;
 console.log(`Base lista en ${DB_PATH}`);
-console.log(`  asesores: ${c('advisors')} · reglas: ${c('rules')} · piezas: ${c('rule_parts')} · palabras clave: ${c('rule_keywords')}`);
+console.log(`  agencias: ${c('agencies')} · asesores: ${c('advisors')} · reglas: ${c('rules')} · piezas: ${c('rule_parts')} · palabras clave: ${c('rule_keywords')}`);

@@ -1,9 +1,19 @@
 -- Esquema de Ax AI Garantías (SQLite)
 -- Refleja las estructuras de index.html: ADVISORS, CASES/GMCODES y RS (reglas aprendidas).
 
+CREATE TABLE IF NOT EXISTS agencies (
+  id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  name    TEXT NOT NULL UNIQUE,                  -- 'Chevrolet FAME Morelia'
+  brand   TEXT NOT NULL,                         -- 'Chevrolet'
+  region  TEXT NOT NULL,                         -- 'Región Morelia (Sede Principal)'
+  city    TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS advisors (
   id            TEXT PRIMARY KEY,                -- 'a1', 'a2'...
-  name          TEXT NOT NULL UNIQUE,
+  name          TEXT NOT NULL,
+  email         TEXT UNIQUE COLLATE NOCASE,      -- login; NULL en asesores de ejemplo
+  agency_id     INTEGER REFERENCES agencies(id),
   password_hash TEXT,                            -- bcrypt; NULL = sin acceso aún
   role          TEXT NOT NULL DEFAULT 'asesor' CHECK (role IN ('asesor','admin')),
   active        INTEGER NOT NULL DEFAULT 1,
