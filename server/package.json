@@ -1,0 +1,23 @@
+{
+  "name": "ax-garantias-server",
+  "version": "0.1.0",
+  "description": "Backend compartido para los asesores de Ax AI Garantías",
+  "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "db:init": "node seed.js",
+    "db:reset": "node seed.js --reset"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^11.7.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
