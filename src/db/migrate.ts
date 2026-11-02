@@ -4,7 +4,7 @@ import type pg from 'pg';
 
 const DIR = path.resolve(import.meta.dirname, '../../supabase/migrations');
 
-export async function migrate(client: pg.Pool | pg.PoolClient): Promise<string[]> {
+export async function migrate(client: pg.Pool | pg.PoolClient | pg.Client): Promise<string[]> {
   await client.query('create table if not exists schema_migrations (name text primary key, applied_at timestamptz default now())');
   const done = new Set((await client.query('select name from schema_migrations')).rows.map(r => r.name));
   const applied: string[] = [];

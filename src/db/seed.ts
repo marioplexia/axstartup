@@ -2,7 +2,7 @@ import type pg from 'pg';
 import { IDS, FORM_FIELDS, LABOR_RATE_MXN, STD_OPS, PART_PRICES } from './seedData.js';
 
 /** Idempotente. Debe correr con un rol privilegiado (no axai_app). */
-export async function seed(c: pg.Pool | pg.PoolClient): Promise<void> {
+export async function seed(c: pg.Pool | pg.PoolClient | pg.Client): Promise<void> {
   await c.query(`insert into groups(id,name) values ($1,'Grupo FAME (ficticio)') on conflict do nothing`, [IDS.group]);
   await c.query(`insert into brands(id,group_id,name,code) values ($1,$2,'General Motors','GM') on conflict do nothing`, [IDS.brand, IDS.group]);
   for (const [i, [id, name, city]] of IDS.agencies.entries()) {
