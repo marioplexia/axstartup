@@ -48,6 +48,10 @@ router.post('/register', async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
   db.prepare(`INSERT INTO advisors (id, name, email, agency_id, password_hash, role, created_at)
               VALUES (?,?,?,?,?, 'asesor', ?)`).run(id, email.split('@')[0], email, agencyId, hash, Date.now());
+  // El nuevo asesor recibe las reglas que ya están activas
+  db.prepare(`INSERT OR IGNORE INTO rule_distribution (rule_id, advisor_id, delivered_at)
+              SELECT id, ?, ? FROM rules WHERE status = 'activa'`).run(id, Date.now());
+  db.prepare("UPDATE settings SET value = CAST(value AS INTEGER) + 1 WHERE key = 'rev'").run();
   const user = db.prepare(USER_SQL + ' WHERE a.id = ?').get(id);
   res.status(201).json({ token: sign(id), user: publicUser(user) });
 });

@@ -573,6 +573,22 @@ textarea,input{font:inherit;color:inherit}
 (function(){
 'use strict';
 var $=function(s,r){return (r||document).querySelector(s)};
+/* Conexión con el servidor: solo activa si la app se sirve desde el backend (window.AX_SERVER) */
+var AX=(function(){
+  var o={on:!!window.AX_SERVER,token:null,user:null,name:'mariogarantias'};
+  try{o.token=localStorage.getItem('ax.token');o.user=JSON.parse(localStorage.getItem('ax.user')||'null')}catch(_){}
+  o.logout=function(){try{localStorage.removeItem('ax.token');localStorage.removeItem('ax.user')}catch(_){}location.replace('/login')};
+  if(o.on&&(!o.token||!o.user)){o.on=false;o.redirect=true;location.replace('/login')}
+  if(o.on)o.name=o.user.name;
+  o.api=function(method,url,body){
+    return fetch(url,{method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+o.token},body:body?JSON.stringify(body):undefined}).then(function(r){
+      if(r.status===401){o.logout();throw new Error('sesión')}
+      return r.json().then(function(d){if(!r.ok){var e=new Error(d.error||'Error');e.status=r.status;throw e}return d});
+    });
+  };
+  if(o.on){var ub=document.getElementById('userBtn');if(ub)ub.innerHTML='<span class="avatar">'+o.name.charAt(0).toUpperCase()+'</span>'+o.name}
+  return o;
+})();
 var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var P={
   plus:'<path d="M5 12h14M12 5v14"/>',
@@ -630,7 +646,10 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){toast('Sin notificaciones nuevas')});
 $('#settings').addEventListener('click',function(){toast('Configuración no está disponible en esta réplica')});
-$('#userBtn').addEventListener('click',function(){toast('Sesión: mariogarantias')});
+$('#userBtn').addEventListener('click',function(){
+  if(AX.on){if(confirm('Sesión: '+AX.user.email+' · '+AX.user.agency.name+'\n\n¿Cerrar sesión?'))AX.logout()}
+  else toast('Sesión: mariogarantias');
+});
 
 var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',chat:'Chatea con tus Registros',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia'};
 function isMain(id){return id==='agent'||id==='inicio'||id==='cobros'}
@@ -1150,7 +1169,7 @@ async function simulatePrea(card,ctx,my){
 
 
 /* ---------- Catálogo de reglas: aprendizaje, distribución e importación ---------- */
-var ME='a1';
+var ME=AX.on?AX.user.id:'a1';
 var ADVISORS=[{id:'a1',name:'mariogarantias',tag:'tú'},{id:'a2',name:'Heriberto Castañeda'},{id:'a3',name:'Lucía Ortega'},{id:'a4',name:'Jorge Salinas'}];
 var STOPW={cliente:1,reporta:1,reportan:1,vehiculo:1,garantia:1,falla:1,fallas:1,problema:1,cuando:1,presenta:1,presentan:1,aparece:1,unidad:1,diagnostico:1,chevrolet:1,general:1,motors:1,desde:1,donde:1,tiene:1,tienen:1,hace:1,hacen:1,sobre:1,despues:1,antes:1,durante:1,siempre:1,ahora:1};
 function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
@@ -1189,6 +1208,40 @@ RS.save=function(quiet){
   var s=JSON.stringify(RS.d);RS.mem=s;
   try{localStorage.setItem(RS.K,s)}catch(_){}
   if(!quiet&&RS.bc){try{RS.bc.postMessage('sync')}catch(_){}}
+  if(AX.on){RS.ver++;RS.dirty=true;clearTimeout(RS.pt);RS.pt=setTimeout(RS.push,400)}
+};
+/* Sincronización con el servidor (la copia en localStorage queda como caché) */
+RS.ver=0;RS.rev=-1;RS.dirty=false;RS.pushing=false;RS.resetNext=false;RS.pt=null;
+RS.syncAdv=function(list){
+  if(!list||!list.length)return;
+  ADVISORS.length=0;
+  list.forEach(function(a){var o={id:a.id,name:a.name};if(a.id===ME)o.tag='tú';ADVISORS.push(o)});
+};
+RS.apply=function(res){
+  RS.rev=res.rev;RS.syncAdv(res.advisors);RS.d=res.state;
+  try{localStorage.setItem(RS.K,JSON.stringify(RS.d))}catch(_){}
+  RS.emit();
+};
+RS.push=async function(){
+  if(RS.pushing){RS.pt=setTimeout(RS.push,400);return}
+  RS.pushing=true;var v=RS.ver,reset=RS.resetNext;
+  try{
+    var res=await AX.api('PUT','/api/garantias/estado',{state:RS.d,reset:reset});
+    RS.resetNext=false;
+    if(v===RS.ver){RS.dirty=false;RS.apply(res)}else RS.rev=res.rev;
+  }catch(e){
+    if(e.status===403){RS.resetNext=false;RS.dirty=false;RS.rev=-1;RS.pull()}
+    else if(e.message!=='sesión'){RS.pt=setTimeout(RS.push,5000)}
+  }
+  RS.pushing=false;
+};
+RS.pull=async function(){
+  if(!AX.on||RS.dirty||RS.pushing)return;
+  try{
+    var res=await AX.api('GET','/api/garantias/estado?since='+RS.rev);
+    if(res.unchanged||RS.dirty||RS.pushing)return;
+    RS.apply(res);
+  }catch(_){}
 };
 RS.on=function(fn){RS.subs.push(fn)};
 RS.emit=function(){RS.subs.forEach(function(f){try{f()}catch(e){console.error(e)}})};
@@ -1263,7 +1316,7 @@ RS.setStatus=function(id,st){
   RS.save();RS.emit();
 };
 RS.cfg=function(k,v){RS.d.cfg[k]=v;RS.log('info','','Ajuste: '+(k==='th'?'umbral de activación en '+v+' PREAs':'distribución '+(v?'automática':'con tu aprobación')));RS.save();RS.emit()};
-RS.reset=function(){RS.q=[];RS.d=RS.seed();RS.save();RS.emit()};
+RS.reset=function(){RS.q=[];RS.d=RS.seed();RS.resetNext=AX.on;RS.save();RS.emit()};
 RS.recFromPool=function(f,advisor,src){
   return {sys:f.sys,q:f.q,c:f.c,r:f.r,op:f.op,opd:f.opd,h:r1(f.h+(Math.random()<.25?0.1:0)),parts:f.parts,kw:f.kw,kwText:f.q[1],src:src||'historico',advisor:advisor};
 };
@@ -1329,6 +1382,7 @@ function parseRecs(text,name){
 RS.template='sistema,queja_codigo,queja,causa_codigo,causa,correccion_codigo,correccion,operacion,operacion_desc,horas,piezas,asesor\nSuspensión,SU-110,Ruido en suspensión delantera al pasar baches,SU-320,Amortiguador delantero con fuga,SU-420,Reemplazar amortiguadores delanteros,OP-SU-018,Reemplazar amortiguadores delanteros,2.4,PZ-SU-7101:Amortiguador delantero:2:1480;PZ-SU-7102:Kit de cubrepolvo:1:320,Lucía Ortega\n';
 
 RS.load();
+if(AX.on){RS.pull();setInterval(RS.pull,5000);document.addEventListener('visibilitychange',function(){if(!document.hidden)RS.pull()})}
 try{RS.bc=new BroadcastChannel('axai-reglas');RS.bc.onmessage=function(){RS.load();RS.emit()}}catch(_){}
 try{window.addEventListener('storage',function(e){if(e.key===RS.K){RS.load();RS.emit()}})}catch(_){}
 RS.d.rules.forEach(function(r){if(r.status==='distribuyendo'&&RS.q.indexOf(r.id)<0)RS.q.push(r.id)});
@@ -1337,7 +1391,7 @@ if(RS.q.length)setTimeout(function(){RS.pump()},400);
 function basis(c){return c.matched?'Regla <b>'+c.ruleId+'</b>, aprendida de '+c.ruleN+' PREAs aceptadas · confianza '+c.ruleConf+'%.':'Sin regla para este caso: apliqué criterio general (confianza baja). Si el fabricante la acepta, indícalo abajo y el agente aprenderá.'}
 function ctxToRec(c){
   var k=c.codes||GMCODES[c.sys]||GMCODES['Diagnóstico general'],t=(c.rawText||c.queja||'SIN QUEJA');
-  return {ruleId:c.ruleId||null,sys:c.matched?c.sys:'Por clasificar',q:c.matched?k.q:['NUEVA',(t.length>60?t.slice(0,57).replace(/\s+\S*$/,'')+'…':t).toUpperCase()],c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,parts:c.parts,kwText:t,src:'asesor',advisor:'mariogarantias'};
+  return {ruleId:c.ruleId||null,sys:c.matched?c.sys:'Por clasificar',q:c.matched?k.q:['NUEVA',(t.length>60?t.slice(0,57).replace(/\s+\S*$/,'')+'…':t).toUpperCase()],c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,parts:c.parts,kwText:t,src:'asesor',advisor:AX.name};
 }
 
 /* ---------- Tablero de agencia ---------- */

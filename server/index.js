@@ -22,7 +22,13 @@ app.use('/api/garantias', garantias);
 
 // Pantallas de acceso y la app
 app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
-app.get('/', (_req, res) => res.sendFile(path.join(__dirname, '..', 'index.html')));
+// La app se sirve con una bandera para que sepa que hay backend (y exija sesión).
+const fs = require('fs');
+app.get('/', (_req, res) => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8')
+    .replace('<script>', '<script>window.AX_SERVER=true;</script>\n<script>');
+  res.type('html').send(html);
+});
 
 app.use('/api', (_req, res) => res.status(404).json({ error: 'No encontrado.' }));
 app.use((err, _req, res, _next) => {

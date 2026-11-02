@@ -99,3 +99,6 @@ CREATE TABLE IF NOT EXISTS settings (
   key    TEXT PRIMARY KEY,
   value  TEXT NOT NULL
 );
+
+-- Evita duplicar eventos cuando varios clientes reenvían la misma bitácora
+CREATE UNIQUE INDEX IF NOT EXISTS idx_log_uniq ON rule_log(ts, type, rule_id, msg);

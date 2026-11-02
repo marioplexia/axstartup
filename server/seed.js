@@ -91,10 +91,12 @@ const seed = db.transaction(() => {
   const insSet = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?,?)');
   insSet.run('th', '3');
   insSet.run('auto', 'true');
+  insSet.run('seq', String(CASES.length));
+  insSet.run('rev', '1');
 
   if (!db.prepare('SELECT 1 FROM rule_log LIMIT 1').get()) {
     db.prepare('INSERT INTO rule_log (ts, type, rule_id, msg) VALUES (?,?,?,?)')
-      .run(now, 'info', null, `Catálogo base cargado con ${CASES.length} reglas de la agencia`);
+      .run(now, 'info', '', `Catálogo base cargado con ${CASES.length} reglas de la agencia`);
   }
 });
 
