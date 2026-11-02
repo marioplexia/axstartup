@@ -4,6 +4,7 @@ import { verifyToken, type Principal } from './auth.js';
 import type { Role } from './db/pool.js';
 import { makeLlm, type LlmClient } from './llm/client.js';
 import { preaRoutes } from './routes/prea.js';
+import { outcomeRoutes } from './routes/outcome.js';
 
 declare module 'fastify' { interface FastifyRequest { principal?: Principal } }
 
@@ -41,6 +42,7 @@ export async function buildServer(deps: Partial<Deps> = {}): Promise<FastifyInst
 
   app.get('/health', async () => ({ ok: true }));
   await app.register(async i => preaRoutes(i, d));
+  await app.register(async i => outcomeRoutes(i));
   return app;
 }
 
