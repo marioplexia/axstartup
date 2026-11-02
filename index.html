@@ -326,6 +326,45 @@ textarea,input{font:inherit;color:inherit}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0s !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
 }
+
+/* Formulario GM (PREA) con campos del agente y botón copiar */
+.gmf{--g-fg:#1d1d1d;--g-mut:#5b5b5b;--g-acc:#0a5bd3;--g-line:#d9d9d9;--g-ok:#0b7a43;
+  margin:16px 0 4px;background:#fff;color:var(--g-fg);border:1px solid var(--card-line);border-radius:12px;box-shadow:var(--shadow);
+  padding:20px 22px 22px;font:13px/1.45 var(--f-ui);color-scheme:light;animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
+.gmf .gtop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.gmf .glogo{width:44px;height:44px;border-radius:8px;background:#0a5bd3;color:#fff;display:grid;place-items:center;font:600 19px var(--f-ui);letter-spacing:-.5px}
+.gmf .gclose{color:var(--g-mut);font-size:12.5px}
+.gmf h3{font:400 24px/1.2 var(--f-ui);margin:14px 0 4px;letter-spacing:-.3px}
+.gmf .gsub{color:var(--g-mut);font-size:12.5px;margin:0 0 14px}
+.gmf .gtab{display:inline-block;border:1px solid var(--g-line);border-bottom-color:#fff;border-radius:4px 4px 0 0;padding:8px 12px;color:var(--g-acc);font-weight:600;font-size:12px;margin-bottom:-1px;background:#fff}
+.gmf .gtabs{border-bottom:1px solid var(--g-line);margin-bottom:12px}
+.gmf .gdis{display:flex;justify-content:flex-end;gap:14px;font-size:12px;padding:8px 0 10px;border-bottom:1px solid #ececec;margin-bottom:10px;flex-wrap:wrap}
+.gmf .gdis b{font-weight:600}.gmf .gdis i{font-style:normal;color:var(--g-acc);font-weight:500}
+.gmf .gr{display:grid;grid-template-columns:minmax(120px,38%) 1fr;gap:6px 16px;padding:4px 0;align-items:start}
+.gmf .gl{text-align:right;font-weight:600;font-size:12.5px;padding-top:1px}
+.gmf .gv{min-width:0;display:flex;align-items:flex-start;gap:8px;overflow-wrap:anywhere}
+.gmf .gt{flex:1;min-width:0}
+.gmf .ga{flex:1;min-width:0;border:1px solid var(--g-line);border-radius:2px;min-height:44px;padding:6px 8px;white-space:pre-wrap}
+.gmf .gr.ag .pend{color:#9b9b9b}
+.gmf .gr.ag .gt.filled,.gmf .gr.ag .ga.filled{background:#eaf3ff;box-shadow:0 0 0 2px #eaf3ff;border-radius:3px;animation:gfill .9s ease-out both}
+@keyframes gfill{from{background:#cfe3ff;box-shadow:0 0 0 2px #cfe3ff}}
+.gmf .ga.filled{border-color:#9cc2f5}
+.gmf .gc{flex:none;display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border:1px solid #b9cfee;background:#fff;color:var(--g-acc);border-radius:6px;font:500 11.5px var(--f-ui);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s,background .15s}
+.gmf .gr.ag.on .gc{opacity:1;pointer-events:auto}
+.gmf .gc:hover{background:#eaf3ff}.gmf .gc.done{color:var(--g-ok);border-color:#a8dcc0;background:#effaf4}
+.gmf .gc svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gmf .ghd{font-weight:600;margin:14px 0 6px}
+.gmf .gtb{width:100%;border-collapse:collapse;border:1px solid var(--g-line);font-size:12px}
+.gmf .gtb th{background:#f4f4f4;text-align:left;font-weight:600;padding:7px 10px;border-bottom:1px solid var(--g-line)}
+.gmf .gtb td{padding:10px;color:var(--g-mut)}
+.gmf .gst{display:inline-block;border:1px solid #9bdcb9;background:#e9faf1;color:var(--g-ok);font-weight:600;font-size:11px;padding:2px 8px;border-radius:3px}
+.gmf .gbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;border-radius:8px;background:#f1f6ff;border:1px solid #d3e3fb;font-size:12.5px}
+.gmf .gbar span{color:#2d4467}
+.gmf .gall{height:30px;padding:0 14px;border-radius:6px;border:0;background:var(--g-acc);color:#fff;font:500 12.5px var(--f-ui);cursor:pointer}
+.gmf .gall:hover{filter:brightness(1.08)}.gmf .gall:disabled{opacity:.45;cursor:default}
+.gmf .gbk{margin-top:18px;border-top:1px solid #ececec;padding-top:12px;font-size:12px;color:var(--g-mut)}
+.gmf .gbk b{color:var(--g-fg)}.gmf .gbk ul{margin:6px 0 0;padding-left:18px}.gmf .gbk li{margin:2px 0}
+@media (max-width:640px){.gmf{padding:16px 14px}.gmf .gr{grid-template-columns:1fr;gap:2px}.gmf .gl{text-align:left}}
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -688,6 +727,7 @@ var ABORT={abort:1};
 var RATE=520;
 var money=function(n){return '$'+n.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})};
 var CASES=[
+  {k:/ruido|met[aá]lic|arranque|fr[ií]o|cadena/i,sys:'Motor',op:'OP-MT-031',opd:'Reemplazar tensor y guía de cadena de distribución',h:3.4,parts:[['PZ-MT-6120','Tensor de cadena de distribución',1,2140],['PZ-MT-6121','Guía de cadena de distribución',1,860],['PZ-MT-9001','Aceite de motor (litro)',5,150]]},
   {k:/transmisi|cambios bruscos|caja de/i,sys:'Transmisión',op:'OP-TR-014',opd:'Reemplazar solenoide de cambios',h:3.2,parts:[['PZ-TR-2201','Solenoide de cambios',1,1840],['PZ-TR-9005','Fluido de transmisión (litro)',6,170]]},
   {k:/ox[ií]geno|luz de motor|check engine/i,sys:'Emisiones',op:'OP-EM-007',opd:'Reemplazar sensor de oxígeno banco 1',h:0.8,parts:[['PZ-EM-1180','Sensor de oxígeno B1S1',1,2350],['PZ-EM-1190','Arnés del sensor',1,610]]},
   {k:/aceite|fuga|junta/i,sys:'Motor',op:'OP-MT-022',opd:'Reemplazar junta de tapa de punterías',h:2.1,parts:[['PZ-MT-3310','Junta de tapa de punterías',1,780],['PZ-MT-3311','Sellador de silicón',1,190],['PZ-MT-9001','Aceite de motor (litro)',5,150]]},
@@ -695,7 +735,7 @@ var CASES=[
   {k:/fren|vibra/i,sys:'Frenos',op:'OP-FR-011',opd:'Reemplazar discos y balatas delanteros',h:1.9,parts:[['PZ-FR-5501','Disco de freno delantero',2,1120],['PZ-FR-5502','Juego de balatas delanteras',1,980]]}
 ];
 var DEFAULT_CASE={sys:'Diagnóstico general',op:'OP-DG-001',opd:'Diagnóstico y reparación según la queja',h:1.0,parts:[['PZ-GN-0001','Pieza según el diagnóstico',1,950]]};
-var STEPS=['Abrir el portal e iniciar sesión','Identificar el vehículo por VIN','Capturar los datos de la reclamación','Buscar el código de operación y el tiempo de mano de obra','Agregar las piezas','Validar la PREA','Enviar la PREA'];
+var STEPS=['Leer la PREA y los datos del vehículo','Consultar las reglas de garantía del fabricante','Revisar expedientes y PREAs anteriores aceptadas','Definir queja, causa, corrección y operación','Armar el formulario para copiar y pegar'];
 function ctxFrom(text,files,brand){
   var t=(text||'').trim().replace(/\s+/g,' ');
   var c=CASES.filter(function(x){return x.k.test(t)})[0]||DEFAULT_CASE;
@@ -708,13 +748,15 @@ function ctxFrom(text,files,brand){
   return {brand:brand,sys:c.sys,op:c.op,opd:c.opd,h:c.h,hBad:+(c.h+0.3).toFixed(1),parts:parts,partsTot:pt,labor:c.h*RATE,
     km:km,kmTxt:km.toLocaleString('es-MX'),date:fmt(now),deliv:fmt(dl),vehicle:'Pickup '+dl.getFullYear()+' (ejemplo)',vin:'3GCDEMO5JG0000001',
     queja:t?(t.length>140?t.slice(0,137)+'…':t):'Falla reportada por el cliente',files:files,
-    folio:'PREA-DEMO-'+String(Math.floor(100000+Math.random()*900000))};
+    folio:'PREA-DEMO-'+String(Math.floor(100000+Math.random()*900000)),
+    rawText:t,vinReal:(t.match(/\b[A-HJ-NPR-Z0-9]{17}\b/i)||[''])[0].toUpperCase(),wo:(t.match(/\bG-[A-Z0-9]{6,10}\b/i)||[''])[0].toUpperCase()};
 }
 function introText(ctx){
-  return 'Entendido. Voy a abrir el portal del fabricante (**'+ctx.brand+'**) y armar la PREA con lo que me describes.\n\nTe dejo la pantalla aquí abajo para que veas cada paso. Si algo no cuadra, lo corrijo y te aviso.';
+  return 'Entendido. Voy a leer la PREA, revisar las reglas del fabricante (**'+ctx.brand+'**) y consultar los expedientes y las PREAs que ya fueron aceptadas.\n\nCon eso te armo el formulario ya lleno, para que solo copies y pegues cada campo en tu PREA fuera de la plataforma.';
 }
 function finalText(ctx){
-  return 'Listo. La PREA quedó enviada y **en revisión**.\n\n1. **Operación**: '+ctx.op+', '+ctx.opd.toLowerCase()+'\n2. **Mano de obra**: '+ctx.h.toFixed(1)+' h, ajustada al tiempo estándar\n3. **Piezas**: '+ctx.parts.length+(ctx.parts.length===1?' partida':' partidas')+', '+money(ctx.partsTot)+'\n4. **Total reclamado**: '+money(ctx.partsTot+ctx.labor)+'\n\nEl folio de esta simulación es **'+ctx.folio+'**. Los códigos, tiempos y precios son de ejemplo y no se envió nada a ningún portal real.';
+  var g=gmData(ctx);
+  return 'Listo. Este es el formulario completo de la PREA, con lo que debes capturar en cada campo.\n\n1. **Queja**: '+g.q.code+'\n2. **Causa**: '+g.c.code+'\n3. **Corrección**: '+g.r.code+'\n4. **Operación**: '+ctx.op+', '+ctx.h.toFixed(1)+' h\n5. **Piezas**: '+ctx.parts.length+(ctx.parts.length===1?' partida':' partidas')+', '+g.fm(ctx.partsTot)+'\n6. **Total bruto**: '+g.fm(g.gross)+'\n\nCopia cada campo con su botón **Copiar**, o todo junto con **Copiar todo**. Los códigos, tiempos y precios son de ejemplo y no se envió nada a ningún portal real.';
 }
 
 var HDR='<div class="ph"><b class="logo">PF</b><span>Portal del fabricante</span><em>Garantías</em></div>';
@@ -859,6 +901,123 @@ async function simulate(card,ctx,my){
   say('PREA enviada. Quedó en revisión.');card.firstElementChild.classList.add('done');
 }
 
+
+/* ---------- Formulario GM: datos, render y simulación ---------- */
+var GMCODES={
+  'Transmisión':{q:['TR-101','CAMBIOS BRUSCOS O RETARDO EN LA TRANSMISIÓN'],c:['TR-310','SOLENOIDE DE CAMBIOS DEFECTUOSO'],r:['TR-410','REEMPLAZAR SOLENOIDE Y RELLENAR FLUIDO']},
+  'Emisiones':{q:['EM-120','LUZ DE MOTOR ENCENDIDA'],c:['EM-340','SENSOR DE OXÍGENO FUERA DE RANGO'],r:['EM-440','REEMPLAZAR SENSOR DE OXÍGENO Y ARNÉS']},
+  'Motor':{q:['MT-205','RUIDO METÁLICO EN ARRANQUE EN FRÍO'],c:['MT-518','TENSOR DE CADENA DE DISTRIBUCIÓN SIN PRESIÓN'],r:['MT-632','REEMPLAZAR TENSOR Y GUÍA DE CADENA']},
+  'Electrónica':{q:['EL-088','PANTALLA SE REINICIA'],c:['EL-271','MÓDULO DE INFOENTRETENIMIENTO DEFECTUOSO'],r:['EL-366','REEMPLAZAR MÓDULO Y REPROGRAMAR']},
+  'Frenos':{q:['FR-140','VIBRACIÓN AL FRENAR'],c:['FR-352','DISCOS DEFORMADOS'],r:['FR-455','REEMPLAZAR DISCOS Y BALATAS DELANTEROS']},
+  'Diagnóstico general':{q:['DG-001','FALLA REPORTADA POR EL CLIENTE'],c:['DG-100','FALLA CONFIRMADA EN DIAGNÓSTICO'],r:['DG-200','REPARAR SEGÚN DIAGNÓSTICO']}
+};
+function gmData(c){
+  var fm=function(n){return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
+  var k=GMCODES[c.sys]||GMCODES['Diagnóstico general'],sys=c.sys.toLowerCase(),RT=420,now=new Date();
+  var wo=c.wo||('G-'+Math.random().toString(36).slice(2,9).toUpperCase());
+  var lab=+(c.h*RT).toFixed(2),gross=+(lab+c.partsTot).toFixed(2);
+  return {fm:fm,RT:RT,gross:gross,lab:lab,wo:wo,
+    q:{code:k.q[0]+' - '+k.q[1],txt:'El cliente reporta: '+(c.rawText||'falla en el sistema de '+sys)+'.'},
+    c:{code:k.c[0]+' - '+k.c[1],txt:'Se realizó el diagnóstico del sistema de '+sys+' y se confirmó la falla: '+k.c[1].toLowerCase()+'. Kilometraje al ingreso: '+c.kmTxt+' km.'},
+    r:{code:k.r[0]+' - '+k.r[1],txt:'Se aplicó la operación '+c.op+' ('+c.opd.toLowerCase()+') con '+c.h.toFixed(1)+' h de mano de obra. Piezas: '+c.parts.map(function(p){return p.no}).join(', ')+'. Se verificó el funcionamiento y se entregó al cliente.'},
+    vin:c.vinReal||c.vin,odo:String(c.km),
+    date:now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear(),
+    hora:now.toLocaleString('es-MX',{day:'numeric',month:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',second:'2-digit',hour12:true}),
+    parts:c.parts.map(function(p){return p.no}).join(', ')};
+}
+var COPY_IC='<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>';
+function gr(label,val,o){
+  o=o||{};
+  var v=o.f!=null?'<span class="gt pend">—</span>':'<span class="gt">'+(val==null?'':val)+'</span>';
+  if(o.area)v='<div class="ga pend">—</div>';
+  return '<div class="gr'+(o.f!=null?' ag':'')+'"'+(o.f!=null?' data-f="'+o.f+'"':'')+'><div class="gl">'+label+(label?':':'')+'</div><div class="gv">'+v+(o.f!=null?'<button class="gc" type="button" tabindex="-1">'+COPY_IC+'<span>Copiar</span></button>':'')+'</div></div>';
+}
+function gmFields(ctx){
+  var g=gmData(ctx);
+  return [
+    ['VIN',g.vin],['Cuentakilómetros',g.odo],
+    ['Queja',g.q.code],['Queja (descripción)',g.q.txt],
+    ['Causa',g.c.code],['Causa (descripción)',g.c.txt],
+    ['Corrección',g.r.code],['Corrección (descripción)',g.r.txt],
+    ['Operación de trabajo',ctx.op],['Tiempo de trabajo',ctx.h.toFixed(1)],
+    ['Total de piezas',g.fm(ctx.partsTot)],['Números de pieza',g.parts],
+    ['Total tiempo',g.fm(ctx.h)],['Total bruto',g.fm(g.gross)]
+  ];
+}
+function buildPreaCard(ctx,steps){
+  var g=gmData(ctx),F=gmFields(ctx),w=document.createElement('div');w.className='cu-wrap';
+  var li=(steps||STEPS).map(function(t){return '<li data-s="pending"><span class="mk"><svg class="k" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><svg class="w" viewBox="0 0 24 24"><path d="M12 6v7M12 18h.01"/></svg></span><span><span class="t">'+t+'</span><span class="det"></span></span></li>'}).join('');
+  var H=gr;
+  var form='<div class="gmf" hidden>'+
+   '<div class="gtop"><div class="glogo">gm</div><span class="gclose">Cerrar ventana ×</span></div>'+
+   '<h3>Ver autorización previa a la reparación</h3><p class="gsub">Esta pantalla permite al usuario ver la información de una autorización previa a la reparación existente.</p>'+
+   '<div class="gtabs"><span class="gtab">Autorización previa a reparación</span></div>'+
+   '<div class="gbar"><span><b>Formulario sugerido por Ax Ai.</b> Los campos resaltados son los que debes capturar.</span><button class="gall" type="button" disabled>Copiar todo</button></div>'+
+   '<div class="gdis"><b>Aviso de exención de responsabilidad:</b><span>Todas las cantidades son en bruto</span><i>EDITAR</i></div>'+
+   H('ID de autorización de pre-reparación','—')+H('Unidad de negocio','General Motors de México')+H('Tipo de transacción','Transacción Normal de Vehículo')+
+   H('BAC','183147')+H('Reparador','FAME MORELIA')+H('Nombre de contacto del Reparador','HERIBERTO CASTAÑEDA')+H('Número de teléfono','2980 - 753')+H('Número del fax','')+
+   H('Dirección de correo electrónico del contacto','SERVICIOAPA@FAMECUPATITZIO.COM')+H('Número de la transacción','')+
+   H('Orden de trabajo',g.wo)+H('Fecha de la Orden de trabajo',g.date)+H('Nombre de usuario',esc(ctx.rawText||'—'))+H('Hora de presentación',esc(g.hora))+H('Número de referencia',g.wo)+
+   gr('VIN',null,{f:0})+gr('Cuentakilómetros',null,{f:1})+H('Marcador de transacción','Defecto de Fábrica')+
+   gr('Queja',null,{f:2})+gr('',null,{f:3,area:1})+gr('Causa',null,{f:4})+gr('',null,{f:5,area:1})+gr('Corrección',null,{f:6})+gr('',null,{f:7,area:1})+
+   gr('Operación de trabajo',null,{f:8})+gr('Tiempo de trabajo',null,{f:9})+gr('Total de piezas',null,{f:10})+gr('Números de pieza',null,{f:11})+gr('Total tiempo',null,{f:12})+
+   H('Tarifa Mano de Obra',g.fm(g.RT))+H('Tiempo adicionales','0')+H('Tiempo OLH','0')+
+   '<div class="ghd">No se encontraron líneas.</div><table class="gtb"><thead><tr><th>Tipo de adicionales/otros</th><th>Cantidad</th></tr></thead><tbody><tr><td colspan="2">&nbsp;</td></tr></tbody></table>'+
+   H('Total de elementos adicionales','0.00')+gr('Total bruto',null,{f:13})+H('Deducible','0.00')+H('Código de autorización','')+H('Asignado a','')+H('Estado','<span class="gst">POR CAPTURAR</span>')+
+   '<div class="gbk"><b>Respaldo del agente</b> (datos de ejemplo)<ul><li>Reglas aplicadas: cobertura vigente, operación acorde a la queja y tiempo estándar de '+ctx.h.toFixed(1)+' h.</li><li>PREAs similares aceptadas: '+ctx.op+' en 3 casos del sistema '+esc(ctx.sys.toLowerCase())+'.</li>'+ctx.parts.map(function(p){return '<li>'+p.no+' · '+esc(p.d)+' · cant. '+p.q+' · '+g.fm(p.pr)+' c/u</li>'}).join('')+'</ul></div>'+
+   '</div>';
+  w.innerHTML='<div class="cu"><div class="cu-bar"><div class="cu-dots"><i></i><i></i><i></i></div><div class="cu-url">'+svg('search')+'<span>Análisis de la PREA</span></div><span class="cu-tag">Simulación</span></div>'+
+    '<div class="cu-st" aria-live="polite"><span class="pulse"></span><span class="cu-txt">Leyendo la PREA…</span></div></div>'+
+    '<ol class="steps">'+li+'</ol>'+form;
+  $('.gmf',w)._F=F;
+  return w;
+}
+function fbCopy(t){var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(_){}a.remove()}
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(t).catch(function(){fbCopy(t)})}
+  fbCopy(t);return Promise.resolve();
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('.gmf .gc,.gmf .gall');if(!b)return;
+  var f=b.closest('.gmf'),F=f&&f._F;if(!F)return;
+  if(b.classList.contains('gall')){
+    copyText(F.map(function(x){return x[0]+': '+x[1]}).join('\n')).then(function(){toast('Todos los campos copiados')});return;
+  }
+  var it=F[+b.closest('.gr').dataset.f];
+  copyText(it[1]).then(function(){
+    b.classList.add('done');b.querySelector('span').textContent='Copiado';toast(it[0]+' copiado');
+    setTimeout(function(){b.classList.remove('done');b.querySelector('span').textContent='Copiar'},1600);
+  });
+});
+async function simulatePrea(card,ctx,my){
+  var stx=$('.cu-txt',card),lis=$$('.steps li',card),form=$('.gmf',card),F=form._F;
+  var w=function(ms){return nap(ms,my).then(function(){if(my.aborted)throw ABORT})};
+  var say=function(t){stx.textContent=t},step=function(i,st,d){lis[i].dataset.s=st;if(d!=null)$('.det',lis[i]).textContent=d};
+  var nf=ctx.files.length,g=gmData(ctx);
+  await w(500);
+  step(0,'active');say('Leyendo la PREA y los datos del vehículo…');await w(1100);
+  step(0,'done',(nf?nf+(nf===1?' archivo':' archivos')+' · ':'')+g.vin+' · '+ctx.kmTxt+' km');
+  step(1,'active');say('Consultando las reglas de garantía de '+ctx.brand+'…');await w(1200);
+  step(1,'done','Cobertura vigente · tiempo estándar de '+ctx.h.toFixed(1)+' h');
+  step(2,'active');say('Revisando expedientes y PREAs anteriores aceptadas…');await w(1300);
+  step(2,'done','3 PREAs aceptadas del sistema '+ctx.sys.toLowerCase());
+  step(3,'active');say('Definiendo queja, causa, corrección y operación…');await w(1200);
+  step(3,'done',ctx.op+' · '+ctx.parts.length+(ctx.parts.length===1?' pieza':' piezas'));
+  step(4,'active');say('Armando el formulario…');form.hidden=false;
+  try{form.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}
+  await w(600);
+  var rows=$$('.gr.ag',form);
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i],it=F[+r.dataset.f],el=$('.gt,.ga',r);
+    say('Llenando: '+it[0].toLowerCase()+'…');
+    el.textContent=it[1];el.classList.remove('pend');el.classList.add('filled');r.classList.add('on');
+    await w(260);
+  }
+  $('.gall',form).disabled=false;
+  step(4,'done',F.length+' campos listos para copiar');
+  say('Formulario listo. Copia cada campo o todo junto.');card.firstElementChild.classList.add('done');
+}
+
 async function stream(el,text,my){
   var tokens=text.match(/\S+\s*|\s+/g)||[],acc='';
   for(var k=0;k<tokens.length;k++){
@@ -869,17 +1028,17 @@ async function stream(el,text,my){
   el.innerHTML=md(acc,false);return acc;
 }
 var THINK='<span class="thinking">Analizando el caso<span class="dots"><i></i><i></i><i></i></span></span>';
-function stopCard(card){var cu=$('.cu',card);cu.classList.add('stopped');$('.cu-txt',card).textContent='Detenido. No se envió nada.';$$('.steps li[data-s="active"]',card).forEach(function(li){li.dataset.s='pending'})}
+function stopCard(card){var cu=$('.cu',card);cu.classList.add('stopped');$('.cu-txt',card).textContent='Detenido. No se envió nada.';var gf=$('.gmf',card);if(gf)gf.hidden=true;$$('.steps li[data-s="active"]',card).forEach(function(li){li.dataset.s='pending'})}
 function finish(my){if(S.ctrl===my){S.streaming=false;S.ctrl=null;updateSend()}toBottom()}
 function hideRegen(w){var b=$('[data-act="regen"]',w);if(b)b.hidden=true}
-async function agentTurn(w,ctx,intro,steps,sim,fin,my){
+async function agentTurn(w,ctx,intro,steps,sim,fin,my,build){
   var col=$('.ai-col',w),body=$('.ai-body',w),acts=$('.ai-actions',w);
   body.innerHTML=THINK;toBottom();await nap(800+Math.random()*400,my);
   var full='';
   if(!my.aborted){
     full=await stream(body,intro,my);
     if(!my.aborted){
-      var card=buildCard(ctx,steps);col.insertBefore(card,acts);
+      var card=(build||buildCard)(ctx,steps);col.insertBefore(card,acts);
       try{card.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(_){}
       try{await sim(card,ctx,my)}catch(e){if(e!==ABORT)console.error(e)}
       if(my.aborted){stopCard(card)}
@@ -894,7 +1053,7 @@ async function agentTurn(w,ctx,intro,steps,sim,fin,my){
 async function run(text,files){
   var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
   var ctx=ctxFrom(text,files,S.brand);
-  await agentTurn(addAssistant(),ctx,introText(ctx),STEPS,simulate,finalText(ctx),my);
+  await agentTurn(addAssistant(),ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx),my,buildPreaCard);
   finish(my);
 }
 
