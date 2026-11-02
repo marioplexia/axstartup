@@ -1,0 +1,30 @@
+{
+  "name": "axai-prea-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "dev": "tsx src/server.ts",
+    "nightly": "tsx scripts/nightly.ts",
+    "eval:retro": "tsx scripts/eval-retro.ts",
+    "demo": "tsx scripts/demo.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.4.0",
+    "fastify": "^5.12.8",
+    "jose": "^6.2.15",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
