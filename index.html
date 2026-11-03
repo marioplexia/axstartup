@@ -611,6 +611,9 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .axl-seg button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 1px var(--fg);font-weight:600}
 .mr-h{margin:22px 0 10px;font-size:15px}
 .ms-off{display:none!important}
+.pr-stat{display:flex;align-items:center;gap:8px;margin:10px auto 22px;max-width:760px;font-size:12.5px;color:var(--muted);text-align:left}
+.pr-dot{flex:none;width:8px;height:8px;border-radius:50%;background:#1fa971;box-shadow:0 0 0 0 rgba(31,169,113,.5);animation:prpulse 2s infinite}
+@keyframes prpulse{70%{box-shadow:0 0 0 7px rgba(31,169,113,0)}100%{box-shadow:0 0 0 0 rgba(31,169,113,0)}}
 .ls-st{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;padding:14px 16px}
 .ls-s{border:1px solid var(--card-line);border-radius:12px;padding:12px 14px;position:relative}
 .ls-s b{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-bottom:2px}.ls-s strong{font-size:22px}.ls-s small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
@@ -1246,6 +1249,7 @@ function setAgent(a){
   $('#evLbl').textContent=c.ev;$('#refLbl').textContent=c.ref;
   ta.placeholder=c.ph;typeTok++;ta.value='';S.files=[];renderFiles();
   titleEl.textContent=typeof c.title==='function'?c.title():c.title;
+  if(a==='prueba'){setTimeout(function(){PR.stat();PR.tick()},50)}
   var mi=a==='mi',pr=a==='prueba';$('#brandHost').style.display=mi||pr?'none':'';$('#evBtn').style.display=mi?'none':'';$('#plusBtn').style.display=mi||pr?'none':'';
   replayIntro();autosize();updateSend();
 }
@@ -1957,9 +1961,9 @@ SB.pull=async function(first){
 RS.heal=function(){var ch=false;RS.d.rules.forEach(function(r){if(r.status==='activa')ADVISORS.forEach(function(a){if(!r.dist[a.id]){r.dist[a.id]=Date.now();ch=true}})});return ch};
 SB.user=null;SB.chan=null;SB.mode='in';SB.acct='asesor';SB.aiOff=false;
 /* ---- IA: Edge Function "ai" (la llave de Anthropic vive solo en el servidor) ---- */
-SB.ai=async function(body){
+SB.ai=async function(body,fn){
   if(!SB.c||!SB.entered)throw new Error('sin sesión');
-  var r=await SB.c.functions.invoke('ai',{body:body});
+  var r=await SB.c.functions.invoke(fn||'ai',{body:body});
   if(r.error){var m=r.error.message;try{var j=await r.error.context.json();m=j.error||m}catch(_){}throw new Error(m)}
   return r.data;
 };
@@ -3387,11 +3391,13 @@ var MI_EX=[
  {t:'Resumen',s:'Cómo voy este mes',q:'Dame un resumen de cómo voy este mes'}
 ];
 AG.mi={crumb:'Mi Agente',title:function(){var n=SB.user&&SB.user.name?HM.nombre(String(SB.user.name).split(/\s+/)[0]):'';return n?'Hola, '+n+'. ¿Qué necesitas?':'¿En qué te ayudo hoy?'},ph:'Pregunta lo que quieras, anota algo o pide un recordatorio…',menu:['Automático','Solo consultar','Anotar','Recordar','Agendar'],menuDefault:'Automático',ev:'Adjuntar',ref:'Ejemplos',refs:MI_EX,hist:[]};
-AG.prueba={crumb:'Agente de pruebas',title:'Pon a prueba lo que aprendió el agente',ph:'Pregunta algo o adjunta una PREA para ver si recuerda y aprendió…',menu:['Pruebas'],menuDefault:'Pruebas',ev:'Adjuntar PREA',ref:'Preguntas de ejemplo',hist:[],refs:[
-  {t:'¿Qué sabes de este caso?',s:'Cambio de polea · Aveo 2024',q:'Tengo una PREA de cambio de polea de un Aveo 2024 con 40,000 km. ¿Qué has aprendido de casos así?'},
-  {t:'¿Qué pasa si la rechazan?',s:'Lecciones de rechazos',q:'¿Qué PREAs rechazadas recuerdas y qué errores tenían?'},
-  {t:'Revisa mi PREA',s:'Adjunta un PDF o imagen',q:'Revisa la PREA adjunta contra lo que aprendiste y dime qué corregir.'},
-  {t:'¿Cuánto paga planta?',s:'Pagos enseñados',q:'¿Cuánto suele pagar planta de mano de obra y de piezas según lo que te enseñaron?'}]};
+AG.prueba={crumb:'Agente de pruebas',title:'Pregúntale al manual de garantías',ph:'Pregunta lo que sea del manual, o adjunta una PREA para compararla…',menu:['Manual'],menuDefault:'Manual',ev:'Adjuntar PREA',ref:'Preguntas de ejemplo',hist:[],refs:[
+  {t:'¿Qué aprendiste en la última hora?',s:'Actividad en vivo del cerebro',q:'¿Qué has aprendido en la última hora? Dime qué y hace cuánto.'},
+  {t:'Muéstrame el manual de Frenos',s:'Reglas, códigos, tiempos y piezas',q:'Muéstrame todo lo que sabes de Frenos: reglas, códigos de queja, causa y corrección, operación, tiempo y piezas con precio.'},
+  {t:'¿Qué ha dicho planta en los rechazos?',s:'Comentarios de planta y del asesor',q:'¿Qué comentarios ha puesto planta en las PREAs rechazadas y qué ajustes hicieron los asesores?'},
+  {t:'Códigos de mano de obra de Motor',s:'Operaciones y tiempos',q:'Dame el catálogo de operaciones de mano de obra de Motor con sus tiempos.'},
+  {t:'¿Cuánto paga planta?',s:'Pagos aprendidos',q:'¿Cuánto suele pagar planta de mano de obra y de piezas según lo aprendido?'},
+  {t:'Revisa mi PREA',s:'Adjunta un PDF o imagen',q:'Revisa la PREA adjunta contra el manual y dime qué corregir.'}]};
 var ctxReg={};function ctxOf(id){return ctxReg[id]}
 var EX={rows:[],f:'todos',q:'',loading:false};
 EX.load=async function(){
@@ -3900,7 +3906,18 @@ TR.del=async function(k,id){
 };
 
 /* ---- Agente de pruebas: preguntarle al agente lo que aprendió (y mostrarle una PREA) ---- */
-var PR={msgs:[]};
+var PR={msgs:[],timer:0};
+PR.stat=async function(){
+  if(S.agent!=='prueba'||!SB.entered||!SB.c)return;
+  var el=$('#prStat');
+  if(!el){el=document.createElement('p');el.id='prStat';el.className='pr-stat';var t=$('#title');t.parentNode.insertBefore(el,t.nextSibling)}
+  try{
+    var r=await SB.ai({modo:'estado'},'manual'),e=r&&r.estado;if(!e)return;
+    var L=e.lecciones||{},C=e.casos||{},R=e.reglas||{},D=e.documentos||{},P=e.pagos||{};
+    el.innerHTML='<i class="pr-dot"></i><span><b>Manual en vivo</b> · '+R.total+' reglas · '+L.total+' lecciones · '+C.aceptadas+' aceptadas / '+C.rechazadas+' rechazadas · '+(C.con_comentario_de_planta||0)+' comentarios de planta · '+((D.prea||0)+(D.pago||0))+' documentos · '+((P.historicos||0)+(P.reales||0))+' pagos · '+(L.ultima_hace?'última lección '+esc(L.ultima_hace):'aún sin lecciones')+'</span>';
+  }catch(_){}
+};
+PR.tick=function(){clearInterval(PR.timer);PR.timer=setInterval(function(){if(S.agent==='prueba'&&S.view==='prueba'&&!document.hidden)PR.stat()},20000)};
 async function runPrueba(text,files){
   var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
   var w=addAssistant();hideRegen(w);w._noThink=true;
@@ -3912,13 +3929,13 @@ async function runPrueba(text,files){
     if(tot>6e6)throw new Error('Los archivos pesan demasiado juntos (máximo ~4.5 MB en total).');
     if(my.aborted){body.innerHTML='<p class="muted">Respuesta detenida.</p>';$('.ai-actions',w).hidden=false;finish(my);return}
     var q=text||'Revisa el archivo adjunto contra lo que aprendiste.',nm=fs.map(function(f){return f.name}).join(', ');
-    var r=await SB.ai({mode:'probar',messages:PR.msgs.concat([{role:'user',content:q}]),attachments:att,ahora:MI.nowInfo()});
+    var r=await SB.ai({messages:PR.msgs.concat([{role:'user',content:q}]),attachments:att,ahora:MI.nowInfo()},'manual');
     out=(r&&r.text)||'No pude armar una respuesta. ¿Lo intentamos otra vez?';pasos=(r&&r.pasos)||[];
     PR.msgs.push({role:'user',content:q+(nm?'\n[adjuntó: '+nm+']':'')},{role:'assistant',content:out});if(PR.msgs.length>24)PR.msgs=PR.msgs.slice(-24);
   }catch(e){out=TR.errTxt(e)}
   if(my.aborted){body.innerHTML='<p class="muted">Respuesta detenida.</p>';$('.ai-actions',w).hidden=false;finish(my);return}
   var plain=await stream(body,out,my);w._text=plain.replace(/\*\*/g,'');
-  if(pasos.length){var n=document.createElement('small');n.className='muted';n.style.cssText='display:block;margin-top:8px';n.textContent='Revisó su memoria: '+pasos.slice(0,6).join(' · ');col.insertBefore(n,$('.ai-actions',w))}
+  if(pasos.length){var n=document.createElement('small');n.className='muted';n.style.cssText='display:block;margin-top:8px';n.textContent='Consultó el manual: '+pasos.slice(0,8).join(' · ');col.insertBefore(n,$('.ai-actions',w))}
   $('.ai-actions',w).hidden=false;finish(my);
 }
 /* ===== Bucle de autoaprendizaje: observar → aprender → aplicar → verificar, compartido entre agencias ===== */
@@ -3994,7 +4011,7 @@ LS.onNew=function(p){
   if(p.eventType==='INSERT'&&n.created_by!==ME&&Date.now()-LS.last>8000){LS.last=Date.now();toast('El cerebro aprendió algo nuevo'+(n.rule_id?' en la regla '+n.rule_id:'')+(n.alcance==='compartida'?' (de otra agencia)':''))}
   LS.refresh();
 };
-LS.refresh=function(){if(MR.is()&&S.view==='m_cer'){clearTimeout(LS.rt);LS.rt=setTimeout(LS.load,400)}};
+LS.refresh=function(){if(S.agent==='prueba'&&S.view==='prueba'&&typeof PR!=='undefined')PR.stat();if(MR.is()&&S.view==='m_cer'){clearTimeout(LS.rt);LS.rt=setTimeout(LS.load,400)}};
 LS.load=async function(){
   if(!SB.c||!SB.entered||!MR.is())return;
   var r=await SB.c.rpc('marca_aprendizaje');if(r.error){SB.fail(r.error);return}
