@@ -569,6 +569,7 @@ textarea,input{font:inherit;color:inherit}
   <input type="file" id="fileIn" multiple hidden>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){
 'use strict';
@@ -1185,10 +1186,11 @@ RS.load=function(){
   try{RS.d=raw?JSON.parse(raw):null}catch(_){RS.d=null}
   if(!RS.d||!RS.d.rules)RS.d=RS.seed();
 };
-RS.save=function(quiet){
+RS.save=function(quiet,nosync){
   var s=JSON.stringify(RS.d);RS.mem=s;
   try{localStorage.setItem(RS.K,s)}catch(_){}
   if(!quiet&&RS.bc){try{RS.bc.postMessage('sync')}catch(_){}}
+  if(!nosync&&window.SB)SB.schedule();
 };
 RS.on=function(fn){RS.subs.push(fn)};
 RS.emit=function(){RS.subs.forEach(function(f){try{f()}catch(e){console.error(e)}})};
@@ -1263,7 +1265,7 @@ RS.setStatus=function(id,st){
   RS.save();RS.emit();
 };
 RS.cfg=function(k,v){RS.d.cfg[k]=v;RS.log('info','','Ajuste: '+(k==='th'?'umbral de activación en '+v+' PREAs':'distribución '+(v?'automática':'con tu aprobación')));RS.save();RS.emit()};
-RS.reset=function(){RS.q=[];RS.d=RS.seed();RS.save();RS.emit()};
+RS.reset=function(){RS.q=[];RS.d=RS.seed();SB.wipe=true;RS.save();RS.emit()};
 RS.recFromPool=function(f,advisor,src){
   return {sys:f.sys,q:f.q,c:f.c,r:f.r,op:f.op,opd:f.opd,h:r1(f.h+(Math.random()<.25?0.1:0)),parts:f.parts,kw:f.kw,kwText:f.q[1],src:src||'historico',advisor:advisor};
 };
@@ -1328,11 +1330,73 @@ function parseRecs(text,name){
 }
 RS.template='sistema,queja_codigo,queja,causa_codigo,causa,correccion_codigo,correccion,operacion,operacion_desc,horas,piezas,asesor\nSuspensión,SU-110,Ruido en suspensión delantera al pasar baches,SU-320,Amortiguador delantero con fuga,SU-420,Reemplazar amortiguadores delanteros,OP-SU-018,Reemplazar amortiguadores delanteros,2.4,PZ-SU-7101:Amortiguador delantero:2:1480;PZ-SU-7102:Kit de cubrepolvo:1:320,Lucía Ortega\n';
 
+/* ===== Supabase: reglas, bitácora y ajustes en la nube (localStorage queda como caché local) ===== */
+var SB={url:'https://fjmzzghptxkcoarymmzn.supabase.co',key:'sb_publishable_XzONBrrwd2x76JCReSbcPQ_E1gEAP-4',c:null,cache:{},logSeen:{},stateStr:'',tm:0,pt:0,dirty:false,pushing:false,wipe:false,quiet:0,warned:false};
+window.SB=SB;
+SB.toRow=function(r){return {id:r.id,sys:r.sys,q:r.q,c:r.c,r:r.r,op:r.op,opd:r.opd,h:r.h,h_sum:r.hSum,parts:r.parts,kw:r.kw,n:r.n,rej:r.rej||0,status:r.status,src:r.src,dist:r.dist,created_ms:r.created,updated_ms:r.updated}};
+SB.fromRow=function(x){return {id:x.id,sys:x.sys,q:x.q,c:x.c,r:x.r,op:x.op,opd:x.opd,h:Number(x.h),hSum:Number(x.h_sum),parts:x.parts,kw:x.kw,n:x.n,rej:x.rej,status:x.status,src:x.src,dist:x.dist,created:Number(x.created_ms),updated:Number(x.updated_ms)}};
+SB.fail=function(e){console.warn('[Supabase]',e&&e.message||e);if(!SB.warned){SB.warned=true;toast('Sin conexión con la nube: se guarda en este equipo y se sincroniza después')}};
+SB.schedule=function(){if(!SB.c)return;SB.dirty=true;clearTimeout(SB.tm);SB.tm=setTimeout(function(){SB.tm=0;SB.push()},600)};
+SB.push=async function(){
+  if(!SB.c)return;
+  if(SB.pushing){SB.dirty=true;return}
+  SB.pushing=true;SB.dirty=false;
+  try{
+    var db=SB.c,d=RS.d,res;
+    if(SB.wipe){
+      res=await db.from('agency_rules').delete().neq('id','');if(res.error)throw res.error;
+      res=await db.from('agency_log').delete().gte('id',0);if(res.error)throw res.error;
+      SB.cache={};SB.logSeen={};SB.wipe=false;
+    }
+    var seen={},rows=[],strs={};
+    d.rules.forEach(function(r){seen[r.id]=1;var row=SB.toRow(r),s=JSON.stringify(row);if(SB.cache[r.id]!==s){rows.push(row);strs[r.id]=s}});
+    if(rows.length){res=await db.from('agency_rules').upsert(rows);if(res.error)throw res.error;for(var k in strs)SB.cache[k]=strs[k]}
+    var gone=Object.keys(SB.cache).filter(function(id){return !seen[id]});
+    if(gone.length){res=await db.from('agency_rules').delete().in('id',gone);if(res.error)throw res.error;gone.forEach(function(id){delete SB.cache[id]})}
+    var logs=d.log.filter(function(e){return !SB.logSeen[e.t+'|'+e.msg]});
+    if(logs.length){res=await db.from('agency_log').upsert(logs.map(function(e){return {t:e.t,type:e.type,rule:e.rule||'',msg:e.msg}}),{onConflict:'t,msg',ignoreDuplicates:true});if(res.error)throw res.error;logs.forEach(function(e){SB.logSeen[e.t+'|'+e.msg]=1})}
+    var st={id:1,cfg:d.cfg,stats:d.stats,seq:d.seq},ss=JSON.stringify(st);
+    if(ss!==SB.stateStr){res=await db.from('agency_state').upsert(st);if(res.error)throw res.error;SB.stateStr=ss}
+  }catch(e){SB.fail(e);SB.dirty=true;setTimeout(function(){SB.push()},8000)}
+  SB.pushing=false;SB.quiet=Date.now()+1500;
+  if(SB.dirty&&!SB.tm)SB.schedule();
+};
+SB.pull=async function(first){
+  if(!SB.c||SB.pushing||SB.dirty)return;
+  try{
+    var db=SB.c;
+    var out=await Promise.all([db.from('agency_rules').select('*').order('id'),db.from('agency_log').select('t,type,rule,msg').order('t',{ascending:false}).limit(120),db.from('agency_state').select('*').eq('id',1).maybeSingle()]);
+    for(var i=0;i<3;i++)if(out[i].error)throw out[i].error;
+    var a=out[0].data,b=out[1].data,s=out[2].data;
+    if(first&&!a.length&&!s){SB.schedule();return}   /* nube vacía: se sube lo que haya en este equipo (catálogo base) */
+    if(SB.pushing||SB.dirty)return;
+    var d=RS.d;
+    RS.d={v:1,rules:a.map(SB.fromRow),log:b,cfg:s?s.cfg:d.cfg,stats:s?s.stats:d.stats,seq:s?s.seq:d.seq};
+    SB.cache={};a.forEach(function(x){SB.cache[x.id]=JSON.stringify(SB.toRow(SB.fromRow(x)))});
+    SB.logSeen={};b.forEach(function(e){SB.logSeen[e.t+'|'+e.msg]=1});
+    SB.stateStr=JSON.stringify({id:1,cfg:RS.d.cfg,stats:RS.d.stats,seq:RS.d.seq});
+    RS.d.rules.forEach(function(r){if(r.status==='distribuyendo'&&RS.q.indexOf(r.id)<0)RS.q.push(r.id)});
+    RS.save(true,true);RS.emit();
+    if(RS.q.length)RS.pump();
+  }catch(e){SB.fail(e)}
+};
+SB.init=function(){
+  if(!window.supabase||!window.supabase.createClient){SB.fail('supabase-js no cargó');return}
+  SB.c=window.supabase.createClient(SB.url,SB.key);
+  SB.pull(true).then(function(){
+    SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(){
+      if(SB.pushing||SB.dirty||Date.now()<SB.quiet)return;
+      clearTimeout(SB.pt);SB.pt=setTimeout(function(){SB.pull()},500);
+    }).subscribe();
+  });
+};
+
 RS.load();
 try{RS.bc=new BroadcastChannel('axai-reglas');RS.bc.onmessage=function(){RS.load();RS.emit()}}catch(_){}
 try{window.addEventListener('storage',function(e){if(e.key===RS.K){RS.load();RS.emit()}})}catch(_){}
 RS.d.rules.forEach(function(r){if(r.status==='distribuyendo'&&RS.q.indexOf(r.id)<0)RS.q.push(r.id)});
 if(RS.q.length)setTimeout(function(){RS.pump()},400);
+SB.init();
 
 function basis(c){return c.matched?'Regla <b>'+c.ruleId+'</b>, aprendida de '+c.ruleN+' PREAs aceptadas · confianza '+c.ruleConf+'%.':'Sin regla para este caso: apliqué criterio general (confianza baja). Si el fabricante la acepta, indícalo abajo y el agente aprenderá.'}
 function ctxToRec(c){
