@@ -1920,8 +1920,12 @@ SB.errEs=function(e){var m=(e&&e.message)||'';
   if(/Password should/i.test(m))return 'La contraseña debe tener al menos 6 caracteres';
   if(/Email not confirmed/i.test(m))return 'Confirma tu correo antes de entrar (revisa tu bandeja)';
   if(/rate limit/i.test(m))return 'Demasiados intentos: espera un momento';
-  if(/fetch|network/i.test(m))return 'Sin conexión con el servidor';
-  return m||'No se pudo completar la acción'};
+  if(/sending (confirmation|magic|recovery|email)|error sending/i.test(m))return 'Supabase no pudo enviar el correo de confirmación, por eso la cuenta no se creó. En Supabase: Authentication → Providers → Email, desactiva "Confirm email" (o configura un SMTP propio) e inténtalo de nuevo.';
+  if(/database error saving new user/i.test(m))return 'La base de datos rechazó el nuevo usuario. Inténtalo de nuevo; si sigue igual, avisa al administrador.';
+  if(/signups? (not allowed|are disabled|disabled)|not authorized/i.test(m))return 'El registro de cuentas está desactivado en Supabase (Authentication → Sign In / Providers).';
+  if(/valid email|invalid format|unable to validate email/i.test(m))return 'Escribe un correo válido';
+  if(/failed to fetch|networkerror|network request/i.test(m))return 'Sin conexión con el servidor';
+  return m?'No se pudo completar la acción: '+m:'No se pudo completar la acción'};
 SB.submit=async function(ev){
   ev.preventDefault();
   var email=$('#lgEmail').value.trim(),pass=$('#lgPass').value,name=$('#lgName').value.trim(),up=SB.mode==='up';
@@ -1931,7 +1935,8 @@ SB.submit=async function(ev){
   try{
     var r=up?await SB.c.auth.signUp({email:email,password:pass,options:{data:{name:name}}}):await SB.c.auth.signInWithPassword({email:email,password:pass});
     if(r.error)throw r.error;
-    if(up&&!r.data.session)SB.lgMsg('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
+    if(up&&r.data.user&&r.data.user.identities&&!r.data.user.identities.length){SB.lgMode('in');SB.lgMsg('Ese correo ya tiene cuenta: inicia sesión.',true)}
+    else if(up&&!r.data.session)SB.lgMsg('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
   }catch(e){SB.lgMsg(SB.errEs(e),true)}
   btn.disabled=false;
 };
@@ -1941,6 +1946,14 @@ SB.loadAdvisors=async function(){
   ADVISORS.length=0;
   r.data.forEach(function(p){ADVISORS.push({id:p.id,name:p.name,role:p.role,tag:p.id===ME?'tú':''})});
   var me=r.data.filter(function(p){return p.id===ME})[0];
+  if(!me&&!SB.healed){
+    /* la cuenta existe pero no tiene perfil de asesor: se crea ahora (red de seguridad del trigger de alta) */
+    SB.healed=true;
+    var h=await SB.c.rpc('ensure_profile');
+    if(h.error)throw new Error('No se pudo crear tu perfil de asesor: '+h.error.message);
+    return SB.loadAdvisors();
+  }
+  if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
   if(me){SB.user=me;
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
