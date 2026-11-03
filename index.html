@@ -300,6 +300,19 @@ textarea,input{font:inherit;color:inherit}
 .pl{padding:6px;max-height:300px;overflow-y:auto}
 .pl .mi[data-sel="true"]{background:var(--hover)}
 .empty{padding:18px;color:var(--muted);font-size:13px;text-align:center}
+.lg{position:fixed;inset:0;z-index:100;background:var(--bg);color:var(--fg);display:grid;place-items:center;padding:16px;overflow:auto}
+.lg[hidden]{display:none}
+.lg-card{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
+.lg-card h1{font-family:var(--f-display);font-weight:500;font-size:30px;letter-spacing:-.025em;margin:0 0 4px}
+.lg-card p{margin:0 0 8px;color:var(--fg);opacity:.65}
+.lg-card label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;opacity:.9}
+.lg-card input{font:inherit;font-size:15px;color:var(--fg);background:var(--card);border:1px solid var(--card-line);border-radius:10px;padding:10px 12px;outline:none}
+.lg-card input:focus{border-color:var(--fg)}
+.lg-btn{font:inherit;font-weight:500;background:var(--fg);color:var(--bg);border:0;border-radius:10px;padding:11px 14px;cursor:pointer;margin-top:4px}
+.lg-btn:disabled{opacity:.5;cursor:default}
+.lg-alt{font:inherit;background:none;border:0;color:var(--fg);opacity:.7;text-decoration:underline;cursor:pointer;padding:4px}
+.lg-msg{min-height:20px;font-size:13px}
+.lg-msg.err{color:#c0392b}
 .toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13px;z-index:90;box-shadow:0 10px 30px -10px rgba(0,0,0,.4);animation:toast .3s cubic-bezier(.2,.9,.3,1) both;max-width:calc(100vw - 32px)}
 
 @keyframes wordin{from{opacity:0;transform:translateY(12px);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
@@ -569,6 +582,18 @@ textarea,input{font:inherit;color:inherit}
   <input type="file" id="fileIn" multiple hidden>
 </div>
 
+<div class="lg" id="lg">
+  <form class="lg-card" id="lgForm" novalidate>
+    <h1 id="lgTitle">Iniciar sesión</h1>
+    <p id="lgSub">Entra con tu cuenta de asesor.</p>
+    <label id="lgNameW" hidden>Nombre<input id="lgName" autocomplete="name"></label>
+    <label>Correo<input id="lgEmail" type="email" autocomplete="email" required></label>
+    <label>Contraseña<input id="lgPass" type="password" autocomplete="current-password" minlength="6" required></label>
+    <div class="lg-msg" id="lgMsg" role="status"></div>
+    <button class="lg-btn" id="lgGo" type="submit">Entrar</button>
+    <button class="lg-alt" id="lgAlt" type="button">¿No tienes cuenta? Crear cuenta</button>
+  </form>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 (function(){
@@ -631,7 +656,7 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){toast('Sin notificaciones nuevas')});
 $('#settings').addEventListener('click',function(){toast('Configuración no está disponible en esta réplica')});
-$('#userBtn').addEventListener('click',function(){toast('Sesión: mariogarantias')});
+$('#userBtn').addEventListener('click',function(){if(window.SB&&SB.user&&confirm('¿Cerrar la sesión de '+SB.user.name+'?'))SB.signOut()});
 
 var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',chat:'Chatea con tus Registros',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia'};
 function isMain(id){return id==='agent'||id==='inicio'||id==='cobros'}
@@ -1151,8 +1176,8 @@ async function simulatePrea(card,ctx,my){
 
 
 /* ---------- Catálogo de reglas: aprendizaje, distribución e importación ---------- */
-var ME='a1';
-var ADVISORS=[{id:'a1',name:'mariogarantias',tag:'tú'},{id:'a2',name:'Heriberto Castañeda'},{id:'a3',name:'Lucía Ortega'},{id:'a4',name:'Jorge Salinas'}];
+var ME=null;
+var ADVISORS=[];   /* se llena con los perfiles reales de Supabase al iniciar sesión */
 var STOPW={cliente:1,reporta:1,reportan:1,vehiculo:1,garantia:1,falla:1,fallas:1,problema:1,cuando:1,presenta:1,presentan:1,aparece:1,unidad:1,diagnostico:1,chevrolet:1,general:1,motors:1,desde:1,donde:1,tiene:1,tienen:1,hace:1,hacen:1,sobre:1,despues:1,antes:1,durante:1,siempre:1,ahora:1};
 function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')}
 function words(s){var o=[],seen={};norm(s).split(/[^a-z0-9]+/).forEach(function(w){if(w.length>=5&&!STOPW[w]&&!seen[w]){seen[w]=1;o.push(w)}});return o}
@@ -1284,7 +1309,7 @@ RS.feed=async function(recs,label,gap){
   return {n:recs.length,created:created,reinf:reinf};
 };
 RS.sample=function(){
-  var recs=[],adv=function(){return ADVISORS[Math.floor(Math.random()*ADVISORS.length)].name};
+  var recs=[],adv=function(){return ADVISORS.length?ADVISORS[Math.floor(Math.random()*ADVISORS.length)].name:'histórico'};
   var plan=[[0,7],[1,6],[2,2],[3,1]];
   plan.forEach(function(p){for(var i=0;i<p[1];i++)recs.push(RS.recFromPool(POOL[p[0]],adv(),'historico'))});
   for(var j=0;j<3;j++)recs.push(RS.recFromRule(RS.d.rules[0],adv(),'historico'));
@@ -1292,7 +1317,7 @@ RS.sample=function(){
   return recs;
 };
 RS.simAdvisor=function(){
-  var others=ADVISORS.filter(function(a){return a.id!==ME}),a=others[Math.floor(Math.random()*others.length)];
+  var others=ADVISORS.filter(function(a){return a.id!==ME}),a=others.length?others[Math.floor(Math.random()*others.length)]:{name:'asesor de prueba'};
   var f=POOL[Math.floor(Math.random()*POOL.length)];
   return RS.learn(RS.recFromPool(f,a.name,'asesor'));
 };
@@ -1336,7 +1361,7 @@ window.SB=SB;
 SB.toRow=function(r){return {id:r.id,sys:r.sys,q:r.q,c:r.c,r:r.r,op:r.op,opd:r.opd,h:r.h,h_sum:r.hSum,parts:r.parts,kw:r.kw,n:r.n,rej:r.rej||0,status:r.status,src:r.src,dist:r.dist,created_ms:r.created,updated_ms:r.updated}};
 SB.fromRow=function(x){return {id:x.id,sys:x.sys,q:x.q,c:x.c,r:x.r,op:x.op,opd:x.opd,h:Number(x.h),hSum:Number(x.h_sum),parts:x.parts,kw:x.kw,n:x.n,rej:x.rej,status:x.status,src:x.src,dist:x.dist,created:Number(x.created_ms),updated:Number(x.updated_ms)}};
 SB.fail=function(e){console.warn('[Supabase]',e&&e.message||e);if(!SB.warned){SB.warned=true;toast('Sin conexión con la nube: se guarda en este equipo y se sincroniza después')}};
-SB.schedule=function(){if(!SB.c)return;SB.dirty=true;clearTimeout(SB.tm);SB.tm=setTimeout(function(){SB.tm=0;SB.push()},600)};
+SB.schedule=function(){if(!SB.c||!SB.entered)return;SB.dirty=true;clearTimeout(SB.tm);SB.tm=setTimeout(function(){SB.tm=0;SB.push()},600)};
 SB.push=async function(){
   if(!SB.c)return;
   if(SB.pushing){SB.dirty=true;return}
@@ -1372,22 +1397,84 @@ SB.pull=async function(first){
     if(SB.pushing||SB.dirty)return;
     var d=RS.d;
     RS.d={v:1,rules:a.map(SB.fromRow),log:b,cfg:s?s.cfg:d.cfg,stats:s?s.stats:d.stats,seq:s?s.seq:d.seq};
+    var healed=RS.heal();
     SB.cache={};a.forEach(function(x){SB.cache[x.id]=JSON.stringify(SB.toRow(SB.fromRow(x)))});
     SB.logSeen={};b.forEach(function(e){SB.logSeen[e.t+'|'+e.msg]=1});
     SB.stateStr=JSON.stringify({id:1,cfg:RS.d.cfg,stats:RS.d.stats,seq:RS.d.seq});
     RS.d.rules.forEach(function(r){if(r.status==='distribuyendo'&&RS.q.indexOf(r.id)<0)RS.q.push(r.id)});
     RS.save(true,true);RS.emit();
+    if(healed)SB.schedule();
     if(RS.q.length)RS.pump();
   }catch(e){SB.fail(e)}
 };
-SB.init=function(){
-  if(!window.supabase||!window.supabase.createClient){SB.fail('supabase-js no cargó');return}
-  SB.c=window.supabase.createClient(SB.url,SB.key);
-  SB.pull(true).then(function(){
-    SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(){
+/* las reglas activas llegan a todos los asesores reales (también a los que se registran después) */
+RS.heal=function(){var ch=false;RS.d.rules.forEach(function(r){if(r.status==='activa')ADVISORS.forEach(function(a){if(!r.dist[a.id]){r.dist[a.id]=Date.now();ch=true}})});return ch};
+SB.user=null;SB.chan=null;SB.mode='in';
+SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='lg-msg'+(err?' err':'')};
+SB.lgMode=function(m){
+  SB.mode=m;var up=m==='up';
+  $('#lgTitle').textContent=up?'Crear cuenta':'Iniciar sesión';
+  $('#lgSub').textContent=up?'Regístrate como asesor de la agencia.':'Entra con tu cuenta de asesor.';
+  $('#lgNameW').hidden=!up;$('#lgGo').textContent=up?'Crear cuenta':'Entrar';
+  $('#lgPass').autocomplete=up?'new-password':'current-password';
+  $('#lgAlt').textContent=up?'¿Ya tienes cuenta? Iniciar sesión':'¿No tienes cuenta? Crear cuenta';SB.lgMsg('');
+};
+SB.errEs=function(e){var m=(e&&e.message)||'';
+  if(/Invalid login/i.test(m))return 'Correo o contraseña incorrectos';
+  if(/already registered/i.test(m))return 'Ese correo ya tiene cuenta: inicia sesión';
+  if(/Password should/i.test(m))return 'La contraseña debe tener al menos 6 caracteres';
+  if(/Email not confirmed/i.test(m))return 'Confirma tu correo antes de entrar (revisa tu bandeja)';
+  if(/rate limit/i.test(m))return 'Demasiados intentos: espera un momento';
+  if(/fetch|network/i.test(m))return 'Sin conexión con el servidor';
+  return m||'No se pudo completar la acción'};
+SB.submit=async function(ev){
+  ev.preventDefault();
+  var email=$('#lgEmail').value.trim(),pass=$('#lgPass').value,name=$('#lgName').value.trim(),up=SB.mode==='up';
+  if(!email||pass.length<6){SB.lgMsg('Escribe tu correo y una contraseña de 6 caracteres o más',true);return}
+  if(up&&!name){SB.lgMsg('Escribe tu nombre',true);return}
+  var btn=$('#lgGo');btn.disabled=true;SB.lgMsg('');
+  try{
+    var r=up?await SB.c.auth.signUp({email:email,password:pass,options:{data:{name:name}}}):await SB.c.auth.signInWithPassword({email:email,password:pass});
+    if(r.error)throw r.error;
+    if(up&&!r.data.session)SB.lgMsg('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
+  }catch(e){SB.lgMsg(SB.errEs(e),true)}
+  btn.disabled=false;
+};
+SB.loadAdvisors=async function(){
+  var r=await SB.c.from('profiles').select('id,name,role,created_at').order('created_at');
+  if(r.error)throw r.error;
+  ADVISORS.length=0;
+  r.data.forEach(function(p){ADVISORS.push({id:p.id,name:p.name,role:p.role,tag:p.id===ME?'tú':''})});
+  var me=r.data.filter(function(p){return p.id===ME})[0];
+  if(me){SB.user=me;
+    $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
+    $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
+};
+SB.enter=async function(user){
+  if(SB.entered===user.id)return;SB.entered=user.id;ME=user.id;
+  try{
+    await SB.loadAdvisors();
+    $('#lg').hidden=true;
+    await SB.pull(true);
+    if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
+      if(p.table==='profiles'){SB.loadAdvisors().then(function(){return SB.pull()}).catch(SB.fail);return}
       if(SB.pushing||SB.dirty||Date.now()<SB.quiet)return;
       clearTimeout(SB.pt);SB.pt=setTimeout(function(){SB.pull()},500);
     }).subscribe();
+  }catch(e){SB.entered=null;SB.fail(e);SB.lgMsg(SB.errEs(e),true);$('#lg').hidden=false}
+};
+SB.signOut=async function(){try{await SB.c.auth.signOut()}catch(_){}try{localStorage.removeItem(RS.K)}catch(_){}location.reload()};
+SB.init=function(){
+  $('#lgForm').addEventListener('submit',SB.submit);
+  $('#lgAlt').addEventListener('click',function(){SB.lgMode(SB.mode==='in'?'up':'in')});
+  if(!window.supabase||!window.supabase.createClient){SB.lgMsg('No se pudo cargar el servicio. Revisa tu conexión y recarga.',true);return}
+  SB.c=window.supabase.createClient(SB.url,SB.key);
+  SB.c.auth.onAuthStateChange(function(ev,sess){
+    /* sin await dentro del callback: supabase-js se bloquea si se llama a su API desde aquí */
+    setTimeout(function(){
+      if(sess&&sess.user&&(ev==='INITIAL_SESSION'||ev==='SIGNED_IN'))SB.enter(sess.user);
+      else if(ev==='SIGNED_OUT'&&SB.entered)location.reload();
+    },0);
   });
 };
 
