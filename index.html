@@ -609,6 +609,16 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .axl-seg button{height:38px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:13px;cursor:pointer}
 .axl-seg button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 1px var(--fg);font-weight:600}
 .mr-h{margin:22px 0 10px;font-size:15px}
+.ms-off{display:none!important}
+.ad-grid.flat,.ad-grid.one{grid-template-columns:1fr}
+.mr-hero{position:relative;height:184px;background:#03050c;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 max(24px,3.2vw)}
+.mr-hero[hidden]{display:none}
+.mr-hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.mr-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,4,10,.78) 0%,rgba(2,4,10,.3) 55%,rgba(2,4,10,0) 100%);pointer-events:none}
+.mr-hero>h1,.mr-hero>p{position:relative;z-index:1}
+.mr-hero h1{margin:0;color:#fff;font-family:var(--f-display);font-weight:500;font-size:clamp(28px,4vw,44px);letter-spacing:-.025em;line-height:1.08}
+.mr-hero p{margin:8px 0 0;color:rgba(255,255,255,.74);font-size:14px;max-width:640px}
+.mr-hero:not([hidden])+.ad-in{margin-top:18px}
 .mr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:14px}
 .mr-ag{border:1px solid var(--card-line);border-radius:12px;background:var(--card);padding:14px 16px;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .mr-ag:hover,.mr-ag[aria-expanded="true"]{border-color:var(--fg)}
@@ -781,19 +791,26 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         </div>
       </div>
       <div class="sb-scroll">
-        <div class="grp" style="margin-top:6px">Agentes</div>
-        <button class="nav" data-view="agent" data-i="file" aria-current="true">Agente de Garantías</button>
-        <div class="grp" style="margin-top:22px">Sistema de registro</div>
-        <button class="nav" data-view="inicio" data-i="home" aria-current="true">Inicio</button>
-        <button class="nav" data-view="mi" data-i="chat">Mi Agente</button>
-        <button class="nav" data-view="bitacora" data-i="clip">Bitácora</button>
-        <button class="nav" data-view="exp" data-i="folderopen">Expedientes</button>
-        <button class="nav" data-view="cobros" data-i="dollar">Agente de Cobros</button>
-        <button class="nav" data-view="cartera" data-i="wallet">Agente de Cartera</button>
-        <div class="grp" style="margin-top:22px">Administración</div>
-        <button class="nav" data-view="admin" data-i="chart">Tablero de agencia<span class="nbadge" id="adBadge" hidden></span></button>
-        <div class="grp" style="margin-top:22px">Ax AI</div>
-        <button class="nav" data-view="pres" data-i="present">Presentación</button>
+        <div class="grp" data-nm style="margin-top:6px">Agentes</div>
+        <button class="nav" data-nm data-view="agent" data-i="file" aria-current="true">Agente de Garantías</button>
+        <div class="grp" data-nm style="margin-top:22px">Sistema de registro</div>
+        <button class="nav" data-nm data-view="inicio" data-i="home" aria-current="true">Inicio</button>
+        <button class="nav" data-nm data-view="mi" data-i="chat">Mi Agente</button>
+        <button class="nav" data-nm data-view="bitacora" data-i="clip">Bitácora</button>
+        <button class="nav" data-nm data-view="exp" data-i="folderopen">Expedientes</button>
+        <button class="nav" data-nm data-view="cobros" data-i="dollar">Agente de Cobros</button>
+        <button class="nav" data-nm data-view="cartera" data-i="wallet">Agente de Cartera</button>
+        <div class="grp" data-mr-nav style="margin-top:6px" hidden>Marca</div>
+        <button class="nav" data-mr-nav data-view="m_res" data-i="chart" hidden>Tablero de marca</button>
+        <button class="nav" data-mr-nav data-view="m_ag" data-i="folderchart" hidden>Agencias de la marca</button>
+        <div class="grp" data-mr-nav style="margin-top:22px" hidden>Inteligencia</div>
+        <button class="nav" data-mr-nav data-view="m_cer" data-i="chat" hidden>Cerebro<span class="nbadge" id="mrBadge" hidden></span></button>
+        <button class="nav" data-mr-nav data-view="m_reg" data-i="clip" hidden>Catálogo de reglas</button>
+        <button class="nav" data-mr-nav data-view="m_ent" data-i="file" hidden>Centro de entrenamiento</button>
+        <div class="grp" data-nm style="margin-top:22px">Administración</div>
+        <button class="nav" data-nm data-view="admin" data-i="chart">Tablero de agencia<span class="nbadge" id="adBadge" hidden></span></button>
+        <div class="grp" data-nm style="margin-top:22px">Ax AI</div>
+        <button class="nav" data-nm data-view="pres" data-i="present">Presentación</button>
       </div>
       <div class="sb-foot">
         <button class="nav" id="settings" data-i="settings">Configuración</button>
@@ -900,33 +917,34 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
       </div>
     </section>
     <section class="admin" id="viewAdmin" hidden>
+      <div class="mr-hero" id="mrHero" hidden><canvas id="mrCv" aria-hidden="true"></canvas><h1 id="mrH"></h1><p id="mrP"></p></div>
       <div class="ad-in">
-        <div class="ad-head">
+        <div class="ad-head" id="adHead">
           <div><h2>Tablero de agencia</h2><p><span id="adAgency">Tu agencia</span> · reglas que aprende el Agente de Garantías y cómo se distribuyen</p></div>
           <div class="ad-live" id="adLive"><i></i><span>En vivo</span></div>
         </div>
-        <div id="mrBox" hidden>
-          <div class="ad-kpi" id="mrKpi"></div>
-          <h3 class="mr-h">Agencias de la marca</h3>
+        <div id="mrBox">
+          <div class="ad-kpi" id="mrKpi" data-ms="resumen"></div>
+          <div data-ms="agencias">
           <div class="mr-grid" id="mrAg"></div>
           <div class="mr-adv" id="mrAdv" hidden></div>
-          <div class="ad-grid">
-            <div class="ad-card"><div class="ad-ch"><h3>Resultados por sistema (toda la marca)</h3></div><div id="mrSys"></div></div>
-            <div class="ad-card"><div class="ad-ch"><h3>Código para nuevos administradores</h3></div>
+          </div>
+          <div class="ad-grid flat">
+            <div class="ad-card" data-ms="cerebro"><div class="ad-ch"><h3>Resultados por sistema (toda la marca)</h3></div><div id="mrSys"></div></div>
+            <div class="ad-card" data-ms="resumen"><div class="ad-ch"><h3>Código para nuevos administradores</h3></div>
               <div class="mr-code"><code id="mrCode">··········</code><button class="bt" type="button" id="mrCopy">Copiar</button><button class="bt dng" type="button" id="mrNew">Generar uno nuevo</button></div>
               <p class="axl-hint" style="padding:0 16px 14px">Quien se registre como <b>Administrador de marca</b> con este código tendrá acceso a todas las agencias. Si lo generas de nuevo, el anterior deja de servir.</p></div>
           </div>
-          <h3 class="mr-h">Cerebro y centro de entrenamiento</h3>
         </div>
-        <div class="ad-kpi" id="adKpi"></div>
-        <div class="ad-bar" id="adBarBox">
+        <div class="ad-kpi" id="adKpi" data-ms="cerebro agencia"></div>
+        <div class="ad-bar" id="adBarBox" data-ms="entren">
           <label>Activar con <select id="adThr"><option value="2">2 PREAs</option><option value="3">3 PREAs</option><option value="5">5 PREAs</option></select></label>
           <label>Distribución <select id="adDist"><option value="auto">Automática</option><option value="manual">Con mi aprobación</option></select></label>
           <span class="sp"></span>
           <button class="bt" id="adSim" type="button" hidden>Simular PREA de un asesor</button>
           <button class="bt pri" id="adImpBtn" type="button" aria-expanded="false">Enseñar con PREAs aceptadas</button>
         </div>
-        <div class="ad-imp" id="adImp" hidden>
+        <div class="ad-imp" id="adImp" data-ms="entren" hidden>
           <p>Sube PREAs que el fabricante ya aceptó (CSV o JSON) o pega su contenido. El agente agrupa las PREAs por queja y operación, crea las reglas y las refuerza con cada caso. Una regla se activa al llegar al umbral.</p>
           <div class="imp-row">
             <input type="file" id="adFile" accept=".csv,.json,.txt" hidden>
@@ -938,7 +956,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
           <textarea id="adPaste" placeholder="O pega aquí las PREAs en CSV o JSON…" aria-label="Pegar PREAs aceptadas"></textarea>
           <div class="imp-row"><button class="bt pri" type="button" id="adPasteGo">Enseñar al agente</button><span class="imp-msg" id="adImpMsg" role="status"></span></div>
         </div>
-        <div class="ad-imp" id="adHist" hidden>
+        <div class="ad-imp" id="adHist" data-ms="entren">
           <p><b>Pagos históricos de planta</b> · el Agente de Cobros aprende de ellos desde el primer día. Sube lo que planta pagó en PREAs anteriores: mano de obra y piezas, reclamado contra pagado, antes de IVA (CSV, sin separador de miles). <span id="phCount"></span></p>
           <div class="imp-row">
             <input type="file" id="phFile" accept=".csv,.txt" hidden>
@@ -949,16 +967,16 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
           <textarea id="phPaste" placeholder="O pega aquí los pagos históricos en CSV…" aria-label="Pegar pagos históricos"></textarea>
           <div class="imp-row"><button class="bt pri" type="button" id="phGo">Enseñar al Agente de Cobros</button><span class="imp-msg" id="phMsg" role="status"></span></div>
         </div>
-        <div class="ad-grid">
-          <div class="ad-card">
+        <div class="ad-grid" id="adGrid">
+          <div class="ad-card" data-ms="reglas agencia">
             <div class="ad-ch"><h3>Catálogo de reglas</h3><small id="adCount"></small>
               <div class="ad-f" id="adFilt"><button class="on" data-f="todas" type="button">Todas</button><button data-f="activas" type="button">Activas</button><button data-f="aprendizaje" type="button">Aprendiendo</button><button data-f="aprobar" type="button">Por aprobar</button><button data-f="pausadas" type="button">Pausadas</button></div>
               <input type="search" id="adSearch" placeholder="Buscar" aria-label="Buscar reglas"></div>
             <div id="adRules"></div>
           </div>
-          <div>
+          <div data-ms="resumen agencia">
             <div class="ad-card"><div class="ad-ch"><h3>Actividad en vivo</h3></div><div id="adFeed" aria-live="polite"></div></div>
-            <div class="ad-card"><div class="ad-ch"><h3>Asesores de la agencia</h3></div><div id="adAdv"></div></div>
+            <div class="ad-card" data-ms="agencia"><div class="ad-ch"><h3>Asesores de la agencia</h3></div><div id="adAdv"></div></div>
           </div>
         </div>
       </div>
@@ -1079,13 +1097,13 @@ $('#bell').addEventListener('click',function(){if(!MI.due().length){toast('Sin a
 $('#settings').addEventListener('click',function(){toast('Configuración no está disponible en esta réplica')});
 $('#userBtn').addEventListener('click',function(){if(window.SB&&SB.user&&confirm('¿Cerrar la sesión de '+SB.user.name+'?'))SB.signOut()});
 
-var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia'};
+var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_ent:'Centro de entrenamiento'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'}
 function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===(S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin';stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show();$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
@@ -3460,6 +3478,7 @@ SB.loadAdvisors=async function(){
   }
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
   if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.user=me;SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
+    MR.nav(!!me.marca);
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
@@ -3472,7 +3491,7 @@ SB.enter=async function(user){
     await SB.pull(true);
     SB.loadHist();GP.load();
     MI.loadAgenda().then(MI.startTimer);
-    showView('inicio');
+    showView(MR.is()?'m_res':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
       if(p.table==='cartera'){if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
@@ -3523,20 +3542,67 @@ function ctxToRec(c){
 /* ===== Tablero de marca: agencias, asesores y cerebro (solo administradores de marca) ===== */
 var MR={d:null,adv:null,open:null,t:0};
 MR.is=function(){return !!(SB.user&&SB.user.marca)};
-MR.show=function(){
-  var m=MR.is();
-  $('#mrBox').hidden=!m;$('#adBarBox').hidden=!m;$('#adHist').hidden=!m;if(!m)$('#adImp').hidden=true;
-  var ca=$('#adAdv');if(ca&&ca.parentNode)ca.parentNode.hidden=m;
-  var h=$('#viewAdmin .ad-head h2'),pp=$('#viewAdmin .ad-head p');
-  if(h)h.textContent=m?'Tablero de marca':'Tablero de agencia';
-  if(pp)pp.innerHTML=m?'<span id="adAgency">'+esc(SB.agency||'')+'</span> · agencias, asesores, cerebro y centro de entrenamiento':'<span id="adAgency">'+esc(SB.agency||'Tu agencia')+'</span> · reglas que aprende el Agente de Garantías (las administra la marca)';
+MR.nav=function(m){
+  $$('[data-nm]').forEach(function(e){e.style.display=m?'none':''});
+  $$('[data-mr-nav]').forEach(function(e){e.hidden=!m;e.style.display=m?'':'none'});
+};
+MR.TABS={m_res:'resumen',m_ag:'agencias',m_cer:'cerebro',m_reg:'reglas',m_ent:'entren'};
+MR.show=function(id){
+  var m=MR.is(),tab=m?(MR.TABS[id]||'resumen'):'agencia';MR.tab=tab;
+  $$('#viewAdmin [data-ms]').forEach(function(el){el.classList.toggle('ms-off',el.dataset.ms.split(' ').indexOf(tab)<0)});
+  $('#adGrid').classList.toggle('flat',m);
+  $('#adHead').hidden=m;$('#mrHero').hidden=!m;
+  if(m){
+    var T={resumen:['Tablero de marca','Resumen de toda la marca y acceso para nuevos administradores.'],agencias:['Agencias de la marca','Desempeño de cada agencia y de sus asesores.'],cerebro:['Cerebro','Lo que el agente ha aprendido: reglas, aciertos y resultados por sistema.'],reglas:['Catálogo de reglas','Cada regla aprendida de PREAs aceptadas: activa, edita o elimina.'],entren:['Centro de entrenamiento','Enseña al agente con PREAs aceptadas y pagos históricos de planta.']}[tab];
+    var D=MR.d||[],sm=function(k){return D.reduce(function(a,x){return a+Number(x[k]||0)},0)},R=RS.d.rules,act=R.filter(function(r){return r.status==='activa'||r.status==='distribuyendo'}).length;
+    var sub={resumen:D.length?D.length+' agencias · '+sm('asesores')+' asesores · '+sm('preas')+' PREAs':T[1],agencias:D.length?D.length+' agencias de '+(SB.agency||'la marca')+' · toca una para ver a sus asesores':T[1],cerebro:R.length+' reglas aprendidas · '+act+' activas',reglas:R.length+' reglas en el catálogo · '+act+' activas',entren:T[1]}[tab];
+    $('#mrH').textContent=T[0];$('#mrP').textContent=sub;
+    $('#adImp').hidden=tab!=='entren'?true:$('#adImp').hidden;
+    $('#mrHero').dataset.tab=tab;MR.pixStart();
+  }else{
+    var h=$('#viewAdmin .ad-head h2'),pp=$('#viewAdmin .ad-head p');
+    if(h)h.textContent='Tablero de agencia';
+    if(pp)pp.innerHTML='<span id="adAgency">'+esc(SB.agency||'Tu agencia')+'</span> · reglas que aprende el Agente de Garantías (las administra la marca)';
+  }
   if(m&&(!MR.d||Date.now()-MR.t>20000))MR.load();
+};
+/* cabecera de píxeles animados (misma que Inicio) */
+MR.pixStart=function(){
+  var cv=$('#mrCv');if(!cv)return;
+  var ctx=cv.getContext('2d'),cell=12,gap=2,cols=0,rows=0,ph=[],dpr=Math.min(2,window.devicePixelRatio||1),last=0;
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function size(){
+    var r=cv.parentNode.getBoundingClientRect();if(!r.width)return;
+    cv.width=Math.ceil(r.width*dpr);cv.height=Math.ceil(r.height*dpr);
+    cols=Math.ceil(r.width/cell);rows=Math.ceil(r.height/cell);ph=[];
+    for(var i=0;i<cols*rows;i++)ph.push(Math.random()*6.283);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function draw(s){
+    var W=cv.width/dpr,H=cv.height/dpr;ctx.fillStyle='#03050c';ctx.fillRect(0,0,W,H);
+    for(var y=0;y<rows;y++)for(var x=0;x<cols;x++){
+      var v=(Math.sin(x*.16+s*.9)+Math.sin(y*.31-s*.7)+Math.sin((x+y)*.09+s*.55)+Math.sin(Math.hypot(x-cols*.72,y-rows*.5)*.22-s*1.1))/4;
+      var k=(v+1)/2,f=.5+.5*Math.sin(s*2.4+ph[y*cols+x]),a=Math.pow(k,1.5)*f*(.45+.55*x/cols)*1.35;
+      if(a<.05)continue;a=Math.min(a,1);
+      ctx.fillStyle='rgba('+Math.round(10+60*a*a)+','+Math.round(70+140*a)+','+Math.round(190+65*a)+','+Math.min(1,.4+a*.7).toFixed(2)+')';
+      ctx.fillRect(x*cell,y*cell,cell-gap,cell-gap);
+    }
+  }
+  function frame(t){
+    MR.raf=0;
+    if(!(S.view||'').indexOf||(S.view.indexOf('m_')!==0)||document.hidden)return;
+    if(t-last>=45){last=t;draw(t/1000)}
+    if(!reduce)MR.raf=requestAnimationFrame(frame);
+  }
+  if(!MR.pixInit){MR.pixInit=true;window.addEventListener('resize',function(){size();if(reduce)draw(2)});document.addEventListener('visibilitychange',function(){if(!document.hidden)MR.pixStart()})}
+  size();if(reduce){draw(2);return}
+  if(!MR.raf)MR.raf=requestAnimationFrame(frame);
 };
 MR.load=async function(){
   if(!SB.c||!SB.entered||!MR.is())return;
   var r=await Promise.all([SB.c.rpc('marca_resumen'),SB.c.rpc('marca_asesores'),SB.c.rpc('marca_sistemas'),SB.c.rpc('marca_codigo')]);
   if(r[0].error){SB.fail(r[0].error);return}
-  MR.d=r[0].data||[];MR.adv=r[1].data||[];MR.sys=r[2].data||[];MR.code=r[3].data||'';MR.t=Date.now();MR.render();
+  MR.d=r[0].data||[];MR.adv=r[1].data||[];MR.sys=r[2].data||[];MR.code=r[3].data||'';MR.t=Date.now();MR.render();if(S.view&&S.view.indexOf('m_')===0)MR.show(S.view);
 };
 MR.render=function(){
   var D=MR.d||[],sum=function(k){return D.reduce(function(a,x){return a+Number(x[k]||0)},0)};
@@ -3586,7 +3652,7 @@ function adRender(){
   var rate=eq?Math.round(100*eh/eq):null,acc=ea_+er?Math.round(100*ea_/(ea_+er)):null;
   var K=function(l,v,s,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
   $('#adKpi').innerHTML=K('Reglas en el catálogo',rules.length,act+' activas')+K('En aprendizaje',learn,pend?pend+' por aprobar':'Necesitan '+d.cfg.th+' PREAs',pend?'warn':'')+K('PREAs aprendidas',tot,'aceptadas por el fabricante')+K('Consultas resueltas con regla',rate==null?'—':rate+'%',eq?eh+' de '+eq+' PREAs':'Aún sin PREAs','ok')+K('Aceptación del fabricante',acc==null?'—':acc+'%',ea_+er?ea_+' aceptadas · '+er+' rechazadas':'Sin respuestas todavía','ok');
-  var nb=$('#adBadge');if(nb){nb.textContent=pend||'';nb.hidden=!pend}
+  var nb=$('#adBadge');if(nb){nb.textContent=pend||'';nb.hidden=!pend}var nb2=$('#mrBadge');if(nb2){nb2.textContent=pend||'';nb2.hidden=!pend}
   $('#adThr').value=String(d.cfg.th);$('#adDist').value=d.cfg.auto?'auto':'manual';
   $('#adLive span').textContent=RS.busy?'Distribuyendo…':'En vivo';$('#adLive').classList.toggle('busy',RS.busy);
 
@@ -4028,7 +4094,7 @@ function openSearch(){
   var q=$('#q',sc),pl=$('#pl',sc),sel=0,cur=[];
   function paint(){
     var v=q.value.trim().toLowerCase();
-    cur=Object.keys(VIEWS).filter(function(k){return k!=='inicio'&&VIEWS[k].toLowerCase().indexOf(v)>-1});
+    cur=Object.keys(VIEWS).filter(function(k){return (MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&VIEWS[k].toLowerCase().indexOf(v)>-1});
     if(sel>=cur.length)sel=0;pl.innerHTML='';
     if(!cur.length){pl.innerHTML='<div class="empty">Sin resultados</div>';return}
     cur.forEach(function(k,i){var b=item(pl,{icon:{agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'}[k],t:VIEWS[k],fn:function(){close();showView(k)}});b.dataset.sel=String(i===sel)});
