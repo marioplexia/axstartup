@@ -610,6 +610,27 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .axl-seg button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 1px var(--fg);font-weight:600}
 .mr-h{margin:22px 0 10px;font-size:15px}
 .ms-off{display:none!important}
+.tr-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:34px 20px;margin-bottom:14px;border:1.5px dashed var(--card-line);border-radius:14px;background:var(--card);text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.tr-drop:hover,.tr-drop.drag{border-color:#2a6df4;background:rgba(42,109,244,.06)}
+.tr-drop b{font-size:15px}.tr-drop small{color:var(--muted);font-size:12.5px}
+.tr-q{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+.tr-card{border:1px solid var(--card-line);border-radius:14px;background:var(--card);padding:16px 18px}
+.tr-card.err{border-color:#e8b4ad}.tr-card.ok{border-color:#a8dcc0}
+.tr-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.tr-h b{font-size:14px}.tr-h small{color:var(--muted)}
+.tr-badge{font-size:11px;font-weight:600;border-radius:999px;padding:2px 9px;background:#eef0f4;color:#4a5568}
+.tr-badge.aceptada{background:#e7f6ee;color:#1f7a4d}.tr-badge.rechazada{background:#fdeceb;color:#b42318}.tr-badge.pendiente{background:#fff4dd;color:#9a6700}
+.tr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px 18px;margin:12px 0}
+.tr-grid span{display:block;font-size:11px;color:var(--muted)}.tr-grid div{font-size:13.5px}
+.tr-note{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:#f4f7ff;font-size:13px;line-height:1.5}
+.tr-note.warn{background:#fff7e6}.tr-note.bad{background:#fdeceb}.tr-note b{font-weight:600}
+.tr-cm{margin:8px 0 0;padding:0;list-style:none;font-size:13px}.tr-cm li{padding:6px 0;border-top:1px solid var(--card-line)}.tr-cm small{color:var(--muted)}
+.tr-act{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.tr-amt{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.tr-amt label{display:block;font-size:11px;color:var(--muted)}.tr-amt input{width:100%;height:34px;margin-top:3px;padding:0 10px;border:1px solid var(--card-line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
+.tr-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.6fr) minmax(0,.8fr) 90px 36px;gap:10px;align-items:center;padding:10px 16px;border-top:1px solid var(--card-line);font-size:13px}
+.tr-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tr-row .m{color:var(--muted)}
+.tr-spin{display:inline-block;width:14px;height:14px;border:2px solid var(--card-line);border-top-color:#2a6df4;border-radius:50%;animation:trspin .8s linear infinite}
+@keyframes trspin{to{transform:rotate(360deg)}}
 .ad-grid.flat,.ad-grid.one{grid-template-columns:1fr}
 .ad-grid.flat>*:not(.ms-off)~*:not(.ms-off){margin-top:14px}
 .mr-hero{position:relative;height:292px;background:#000;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 max(24px,8vw)}
@@ -810,7 +831,10 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         <div class="grp" data-mr-nav style="margin-top:22px" hidden>Inteligencia</div>
         <button class="nav" data-mr-nav data-view="m_cer" data-i="chat" hidden>Cerebro<span class="nbadge" id="mrBadge" hidden></span></button>
         <button class="nav" data-mr-nav data-view="m_reg" data-i="clip" hidden>Catálogo de reglas</button>
-        <button class="nav" data-mr-nav data-view="m_ent" data-i="file" hidden>Centro de entrenamiento</button>
+        <div class="grp" data-mr-nav style="margin-top:22px" hidden>Centro de entrenamiento</div>
+        <button class="nav" data-mr-nav data-view="m_tp" data-i="file" hidden>PREAs aceptadas</button>
+        <button class="nav" data-mr-nav data-view="m_tg" data-i="dollar" hidden>Pagos de planta</button>
+        <button class="nav" data-mr-nav data-view="prueba" data-i="chat" hidden>Agente de pruebas</button>
         <div class="grp" data-nm style="margin-top:22px">Administración</div>
         <button class="nav" data-nm data-view="admin" data-i="chart">Tablero de agencia<span class="nbadge" id="adBadge" hidden></span></button>
         <div class="grp" data-nm style="margin-top:22px">Ax AI</div>
@@ -941,14 +965,16 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
               <p class="axl-hint" style="padding:0 16px 14px">Quien se registre como <b>Administrador de marca</b> con este código tendrá acceso a todas las agencias. Si lo generas de nuevo, el anterior deja de servir.</p></div>
           </div>
         </div>
-        <div class="ad-bar" id="adBarBox" data-ms="entren">
+        <div id="trPrea" data-ms="tprea"></div>
+        <div id="trPago" data-ms="tpago"></div>
+        <div class="ad-bar" id="adBarBox" data-ms="tprea">
           <label>Activar con <select id="adThr"><option value="2">2 PREAs</option><option value="3">3 PREAs</option><option value="5">5 PREAs</option></select></label>
           <label>Distribución <select id="adDist"><option value="auto">Automática</option><option value="manual">Con mi aprobación</option></select></label>
           <span class="sp"></span>
           <button class="bt" id="adSim" type="button" hidden>Simular PREA de un asesor</button>
           <button class="bt pri" id="adImpBtn" type="button" aria-expanded="false">Enseñar con PREAs aceptadas</button>
         </div>
-        <div class="ad-imp" id="adImp" data-ms="entren" hidden>
+        <div class="ad-imp" id="adImp" data-ms="tprea" hidden>
           <p>Sube PREAs que el fabricante ya aceptó (CSV o JSON) o pega su contenido. El agente agrupa las PREAs por queja y operación, crea las reglas y las refuerza con cada caso. Una regla se activa al llegar al umbral.</p>
           <div class="imp-row">
             <input type="file" id="adFile" accept=".csv,.json,.txt" hidden>
@@ -960,7 +986,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
           <textarea id="adPaste" placeholder="O pega aquí las PREAs en CSV o JSON…" aria-label="Pegar PREAs aceptadas"></textarea>
           <div class="imp-row"><button class="bt pri" type="button" id="adPasteGo">Enseñar al agente</button><span class="imp-msg" id="adImpMsg" role="status"></span></div>
         </div>
-        <div class="ad-imp" id="adHist" data-ms="entren">
+        <div class="ad-imp" id="adHist" data-ms="tpago">
           <p><b>Pagos históricos de planta</b> · el Agente de Cobros aprende de ellos desde el primer día. Sube lo que planta pagó en PREAs anteriores: mano de obra y piezas, reclamado contra pagado, antes de IVA (CSV, sin separador de miles). <span id="phCount"></span></p>
           <div class="imp-row">
             <input type="file" id="phFile" accept=".csv,.txt" hidden>
@@ -1101,12 +1127,12 @@ $('#bell').addEventListener('click',function(){if(!MI.due().length){toast('Sin a
 $('#settings').addEventListener('click',function(){toast('Configuración no está disponible en esta réplica')});
 $('#userBtn').addEventListener('click',function(){if(window.SB&&SB.user&&confirm('¿Cerrar la sesión de '+SB.user.name+'?'))SB.signOut()});
 
-var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_ent:'Centro de entrenamiento'};
-function isMain(id){return id==='agent'||id==='cobros'||id==='mi'}
+var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas'};
+function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'}
 function showView(id){
   S.view=id;var main=isMain(id);
-  if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':'garantias';if(ag!==S.agent)setAgent(ag)}
-  $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===(S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
+  if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':'garantias';if(ag!==S.agent)setAgent(ag)}
+  $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
   var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count()}
@@ -1194,7 +1220,7 @@ var AG={
   garantias:{crumb:'Agente de Garantías',title:'Trabajemos en tu próxima PREA',ph:'Describe tu caso de garantía…',menu:PREAS,menuDefault:'Nueva PREA',ev:'Evidencia',ref:'Casos de referencia',refs:REFS,hist:HIST},
   cobros:{crumb:'Agente de Cobros',title:'Cobremos tu próxima PREA',ph:'Escribe el folio de la PREA aceptada (PREA-…) o adjunta su archivo…',menu:['PREA a cobrar','Todas las aprobadas','Pendientes de pago'],menuDefault:'PREA a cobrar',ev:'Factura',ref:'PREA aprobadas',refs:COBROS_REFS,hist:COBROS_HIST}
 };
-function curView(){return S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'agent'}
+function curView(){return S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':S.agent==='prueba'?'prueba':'agent'}
 function setAgent(a){
   resetChat();
   S.agent=a;var c=AG[a];
@@ -1202,7 +1228,7 @@ function setAgent(a){
   $('#evLbl').textContent=c.ev;$('#refLbl').textContent=c.ref;
   ta.placeholder=c.ph;typeTok++;ta.value='';S.files=[];renderFiles();
   titleEl.textContent=typeof c.title==='function'?c.title():c.title;
-  var mi=a==='mi';$('#brandHost').style.display=mi?'none':'';$('#evBtn').style.display=mi?'none':'';$('#plusBtn').style.display=mi?'none':'';
+  var mi=a==='mi',pr=a==='prueba';$('#brandHost').style.display=mi||pr?'none':'';$('#evBtn').style.display=mi?'none':'';$('#plusBtn').style.display=mi||pr?'none':'';
   replayIntro();autosize();updateSend();
 }
 function histBuild(m){head(m,'Conversaciones recientes');var L=SB.hist[S.agent];if(!L.length){var e=document.createElement('div');e.className='mh';e.textContent='Aún no hay conversaciones';m.appendChild(e)}L.forEach(function(h){item(m,{icon:'chat',t:h.t,s:h.s,fn:function(){loadHistory(h)}})})}
@@ -1231,7 +1257,7 @@ composer.addEventListener('drop',function(e){e.preventDefault();composer.classLi
 ta.addEventListener('paste',function(e){var f=e.clipboardData&&e.clipboardData.files;if(f&&f.length){e.preventDefault();addFiles(Array.prototype.slice.call(f))}});
 
 function addFiles(list){
-  list.forEach(function(f){var o={name:f.name||'archivo',img:null};if(/^image\//.test(f.type)){try{o.img=URL.createObjectURL(f)}catch(_){}}S.files.push(o)});
+  list.forEach(function(f){var o={name:f.name||'archivo',img:null,file:f};if(/^image\//.test(f.type)){try{o.img=URL.createObjectURL(f)}catch(_){}}S.files.push(o)});
   renderFiles();updateSend();ta.focus();
 }
 function fileChip(o,removable,idx){
@@ -1263,7 +1289,7 @@ function enterChat(title){
   syncCrumb();
 }
 function resetChat(){
-  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.caseText='';GP.lastExpP=null}if(typeof CB!=='undefined'&&CB)CB.last=null
+  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(typeof PR!=='undefined'&&PR)PR.msgs=[];if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.caseText='';GP.lastExpP=null}if(typeof CB!=='undefined'&&CB)CB.last=null
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
     flip(function(){stage.dataset.state='home';thread.hidden=true;ta.placeholder=AG[S.agent].ph;autosize()});
@@ -1931,7 +1957,7 @@ SB.applyForm=function(c,f){
   c.codes={q:[f.queja.code,up(f.queja.desc)],c:[f.causa.code,up(f.causa.desc)],r:[f.correccion.code,up(f.correccion.desc)]};
   c.ruleId=rule?rule.id:null;c.ruleN=rule?rule.n:0;c.ruleConf=rule?RS.conf(rule):0;c.matched=!!rule;
   c.ai=true;c.aiNote=f.resumen||'';
-};SB.hist={garantias:[],cobros:[],mi:[]};
+};SB.hist={garantias:[],cobros:[],mi:[],prueba:[]};
 /* ---- Conversaciones y expedientes (por usuario, con RLS) ---- */
 SB.dayLbl=function(iso){var d=new Date(iso),n=new Date(),a=new Date(n.getFullYear(),n.getMonth(),n.getDate()),b=new Date(d.getFullYear(),d.getMonth(),d.getDate()),k=Math.round((a-b)/864e5);
   if(k<=0)return 'Hoy';if(k===1)return 'Ayer';return d.toLocaleDateString('es-MX',{day:'numeric',month:'short'}).replace('.','')};
@@ -1940,10 +1966,11 @@ SB.loadHist=async function(){
   CB.loadRefs();
   var r=await SB.c.from('conversations').select('id,agent,title,text,created_at').order('created_at',{ascending:false}).limit(40);
   if(r.error){SB.fail(r.error);return}
-  SB.hist={garantias:[],cobros:[],mi:[]};
+  SB.hist={garantias:[],cobros:[],mi:[],prueba:[]};
   r.data.forEach(function(c){var L=SB.hist[c.agent];if(L&&L.length<12)L.push({id:c.id,t:c.title,s:SB.dayLbl(c.created_at),q:c.text})});
 };
 SB.saveConv=function(text,files){
+  if(S.agent==='prueba')return;
   if(S.agent==='garantias'||S.agent==='cobros'){GP.save(text,files);return}
   if(!SB.c||!SB.entered||S.convId)return;
   var id=crypto.randomUUID(),t=text.trim(),agent=S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'garantias';
@@ -3341,6 +3368,11 @@ var MI_EX=[
  {t:'Resumen',s:'Cómo voy este mes',q:'Dame un resumen de cómo voy este mes'}
 ];
 AG.mi={crumb:'Mi Agente',title:function(){var n=SB.user&&SB.user.name?HM.nombre(String(SB.user.name).split(/\s+/)[0]):'';return n?'Hola, '+n+'. ¿Qué necesitas?':'¿En qué te ayudo hoy?'},ph:'Pregunta lo que quieras, anota algo o pide un recordatorio…',menu:['Automático','Solo consultar','Anotar','Recordar','Agendar'],menuDefault:'Automático',ev:'Adjuntar',ref:'Ejemplos',refs:MI_EX,hist:[]};
+AG.prueba={crumb:'Agente de pruebas',title:'Pon a prueba lo que aprendió el agente',ph:'Pregunta algo o adjunta una PREA para ver si recuerda y aprendió…',menu:['Pruebas'],menuDefault:'Pruebas',ev:'Adjuntar PREA',ref:'Preguntas de ejemplo',hist:[],refs:[
+  {t:'¿Qué sabes de este caso?',s:'Cambio de polea · Aveo 2024',q:'Tengo una PREA de cambio de polea de un Aveo 2024 con 40,000 km. ¿Qué has aprendido de casos así?'},
+  {t:'¿Qué pasa si la rechazan?',s:'Lecciones de rechazos',q:'¿Qué PREAs rechazadas recuerdas y qué errores tenían?'},
+  {t:'Revisa mi PREA',s:'Adjunta un PDF o imagen',q:'Revisa la PREA adjunta contra lo que aprendiste y dime qué corregir.'},
+  {t:'¿Cuánto paga planta?',s:'Pagos enseñados',q:'¿Cuánto suele pagar planta de mano de obra y de piezas según lo que te enseñaron?'}]};
 var ctxReg={};function ctxOf(id){return ctxReg[id]}
 var EX={rows:[],f:'todos',q:'',loading:false};
 EX.load=async function(){
@@ -3550,19 +3582,20 @@ MR.nav=function(m){
   $$('[data-nm]').forEach(function(e){e.style.display=m?'none':''});
   $$('[data-mr-nav]').forEach(function(e){e.hidden=!m;e.style.display=m?'':'none'});
 };
-MR.TABS={m_res:'resumen',m_ag:'agencias',m_cer:'cerebro',m_reg:'reglas',m_ent:'entren'};
+MR.TABS={m_res:'resumen',m_ag:'agencias',m_cer:'cerebro',m_reg:'reglas',m_tp:'tprea',m_tg:'tpago'};
 MR.show=function(id){
   var m=MR.is(),tab=m?(MR.TABS[id]||'resumen'):'agencia';MR.tab=tab;
   $$('#viewAdmin [data-ms]').forEach(function(el){el.classList.toggle('ms-off',el.dataset.ms.split(' ').indexOf(tab)<0)});
   $('#adGrid').classList.toggle('flat',m);
   $('#adHead').hidden=m;$('#mrHero').hidden=!m;
   if(m){
-    var T={resumen:['Tablero de marca','Resumen de toda la marca y acceso para nuevos administradores.'],agencias:['Agencias de la marca','Desempeño de cada agencia y de sus asesores.'],cerebro:['Cerebro','Lo que el agente ha aprendido: reglas, aciertos y resultados por sistema.'],reglas:['Catálogo de reglas','Cada regla aprendida de PREAs aceptadas: activa, edita o elimina.'],entren:['Centro de entrenamiento','Enseña al agente con PREAs aceptadas y pagos históricos de planta.']}[tab];
+    var T={resumen:['Tablero de marca','Resumen de toda la marca y acceso para nuevos administradores.'],agencias:['Agencias de la marca','Desempeño de cada agencia y de sus asesores.'],cerebro:['Cerebro','Lo que el agente ha aprendido: reglas, aciertos y resultados por sistema.'],reglas:['Catálogo de reglas','Cada regla aprendida de PREAs aceptadas: activa, edita o elimina.'],tprea:['PREAs aceptadas','Sube PDFs o imágenes de PREAs: el agente las lee, valida y aprende de ellas.'],tpago:['Pagos de planta','Sube comprobantes de pagos de planta para que el agente aprenda cuánto paga.']}[tab];
     var D=MR.d||[],sm=function(k){return D.reduce(function(a,x){return a+Number(x[k]||0)},0)},R=RS.d.rules,act=R.filter(function(r){return r.status==='activa'||r.status==='distribuyendo'}).length;
-    var sub={resumen:D.length?D.length+' agencias · '+sm('asesores')+' asesores · '+sm('preas')+' PREAs':T[1],agencias:D.length?D.length+' agencias de '+(SB.agency||'la marca')+' · toca una para ver a sus asesores':T[1],cerebro:R.length+' reglas aprendidas · '+act+' activas',reglas:R.length+' reglas en el catálogo · '+act+' activas',entren:T[1]}[tab];
+    var sub={resumen:D.length?D.length+' agencias · '+sm('asesores')+' asesores · '+sm('preas')+' PREAs':T[1],agencias:D.length?D.length+' agencias de '+(SB.agency||'la marca')+' · toca una para ver a sus asesores':T[1],cerebro:R.length+' reglas aprendidas · '+act+' activas',reglas:R.length+' reglas en el catálogo · '+act+' activas',tprea:TR.lib.prea.length?TR.lib.prea.length+' PREAs enseñadas al agente':T[1],tpago:TR.lib.pago.length?TR.lib.pago.length+' pagos enseñados al agente':T[1]}[tab];
     var wd=T[0].split(' '),cut=wd.length>2?Math.ceil(wd.length/2):wd.length>1?1:0;
     $('#mrH').innerHTML=cut?esc(wd.slice(0,cut).join(' '))+' <em>'+esc(wd.slice(cut).join(' '))+'</em>':esc(T[0]);$('#mrP').textContent=sub;
-    $('#adImp').hidden=tab!=='entren'?true:$('#adImp').hidden;
+    if(tab!=='tprea')$('#adImp').hidden=true;
+    if(tab==='tprea'||tab==='tpago')TR.show(tab==='tpago'?'pago':'prea');
     $('#mrHero').dataset.tab=tab;MR.pixStart();
   }else{
     var h=$('#viewAdmin .ad-head h2'),pp=$('#viewAdmin .ad-head p');
@@ -3642,6 +3675,197 @@ $('#mrNew').addEventListener('click',async function(){
   var r=await SB.c.rpc('marca_regenerar_codigo');if(r.error){SB.fail(r.error);toast('No se pudo generar el código');return}
   MR.code=r.data;MR.render();toast('Código nuevo generado');
 });
+/* ===== Centro de entrenamiento: leer PREAs y pagos (PDF/imagen), enseñar al agente y probarlo ===== */
+var TR={lib:{prea:[],pago:[]},items:{prea:[],pago:[]},seq:0,busy:{},ready:{}};
+TR.box=function(k){return $(k==='pago'?'#trPago':'#trPrea')};
+TR.b64=function(buf){var s='',b=new Uint8Array(buf);for(var i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s)};
+TR.prep=async function(f){
+  if(f.type==='application/pdf'||/\.pdf$/i.test(f.name||'')){
+    if(f.size>4.5e6)throw new Error('El PDF pesa más de 4.5 MB: divídelo o comprímelo');
+    return {name:f.name,media_type:'application/pdf',data:TR.b64(await f.arrayBuffer())};
+  }
+  if(/^image\//.test(f.type||'')){
+    var bm=await createImageBitmap(f),sc=Math.min(1,1800/Math.max(bm.width,bm.height)),cv=document.createElement('canvas');
+    cv.width=Math.max(1,Math.round(bm.width*sc));cv.height=Math.max(1,Math.round(bm.height*sc));
+    var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(bm,0,0,cv.width,cv.height);
+    return {name:f.name,media_type:'image/jpeg',data:cv.toDataURL('image/jpeg',.85).split(',')[1]};
+  }
+  throw new Error('Solo PDF o imágenes (PNG, JPG, WEBP)');
+};
+TR.errTxt=function(e){
+  var m=String((e&&e.message)||e);
+  if(/ai_not_configured/.test(m))return 'La IA aún no está configurada: agrega ANTHROPIC_API_KEY en Supabase (Edge Functions → Secrets).';
+  if(/forbidden/.test(m))return 'Solo los administradores pueden entrenar al agente.';
+  if(/archivo_invalido/.test(m))return 'El archivo no es válido o pesa demasiado.';
+  if(/upstream|bad_output/.test(m))return 'El modelo de IA no pudo leer el documento. Inténtalo de nuevo.';
+  return m;
+};
+TR.show=function(k){
+  var b=TR.box(k);
+  if(!TR.ready[k]){
+    TR.ready[k]=true;
+    b.innerHTML='<label class="tr-drop" data-drop><input type="file" multiple accept="application/pdf,image/*" hidden><b>'+(k==='pago'?'Sube comprobantes de pagos de planta':'Sube PREAs aceptadas')+'</b><span>Arrastra PDFs o imágenes aquí, o haz clic para elegirlos</span><small>'+(k==='pago'?'Solo pagos de planta ya cobrados correctamente. El agente lee reclamado y pagado de mano de obra y piezas.':'El agente lee la PREA completa, incluidos los comentarios y el historial del fabricante, y valida las reglas.')+' · PDF, PNG, JPG · máx. 4.5 MB por archivo</small></label>'+
+      '<div class="tr-q" data-q></div><div class="ad-card"><div class="ad-ch"><h3>'+(k==='pago'?'Pagos enseñados':'PREAs enseñadas')+'</h3><small data-cnt></small></div><div data-lib></div></div>';
+    var dz=$('[data-drop]',b),inp=$('input',dz);
+    inp.addEventListener('change',function(){var f=[].slice.call(inp.files);inp.value='';TR.pick(k,f)});
+    ['dragenter','dragover'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.add('drag')})});
+    ['dragleave','drop'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.remove('drag')})});
+    dz.addEventListener('drop',function(e){TR.pick(k,[].slice.call(e.dataTransfer.files||[]))});
+    b.addEventListener('click',function(e){
+      var a=e.target.closest('[data-tr]');if(!a)return;var id=a.dataset.id,act=a.dataset.tr;
+      if(act==='save')TR.save(k,id);else if(act==='drop'){TR.items[k]=TR.items[k].filter(function(x){return x.id!==id});TR.renderQ(k)}
+      else if(act==='del')TR.del(k,id);
+    });
+  }
+  TR.loadLib(k);TR.renderQ(k);
+};
+TR.pick=function(k,files){
+  files=files.filter(function(f){return f&&(/^image\//.test(f.type)||f.type==='application/pdf'||/\.pdf$/i.test(f.name))});
+  if(!files.length){toast('Elige PDFs o imágenes');return}
+  files.slice(0,10).forEach(function(f){TR.items[k].push({id:'t'+(++TR.seq),name:f.name,file:f,state:'leyendo'})});
+  TR.renderQ(k);TR.pump(k);
+};
+TR.pump=async function(k){
+  if(TR.busy[k])return;TR.busy[k]=true;
+  try{
+    for(;;){
+      var it=TR.items[k].filter(function(x){return x.state==='leyendo'&&!x.started})[0];if(!it)break;
+      it.started=true;
+      try{
+        var f=await TR.prep(it.file);
+        var r=await SB.ai({mode:'extraer',kind:k,file:f});
+        var d=r&&r.datos;if(!d)throw new Error('bad_output');
+        if(k==='prea'&&d.es_prea===false){it.state='error';it.err='No parece una PREA'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
+        else if(k==='pago'&&d.es_pago===false){it.state='error';it.err='No parece un pago de planta'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
+        else{it.state='listo';it.d=d}
+      }catch(e){it.state='error';it.err=TR.errTxt(e)}
+      TR.renderQ(k);
+    }
+  }finally{TR.busy[k]=false}
+};
+TR.veh=function(d){var v=d.vehiculo;if(typeof v==='string')return v;v=v||{};return [v.marca,v.modelo,v.anio].filter(Boolean).join(' ')+(v.km?' · '+Number(v.km).toLocaleString('es-MX')+' km':'')};
+TR.ruleFor=function(d){var q=d.queja&&d.queja.code;return q?RS.d.rules.filter(function(r){return r.sys===d.sistema&&r.q[0]===q})[0]||null:null};
+TR.codes=function(c){return c&&(c.code||c.desc)?esc((c.code?c.code+' · ':'')+(c.desc||'')):'—'};
+TR.cardPrea=function(it){
+  var d=it.d,rule=TR.ruleFor(d),est=d.estado||'desconocido',ps=Array.isArray(d.piezas)?d.piezas:[],cm=Array.isArray(d.comentarios)?d.comentarios:[];
+  var G=function(l,v){return '<div><span>'+l+'</span>'+v+'</div>'};
+  var learn=est==='aceptada'?(rule?'Reforzará la regla <b>'+esc(rule.id)+'</b> ('+rule.n+' PREAs aceptadas hasta ahora).':'Creará una <b>regla nueva</b> con esta PREA.'):(est==='rechazada'?(rule?'Registrará un rechazo en la regla <b>'+esc(rule.id)+'</b> y guardará lo que falló como lección.':'Guardará lo que falló como lección (no hay una regla que penalizar).'):'Se guardará como ejemplo, sin modificar reglas.');
+  return '<div class="tr-card"><div class="tr-h"><b>'+esc(d.folio||it.name)+'</b><span class="tr-badge '+esc(est)+'">'+esc({aceptada:'Aceptada',rechazada:'Rechazada',pendiente:'Pendiente',desconocido:'Estado no visible'}[est]||est)+'</span><small>'+esc(it.name)+(d.confianza!=null?' · lectura '+Math.round(Number(d.confianza)*100)+'%':'')+'</small></div>'+
+    '<div class="tr-grid">'+G('Vehículo',esc(TR.veh(d)||'—'))+G('Orden',esc(d.orden||'—'))+G('Sistema',esc(d.sistema||'—'))+G('Operación',TR.codes(d.operacion))+G('Horas',d.horas!=null?esc(String(d.horas)):'—')+G('Queja',TR.codes(d.queja))+G('Causa',TR.codes(d.causa))+G('Corrección',TR.codes(d.correccion))+G('Piezas',ps.length?ps.map(function(p){return esc(p.no+' · '+p.d+' ×'+p.q)}).join('<br>'):'—')+'</div>'+
+    (est!=='aceptada'?'<div class="tr-note warn"><b>Ojo:</b> este documento aparece como <b>'+esc(est==='desconocido'?'sin estado visible':est)+'</b>, no como aceptada. '+(est==='rechazada'?'Puedes guardarlo para que el agente aprenda qué evitar.':'Revisa que sea el documento correcto.')+'</div>':'')+
+    (d.motivo_resolucion?'<div class="tr-note"><b>Resolución del fabricante:</b> '+esc(d.motivo_resolucion)+'</div>':'')+
+    (d.como_se_lleno?'<div class="tr-note"><b>Cómo se llenó:</b> '+esc(d.como_se_lleno)+'</div>':'')+
+    (d.errores_y_correcciones?'<div class="tr-note bad"><b>Errores y correcciones:</b> '+esc(d.errores_y_correcciones)+'</div>':'')+
+    (d.lecciones?'<div class="tr-note"><b>Lección:</b> '+esc(d.lecciones)+'</div>':'')+
+    (cm.length?'<ul class="tr-cm">'+cm.slice(0,12).map(function(c){return '<li>'+esc(c.texto)+'<br><small>'+esc([c.autor,c.fecha].filter(Boolean).join(' · '))+'</small></li>'}).join('')+'</ul>':'')+
+    '<div class="tr-note"><b>Al enseñar:</b> '+learn+'</div>'+
+    '<div class="tr-act"><button class="bt pri" type="button" data-tr="save" data-id="'+it.id+'">'+(est==='aceptada'?'Enseñar al agente':'Guardar como lección')+'</button><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Descartar</button></div></div>';
+};
+TR.cardPago=function(it){
+  var d=it.d,N=function(n){return d[n]!=null&&d[n]!==''?d[n]:''},I=function(n,l){return '<div><label>'+l+'</label><input inputmode="decimal" data-f="'+n+'" value="'+ea(N(n))+'" placeholder="0.00"></div>'};
+  var split=Number(d.labor_pagada||0)+Number(d.piezas_pagadas||0)>0;
+  return '<div class="tr-card"><div class="tr-h"><b>'+esc(d.folio||it.name)+'</b><span class="tr-badge aceptada">Pago de planta</span><small>'+esc(it.name)+(d.confianza!=null?' · lectura '+Math.round(Number(d.confianza)*100)+'%':'')+'</small></div>'+
+    '<div class="tr-grid"><div><span>Orden</span>'+esc(d.orden||'—')+'</div><div><span>Sistema</span>'+esc(d.sistema||'—')+'</div><div><span>Operación</span>'+esc(d.operacion||'—')+'</div><div><span>Vehículo</span>'+esc(TR.veh(d)||'—')+'</div><div><span>Fecha de pago</span>'+esc(d.fecha_pago||'—')+'</div><div><span>Referencia</span>'+esc(d.referencia||'—')+'</div></div>'+
+    '<div class="tr-amt">'+I('labor_reclamada','Mano de obra reclamada')+I('piezas_reclamadas','Piezas reclamadas')+I('labor_pagada','Mano de obra pagada')+I('piezas_pagadas','Piezas pagadas')+'</div>'+
+    (split?'':'<div class="tr-note warn"><b>Falta el desglose:</b> el comprobante no separa mano de obra y piezas pagadas. Captúralo para que el agente pueda aprender de este pago.</div>')+
+    (d.ajustes?'<div class="tr-note"><b>Ajustes de planta:</b> '+esc(d.ajustes)+'</div>':'')+(d.lecciones?'<div class="tr-note"><b>Lección:</b> '+esc(d.lecciones)+'</div>':'')+
+    '<div class="tr-act"><button class="bt pri" type="button" data-tr="save" data-id="'+it.id+'">Enseñar al agente</button><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Descartar</button></div></div>';
+};
+TR.renderQ=function(k){
+  var q=$('[data-q]',TR.box(k));if(!q)return;
+  q.innerHTML=TR.items[k].map(function(it){
+    if(it.state==='leyendo')return '<div class="tr-card"><div class="tr-h"><span class="tr-spin"></span><b>Leyendo '+esc(it.name)+'…</b><small>el agente extrae todos los datos</small></div></div>';
+    if(it.state==='error')return '<div class="tr-card err"><div class="tr-h"><b>'+esc(it.name)+'</b></div><div class="tr-note bad">'+esc(it.err)+'</div><div class="tr-act"><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Quitar</button></div></div>';
+    if(it.state==='guardado')return '<div class="tr-card ok"><div class="tr-h"><b>'+esc(it.d.folio||it.name)+'</b><span class="tr-badge aceptada">Enseñada</span></div><div class="tr-note">'+it.msg+'</div><div class="tr-act"><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Quitar de la lista</button></div></div>';
+    return k==='pago'?TR.cardPago(it):TR.cardPrea(it);
+  }).join('');
+};
+TR.search=function(k,d){
+  var v=TR.veh(d),a=[d.folio,d.orden,v,d.sistema,d.operacion&&d.operacion.code||d.operacion,d.operacion&&d.operacion.desc,d.queja&&d.queja.code,d.queja&&d.queja.desc,d.causa&&d.causa.desc,d.correccion&&d.correccion.desc,d.estado,d.motivo_resolucion,d.referencia];
+  (d.piezas||[]).forEach(function(p){a.push(p.no,p.d)});(d.comentarios||[]).forEach(function(c){a.push(c.texto)});
+  return norm(a.filter(Boolean).join(' ')).slice(0,6000);
+};
+TR.save=async function(k,id){
+  var it=TR.items[k].filter(function(x){return x.id===id})[0];if(!it||!it.d)return;
+  var d=it.d,btn=$('[data-tr="save"][data-id="'+id+'"]',TR.box(k));if(btn)btn.disabled=true;
+  try{
+    var msg='',row;
+    if(k==='pago'){
+      $$('input[data-f]',btn.closest('.tr-card')).forEach(function(i){var n=PH.num(i.value);d[i.dataset.f]=n==null?0:n});
+      if(!(Number(d.labor_pagada)+Number(d.piezas_pagadas)>0))throw new Error('Captura la mano de obra y las piezas pagadas para enseñarle este pago.');
+      var ph={folio:d.folio||null,sys:d.sistema||null,op:d.operacion||null,labor_reclamada:Number(d.labor_reclamada)||0,piezas_reclamadas:Number(d.piezas_reclamadas)||0,labor_pagada:Number(d.labor_pagada)||0,piezas_pagadas:Number(d.piezas_pagadas)||0,fecha:/^\d{4}-\d{2}-\d{2}$/.test(d.fecha_pago||'')?d.fecha_pago:null};
+      var w=ph.folio?await SB.c.from('pagos_historicos').upsert(ph,{onConflict:'folio'}):await SB.c.from('pagos_historicos').insert(ph);
+      if(w.error)throw w.error;
+      try{await CB.get()}catch(_){}
+      var rl=ph.labor_reclamada>0?Math.round(100*ph.labor_pagada/ph.labor_reclamada):null,rp=ph.piezas_reclamadas>0?Math.round(100*ph.piezas_pagadas/ph.piezas_reclamadas):null;
+      msg='Pago aprendido: planta pagó '+(rl!=null?rl+'% de la mano de obra':money(ph.labor_pagada)+' de mano de obra')+' y '+(rp!=null?rp+'% de las piezas':money(ph.piezas_pagadas)+' de piezas')+'. El Agente de Cobros ya lo usa.';
+      row={kind:'pago',folio:d.folio||null,wo:d.orden||null,file_name:it.name,vehiculo:TR.veh(d)||null,sys:d.sistema||null,op:d.operacion||null,resultado:'pagada',resumen:(d.sistema||'Pago')+' '+(d.operacion||'')+': reclamado '+money(ph.labor_reclamada+ph.piezas_reclamadas)+', pagado '+money(ph.labor_pagada+ph.piezas_pagadas)+(d.ajustes?'. Ajustes: '+d.ajustes:''),lecciones:d.lecciones||null,datos:d,busqueda:TR.search(k,d)};
+    }else{
+      var est=d.estado||'desconocido',rule=TR.ruleFor(d),dup=d.folio?TR.lib.prea.filter(function(x){return x.folio===d.folio})[0]:null;
+      if(dup){if(!confirm('Ya enseñaste la PREA '+d.folio+'. ¿Actualizar lo aprendido de ese documento? (no vuelve a contar como una PREA nueva en las reglas)')){if(btn)btn.disabled=false;return}}
+      if(!dup){
+        if(est==='aceptada'){
+          var ps=(d.piezas||[]).map(function(p){return [p.no,p.d,p.q,p.pr].map(function(x){return String(x==null?'':x).replace(/[:;|]/g,' ')}).join(':')}).join(';');
+          var o={sistema:d.sistema,queja_codigo:d.queja&&d.queja.code,queja:d.queja&&d.queja.desc,causa_codigo:d.causa&&d.causa.code,causa:d.causa&&d.causa.desc,correccion_codigo:d.correccion&&d.correccion.code,correccion:d.correccion&&d.correccion.desc,operacion:d.operacion&&d.operacion.code,operacion_desc:d.operacion&&d.operacion.desc,horas:d.horas,piezas:ps,asesor:'entrenamiento'};
+              var rec=recFromRow(o);
+          if(rec){var v=d.vehiculo||{};rec.kw=[norm(v.modelo||''),norm(v.marca||'')].filter(function(x){return x.length>=3});rec.src='historico';var lr=RS.learn(rec);msg=lr.kind==='creada'?'Aprendió una <b>regla nueva '+esc(lr.rule.id)+'</b> ('+esc(lr.rule.q[1].toLowerCase())+' → '+esc(lr.rule.op)+').':'<b>Reforzó la regla '+esc(lr.rule.id)+'</b>: ya suma '+lr.rule.n+' PREAs aceptadas.'}
+          else msg='Se guardó como ejemplo, pero faltaban queja, operación u horas para formar una regla.';
+        }else if(est==='rechazada'){
+          if(rule){RS.reject(rule.id);msg='Registró un <b>rechazo en '+esc(rule.id)+'</b> (confianza '+RS.conf(rule)+'%) y guardó lo que falló como lección.'}
+          else msg='Guardó lo que falló como lección. No había una regla que penalizar.';
+        }else msg='Se guardó como ejemplo, sin modificar reglas.';
+      }else msg='Actualizó el ejemplo de la PREA '+esc(d.folio)+'.';
+      var v2=TR.veh(d);
+      row={kind:'prea',folio:d.folio||null,wo:d.orden||null,file_name:it.name,vehiculo:v2||null,sys:d.sistema||null,op:(d.operacion&&d.operacion.code)||null,resultado:est,resumen:[v2,d.queja&&d.queja.desc,d.operacion&&d.operacion.desc,est,d.motivo_resolucion].filter(Boolean).join(' · ').slice(0,700),lecciones:[d.como_se_lleno,d.errores_y_correcciones,d.lecciones].filter(Boolean).join(' | ')||null,datos:d,busqueda:TR.search(k,d)};
+      if(dup){var u=await SB.c.from('entrenamiento_docs').update(row).eq('id',dup.id);if(u.error)throw u.error;it.state='guardado';it.msg=msg;TR.renderQ(k);TR.loadLib(k);return}
+    }
+    var ins=await SB.c.from('entrenamiento_docs').insert(row);if(ins.error)throw ins.error;
+    it.state='guardado';it.msg=msg;TR.renderQ(k);TR.loadLib(k);
+  }catch(e){SB.fail(e);toast(e&&e.message&&!/^\{/.test(e.message)?e.message:'No se pudo guardar');if(btn)btn.disabled=false}
+};
+TR.loadLib=async function(k){
+  if(!SB.c||!SB.entered)return;
+  var r=await SB.c.from('entrenamiento_docs').select('id,kind,folio,wo,vehiculo,sys,op,resultado,created_at,file_name').eq('kind',k).order('created_at',{ascending:false}).limit(100);
+  if(r.error){SB.fail(r.error);return}
+  TR.lib[k]=r.data||[];TR.renderLib(k);
+  var pp=$('#mrP'),n=TR.lib[k].length;if(pp&&n&&S.view===(k==='pago'?'m_tg':'m_tp'))pp.textContent=n+(k==='pago'?(n===1?' pago enseñado':' pagos enseñados'):(n===1?' PREA enseñada':' PREAs enseñadas'))+' al agente';
+};
+TR.renderLib=function(k){
+  var b=TR.box(k),L=TR.lib[k],lib=$('[data-lib]',b);if(!lib)return;
+  $('[data-cnt]',b).textContent=L.length?L.length+(L.length===1?' documento':' documentos'):'';
+  lib.innerHTML=L.length?L.map(function(x){
+    return '<div class="tr-row"><span><b>'+esc(x.folio||x.file_name||'Sin folio')+'</b>'+(x.wo?' · '+esc(x.wo):'')+'</span><span class="m">'+esc([x.vehiculo,x.sys].filter(Boolean).join(' · ')||'—')+'</span><span><i class="tr-badge '+esc(x.resultado==='pagada'?'aceptada':x.resultado||'')+'">'+esc(x.resultado||'—')+'</i></span><span class="m">'+esc(SB.dayLbl(x.created_at))+'</span><button class="gp-b" type="button" data-tr="del" data-id="'+ea(x.id)+'" aria-label="Eliminar" title="Eliminar">×</button></div>';
+  }).join(''):'<p class="axl-hint" style="padding:16px">Aún no has enseñado '+(k==='pago'?'ningún pago':'ninguna PREA')+'. Sube los primeros documentos arriba.</p>';
+};
+TR.del=async function(k,id){
+  if(!confirm('¿Quitar este documento? Las reglas que ya aprendió se conservan (puedes editarlas en el Catálogo de reglas).'))return;
+  var r=await SB.c.from('entrenamiento_docs').delete().eq('id',id);
+  if(r.error){SB.fail(r.error);toast('No se pudo quitar');return}
+  TR.loadLib(k);
+};
+
+/* ---- Agente de pruebas: preguntarle al agente lo que aprendió (y mostrarle una PREA) ---- */
+var PR={msgs:[]};
+async function runPrueba(text,files){
+  var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
+  var w=addAssistant();hideRegen(w);w._noThink=true;
+  var body=$('.ai-body',w),col=$('.ai-col',w);body.innerHTML='<span class="typing" aria-label="Pensando"><i></i><i></i><i></i></span>';
+  var out='',pasos=[];
+  try{
+    var att=[],tot=0,fs=(files||[]).filter(function(f){return f.file});
+    for(var i=0;i<fs.length;i++){var pp=await TR.prep(fs[i].file);tot+=pp.data.length;att.push(pp)}
+    if(tot>6e6)throw new Error('Los archivos pesan demasiado juntos (máximo ~4.5 MB en total).');
+    if(my.aborted){body.innerHTML='<p class="muted">Respuesta detenida.</p>';$('.ai-actions',w).hidden=false;finish(my);return}
+    var q=text||'Revisa el archivo adjunto contra lo que aprendiste.',nm=fs.map(function(f){return f.name}).join(', ');
+    var r=await SB.ai({mode:'probar',messages:PR.msgs.concat([{role:'user',content:q}]),attachments:att,ahora:MI.nowInfo()});
+    out=(r&&r.text)||'No pude armar una respuesta. ¿Lo intentamos otra vez?';pasos=(r&&r.pasos)||[];
+    PR.msgs.push({role:'user',content:q+(nm?'\n[adjuntó: '+nm+']':'')},{role:'assistant',content:out});if(PR.msgs.length>24)PR.msgs=PR.msgs.slice(-24);
+  }catch(e){out=TR.errTxt(e)}
+  if(my.aborted){body.innerHTML='<p class="muted">Respuesta detenida.</p>';$('.ai-actions',w).hidden=false;finish(my);return}
+  var plain=await stream(body,out,my);w._text=plain.replace(/\*\*/g,'');
+  if(pasos.length){var n=document.createElement('small');n.className='muted';n.style.cssText='display:block;margin-top:8px';n.textContent='Revisó su memoria: '+pasos.slice(0,6).join(' · ');col.insertBefore(n,$('.ai-actions',w))}
+  $('.ai-actions',w).hidden=false;finish(my);
+}
 var AD={filter:'todas',q:'',open:{},raf:0,exp:[]};
 AD.loadExp=async function(){
   if(!SB.c||!SB.entered)return;
@@ -4064,6 +4288,7 @@ async function runCobros(text,files){
   finish(my);
 }
 function start(text,files){
+  if(S.agent==='prueba')return runPrueba(text,files);
   if(S.agent==='garantias'){var oo=GP.orderOnly(text);if(oo){GP.save(text,files);GP.ack(oo);return}}
   SB.saveConv(text||(files[0]&&files[0].name)||'Conversación',files);
   if(S.agent==='garantias'&&!(files&&files.length)&&GP.isChat(text)){GP.caseText=GP.caseText||'';return runConv(text)}
