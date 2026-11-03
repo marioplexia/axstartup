@@ -611,14 +611,18 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .mr-h{margin:22px 0 10px;font-size:15px}
 .ms-off{display:none!important}
 .ad-grid.flat,.ad-grid.one{grid-template-columns:1fr}
-.mr-hero{position:relative;height:184px;background:#03050c;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 max(24px,3.2vw)}
+.ad-grid.flat>*:not(.ms-off)~*:not(.ms-off){margin-top:14px}
+.mr-hero{position:relative;height:292px;background:#000;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:0 max(24px,8vw)}
 .mr-hero[hidden]{display:none}
 .mr-hero canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.mr-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,4,10,.78) 0%,rgba(2,4,10,.3) 55%,rgba(2,4,10,0) 100%);pointer-events:none}
+.mr-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.35) 0%,rgba(0,0,0,0) 45%);pointer-events:none}
+@media(max-width:700px){.mr-hero{height:210px}}
 .mr-hero>h1,.mr-hero>p{position:relative;z-index:1}
-.mr-hero h1{margin:0;color:#fff;font-family:var(--f-display);font-weight:500;font-size:clamp(28px,4vw,44px);letter-spacing:-.025em;line-height:1.08}
-.mr-hero p{margin:8px 0 0;color:rgba(255,255,255,.74);font-size:14px;max-width:640px}
+.mr-hero h1{margin:0;color:#fff;font-family:var(--f-ui);font-weight:500;font-size:clamp(30px,4.6vw,58px);letter-spacing:-.025em;line-height:1.06;text-shadow:0 2px 24px rgba(0,0,0,.45)}
+.mr-hero h1 em{font-style:normal;color:#8db4ff;display:block}
+.mr-hero p{margin:14px 0 0;color:rgba(255,255,255,.78);font-size:15px;max-width:640px}
 .mr-hero:not([hidden])+.ad-in{margin-top:18px}
+#adKpi{margin-bottom:14px}
 .mr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:14px}
 .mr-ag{border:1px solid var(--card-line);border-radius:12px;background:var(--card);padding:14px 16px;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .mr-ag:hover,.mr-ag[aria-expanded="true"]{border-color:var(--fg)}
@@ -923,6 +927,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
           <div><h2>Tablero de agencia</h2><p><span id="adAgency">Tu agencia</span> · reglas que aprende el Agente de Garantías y cómo se distribuyen</p></div>
           <div class="ad-live" id="adLive"><i></i><span>En vivo</span></div>
         </div>
+        <div class="ad-kpi" id="adKpi" data-ms="cerebro agencia"></div>
         <div id="mrBox">
           <div class="ad-kpi" id="mrKpi" data-ms="resumen"></div>
           <div data-ms="agencias">
@@ -936,7 +941,6 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
               <p class="axl-hint" style="padding:0 16px 14px">Quien se registre como <b>Administrador de marca</b> con este código tendrá acceso a todas las agencias. Si lo generas de nuevo, el anterior deja de servir.</p></div>
           </div>
         </div>
-        <div class="ad-kpi" id="adKpi" data-ms="cerebro agencia"></div>
         <div class="ad-bar" id="adBarBox" data-ms="entren">
           <label>Activar con <select id="adThr"><option value="2">2 PREAs</option><option value="3">3 PREAs</option><option value="5">5 PREAs</option></select></label>
           <label>Distribución <select id="adDist"><option value="auto">Automática</option><option value="manual">Con mi aprobación</option></select></label>
@@ -3556,7 +3560,8 @@ MR.show=function(id){
     var T={resumen:['Tablero de marca','Resumen de toda la marca y acceso para nuevos administradores.'],agencias:['Agencias de la marca','Desempeño de cada agencia y de sus asesores.'],cerebro:['Cerebro','Lo que el agente ha aprendido: reglas, aciertos y resultados por sistema.'],reglas:['Catálogo de reglas','Cada regla aprendida de PREAs aceptadas: activa, edita o elimina.'],entren:['Centro de entrenamiento','Enseña al agente con PREAs aceptadas y pagos históricos de planta.']}[tab];
     var D=MR.d||[],sm=function(k){return D.reduce(function(a,x){return a+Number(x[k]||0)},0)},R=RS.d.rules,act=R.filter(function(r){return r.status==='activa'||r.status==='distribuyendo'}).length;
     var sub={resumen:D.length?D.length+' agencias · '+sm('asesores')+' asesores · '+sm('preas')+' PREAs':T[1],agencias:D.length?D.length+' agencias de '+(SB.agency||'la marca')+' · toca una para ver a sus asesores':T[1],cerebro:R.length+' reglas aprendidas · '+act+' activas',reglas:R.length+' reglas en el catálogo · '+act+' activas',entren:T[1]}[tab];
-    $('#mrH').textContent=T[0];$('#mrP').textContent=sub;
+    var wd=T[0].split(' '),cut=wd.length>2?Math.ceil(wd.length/2):wd.length>1?1:0;
+    $('#mrH').innerHTML=cut?esc(wd.slice(0,cut).join(' '))+' <em>'+esc(wd.slice(cut).join(' '))+'</em>':esc(T[0]);$('#mrP').textContent=sub;
     $('#adImp').hidden=tab!=='entren'?true:$('#adImp').hidden;
     $('#mrHero').dataset.tab=tab;MR.pixStart();
   }else{
@@ -3569,29 +3574,34 @@ MR.show=function(id){
 /* cabecera de píxeles animados (misma que Inicio) */
 MR.pixStart=function(){
   var cv=$('#mrCv');if(!cv)return;
-  var ctx=cv.getContext('2d'),cell=12,gap=2,cols=0,rows=0,ph=[],dpr=Math.min(2,window.devicePixelRatio||1),last=0;
+  var ctx=cv.getContext('2d'),cell=61,gap=5,rad=10,cols=0,rows=0,ph=[],dpr=Math.min(2,window.devicePixelRatio||1),last=0,oy=-14;
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function rr(x,y,w,h,r){ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x,y,w,h,r);else{ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}}
   function size(){
     var r=cv.parentNode.getBoundingClientRect();if(!r.width)return;
+    cell=r.width<700?44:61;gap=r.width<700?4:5;rad=r.width<700?8:10;
     cv.width=Math.ceil(r.width*dpr);cv.height=Math.ceil(r.height*dpr);
-    cols=Math.ceil(r.width/cell);rows=Math.ceil(r.height/cell);ph=[];
+    cols=Math.ceil(r.width/cell)+1;rows=Math.ceil(r.height/cell)+1;ph=[];
     for(var i=0;i<cols*rows;i++)ph.push(Math.random()*6.283);
     ctx.setTransform(dpr,0,0,dpr,0,0);
   }
-  function draw(s){
-    var W=cv.width/dpr,H=cv.height/dpr;ctx.fillStyle='#03050c';ctx.fillRect(0,0,W,H);
+  function draw(t){
+    var W=cv.width/dpr,H=cv.height/dpr;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+    var cx=cols*(.5+.1*Math.sin(t*.32)),sp=cols*.2;
     for(var y=0;y<rows;y++)for(var x=0;x<cols;x++){
-      var v=(Math.sin(x*.16+s*.9)+Math.sin(y*.31-s*.7)+Math.sin((x+y)*.09+s*.55)+Math.sin(Math.hypot(x-cols*.72,y-rows*.5)*.22-s*1.1))/4;
-      var k=(v+1)/2,f=.5+.5*Math.sin(s*2.4+ph[y*cols+x]),a=Math.pow(k,1.5)*f*(.45+.55*x/cols)*1.35;
-      if(a<.05)continue;a=Math.min(a,1);
-      ctx.fillStyle='rgba('+Math.round(10+60*a*a)+','+Math.round(70+140*a)+','+Math.round(190+65*a)+','+Math.min(1,.4+a*.7).toFixed(2)+')';
-      ctx.fillRect(x*cell,y*cell,cell-gap,cell-gap);
+      var dx=(x+.5-cx)/sp,core=Math.exp(-dx*dx);                                /* núcleo central, cae hacia los lados */
+      var col=Math.exp(-Math.pow((x+.5-cx)/1.4,2))*(.55+.45*Math.sin(t*.7+y*.9));  /* columna más luminosa */
+      var f=.5+.5*Math.sin(t*1.15+ph[y*cols+x]+x*.35-y*.5);
+      var k=Math.min(1,core*(.38+.5*f)+col*.42*f);
+      var rc=Math.round(5+30*k*k),gc=Math.round(14+92*k),bc=Math.round(34+182*k);
+      ctx.fillStyle='rgb('+rc+','+gc+','+bc+')';
+      rr(x*cell,y*cell+oy,cell-gap,cell-gap,rad);ctx.fill();
     }
   }
-  function frame(t){
+  function frame(tm){
     MR.raf=0;
     if(!(S.view||'').indexOf||(S.view.indexOf('m_')!==0)||document.hidden)return;
-    if(t-last>=45){last=t;draw(t/1000)}
+    if(tm-last>=40){last=tm;draw(tm/1000)}
     if(!reduce)MR.raf=requestAnimationFrame(frame);
   }
   if(!MR.pixInit){MR.pixInit=true;window.addEventListener('resize',function(){size();if(reduce)draw(2)});document.addEventListener('visibilitychange',function(){if(!document.hidden)MR.pixStart()})}
