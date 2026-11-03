@@ -496,6 +496,48 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 #hmDlg .row{display:flex;gap:8px;justify-content:flex-end}
 #hmDlg .err{color:#b4372b;font-size:13px;min-height:18px}
 @media(max-width:700px){.hm-hero{height:150px}.hm-big{font-size:44px}.hm-card{padding:18px 16px 0}.hm-foot{margin:8px -16px 0;padding:12px 16px}}
+/* ===== Panel de conversaciones del Agente de Garantías ===== */
+.gp-row{flex:1;min-height:0;display:flex}
+.gp-row[hidden]{display:none}
+.gp-row>.stage{flex:1;min-width:0}
+.gp{width:300px;flex:none;border-left:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;min-height:0}
+.gp[hidden]{display:none}
+.gp-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 16px 10px}
+.gp-h b{font-size:14px;font-weight:600}.gp-h small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.gp-new{height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--card-line);background:var(--card);color:var(--fg);font:500 12.5px var(--f-ui);cursor:pointer;white-space:nowrap}
+.gp-new:hover{background:var(--hover)}
+.gp-s{display:flex;align-items:center;gap:8px;margin:0 16px 8px;height:34px;padding:0 10px;border:1px solid var(--card-line);border-radius:8px;color:var(--muted)}
+.gp-s input{border:0;outline:0;background:none;color:var(--fg);font:13px var(--f-ui);width:100%}
+.gp-s .ic{width:15px;height:15px}
+.gp-l{flex:1;overflow-y:auto;padding:4px 8px 18px}
+.gp-d{padding:12px 8px 6px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+.gp-i{position:relative;display:block;width:100%;text-align:left;padding:10px 10px;border:0;border-radius:10px;background:none;color:var(--fg);cursor:pointer;font:inherit}
+.gp-i:hover{background:var(--hover)}
+.gp-i[aria-current="true"]{background:var(--chip)}
+.gp-t{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;letter-spacing:.01em}
+.gp-t.no{font-weight:500;color:var(--muted)}
+.gp-st{width:8px;height:8px;border-radius:50%;background:#e0a100;flex:none}
+.gp-st.aceptada{background:#2fa863}.gp-st.rechazada{background:#d9534f}.gp-st.none{background:var(--line)}
+.gp-q{margin-top:2px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:44px}
+.gp-a{position:absolute;right:6px;top:8px;display:none;gap:2px}
+.gp-i:hover .gp-a,.gp-i:focus-within .gp-a{display:flex}
+.gp-a span{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;color:var(--muted);font-size:13px}
+.gp-a span:hover{background:var(--card);color:var(--fg)}
+.gp-none{padding:26px 14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.55}
+@media(max-width:1100px){.gp{display:none}}
+.gpc{background:var(--card);border:1px solid var(--card-line);border-radius:12px;overflow:hidden;max-width:640px;margin-top:12px}
+.gpc-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line);font-weight:600;font-size:13.5px}
+.gpc-h .st{font:600 11px var(--f-ui);padding:3px 9px;border-radius:99px;background:var(--chip)}
+.gpc-h .st.aceptada{background:color-mix(in srgb,#2fa863 20%,transparent);color:#238c52}.gpc-h .st.rechazada{background:color-mix(in srgb,#d9534f 18%,transparent);color:#c0443f}
+.gpc-r{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-top:1px solid var(--line);font-size:13px}
+.gpc-h+.gpc-r{border-top:0}
+.gpc-r span{flex:none;width:92px;color:var(--muted);font-size:12px;padding-top:1px}
+.gpc-r div{flex:1;min-width:0;overflow-wrap:anywhere;white-space:pre-line}
+.gpc-r button{flex:none;height:26px;padding:0 9px;border-radius:7px;border:1px solid var(--card-line);background:var(--card);color:var(--fg);font:500 11.5px var(--f-ui);cursor:pointer}
+.gpc-r button:hover{background:var(--hover)}
+.gpc-f{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--line);flex-wrap:wrap}
+.gpc-f button{height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--card-line);background:var(--card);color:var(--fg);font:500 12.5px var(--f-ui);cursor:pointer}
+.gpc-f button:hover{background:var(--hover)}
 /* ===== Mi Agente ===== */
 #bell{position:relative}
 #bell[data-n]:not([data-n="0"])::after{content:attr(data-n);position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#e5484d;color:#fff;font:600 10px/16px var(--f-ui);text-align:center}
@@ -758,6 +800,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
       </div>
     </header>
 
+    <div class="gp-row" id="gpRow">
     <section class="stage" id="stage" data-state="home">
       <div class="thread" id="thread" hidden><div class="thread-in" id="threadIn"></div></div>
       <div class="dock" id="dock">
@@ -786,6 +829,12 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         </div>
       </div>
     </section>
+    <aside class="gp" id="gp" aria-label="Conversaciones de garantías" hidden>
+      <div class="gp-h"><div><b>Conversaciones</b><small id="gpCount"></small></div><button class="gp-new" id="gpNew" type="button">+ Nueva</button></div>
+      <label class="gp-s"><span data-i="search" style="display:contents"></span><input id="gpQ" type="search" placeholder="Buscar orden o queja" aria-label="Buscar conversaciones" autocomplete="off"></label>
+      <div class="gp-l" id="gpList" role="list"></div>
+    </aside>
+    </div>
 
     <section class="view-ph" id="viewPh" hidden>
       <h2 id="phTitle"></h2>
@@ -995,7 +1044,7 @@ function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===(S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin';stage.hidden=!main;$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
+  var adm=id==='admin';stage.hidden=!main;$('#gpRow').hidden=!main;$('#gp').hidden=!(main&&S.agent==='garantias');if(main&&S.agent==='garantias'&&SB.entered&&Date.now()-GP.t>15000)GP.load();$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
@@ -1151,7 +1200,7 @@ function enterChat(title){
   syncCrumb();
 }
 function resetChat(){
-  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}
+  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(GP){GP.cur=null;GP.msgs=[]}
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
     flip(function(){stage.dataset.state='home';thread.hidden=true;ta.placeholder=AG[S.agent].ph;autosize()});
@@ -1831,7 +1880,8 @@ SB.loadHist=async function(){
   SB.hist={garantias:[],cobros:[],mi:[]};
   r.data.forEach(function(c){var L=SB.hist[c.agent];if(L&&L.length<12)L.push({id:c.id,t:c.title,s:SB.dayLbl(c.created_at),q:c.text})});
 };
-SB.saveConv=function(text){
+SB.saveConv=function(text,files){
+  if(S.agent==='garantias'){GP.save(text,files);return}
   if(!SB.c||!SB.entered||S.convId)return;
   var id=crypto.randomUUID(),t=text.trim(),agent=S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'garantias';
   S.convId=id;var title=t.length>48?t.slice(0,45).replace(/\s+\S*$/,'')+'…':t;
@@ -1839,7 +1889,7 @@ SB.saveConv=function(text){
 };
 SB.saveExp=function(c){
   if(!SB.c||!SB.entered)return;
-  var row={id:c.expId,conversation_id:S.convId||null,cliente:c.cliente||null,folio:c.folio,brand:c.brand,sys:c.sys,rule_id:c.ruleId,queja:c.rawText||c.queja,vin:c.vinReal||null,wo:c.wo||null,vehicle:c.vehicle,km:c.km,op:c.op,opd:c.opd,hours:c.h,parts:c.parts,parts_total:c.partsTot,labor:c.labor,codes:c.codes||null};
+  var row={id:c.expId,conversation_id:S.convId||null,cliente:c.cliente||null,folio:c.folio,brand:c.brand,sys:c.sys,rule_id:c.ruleId,queja:c.rawText||c.queja,vin:c.vinReal||null,wo:c.wo||null,vehicle:c.vehicle,km:c.km,op:c.op,opd:c.opd,hours:c.h,parts:c.parts,parts_total:c.partsTot,labor:c.labor,codes:c.codes||GMCODES[c.sys]||GMCODES['Diagnóstico general']};
   c.expP=SB.c.from('expedientes').insert(row).then(function(r){if(r.error)SB.fail(r.error);return r});
 };
 SB.setExpStatus=async function(id,st){
@@ -2920,6 +2970,145 @@ document.addEventListener('click',function(e){
 });
 
 document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('.mi-wrap [data-folio]');if(f){EX.q=f.dataset.folio;$('#exQ').value=EX.q;EX.f='todos';showView('exp')}});
+/* ===== Agente de Garantías: panel de conversaciones, tituladas con el número de orden (GA4041) ===== */
+var GP={list:[],q:'',cur:null,msgs:[],t:0};
+GP.norm=function(v){
+  v=String(v||'').toUpperCase().replace(/\s+/g,'');var m;
+  if((m=v.match(/^([A-Z]{1,3})-?(\d{3,8})$/)))return m[1]+m[2];
+  if((m=v.match(/^G-([A-Z0-9]{6,10})$/)))return 'G-'+m[1];
+  return null;
+};
+GP.orden=function(text,files){
+  var src=String(text||'')+' '+(files||[]).map(function(f){return f.name}).join(' '),m;
+  if((m=src.match(/\bGA\s?-?\s?\d{3,8}\b/i)))return GP.norm(m[0]);
+  if((m=src.match(/\bG-[A-Z0-9]{6,10}\b/i)))return GP.norm(m[0]);
+  if((m=src.match(/\b(?:orden(?: de trabajo)?|OT)\s*(?:n[uú]mero|no\.?|#|:)?\s*([A-Z]{1,3}-?\d{3,8})\b/i)))return GP.norm(m[1]);
+  return null;
+};
+GP.orderOnly=function(text){
+  var m=String(text||'').trim().match(/^(?:(?:la |mi )?(?:orden|ot)(?: de trabajo)?(?: es| n[uú]mero)?|es|n[uú]mero)?[\s:#]*([A-Za-z]{1,3}-?\d{3,8}|G-[A-Za-z0-9]{6,10})[.!\s]*$/i);
+  return m?GP.norm(m[1]):null;
+};
+GP.load=async function(){
+  if(!SB.c||!SB.entered)return;
+  var r=await SB.c.from('conversations').select('id,title,orden,text,created_at,expedientes(status,folio)').eq('agent','garantias').order('created_at',{ascending:false}).limit(200);
+  if(r.error){SB.fail(r.error);return}
+  GP.list=r.data;GP.t=Date.now();GP.render();
+};
+GP.render=function(){
+  var box=$('#gpList');if(!box)return;
+  var q=norm(GP.q),L=GP.list.filter(function(c){return !q||norm((c.orden||'')+' '+(c.text||'')+' '+(c.title||'')).indexOf(q)>=0});
+  $('#gpCount').textContent=GP.list.length?GP.list.length+(GP.list.length===1?' conversación':' conversaciones'):'Se guardan solas';
+  if(!L.length){box.innerHTML='<div class="gp-none">'+(GP.list.length?'Sin resultados.':'Aún no hay conversaciones.<br>Escribe un caso con su número de orden, por ejemplo <b>GA4041</b>, y se guarda solo.')+'</div>';return}
+  var html='',last='';
+  L.forEach(function(c){
+    var day=SB.dayLbl(c.created_at);if(day!==last){html+='<div class="gp-d">'+esc(day)+'</div>';last=day}
+    var ex=(c.expedientes&&c.expedientes[0])||null,st=ex?ex.status:'none',stl={borrador:'Esperando respuesta del fabricante',aceptada:'Aceptada por el fabricante',rechazada:'Rechazada por el fabricante',none:'Sin PREA generada'};
+    html+='<div class="gp-i" role="listitem" tabindex="0" data-id="'+ea(c.id)+'"'+(S.convId===c.id?' aria-current="true"':'')+'>'+
+      '<div class="gp-t'+(c.orden?'':' no')+'"><i class="gp-st '+st+'" title="'+ea(stl[st])+'"></i>'+esc(c.orden||'Sin orden')+'</div><div class="gp-q">'+esc(MI.cl(c.text||'',70))+'</div>'+
+      '<span class="gp-a"><button type="button" class="gp-b" data-gp="ren" aria-label="Cambiar número de orden" title="Cambiar número de orden">✎</button><button type="button" class="gp-b" data-gp="del" aria-label="Eliminar conversación" title="Eliminar">×</button></span></div>';
+  });
+  box.innerHTML=html;
+};
+/* guarda sola la conversación: la primera vez que se escribe, con el número de orden como título */
+GP.save=function(text,files){
+  if(!SB.c||!SB.entered)return;
+  var ord=GP.orden(text,files);
+  if(S.convId){
+    if(ord&&!GP.cur){GP.cur=ord;var id0=S.convId;S.convP=Promise.resolve(S.convP).then(function(){return GP.setOrden(id0,ord)})}
+    return;
+  }
+  var id=crypto.randomUUID(),t=String(text||'').trim()||(files&&files[0]&&files[0].name)||'Conversación';
+  S.convId=id;GP.cur=ord;GP.msgs=[];
+  S.convP=(async function(){
+    if(ord){
+      var f=await SB.c.from('conversations').select('id,messages').eq('agent','garantias').eq('orden',ord).limit(1);
+      if(!f.error&&f.data&&f.data[0]){S.convId=f.data[0].id;GP.msgs=Array.isArray(f.data[0].messages)?f.data[0].messages.slice():[];toast('Continuando la conversación '+ord);return}
+    }
+    var ins=await SB.c.from('conversations').insert({id:id,agent:'garantias',title:ord||'Sin orden',text:t.slice(0,2000),orden:ord});
+    if(ins.error)SB.fail(ins.error);
+  })().then(function(){SB.loadHist();return GP.load()});
+};
+GP.setOrden=async function(id,ord){
+  var r=await SB.c.from('conversations').update({orden:ord,title:ord}).eq('id',id);
+  if(r.error){SB.fail(r.error);toast('No se pudo guardar el número de orden');return false}
+  await SB.c.from('expedientes').update({wo:ord}).eq('conversation_id',id);
+  var c=GP.list.filter(function(x){return x.id===id})[0];if(c){c.orden=ord;c.title=ord}
+  if(S.convId===id){GP.cur=ord;crumb2.textContent=ord}
+  SB.loadHist();GP.render();return true;
+};
+GP.rename=async function(id){
+  var c=GP.list.filter(function(x){return x.id===id})[0];if(!c)return;
+  var v=await HM.dlg({title:'Número de orden',intro:'Será el título de esta conversación y la orden de su PREA.',fields:[{k:'o',label:'Orden',value:c.orden||'',ph:'GA4041',req:true}],ok:'Guardar'});
+  if(!v)return;var o=GP.norm(v.o);
+  if(!o){toast('Escribe una orden válida, por ejemplo GA4041');return}
+  if(await GP.setOrden(id,o))toast('Conversación titulada '+o);
+};
+GP.del=async function(id){
+  var c=GP.list.filter(function(x){return x.id===id})[0];if(!c)return;
+  if(!confirm('¿Eliminar la conversación '+(c.orden||'sin orden')+'? Su PREA se conserva en Expedientes.'))return;
+  var r=await SB.c.from('conversations').delete().eq('id',id);
+  if(r.error){SB.fail(r.error);toast('No se pudo eliminar');return}
+  GP.list=GP.list.filter(function(x){return x.id!==id});SB.loadHist();
+  if(S.convId===id)document.getElementById('newChat').click();else GP.render();
+};
+GP.remember=function(u,a){
+  GP.msgs.push({role:'user',content:String(u||'').slice(0,2000)},{role:'assistant',content:String(a||'').slice(0,3000)});
+  if(GP.msgs.length>40)GP.msgs=GP.msgs.slice(-40);GP.persist();
+};
+GP.persist=async function(){
+  if(!SB.c||!SB.entered)return;
+  try{if(S.convP)await S.convP;if(!S.convId)return;await SB.c.from('conversations').update({messages:GP.msgs}).eq('id',S.convId)}catch(e){console.warn('[Conversaciones]',e)}
+};
+GP.ack=function(o){
+  var w=addAssistant();hideRegen(w);$('.ai-body',w).innerHTML=md('Listo, esta conversación queda titulada **'+o+'**. Cuéntame el caso del cliente y armo la PREA.',false);
+  w._text='Listo, esta conversación queda titulada '+o+'. Cuéntame el caso del cliente y armo la PREA.';$('.ai-actions',w).hidden=false;toBottom(true);
+};
+GP.prea=function(e){
+  var mo=function(n){return EX.money(Number(n||0))},cd=e.codes||{},cj=function(a){return a&&a.length?a.join(' - '):'—'};
+  var parts=(Array.isArray(e.parts)?e.parts:[]).map(function(p){return p.no+' · '+p.d+' ×'+p.q+(p.pr?' · '+mo(p.pr):'')}).join('\n')||'—';
+  var rows=[['Orden',e.wo||'—',e.wo||''],['Cliente',e.cliente||'—',e.cliente||''],['Queja',cj(cd.q),cj(cd.q)],['Causa',cj(cd.c),cj(cd.c)],['Corrección',cj(cd.r),cj(cd.r)],['Operación',(e.op||'—')+(e.opd?' · '+e.opd:'')+(e.hours?' · '+e.hours+' h':''),e.op||''],['Piezas',parts,''],['Total (antes de IVA)',mo(Number(e.parts_total)+Number(e.labor)),'']];
+  var all=rows.filter(function(r){return r[1]!=='—'}).map(function(r){return r[0]+': '+r[1].replace(/\n/g,'; ')}).join('\n'),stl={borrador:'Esperando respuesta',aceptada:'Aceptada',rechazada:'Rechazada'};
+  return '<div class="gpc"><div class="gpc-h"><span>PREA '+esc(e.folio)+'</span><span class="st '+ea(e.status||'borrador')+'">'+(stl[e.status||'borrador'])+'</span></div>'+
+    rows.map(function(r){return '<div class="gpc-r"><span>'+r[0]+'</span><div>'+esc(r[1])+'</div>'+(r[2]?'<button type="button" data-gpcopy="'+ea(r[2])+'">Copiar</button>':'')+'</div>'}).join('')+
+    '<div class="gpc-f"><button type="button" data-gpcopy="'+ea(all)+'">Copiar todo</button><button type="button" data-gpexp="'+ea(e.folio)+'">Ver en Expedientes</button></div></div>';
+};
+GP.open=async function(id){
+  if(!SB.c||!SB.entered)return;
+  showView('agent');resetChat();S.convId=id;
+  var c=await SB.c.from('conversations').select('id,title,orden,text,messages').eq('id',id).single();
+  if(c.error||!c.data){SB.fail(c.error||'sin datos');toast('No se pudo abrir la conversación');return}
+  var cv=c.data;GP.cur=cv.orden;GP.msgs=Array.isArray(cv.messages)?cv.messages.slice():[];
+  enterChat(cv.orden||cv.title||'Conversación');
+  var ex=await SB.c.from('expedientes').select('id,folio,status,wo,cliente,op,opd,hours,parts,parts_total,labor,codes').eq('conversation_id',id).order('created_at',{ascending:true}).limit(10);
+  if(GP.msgs.length)GP.msgs.forEach(function(m){
+    if(m.role==='user')addUser(m.content,[]);
+    else{var w=addAssistant();hideRegen(w);$('.ai-body',w).innerHTML=md(m.content,false);w._text=m.content;$('.ai-actions',w).hidden=false}
+  });else addUser(cv.text||'',[]);
+  var rows=(ex.data||[]);
+  if(rows.length){
+    var w2=addAssistant();hideRegen(w2);$('.ai-body',w2).innerHTML=md(rows.length>1?'Estas son las PREAs de esta conversación.':'Esta es la PREA de esta conversación.',false);
+    var box=document.createElement('div');box.className='mi-wrap';box.innerHTML=rows.map(GP.prea).join('');$('.ai-col',w2).insertBefore(box,$('.ai-actions',w2));$('.ai-actions',w2).hidden=false;
+  }else if(!GP.msgs.length){
+    var w3=addAssistant();hideRegen(w3);$('.ai-body',w3).innerHTML=md('Esta conversación no llegó a generar una PREA. Puedes continuar escribiendo aquí.',false);$('.ai-actions',w3).hidden=false;
+  }
+  S.last=null;toBottom(true);GP.render();
+};
+(function(){
+  var list=$('#gpList');
+  list.addEventListener('click',function(e){
+    var b=e.target.closest('[data-gp]'),it=e.target.closest('.gp-i');if(!it)return;
+    if(b){e.stopPropagation();if(b.dataset.gp==='ren')GP.rename(it.dataset.id);else GP.del(it.dataset.id);return}
+    GP.open(it.dataset.id);
+  });
+  list.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.classList.contains('gp-i'))GP.open(e.target.dataset.id)});
+  $('#gpQ').addEventListener('input',function(){GP.q=this.value;GP.render()});
+  $('#gpNew').addEventListener('click',function(){document.getElementById('newChat').click()});
+  document.addEventListener('click',function(e){
+    var c=e.target.closest&&e.target.closest('[data-gpcopy]');if(c){copyText(c.dataset.gpcopy).then(function(){toast('Copiado')});return}
+    var x=e.target.closest&&e.target.closest('[data-gpexp]');if(x){EX.q=x.dataset.gpexp;$('#exQ').value=EX.q;EX.f='todos';showView('exp')}
+  });
+})();
 /* ---- ejemplos y configuración del agente ---- */
 var MI_EX=[
  {t:'Recordatorio',s:'Mañana a las 9',q:'Recuérdame mañana a las 9 llamar al cliente de la PREA pendiente'},
@@ -3063,7 +3252,7 @@ SB.enter=async function(user){
     await SB.loadAdvisors();
     $('#lg').hidden=true;
     await SB.pull(true);
-    SB.loadHist();
+    SB.loadHist();GP.load();
     MI.loadAgenda().then(MI.startTimer);
     showView('inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
@@ -3249,8 +3438,9 @@ async function agentTurn(w,ctx,intro,steps,sim,fin,my,build){
 async function run(text,files){
   var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
   var ctx=ctxFrom(text,files,S.brand),w=addAssistant();
-  var cm=(text||'').match(/\bcliente[:\s]+([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ0-9&.\-]*(?:\s+[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ0-9&.\-]*){0,4})/);
+  var cm=(text||'').match(/\bcliente[:\s]+([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ0-9&.\-]*(?:\s+(?:(?:del|de|la|las|los|y|e)\s+)?[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñ0-9&.\-]*){0,5})/);
   ctx.cliente=cm?cm[1].trim().slice(0,80):null;
+  var ordn=GP.orden(text,files)||GP.cur;if(ordn)ctx.wo=ordn;
   var tk=TK.make();$('.ai-col',w).insertBefore(tk.el,$('.ai-body',w));w._noThink=true;
   var kw=words(text||'').slice(0,5),s1=tk.step('Leyendo tu mensaje');
   await nap(550,my);s1.done(kw.length?'claves: '+kw.join(', '):'sin palabras clave claras');
@@ -3273,8 +3463,8 @@ async function run(text,files){
   tk.end(my.aborted);
   RS.note(ctx.matched);
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
-  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:''),my,buildPreaCard);
-  if(okp)SB.saveExp(ctx);
+  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
+  if(okp){SB.saveExp(ctx);GP.remember(text,w._text)}
   finish(my);
 }
 
@@ -3521,7 +3711,10 @@ async function runCobros(text,files){
   await agentTurn(w,ctx,introCB(ctx),[],function(){},finalCB(ctx),my,buildCobroCard);
   finish(my);
 }
-function start(text,files){SB.saveConv(text||(files[0]&&files[0].name)||'Conversación');return S.agent==='cobros'?runCobros(text,files):S.agent==='mi'?runMi(text,files):run(text,files)}
+function start(text,files){
+  if(S.agent==='garantias'){var oo=GP.orderOnly(text);if(oo){GP.save(text,files);GP.ack(oo);return}}
+  SB.saveConv(text||(files[0]&&files[0].name)||'Conversación',files);
+  return S.agent==='cobros'?runCobros(text,files):S.agent==='mi'?runMi(text,files):run(text,files)}
 
 function onSend(){
   if(S.streaming){if(S.ctrl)S.ctrl.aborted=true;return}
@@ -3534,6 +3727,7 @@ function onSend(){
   start(text,files);
 }
 async function loadHistory(h){
+  if(S.agent==='garantias')return GP.open(h.id);
   showView(curView());resetChat();S.convId=h.id;
   enterChat(h.t);
   if(S.agent==='mi'){await MI.replay(h);return}
