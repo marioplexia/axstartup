@@ -3333,7 +3333,7 @@ GP.think=async function(text,my){
   if(!SB.aiOff&&SB.entered){
     try{
       if(S.convP)await S.convP;if(GP.lastExpP)await GP.lastExpP;
-      var r=await SB.ai({mode:'garantias_chat',agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:text}]),ahora:MI.nowInfo()});
+      var r=await SB.ai({rol_agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:text}]),ahora:MI.nowInfo()},'manual');
       if(r&&r.text)return {md:r.text};
     }catch(e){SB.aiFail(e)}
   }
@@ -3940,7 +3940,7 @@ async function runPrueba(text,files){
 }
 /* ===== Bucle de autoaprendizaje: observar → aprender → aplicar → verificar, compartido entre agencias ===== */
 var LS={d:null,t:0,last:0};
-LS.TIPO={acierto:'Acierto',error:'Error',tiempo:'Tiempo',pieza:'Pieza',codigo:'Códigos',comentario:'Comentario',riesgo:'Riesgo'};
+LS.TIPO={patron:'Patrón',acierto:'Acierto',error:'Error',tiempo:'Tiempo',pieza:'Pieza',codigo:'Códigos',comentario:'Comentario',riesgo:'Riesgo'};
 LS.learnNow=async function(){
   if(!SB.c||!SB.entered)return;
   try{
@@ -4005,6 +4005,26 @@ LS.apply=async function(ctx){
   if(cambios.length)out.push('**Ajusté la PREA con lo aprendido**: '+cambios.join('; ')+'.');
   if(notes.length)out.push('**Ten en cuenta**: '+notes.slice(0,5).join(' · '));
   if(out.length){ctx.lessonNote='\n\n> **Lo que el cerebro aprendió de casos anteriores**'+(ctx.ruleId?' (regla '+ctx.ruleId+')':'')+'. '+out.join(' ');ctx.lessons=M.length;ctx.adjusted=cambios.length}
+};
+LS.applyCobros=async function(ctx){
+  if(!SB.c||!SB.entered)return;
+  var raw=(ctx.queja||'')+' '+(ctx.vehicle||''),vv=LS.veh(raw);
+  var r=await SB.c.from('reglas_lecciones').select('tipo,texto,vehiculo,contexto,efecto,created_at').order('created_at',{ascending:false}).limit(150);
+  var V={modelo:vv.modelo,anio:vv.anio,km:Number(ctx.km)||null,sys:ctx.sys,op:ctx.op,txt:raw};
+  var M=(r.data||[]).map(function(l){var m=LS.match(l.contexto,V);return m&&(l.efecto&&l.efecto.pago||l.tipo==='riesgo'&&/pago|cobrar/i.test(l.texto))?{l:l,m:m}:null}).filter(Boolean);
+  M.sort(function(a,b){return (b.m.n-a.m.n)||String(b.l.created_at).localeCompare(String(a.l.created_at))});
+  var notes=[],mo=function(n){return money(Math.round(n))};
+  var best=M.filter(function(x){return x.l.efecto&&x.l.efecto.pago})[0];
+  if(best){
+    var pg=best.l.efecto.pago,lr=pg.labor_ratio,pr=pg.piezas_ratio;
+    var where=best.l.vehiculo?'en '+best.l.vehiculo:'en un caso parecido';
+    var alt=(lr!=null&&pr!=null)?ctx.lc*lr+ctx.pc*pr:null;
+    notes.push(where+' ('+(best.m.esp?'mismo contexto':'misma operación y sistema')+') planta pagó '+(lr!=null?Math.round(lr*100)+'% de la mano de obra':'')+(lr!=null&&pr!=null?' y ':'')+(pr!=null?Math.round(pr*100)+'% de las piezas':'')+(alt!=null?', lo que daría unos '+mo(alt)+' antes de IVA para esta PREA':''));
+  }
+  M.filter(function(x){return x.l.tipo==='riesgo'}).slice(0,2).forEach(function(x){notes.push(x.l.texto)});
+  var lat=(r.data||[]).filter(function(l){return /tard[óo] \d+ d[ií]a\(s\) en pagar/.test(l.texto)&&LS.match(l.contexto,V)})[0];
+  if(lat)notes.push(lat.texto.replace(/^.*?(planta tard[óo])/i,'Planta tardó').replace(/\.$/,''));
+  if(notes.length)ctx.lessonNote='\n\n> **Lo que el cerebro aprendió de pagos anteriores**: '+notes.join(' · ');
 };
 LS.onNew=function(p){
   var n=p.new||{};
@@ -4398,7 +4418,7 @@ CB.prepare=async function(text,files,tk,my){
   };
   if(!folio)return {kind:'msg',text:'Dime el **número de orden** (por ejemplo GA4041) o el **folio de la PREA aceptada** (PREA-…), o adjunta su archivo, y calculo cuánto va a pagar planta.'+await pend()};
   var s2=tk.step('Buscando la PREA en tus aceptadas');
-  var r=await SB.c.from('cartera').select('*,expedientes!inner(folio,sys,op,opd,queja,labor,parts_total,wo)').eq('expedientes.folio',folio).limit(1);
+  var r=await SB.c.from('cartera').select('*,expedientes!inner(folio,sys,op,opd,queja,labor,parts_total,wo,vehicle,km)').eq('expedientes.folio',folio).limit(1);
   if(r.error)throw r.error;
   var row=r.data[0];
   await pace(500);if(my.aborted)return {kind:'aborted'};
@@ -4415,7 +4435,7 @@ CB.prepare=async function(text,files,tk,my){
   await CB.get();var b=CB.pick(ex);
   await pace(650);if(my.aborted)return {kind:'aborted'};
   s3.done(b?b.n+(b.n===1?' pago':' pagos')+' · base: '+CB.baseTxt(b,ex):'sin pagos registrados todavía');
-  var c={prea:folio,wo:ex.wo||ord||null,id:row.expediente_id,sys:ex.sys,op:ex.op,opd:ex.opd,queja:ex.queja,claim:claim,lc:lc,pc:pc,basis:b,estado:row.estado,factura:row.factura};
+  var c={prea:folio,wo:ex.wo||ord||null,vehicle:ex.vehicle,km:ex.km,id:row.expediente_id,sys:ex.sys,op:ex.op,opd:ex.opd,queja:ex.queja,claim:claim,lc:lc,pc:pc,basis:b,estado:row.estado,factura:row.factura};
   var s4=tk.step('Calculando lo que pagará planta');
   if(b){
     var cl=function(x){return Math.min(1.2,Math.max(0,x))},rl=cl(b.rl!=null?b.rl:b.rp),rp=cl(b.rp!=null?b.rp:b.rl);
@@ -4432,7 +4452,8 @@ CB.prepare=async function(text,files,tk,my){
   return {kind:'ok',ctx:c};
 };
 function introCB(c){return 'Entendido. Busco la PREA **'+c.prea+'** entre tus aceptadas, reviso cuánto ha pagado planta en casos parecidos y calculo cuánto va a pagar por esta transacción.'}
-function finalCB(c){
+function finalCB(c){return finalCB0(c)+(c.lessonNote||'')}
+function finalCB0(c){
   if(!c.basis)return 'Todavía no tengo pagos de planta registrados, así que no puedo estimar cuánto va a pagar sin inventarlo.\n\n1. **Reclamado**: '+money(c.claim)+' antes de IVA (es lo máximo que planta podría pagar)\n\nCada vez que planta pague una PREA, registra el monto recibido en **Cartera**. Con esos pagos aprendo y empiezo a estimar.';
   var b=c.basis;
   return 'Esto es lo que calculo que planta pagará por la PREA **'+c.prea+'**.\n\n1. **Reclamado**: '+money(c.claim)+' antes de IVA\n2. **Mano de obra**: planta pagará **'+money(c.estL)+'** de '+money(c.lc)+' reclamados (≈ '+Math.round(c.rl*100)+'%)\n3. **Piezas**: planta pagará **'+money(c.estP)+'** de '+money(c.pc)+' reclamadas (≈ '+Math.round(c.rp*100)+'%)\n4. **Total antes de IVA**: **'+money(c.est)+'**, con IVA (16%) **'+money(c.total)+'**\n5. **Rango probable**: '+money(c.lo)+' a '+money(c.hi)+'\n6. **Confianza**: '+c.conf+'%, aprendida de '+b.n+(b.n===1?' pago':' pagos')+' de '+CB.baseTxt(b,{op:c.op,sys:c.sys})+'\n\nFactura '+money(c.est)+' antes de IVA para evitar refacturar. '+(b.n<2?'Es un solo pago de referencia, tómalo con cautela. ':'')+'Cuando planta pague, registra el monto recibido en **Cartera** y mi próxima estimación será más precisa.';
@@ -4454,6 +4475,7 @@ async function runCobros(text,files){
   if(my.aborted||out.kind==='aborted'){$('.ai-body',w).innerHTML='<p class="muted">Respuesta detenida.</p>';$('.ai-actions',w).hidden=false;finish(my);return}
   if(out.kind==='msg'){var full=await stream($('.ai-body',w),out.text,my);w._text=full.replace(/\*\*/g,'');$('.ai-actions',w).hidden=false;finish(my);return}
   var ctx=out.ctx;CB.last=ctx;
+  try{await LS.applyCobros(ctx)}catch(_){}
   if(ctx.wo&&!GP.cur&&S.convId){var oc=ctx.wo,ci=S.convId;S.convP=Promise.resolve(S.convP).then(function(){return GP.setOrden(ci,oc)})}
   await agentTurn(w,ctx,introCB(ctx),[],function(){},finalCB(ctx),my,buildCobroCard);
   GP.remember(text,w._text||finalCB(ctx).replace(/\*\*/g,''));
