@@ -49,6 +49,7 @@
     <button class="go" type="submit">Entrar</button>
     <div class="err" role="alert"></div>
     <p class="alt">¿No tienes cuenta? <a data-go="reg">Crea una</a></p>
+    <button class="go" type="button" id="b-prueba" hidden style="margin-top:10px;background:transparent;color:inherit;border:1px solid currentColor">Entrar en modo prueba</button>
   </form>
 
   <form id="f-reg" novalidate hidden>
@@ -116,6 +117,11 @@
       var o=document.createElement('option');o.value=a.id;o.textContent=a.name;groups[a.region].appendChild(o);
     });
   }).catch(function(){$('#r-ag').innerHTML='<option value="">No se pudieron cargar las agencias</option>'});
+
+  fetch('/api/auth/config').then(function(r){return r.json()}).then(function(c){
+    if(!c.modoPrueba)return;var b=$('#b-prueba');b.hidden=false;
+    b.onclick=function(){send(forms.log,'/api/auth/prueba',{})};
+  }).catch(function(){});
 
   if(location.hash==='#registro')show('reg');
 })();

@@ -69,6 +69,25 @@ router.post('/login', async (req, res) => {
   res.json({ token: sign(row.id), user: publicUser(row) });
 });
 
+// Modo prueba (solo con AX_MODO_PRUEBA=1): entra como asesor de demostración sin contraseña.
+const MODO_PRUEBA = process.env.AX_MODO_PRUEBA === '1';
+router.get('/config', (_req, res) => res.json({ modoPrueba: MODO_PRUEBA }));
+router.post('/prueba', (_req, res) => {
+  if (!MODO_PRUEBA) return res.status(404).json({ error: 'No encontrado.' });
+  const email = 'prueba@ax.test';
+  let row = db.prepare(USER_SQL + ' WHERE a.email = ?').get(email);
+  if (!row) {
+    const ag = db.prepare('SELECT id FROM agencies ORDER BY id LIMIT 1').get();
+    db.prepare(`INSERT INTO advisors (id, name, email, agency_id, password_hash, role, created_at)
+                VALUES ('prueba', 'Asesor de prueba', ?, ?, NULL, 'asesor', ?)`).run(email, ag.id, Date.now());
+    db.prepare(`INSERT OR IGNORE INTO rule_distribution (rule_id, advisor_id, delivered_at)
+                SELECT id, 'prueba', ? FROM rules WHERE status = 'activa'`).run(Date.now());
+    db.prepare("UPDATE settings SET value = CAST(value AS INTEGER) + 1 WHERE key = 'rev'").run();
+    row = db.prepare(USER_SQL + ' WHERE a.id = ?').get('prueba');
+  }
+  res.json({ token: sign(row.id), user: publicUser(row) });
+});
+
 // Middleware: exige "Authorization: Bearer <token>"
 function requireAuth(req, res, next) {
   const m = /^Bearer (.+)$/.exec(req.headers.authorization || '');
