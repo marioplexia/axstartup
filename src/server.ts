@@ -8,6 +8,7 @@ import { outcomeRoutes } from './routes/outcome.js';
 import { nightlyRoutes } from './routes/nightly.js';
 import { rulesRoutes } from './routes/rules.js';
 import { eventsRoutes } from './routes/events.js';
+import { ordersRoutes } from './routes/orders.js';
 
 declare module 'fastify' { interface FastifyRequest { principal?: Principal } }
 
@@ -25,7 +26,7 @@ export function assertAgency(p: Principal, agencyId: string) {
 export async function buildServer(deps: Partial<Deps> = {}): Promise<FastifyInstance> {
   const d: Deps = { llm: deps.llm ?? makeLlm() };
   // El logger solo registra método, ruta y estado: nunca cuerpos ni cabeceras (datos personales).
-  const app = Fastify({ forceCloseConnections: true, logger: process.env.NODE_ENV === 'test' || process.env.VITEST ? false : { level: 'info', serializers: {
+  const app = Fastify({ forceCloseConnections: true, logger: process.env.NODE_ENV === 'test' || process.env.VITEST || process.env.LOG_LEVEL === 'silent' ? false : { level: process.env.LOG_LEVEL ?? 'info', serializers: {
     req: r => ({ method: r.method, url: r.url?.split('?')[0] }), res: r => ({ statusCode: r.statusCode }) } } });
 
   app.addHook('onRequest', async (req, reply) => {
@@ -51,6 +52,7 @@ export async function buildServer(deps: Partial<Deps> = {}): Promise<FastifyInst
   await app.register(async i => nightlyRoutes(i, d));
   await app.register(async i => rulesRoutes(i));
   await app.register(async i => eventsRoutes(i));
+  await app.register(async i => ordersRoutes(i));
   return app;
 }
 

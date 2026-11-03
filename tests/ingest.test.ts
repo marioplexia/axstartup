@@ -104,3 +104,19 @@ describe('ingesta', () => {
     await expect(ingestOrder(T, { order_number: '' })).rejects.toThrow();
   });
 });
+
+describe('POST /orders/import', () => {
+  it('importa por API, exige auth y limita al asesor a su agencia', async () => {
+    const { buildServer } = await import('../src/server.js');
+    const { signDevToken } = await import('../src/auth.js');
+    const app = await buildServer();
+    const adv = await signDevToken({ userId: IDS.advisor(0), groupId: IDS.group, role: 'advisor', agencyId: AG });
+    expect((await app.inject({ method: 'POST', url: '/orders/import', payload: fullOrder('ORD-API-1') })).statusCode).toBe(401);
+    const ok = await app.inject({ method: 'POST', url: '/orders/import', headers: { authorization: `Bearer ${adv}` }, payload: fullOrder('ORD-API-1') });
+    expect(ok.statusCode).toBe(200);
+    expect(ok.json().orderCreated).toBe(true);
+    const otherAgency = await app.inject({ method: 'POST', url: '/orders/import', headers: { authorization: `Bearer ${adv}` }, payload: { ...fullOrder('ORD-API-2'), agency_id: IDS.agencies[1][0] } });
+    expect(otherAgency.statusCode).toBe(403);
+    expect((await app.inject({ method: 'POST', url: '/orders/import', headers: { authorization: `Bearer ${adv}` }, payload: { order_number: '' } })).statusCode).toBe(400);
+  });
+});

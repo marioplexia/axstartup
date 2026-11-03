@@ -13,12 +13,17 @@ export async function seed(c: pg.Pool | pg.PoolClient | pg.Client): Promise<void
   await c.query(`insert into users(id,group_id,email,display_name,role) values ($1,$2,'revisor@fame.example.test','Revisor FAME','reviewer') on conflict do nothing`, [IDS.reviewer, IDS.group]);
   await c.query(`insert into users(id,group_id,email,display_name,role) values ($1,$2,'dueno@fame.example.test','Dueño FAME','owner') on conflict do nothing`, [IDS.owner, IDS.group]);
 
+  await seedKnowledge(c, IDS.group, IDS.brand);
+}
+
+/** Reglas del formulario y tabuladores iniciales FICTICIOS para un grupo/marca dados. */
+export async function seedKnowledge(c: pg.Pool | pg.PoolClient | pg.Client, groupId: string, brandId: string): Promise<void> {
   // Reglas bucle 1 derivadas SOLO del formulario: campo obligatorio. Las demás se aprenden con expedientes.
   for (const [key, label] of FORM_FIELDS) {
     await c.query(
       `insert into rules(group_id,brand_id,rule_key,version,loop,status,kind,title,severity,condition,origin,valid_from)
        values ($1,$2,$3,1,1,'active','required_field',$4,'blocker',$5,'form','2024-01-01') on conflict do nothing`,
-      [IDS.group, IDS.brand, `form.required.${key}`, `Campo obligatorio: ${label}`, JSON.stringify({ type: 'required_field', field: key })]);
+      [groupId, brandId, `form.required.${key}`, `Campo obligatorio: ${label}`, JSON.stringify({ type: 'required_field', field: key })]);
   }
 
   // Tabuladores iniciales FICTICIOS (bucle 2). Se afinan con pagos reales vía corte nocturno.
@@ -26,7 +31,7 @@ export async function seed(c: pg.Pool | pg.PoolClient | pg.Client): Promise<void
     c.query(
       `insert into tabulators(group_id,brand_id,tab_key,version,kind,subject,value,unit,status,valid_from,origin)
        values ($1,$2,$3,1,$4,$5,$6,$7,'active','2024-01-01','seed') on conflict do nothing`,
-      [IDS.group, IDS.brand, key, kind, subject, value, unit]);
+      [groupId, brandId, key, kind, subject, value, unit]);
   await tab('labor_rate', 'labor_rate', null, LABOR_RATE_MXN, 'MXN/h');
   await tab('deductible', 'deductible', null, 0, 'MXN');
   for (const [op, h] of STD_OPS) await tab(`std_time:${op}`, 'standard_time', op, h, 'h');

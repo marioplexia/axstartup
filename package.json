@@ -10,6 +10,7 @@
     "db:seed": "tsx scripts/seed.ts",
     "dev": "tsx src/server.ts",
     "nightly": "tsx scripts/nightly.ts",
+    "ingest": "tsx scripts/ingest.ts",
     "eval:retro": "tsx scripts/eval-retro.ts",
     "demo": "tsx scripts/demo.ts"
   },
