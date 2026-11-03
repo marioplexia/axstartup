@@ -1,3 +1,4 @@
+import { FORM_FIELDS } from '../db/seedData.js';
 // Agente simulado y determinista para pruebas y demo. Imita el contrato del prompt, no el criterio del modelo.
 const KEYWORDS: Array<[kind: string, re: RegExp]> = [
   ['foto', /foto|imagen/i], ['orden_reparacion', /orden de reparaci[oó]n/i],
@@ -19,9 +20,14 @@ export function mockComplete(agent: string, input: any): unknown {
   }
   if (agent === 'rejection-classifier') {
     const t: string = (input.comment ?? '').toLowerCase();
-    const tax: Array<{ code: string; kw: string[] }> = input.taxonomy ?? [];
-    const hit = tax.find(c => c.kw.some(k => t.includes(k.toLowerCase())));
-    return { cause_code: hit?.code ?? 'otro', confidence: hit ? 0.9 : 0.3, evidence_kind: hit ? (input.evidence_hint ?? null) : null };
+    const tax: Array<{ code: string; keywords?: string[] }> = input.taxonomy ?? [];
+    const hit = tax.find(c => (c.keywords ?? []).some(k => t.includes(k.toLowerCase())));
+    let field: string | null = null;
+    if (hit?.code === 'campo_faltante') {
+      const f = FORM_FIELDS.find(([key, label]) => t.includes(key.replace(/_/g, ' ')) || t.includes(label.toLowerCase().replace(/ \(.*\)/, '')));
+      field = f ? f[0] : null;
+    }
+    return { cause_code: hit?.code ?? 'otro', confidence: hit ? 0.9 : 0.3, field };
   }
   throw new Error('agente mock desconocido: ' + agent);
 }

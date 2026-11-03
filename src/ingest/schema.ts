@@ -29,6 +29,7 @@ export const BundleSchema = z.object({
     field_history: z.array(z.object({ at: iso, field: z.string(), from: z.union([z.string(), z.number(), z.null()]), to: z.union([z.string(), z.number(), z.null()]) })).default([]),
     comments: z.array(z.object({ author_role: z.enum(['plant', 'advisor']), author: z.string(), authored_at: iso, body: z.string() })).default([]),
   }).optional(),
+  evidence: z.array(z.object({ kind: z.string(), filename: z.string(), version_no: z.number().int().min(1).default(1), sha256: z.string().optional(), text: z.string().optional() })).default([]),
   transactions: z.array(z.object({
     tx_number: z.string(),
     claim_date: z.string().optional(),

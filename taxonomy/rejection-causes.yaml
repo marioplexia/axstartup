@@ -1,0 +1,50 @@
+# Taxonomía de causas de rechazo de la planta. REVÍSALA Y EDÍTALA: es lo que el clasificador puede responder.
+# - code: identificador estable (no lo cambies una vez que haya reglas aprendidas con él)
+# - keywords: pistas para el clasificador simulado y para auditar; el modelo real usa label + description
+# - rule: plantilla de la regla candidata que se propone cuando la causa se repite.
+#         Si no hay `rule`, la causa se reporta en el corte pero NO genera regla automática.
+version: 1
+causes:
+  - code: falta_foto
+    label: Falta evidencia fotográfica
+    description: La planta pide fotos de la pieza, del daño o del vehículo que no venían en la PREA.
+    keywords: [foto, fotografía, imagen]
+    rule: { kind: required_evidence, evidence_kind: foto, severity: warning }
+  - code: falta_diagnostico
+    label: Falta diagnóstico o escaneo
+    description: La planta pide el reporte de diagnóstico, DTC o escaneo.
+    keywords: [diagnóstico, diagnostico, escaneo, dtc]
+    rule: { kind: required_evidence, evidence_kind: diagnostico, severity: warning }
+  - code: falta_orden_reparacion
+    label: Falta orden de reparación
+    description: La planta pide la orden de reparación firmada o completa.
+    keywords: [orden de reparación, orden de reparacion]
+    rule: { kind: required_evidence, evidence_kind: orden_reparacion, severity: warning }
+  - code: falta_factura
+    label: Falta factura de la pieza
+    description: La planta pide la factura o comprobante de la pieza.
+    keywords: [factura, comprobante]
+    rule: { kind: required_evidence, evidence_kind: factura, severity: warning }
+  - code: campo_faltante
+    label: Campo del formulario faltante o vacío
+    description: La planta indica que un campo del formulario GM está vacío o incompleto. El clasificador debe devolver `field` con la llave interna.
+    keywords: [campo, falta el, vacío, vacio, incompleto]
+    rule: { kind: required_field, severity: blocker }
+  - code: plazo_excedido
+    label: Plazo de envío excedido
+    description: La PREA se envió fuera del plazo permitido.
+    keywords: [plazo, extemporánea, extemporanea, fuera de tiempo]
+    rule: { kind: deadline, severity: blocker }
+  - code: duplicada
+    label: PREA duplicada
+    description: Ya existe otra PREA para la misma unidad y operación.
+    keywords: [duplicad, ya existe]
+    rule: { kind: duplicate, keys: [vin, work_op], window_days: 90, severity: blocker }
+  - code: codigos_inconsistentes
+    label: Códigos de queja/causa/corrección inconsistentes
+    description: Los códigos no son congruentes entre sí. Requiere una regla manual; no se genera automáticamente.
+    keywords: [inconsistente, no corresponde, código incorrecto, codigo incorrecto]
+  - code: otro
+    label: Otro / aceptación / sin causa clara
+    description: Comentario sin causa de rechazo identificable.
+    keywords: []

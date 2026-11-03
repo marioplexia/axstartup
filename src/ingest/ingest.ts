@@ -105,6 +105,13 @@ export async function ingestOrder(tenant: Tenant, raw: unknown): Promise<IngestR
       }
     }
 
+    for (const e of b.evidence) {
+      const r = await c.query(
+        `insert into evidence_files(group_id,order_id,kind,filename,version_no,sha256,extracted) values ($1,$2,$3,$4,$5,$6,$7) on conflict (order_id,kind,filename,version_no) do nothing`,
+        [tenant.groupId, orderId, e.kind, e.filename, e.version_no, e.sha256 ?? null, e.text ? JSON.stringify({ text: redact(e.text, { knownNames: names }).text }) : null]);
+      void r;
+    }
+
     // ---------- Transacciones ----------
     if (!b.transactions.length) await note('missing_transaction', {});
     const seenTx = new Set<string>();
