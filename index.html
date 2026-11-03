@@ -343,6 +343,16 @@ textarea,input{font:inherit;color:inherit}
 .cb-res{border:1px solid var(--card-line);border-radius:12px;background:var(--card);padding:12px 14px;margin:0 0 12px;font-size:13.5px}
 .cb-res .ln{display:flex;justify-content:space-between;gap:12px;padding:4px 0}.cb-res .ln+.ln{border-top:1px solid var(--line)}
 .cb-res .ln span{color:var(--muted)}.cb-res .ln.big b{font-size:16px}.cb-res small{color:var(--muted);display:block;margin-top:6px}
+#pgDlg{border:1px solid var(--card-line);border-radius:14px;background:var(--card);color:var(--fg);padding:0;width:min(420px,calc(100vw - 32px))}
+#pgDlg::backdrop{background:rgba(0,0,0,.45)}
+#pgDlg form{display:flex;flex-direction:column;gap:12px;padding:18px}
+#pgDlg h3{margin:0;font-family:var(--f-display);font-weight:500;font-size:22px;letter-spacing:-.02em}
+#pgDlg p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+#pgDlg label{display:flex;flex-direction:column;gap:5px;font-size:12.5px}
+#pgDlg input{font:inherit;font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--card-line);border-radius:10px;padding:9px 11px;outline:none}
+#pgDlg input:focus{border-color:var(--fg)}
+#pgDlg .row{display:flex;gap:8px;justify-content:flex-end}
+#pgDlg .err{color:#b4372b;font-size:13px;min-height:18px}
 .lg{position:fixed;inset:0;z-index:100;background:var(--bg);color:var(--fg);display:grid;place-items:center;padding:16px;overflow:auto}
 .lg[hidden]{display:none}
 .lg-card{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
@@ -644,6 +654,17 @@ textarea,input{font:inherit;color:inherit}
           <textarea id="adPaste" placeholder="O pega aquí las PREAs en CSV o JSON…" aria-label="Pegar PREAs aceptadas"></textarea>
           <div class="imp-row"><button class="bt pri" type="button" id="adPasteGo">Enseñar al agente</button><span class="imp-msg" id="adImpMsg" role="status"></span></div>
         </div>
+        <div class="ad-imp" id="adHist">
+          <p><b>Pagos históricos de planta</b> · el Agente de Cobros aprende de ellos desde el primer día. Sube lo que planta pagó en PREAs anteriores: mano de obra y piezas, reclamado contra pagado, antes de IVA (CSV, sin separador de miles). <span id="phCount"></span></p>
+          <div class="imp-row">
+            <input type="file" id="phFile" accept=".csv,.txt" hidden>
+            <button class="bt" type="button" onclick="document.getElementById('phFile').click()">Elegir archivo</button>
+            <button class="bt" type="button" id="phTpl">Descargar plantilla CSV</button>
+            <button class="bt dng" type="button" id="phClear">Borrar históricos</button>
+          </div>
+          <textarea id="phPaste" placeholder="O pega aquí los pagos históricos en CSV…" aria-label="Pegar pagos históricos"></textarea>
+          <div class="imp-row"><button class="bt pri" type="button" id="phGo">Enseñar al Agente de Cobros</button><span class="imp-msg" id="phMsg" role="status"></span></div>
+        </div>
         <div class="ad-grid">
           <div class="ad-card">
             <div class="ad-ch"><h3>Catálogo de reglas</h3><small id="adCount"></small>
@@ -662,6 +683,15 @@ textarea,input{font:inherit;color:inherit}
   <input type="file" id="fileIn" multiple hidden>
 </div>
 
+<dialog id="pgDlg"><form method="dialog" id="pgForm" novalidate>
+  <h3>Registrar pago de planta</h3>
+  <p id="pgInfo"></p>
+  <label>Mano de obra pagada (antes de IVA)<input id="pgL" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+  <label>Piezas pagadas (antes de IVA)<input id="pgP" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+  <label>Referencia del pago (opcional)<input id="pgR" autocomplete="off"></label>
+  <div class="err" id="pgE" role="status"></div>
+  <div class="row"><button class="bt" type="button" id="pgNo">Cancelar</button><button class="bt pri" type="submit">Guardar pago</button></div>
+</form></dialog>
 <div class="lg" id="lg">
   <form class="lg-card" id="lgForm" novalidate>
     <h1 id="lgTitle">Iniciar sesión</h1>
@@ -746,7 +776,7 @@ function showView(id){
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':(v==='agent'||v==='inicio')):v===id;b.setAttribute('aria-current',on?'true':'false')});
   var adm=id==='admin';stage.hidden=!main;$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera';$('#viewAdmin').hidden=!adm;$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
-  if(adm){adRender();AD.loadExp()}
+  if(adm){adRender();AD.loadExp();PH.count()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else RC.open()}
   else{crumb.textContent=AG[S.agent].crumb;syncCrumb()}
   if(mq.matches)setSb(false);
@@ -1665,7 +1695,7 @@ CAR.load=async function(){
   if(!SB.c||!SB.entered)return;
   $('#caSub').textContent=SB.user&&SB.user.role==='admin'?'Cuentas por cobrar de toda la agencia: factura, pago y antigüedad':'Cuentas por cobrar de tus PREAs aceptadas: factura, pago y antigüedad';
   CAR.loading=true;CAR.render();
-  var r=await SB.c.from('cartera').select('*,expedientes(folio,queja,sys,op),profiles(name)').order('created_at',{ascending:false}).limit(500);
+  var r=await SB.c.from('cartera').select('*,expedientes(folio,queja,sys,op,labor,parts_total),profiles(name)').order('created_at',{ascending:false}).limit(500);
   CAR.loading=false;
   if(r.error){SB.fail(r.error);CAR.rows=[]}else CAR.rows=r.data;
   CAR.render();CB.loadRefs();
@@ -1696,22 +1726,36 @@ CAR.render=function(){
     var e=x.expedientes||{},st=CAR.state(x),d=CAR.days(x),btn='';
     if(x.estado==='por_facturar')btn='<button class="bt" type="button" data-a="fact">Registrar factura</button>';
     else if(x.estado==='facturada')btn='<button class="bt pri" type="button" data-a="pago">Registrar pago</button>';
-    var sub=st==='pagada'?'pagada '+SB.dayLbl(x.pagada_at||x.updated_at)+(x.monto_pagado!=null?' · planta pagó '+EX.money(x.monto_pagado)+' ('+Math.round(100*x.monto_pagado/Math.max(1,x.monto))+'%)':'')+(x.estimado!=null?' · estimado '+EX.money(x.estimado):'')+(x.referencia?' · ref. '+esc(x.referencia):''):st==='por_facturar'?'aceptada hace '+d+' d':'factura '+esc(x.factura||'s/n')+' · hace '+d+' d';
+    var sub=st==='pagada'?'pagada '+SB.dayLbl(x.pagada_at||x.updated_at)+(x.monto_pagado!=null?' · planta pagó '+EX.money(x.monto_pagado)+(x.labor_pagada!=null?' (mano de obra '+EX.money(x.labor_pagada)+', piezas '+EX.money(x.piezas_pagadas)+')':' ('+Math.round(100*x.monto_pagado/Math.max(1,x.monto))+'%)'):'')+(x.estimado!=null?' · estimado '+EX.money(x.estimado):'')+(x.referencia?' · ref. '+esc(x.referencia):''):st==='por_facturar'?'aceptada hace '+d+' d':'factura '+esc(x.factura||'s/n')+' · hace '+d+' d';
     return '<div class="ca-row" data-id="'+ea(x.expediente_id)+'"><div><b>'+esc(e.folio||'')+'</b><small>'+esc(e.sys||'')+'</small></div>'+
       '<div class="q"><span title="'+ea(e.queja||'')+'">'+esc(e.queja||'')+'</span><small>'+sub+(admin&&x.profiles?' · '+esc(x.profiles.name):'')+'</small></div>'+
       '<div class="ca-h"><b>'+EX.money(x.monto)+'</b></div><div><span class="ca-st '+st+'">'+stl[st]+'</span> '+btn+'</div></div>';
   }).join('');
+};
+CAR.dlg=function(x){
+  return new Promise(function(res){
+    var d=$('#pgDlg'),e=x.expedientes||{},lc=Number(e.labor||0),pc=Number(e.parts_total||0);
+    $('#pgInfo').innerHTML='PREA <b>'+esc(e.folio||'')+'</b>. Reclamado: mano de obra '+EX.money(lc)+' · piezas '+EX.money(pc)+'.'+(x.estimado!=null?'<br>El agente estimó '+EX.money(x.estimado)+' en total.':'')+'<br>De aquí aprende el Agente de Cobros. Si no sabes el desglose, deja ambos vacíos.';
+    $('#pgL').value='';$('#pgP').value='';$('#pgR').value='';$('#pgE').textContent='';
+    var done=false,fin=function(v){if(done)return;done=true;d.close();res(v)};
+    $('#pgForm').onsubmit=function(ev){
+      ev.preventDefault();
+      var n=function(v){v=v.trim();return v===''?null:Number(v.replace(/[$,\s]/g,''))},l=n($('#pgL').value),p=n($('#pgP').value),r=$('#pgR').value.trim().slice(0,60)||null;
+      if((l==null)!==(p==null)){$('#pgE').textContent='Llena mano de obra y piezas, o deja ambas vacías.';return}
+      if(l!=null&&(!(l>=0)||!(p>=0)||l>lc*3+1||p>pc*3+1)){$('#pgE').textContent='Revisa los importes: deben ser números positivos y razonables.';return}
+      fin({l:l,p:p,r:r});
+    };
+    $('#pgNo').onclick=function(){fin(null)};d.oncancel=function(){fin(null)};
+    d.showModal();$('#pgL').focus();
+  });
 };
 CAR.act=async function(id,a){
   var x=CAR.rows.filter(function(r){return r.expediente_id===id})[0];if(!x)return;
   var patch={updated_at:new Date().toISOString()};
   if(a==='fact'){var f=prompt('Folio de la factura:');if(f==null)return;f=f.trim();if(!f){toast('Escribe el folio de la factura');return}
     patch.estado='facturada';patch.factura=f.slice(0,60);patch.facturada_at=patch.updated_at}
-  else{var pm=prompt('¿Cuánto pagó planta, ANTES de IVA? (de aquí aprende el Agente de Cobros; déjalo vacío si no lo sabes)'+(x.estimado!=null?'\nEl agente estimó '+money(Number(x.estimado))+'.':''));if(pm==null)return;
-    var pv=pm.trim()?Number(pm.replace(/[$,\s]/g,'')):null;
-    if(pm.trim()&&!(pv>=0&&pv<=Number(x.monto)*3)){toast('Escribe un importe válido, por ejemplo 3500.50');return}
-    var rf=prompt('Referencia del pago (opcional):');if(rf==null)return;
-    patch.estado='pagada';patch.monto_pagado=pv;patch.referencia=rf.trim().slice(0,60)||null;patch.pagada_at=patch.updated_at}
+  else{var pg=await CAR.dlg(x);if(!pg)return;
+    patch.estado='pagada';patch.labor_pagada=pg.l;patch.piezas_pagadas=pg.p;patch.monto_pagado=pg.l==null?null:r2(pg.l+pg.p);patch.referencia=pg.r;patch.pagada_at=patch.updated_at}
   var old=Object.assign({},x);Object.assign(x,patch);CAR.render();
   var r=await SB.c.from('cartera').update(patch).eq('expediente_id',id);
   if(r.error){Object.assign(x,old);CAR.render();SB.fail(r.error);toast('No se pudo guardar el cambio');return}
@@ -1722,6 +1766,51 @@ document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('#caList [data-a]');if(b)CAR.act(b.closest('.ca-row').dataset.id,b.dataset.a);
 });
 $('#caQ').addEventListener('input',function(){CAR.q=this.value;CAR.render()});
+/* ---- Pagos históricos de planta: arranque del Agente de Cobros ---- */
+var PH={template:'folio,sistema,operacion,mano_obra_reclamada,piezas_reclamadas,mano_obra_pagada,piezas_pagadas,fecha\nPREA-100342,Frenos,OP-FR-011,1900,3200,1900,2700,2026-08-14\n'};
+PH.num=function(v){var n=parseFloat(String(v==null?'':v).replace(/[$,\s]/g,''));return isNaN(n)?null:n};
+PH.msg=function(t,err){var m=$('#phMsg');m.textContent=t;m.className='imp-msg'+(err?' err':'')};
+PH.parse=function(text){
+  var rows=parseCSV(text),map={},nof=[],bad=0;
+  rows.forEach(function(o){
+    var g=function(){for(var i=0;i<arguments.length;i++){var v=o[arguments[i]];if(v!=null&&String(v).trim()!=='')return String(v).trim()}return ''};
+    var lr=PH.num(g('mano_obra_reclamada','labor_reclamada')),pr=PH.num(g('piezas_reclamadas')),lp=PH.num(g('mano_obra_pagada','labor_pagada')),pp=PH.num(g('piezas_pagadas'));
+    if(lr==null)lr=0;if(pr==null)pr=0;
+    if(lp==null||pp==null||lr<0||pr<0||lp<0||pp<0||lr+pr<=0||lp+pp>(lr+pr)*1.5){bad++;return}
+    var f=g('fecha'),r={folio:g('folio','prea')||null,sys:g('sistema')||null,op:g('operacion','codigo_operacion')||null,labor_reclamada:lr,piezas_reclamadas:pr,labor_pagada:lp,piezas_pagadas:pp,fecha:/^\d{4}-\d{2}-\d{2}$/.test(f)?f:null};
+    if(r.folio)map[r.folio]=r;else nof.push(r);
+  });
+  return {ok:Object.keys(map).map(function(k){return map[k]}).concat(nof),bad:bad};
+};
+PH.count=async function(){
+  if(!SB.c||!SB.entered)return;
+  var r=await SB.c.from('pagos_historicos').select('id',{count:'exact',head:true});
+  $('#phCount').textContent=r.error?'':'Cargados: '+(r.count||0)+' pagos.';
+};
+PH.import=async function(text){
+  if(!text.trim()){PH.msg('Elige un archivo o pega el contenido.',true);return}
+  var o=PH.parse(text);
+  if(!o.ok.length){PH.msg('No encontré pagos válidos. Usa la plantilla: reclamado y pagado de mano de obra y piezas.',true);return}
+  if(o.ok.length>5000){PH.msg('Máximo 5,000 filas por carga.',true);return}
+  PH.msg('Cargando '+o.ok.length+' pagos…');
+  try{
+    var withF=o.ok.filter(function(x){return x.folio}),noF=o.ok.filter(function(x){return !x.folio});
+    for(var i=0;i<withF.length;i+=500){var r=await SB.c.from('pagos_historicos').upsert(withF.slice(i,i+500),{onConflict:'folio'});if(r.error)throw r.error}
+    for(var j=0;j<noF.length;j+=500){var r2_=await SB.c.from('pagos_historicos').insert(noF.slice(j,j+500));if(r2_.error)throw r2_.error}
+    await CB.get();
+    PH.msg('Listo: '+o.ok.length+' pagos aprendidos'+(o.bad?' · '+o.bad+' filas omitidas por datos incompletos':'')+'. El Agente de Cobros ya los usa.');
+    $('#phPaste').value='';PH.count();
+  }catch(e){SB.fail(e);PH.msg('No se pudo cargar: '+SB.errEs(e),true)}
+};
+$('#phGo').addEventListener('click',function(){PH.import($('#phPaste').value)});
+$('#phFile').addEventListener('change',function(e){var f=e.target.files[0];e.target.value='';if(!f)return;f.text().then(function(t){PH.import(t)})});
+$('#phTpl').addEventListener('click',function(){var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(PH.template);a.download='plantilla-pagos-historicos.csv';document.body.appendChild(a);a.click();a.remove()});
+$('#phClear').addEventListener('click',async function(){
+  if(!confirm('Esto borra TODOS los pagos históricos cargados. Lo aprendido de los pagos registrados en Cartera se conserva. ¿Continuar?'))return;
+  var r=await SB.c.from('pagos_historicos').delete().gte('id',0);
+  if(r.error){PH.msg('No se pudo borrar: '+SB.errEs(r.error),true);return}
+  PH.msg('Pagos históricos borrados.');PH.count();
+});
 var ctxReg={};function ctxOf(id){return ctxReg[id]}
 var EX={rows:[],f:'todos',q:'',loading:false};
 EX.load=async function(){
@@ -2148,7 +2237,7 @@ async function simCobros2(card,ctx,my){
 var CB={learned:[],steps:['Leer la PREA y su folio','Buscar la PREA en tus aceptadas','Consultar lo aprendido de pagos anteriores de planta','Calcular lo que pagará planta','Dejar el importe listo para facturar']};
 CB.get=async function(){
   var r=await SB.c.rpc('pago_aprendido');if(r.error)throw r.error;
-  CB.learned=(r.data||[]).map(function(x){return {nivel:x.nivel,clave:x.clave,n:x.n,ratio:Number(x.ratio),rmin:Number(x.rmin),rmax:Number(x.rmax)}});
+  CB.learned=(r.data||[]).map(function(x){return {nivel:x.nivel,clave:x.clave,n:x.n,rl:x.r_labor==null?null:Number(x.r_labor),rp:x.r_piezas==null?null:Number(x.r_piezas),rmin:Number(x.rmin),rmax:Number(x.rmax)}}).filter(function(x){return x.rl!=null||x.rp!=null});
 };
 CB.pick=function(ex){
   var L=CB.learned,f=function(nv,k){return L.filter(function(x){return x.nivel===nv&&(nv==='global'||x.clave===k)})[0]};
@@ -2173,7 +2262,7 @@ CB.prepare=async function(text,files){
     return r.data.length?'\n\nTus PREAs aceptadas por facturar:\n\n'+r.data.map(function(x,i){var e=x.expedientes||{};return (i+1)+'. **'+e.folio+'** · '+e.sys+' · '+money(Number(x.monto))}).join('\n'):'\n\nNo tienes PREAs aceptadas por facturar. Cuando el fabricante acepte una, aparecerá aquí.';
   };
   if(!folio)return {kind:'msg',text:'Dime el **folio de la PREA aceptada** (PREA-…) o adjunta su archivo con el folio en el nombre, y calculo cuánto va a pagar planta.'+await pend()};
-  var r=await SB.c.from('cartera').select('*,expedientes!inner(folio,sys,op,opd,queja)').eq('expedientes.folio',folio).limit(1);
+  var r=await SB.c.from('cartera').select('*,expedientes!inner(folio,sys,op,opd,queja,labor,parts_total)').eq('expedientes.folio',folio).limit(1);
   if(r.error)throw r.error;
   var row=r.data[0];
   if(!row){
@@ -2183,15 +2272,19 @@ CB.prepare=async function(text,files){
   }
   if(row.estado==='pagada')return {kind:'msg',text:'La PREA **'+folio+'** ya está pagada'+(row.monto_pagado!=null?': planta pagó **'+money(Number(row.monto_pagado))+'** antes de IVA sobre '+money(Number(row.monto))+' reclamados.':'.')};
   await CB.get();
-  var ex=row.expedientes,claim=Number(row.monto),b=CB.pick(ex),c={prea:folio,id:row.expediente_id,sys:ex.sys,op:ex.op,opd:ex.opd,queja:ex.queja,claim:claim,basis:b,estado:row.estado,factura:row.factura};
-  if(b){c.ratio=Math.min(1.2,Math.max(0,b.ratio));c.est=r2(claim*c.ratio);c.lo=r2(claim*Math.max(0,b.rmin));c.hi=r2(claim*Math.min(1.2,b.rmax));c.iva=r2(c.est*0.16);c.total=r2(c.est+c.iva);c.conf=CB.conf(b)}
+  var ex=row.expedientes,lc=Number(ex.labor),pc=Number(ex.parts_total),claim=r2(lc+pc),b=CB.pick(ex),c={prea:folio,id:row.expediente_id,sys:ex.sys,op:ex.op,opd:ex.opd,queja:ex.queja,claim:claim,lc:lc,pc:pc,basis:b,estado:row.estado,factura:row.factura};
+  if(b){
+    var cl=function(x){return Math.min(1.2,Math.max(0,x))},rl=cl(b.rl!=null?b.rl:b.rp),rp=cl(b.rp!=null?b.rp:b.rl);
+    c.rl=rl;c.rp=rp;c.estL=r2(lc*rl);c.estP=r2(pc*rp);c.est=r2(c.estL+c.estP);c.ratio=claim>0?c.est/claim:0;
+    c.lo=r2(claim*Math.max(0,b.rmin));c.hi=r2(claim*Math.min(1.2,b.rmax));c.iva=r2(c.est*0.16);c.total=r2(c.est+c.iva);c.conf=CB.conf(b);
+  }
   return {kind:'ok',ctx:c};
 };
 function introCB(c){return 'Entendido. Busco la PREA **'+c.prea+'** entre tus aceptadas, reviso cuánto ha pagado planta en casos parecidos y calculo cuánto va a pagar por esta transacción.'}
 function finalCB(c){
   if(!c.basis)return 'Todavía no tengo pagos de planta registrados, así que no puedo estimar cuánto va a pagar sin inventarlo.\n\n1. **Reclamado**: '+money(c.claim)+' antes de IVA (es lo máximo que planta podría pagar)\n\nCada vez que planta pague una PREA, registra el monto recibido en **Cartera**. Con esos pagos aprendo y empiezo a estimar.';
   var b=c.basis;
-  return 'Esto es lo que calculo que planta pagará por la PREA **'+c.prea+'**.\n\n1. **Reclamado**: '+money(c.claim)+' antes de IVA\n2. **Planta pagará**: **'+money(c.est)+'** antes de IVA (≈ '+Math.round(c.ratio*100)+'% de lo reclamado)\n3. **Con IVA (16%)**: **'+money(c.total)+'**\n4. **Rango probable**: '+money(c.lo)+' a '+money(c.hi)+'\n5. **Confianza**: '+c.conf+'%, aprendida de '+b.n+(b.n===1?' pago':' pagos')+' de '+CB.baseTxt(b,{op:c.op,sys:c.sys})+'\n\nFactura '+money(c.est)+' antes de IVA para evitar refacturar. '+(b.n<2?'Es un solo pago de referencia, tómalo con cautela. ':'')+'Cuando planta pague, registra el monto recibido en **Cartera** y mi próxima estimación será más precisa.';
+  return 'Esto es lo que calculo que planta pagará por la PREA **'+c.prea+'**.\n\n1. **Reclamado**: '+money(c.claim)+' antes de IVA\n2. **Mano de obra**: planta pagará **'+money(c.estL)+'** de '+money(c.lc)+' reclamados (≈ '+Math.round(c.rl*100)+'%)\n3. **Piezas**: planta pagará **'+money(c.estP)+'** de '+money(c.pc)+' reclamadas (≈ '+Math.round(c.rp*100)+'%)\n4. **Total antes de IVA**: **'+money(c.est)+'**, con IVA (16%) **'+money(c.total)+'**\n5. **Rango probable**: '+money(c.lo)+' a '+money(c.hi)+'\n6. **Confianza**: '+c.conf+'%, aprendida de '+b.n+(b.n===1?' pago':' pagos')+' de '+CB.baseTxt(b,{op:c.op,sys:c.sys})+'\n\nFactura '+money(c.est)+' antes de IVA para evitar refacturar. '+(b.n<2?'Es un solo pago de referencia, tómalo con cautela. ':'')+'Cuando planta pague, registra el monto recibido en **Cartera** y mi próxima estimación será más precisa.';
 }
 function buildCobroCard(ctx,steps){
   var w=document.createElement('div');w.className='cu-wrap';
@@ -2208,7 +2301,7 @@ async function simCobro(card,ctx,my){
   st(2,'active');await w(650);st(2,'done',b?b.n+(b.n===1?' pago':' pagos')+' · base: '+CB.baseTxt(b,ctx):'Sin pagos registrados todavía');
   st(3,'active');await w(650);
   var L=function(l,v,c){return '<div class="ln'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b></div>'};
-  res.innerHTML=L('Reclamado (antes de IVA)',money(ctx.claim))+(b?L('Factor aprendido',Math.round(ctx.ratio*100)+'%')+L('Planta pagará (antes de IVA)',money(ctx.est),'big')+L('IVA 16%',money(ctx.iva))+L('Total estimado',money(ctx.total),'big')+L('Rango probable',money(ctx.lo)+' – '+money(ctx.hi))+L('Confianza',ctx.conf+'%'):'<small>Sin pagos anteriores no hay base para estimar.</small>');
+  res.innerHTML=L('Reclamado (antes de IVA)',money(ctx.claim))+(b?L('Mano de obra · '+money(ctx.lc)+' reclamada',money(ctx.estL)+' ('+Math.round(ctx.rl*100)+'%)')+L('Piezas · '+money(ctx.pc)+' reclamadas',money(ctx.estP)+' ('+Math.round(ctx.rp*100)+'%)')+L('Planta pagará (antes de IVA)',money(ctx.est),'big')+L('IVA 16%',money(ctx.iva))+L('Total estimado',money(ctx.total),'big')+L('Rango probable',money(ctx.lo)+' – '+money(ctx.hi))+L('Confianza',ctx.conf+'%'):'<small>Sin pagos anteriores no hay base para estimar.</small>');
   res.hidden=false;st(3,'done',b?'≈ '+money(ctx.est)+' antes de IVA':'Sin base para estimar');
   st(4,'active');await w(400);
   if(b){var u=await SB.c.from('cartera').update({estimado:ctx.est,estimado_at:new Date().toISOString()}).eq('expediente_id',ctx.id);st(4,'done',u.error?'No se pudo guardar el estimado':'Estimado guardado en Cartera')}
