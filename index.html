@@ -353,6 +353,21 @@ textarea,input{font:inherit;color:inherit}
 #pgDlg input:focus{border-color:var(--fg)}
 #pgDlg .row{display:flex;gap:8px;justify-content:flex-end}
 #pgDlg .err{color:#b4372b;font-size:13px;min-height:18px}
+.tk{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
+.tk-h{display:flex;align-items:center;gap:8px;background:none;border:0;padding:2px 0;color:var(--muted);font:inherit;cursor:pointer}
+.tk-c{display:inline-block;transition:transform .2s}.tk[data-open="true"] .tk-c{transform:rotate(90deg)}
+.tk-t.live{background:linear-gradient(90deg,var(--muted) 30%,var(--fg) 50%,var(--muted) 70%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:tkshine 1.6s linear infinite}
+.tk-sp{width:11px;height:11px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--fg);animation:tkspin .8s linear infinite}
+.tk-b{margin:6px 0 0 5px;padding-left:12px;border-left:2px solid var(--line);display:grid;gap:7px}
+.tk[data-open="false"] .tk-b{display:none}
+.tk-s{display:flex;gap:8px;align-items:baseline;animation:fadein .3s both}
+.tk-i{flex:none;width:11px;height:11px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--fg);animation:tkspin .8s linear infinite;transform:translateY(1px)}
+.tk-i.ok{animation:none;border:0;background:#1f8a4c;box-shadow:inset 0 0 0 3px var(--bg);outline:1.5px solid #1f8a4c}
+.tk-i.stop{animation:none;border-color:var(--line)}
+.tk-d{color:var(--faint)}
+@keyframes tkspin{to{transform:rotate(360deg)}}
+@keyframes tkshine{to{background-position:-220% 0}}
+@media(prefers-reduced-motion:reduce){.tk-t.live,.tk-sp,.tk-i{animation:none}}
 .lg{position:fixed;inset:0;z-index:100;background:var(--bg);color:var(--fg);display:grid;place-items:center;padding:16px;overflow:auto}
 .lg[hidden]{display:none}
 .lg-card{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
@@ -1622,10 +1637,9 @@ RC.detail=function(x){
   var ps=(x.parts||[]).map(function(p){return esc(p.d)+' ×'+p.q}).join(', ')||'sin piezas';
   return '<b>'+esc(x.folio)+'</b> · '+RC.st[x.status]+'<br>Queja: '+esc(x.queja||'—')+'<br>Sistema: '+esc(x.sys||'—')+' · Operación '+esc(x.op||'—')+' ('+esc(String(x.hours||0))+' h)<br>Piezas: '+ps+'<br>Total: '+RC.money(RC.tot(x))+(x.rule_id?' · regla '+esc(x.rule_id):'')+(x.profiles?'<br><small>Asesor: '+esc(x.profiles.name)+'</small>':'');
 };
-RC.answer=async function(q){
-  var t=norm(q),r=await SB.c.from('expedientes').select('*,profiles(name)').order('created_at',{ascending:false}).limit(500);
-  if(r.error)throw r.error;
-  var rows=r.data,m;
+RC.answer=async function(q,rows0){
+  var t=norm(q),m,rows=rows0;
+  if(!rows){var r=await SB.c.from('expedientes').select('*,profiles(name)').order('created_at',{ascending:false}).limit(500);if(r.error)throw r.error;rows=r.data}
   /* 1. folio exacto */
   if((m=q.match(/PREA-[A-Z0-9-]+/i))){var f=rows.filter(function(x){return x.folio.toUpperCase()===m[0].toUpperCase()})[0];return f?RC.detail(f):'No encuentro la PREA <b>'+esc(m[0])+'</b> en tus registros.'}
   /* 2. VIN u orden de trabajo */
@@ -1665,21 +1679,35 @@ RC.answer=async function(q){
   return out||'No encontré eso en tus registros. Prueba con un folio (PREA-…), un VIN, una regla (R-0001), un sistema como "frenos" o preguntas como "¿cuántas PREAs fueron aceptadas?".';
 };
 RC.hist=[];
+RC.intent=function(q){var t=norm(q);
+  if(/PREA-[A-Z0-9-]+/i.test(q))return 'busca una PREA por folio';
+  if(/\b[A-HJ-NPR-Z0-9]{17}\b/i.test(q)||/\bG-[A-Z0-9]{6,10}\b/i.test(q))return 'busca por VIN u orden de trabajo';
+  if(/\bR-\d{4}\b/i.test(q)||/\breglas?\b/.test(t))return 'consulta sobre reglas';
+  if(/cuant|total|suman|monto|importe|suma/.test(t))return 'conteo o total';
+  if(/ultim|recient/.test(t))return 'últimas PREAs';
+  return 'búsqueda por palabras'};
 RC.linkFolios=function(html){return html.replace(/PREA-[A-Z0-9]+(?:-[A-Z0-9]+)*/g,function(f){return '<button class="rc-f" type="button" data-folio="'+f+'">'+f+'</button>'})};
 RC.ask=async function(q){
   q=q.trim();if(!q||RC.busy)return;
   if(!SB.c||!SB.entered){RC.add('a','Inicia sesión para consultar tus registros.');return}
-  RC.busy=true;RC.add('u',esc(q));var th=RC.add('a','<small>Consultando…</small>');
+  RC.busy=true;RC.add('u',esc(q));var th=RC.add('a',''),tk=TK.make(),ans=document.createElement('div'),rows=null;th.appendChild(tk.el);th.appendChild(ans);
+  var t1=tk.step('Entendiendo la pregunta');await sleep(450);t1.done(RC.intent(q));
+  var t2=tk.step('Buscando en tus expedientes');
+  try{var rr=await SB.c.from('expedientes').select('*,profiles(name)').order('created_at',{ascending:false}).limit(500);if(rr.error)throw rr.error;rows=rr.data}catch(e){SB.fail(e)}
+  await sleep(450);t2.done(rows?rows.length+(rows.length===1?' expediente revisado':' expedientes revisados'):'no pude consultarlos');
+  var t3=tk.step('Revisando el catálogo de reglas');await sleep(400);t3.done(RS.d.rules.length+' reglas');
+  var t4=tk.step('Redactando la respuesta');
   try{
     var done=false;
     if(!SB.aiOff){
       try{
         var r=await SB.ai({mode:'chat',messages:RC.hist.concat([{role:'user',content:q}])});
-        if(r&&r.text){th.innerHTML=RC.linkFolios(md(r.text,false));RC.hist.push({role:'user',content:q},{role:'assistant',content:r.text});RC.hist=RC.hist.slice(-10);done=true}
+        if(r&&r.text){ans.innerHTML=RC.linkFolios(md(r.text,false));RC.hist.push({role:'user',content:q},{role:'assistant',content:r.text});RC.hist=RC.hist.slice(-10);done=true}
       }catch(e){SB.aiFail(e)}
     }
-    if(!done)th.innerHTML=await RC.answer(q)+(SB.aiOff?'<br><small>Modo básico: la IA aún no está configurada.</small>':'');
-  }catch(e){SB.fail(e);th.textContent='No pude consultar los registros ahora. Intenta de nuevo.'}
+    if(!done)ans.innerHTML=await RC.answer(q,rows)+(SB.aiOff?'<br><small>Modo básico: la IA aún no está configurada.</small>':'');
+  }catch(e){SB.fail(e);ans.textContent='No pude consultar los registros ahora. Intenta de nuevo.'}
+  t4.done();tk.end(false);
   RC.busy=false;$('#rcThread').scrollTop=$('#rcThread').scrollHeight;
 };
 $('#rcForm').addEventListener('submit',function(e){e.preventDefault();var i=$('#rcIn'),q=i.value;i.value='';RC.ask(q)});
@@ -1811,6 +1839,32 @@ $('#phClear').addEventListener('click',async function(){
   if(r.error){PH.msg('No se pudo borrar: '+SB.errEs(r.error),true);return}
   PH.msg('Pagos históricos borrados.');PH.count();
 });
+/* ---- Bloque "Pensando…" desplegable: muestra los pasos reales (buscar reglas, expedientes, IA) antes de responder ---- */
+var TK={make:function(){
+  var el=document.createElement('div');el.className='tk';el.dataset.open='true';
+  el.innerHTML='<button class="tk-h" type="button" aria-expanded="true"><span class="tk-sp"></span><span class="tk-t live">Pensando…</span><span class="tk-c">›</span></button><div class="tk-b"></div>';
+  var t0=Date.now(),body=$('.tk-b',el),title=$('.tk-t',el),sp=$('.tk-sp',el),btn=$('.tk-h',el);
+  btn.addEventListener('click',function(){var o=el.dataset.open!=='true';el.dataset.open=o;btn.setAttribute('aria-expanded',o)});
+  return {el:el,
+    step:function(label){
+      var st=document.createElement('div');st.className='tk-s';st.innerHTML='<span class="tk-i"></span><span>'+esc(label)+'<span class="tk-d"></span></span>';body.appendChild(st);toBottom();
+      return {done:function(detail){$('.tk-i',st).className='tk-i ok';if(detail)$('.tk-d',st).textContent=' · '+detail}};
+    },
+    end:function(stopped){
+      var sec=Math.max(1,Math.round((Date.now()-t0)/1000));
+      title.classList.remove('live');title.textContent=stopped?'Detenido':'Pensó durante '+sec+' s';
+      sp.style.display='none';$$('.tk-i',el).forEach(function(i){if(!i.classList.contains('ok'))i.className='tk-i stop'});
+      el.dataset.open='false';btn.setAttribute('aria-expanded','false');
+    }};
+}};
+SB.similar=async function(text){
+  if(!SB.c||!SB.entered)return null;
+  var ws=words(text||'');
+  var r=await SB.c.from('expedientes').select('sys,queja,status').order('created_at',{ascending:false}).limit(200);
+  if(r.error)return null;
+  var hit=ws.length?r.data.filter(function(x){var h=norm((x.queja||'')+' '+(x.sys||''));return ws.some(function(w){return h.indexOf(w)>=0})}):[];
+  return {n:hit.length,total:r.data.length,acc:hit.filter(function(x){return x.status==='aceptada'}).length,rej:hit.filter(function(x){return x.status==='rechazada'}).length};
+};
 var ctxReg={};function ctxOf(id){return ctxReg[id]}
 var EX={rows:[],f:'todos',q:'',loading:false};
 EX.load=async function(){
@@ -2052,7 +2106,8 @@ function finish(my){if(S.ctrl===my){S.streaming=false;S.ctrl=null;updateSend()}t
 function hideRegen(w){var b=$('[data-act="regen"]',w);if(b)b.hidden=true}
 async function agentTurn(w,ctx,intro,steps,sim,fin,my,build){
   var col=$('.ai-col',w),body=$('.ai-body',w),acts=$('.ai-actions',w);
-  body.innerHTML=THINK;toBottom();await nap(800+Math.random()*400,my);
+  if(!w._noThink){body.innerHTML=THINK;toBottom();await nap(800+Math.random()*400,my)}
+  else body.innerHTML='';
   var full='';
   if(!my.aborted){
     full=await stream(body,intro,my);
@@ -2072,10 +2127,26 @@ async function agentTurn(w,ctx,intro,steps,sim,fin,my,build){
 async function run(text,files){
   var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
   var ctx=ctxFrom(text,files,S.brand),w=addAssistant();
-  if(text&&!SB.aiOff&&SB.entered){
-    $('.ai-body',w).innerHTML=THINK;
-    var form=await SB.aiPrea(text);if(form&&!my.aborted)SB.applyForm(ctx,form);
+  var tk=TK.make();$('.ai-col',w).insertBefore(tk.el,$('.ai-body',w));w._noThink=true;
+  var kw=words(text||'').slice(0,5),s1=tk.step('Leyendo tu mensaje');
+  await nap(550,my);s1.done(kw.length?'claves: '+kw.join(', '):'sin palabras clave claras');
+  if(!my.aborted){
+    var s2=tk.step('Buscando en el catálogo de reglas');await nap(700,my);
+    s2.done(ctx.matched?'regla '+ctx.ruleId+' · '+ctx.ruleN+' PREAs aceptadas':'ninguna coincide · '+RS.d.rules.length+' reglas revisadas');
   }
+  if(!my.aborted&&SB.entered){
+    var s3=tk.step('Buscando casos parecidos en tus expedientes'),sm=null;
+    try{sm=await SB.similar(text)}catch(_){}
+    await nap(450,my);
+    s3.done(!sm?'no pude consultar tus expedientes':sm.n?sm.n+' parecidos de '+sm.total+' ('+sm.acc+' aceptadas, '+sm.rej+' rechazadas)':'ninguno parecido entre '+sm.total);
+  }
+  if(!my.aborted&&text&&!SB.aiOff&&SB.entered){
+    var s4=tk.step('Consultando al modelo de IA'),form=await SB.aiPrea(text);
+    if(form&&!my.aborted)SB.applyForm(ctx,form);
+    s4.done(form?'formulario propuesto, '+(form.rule_id?'regla '+form.rule_id:'sin regla del catálogo'):'no disponible, uso el catálogo');
+  }
+  if(!my.aborted){var s5=tk.step('Armando el formulario');await nap(550,my);s5.done(ctx.op+' · '+ctx.h.toFixed(1)+' h · '+ctx.parts.length+(ctx.parts.length===1?' pieza':' piezas'))}
+  tk.end(my.aborted);
   RS.note(ctx.matched);
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
   var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:''),my,buildPreaCard);
