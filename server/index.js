@@ -9,6 +9,7 @@ const ordenes = require('./routes/ordenes');
 const inicio = require('./routes/inicio');
 const chat = require('./routes/chat');
 const cartera = require('./routes/cartera');
+const expedientes = require('./routes/expedientes');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -27,6 +28,7 @@ app.use('/api/garantias', ordenes);
 app.use('/api/garantias', inicio);
 app.use('/api/garantias', chat);
 app.use('/api/garantias', cartera);
+app.use('/api/garantias', expedientes);
 
 // Pantallas de acceso y la app
 app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));

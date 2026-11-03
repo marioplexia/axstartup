@@ -82,3 +82,20 @@ Los cobros se crean solos cuando una campaña pasa a «realizada» o a una PREA 
 | `POST cartera/:id/pago` `{pagado}` | Registra el pago o reabre el cobro |
 | `GET/POST cartera/:id/comentarios` | Comentarios del cobro |
 | `GET cartera/agente` | Lectura del agente y acciones sugeridas |
+
+## Expedientes
+
+Pantalla **Expedientes**: cada PREA, servicio y campaña es una tarjeta con su avance; al abrirla se ve el checklist y se suben los archivos y evidencias.
+Secciones por tipo: PREA (evidencias, factura, documentos firmados, cobro a planta, destrucción de la pieza), servicio (evidencias, factura, documentos firmados) y campaña (evidencias, documentos firmados, cobro a planta).
+Una sección queda completa cuando tiene al menos un archivo; el avance se refleja en Bitácora, Inicio y Mi Agente. Hay auditoría de cada carga o borrado y un resumen en PDF.
+
+- Los archivos se guardan en disco, en la carpeta `files/` junto a la base (en Render, el volumen `/data`). Cambia la ruta con `FILES_DIR`.
+- Máximo 25 MB por archivo; se rechazan ejecutables y archivos HTML/SVG/JS. Las imágenes se pueden ver en pantalla y el resto se descarga.
+- Lo que se adjunta en el Agente de Garantías se guarda en «Evidencias» de la PREA que se registra.
+
+| Endpoint (`/api/garantias/…`) | Qué hace |
+|---|---|
+| `GET expedientes?tipo=&estado=completo\|incompleto&q=` | Lista con avance y estado de cobro |
+| `GET expedientes/:orden` | Checklist, archivos, avance y auditoría |
+| `POST expedientes/:orden/:seccion/archivos?nombre=&nota=` | Sube un archivo (cuerpo binario, cabecera `X-Mime`) |
+| `GET/PATCH/DELETE expedientes/archivos/:id` | Descarga, edita la nota o elimina |

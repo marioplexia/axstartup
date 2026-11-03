@@ -168,3 +168,28 @@ CREATE TABLE IF NOT EXISTS cobro_comments (
   created_at  INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_cc_cobro ON cobro_comments(cobro_id, id);
+
+-- Expedientes: archivos y evidencias de cada orden
+CREATE TABLE IF NOT EXISTS expediente_files (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id    TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  section     TEXT NOT NULL,                     -- evidencias | factura | firmados | cobro | destruccion
+  name        TEXT NOT NULL,
+  mime        TEXT,
+  size        INTEGER NOT NULL DEFAULT 0,
+  note        TEXT,
+  path        TEXT,                              -- archivo en disco (NULL en los de ejemplo)
+  demo        INTEGER NOT NULL DEFAULT 0,
+  advisor_id  TEXT REFERENCES advisors(id),
+  created_at  INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_expf_order ON expediente_files(order_id, section);
+CREATE TABLE IF NOT EXISTS expediente_audit (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id    TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  advisor_id  TEXT REFERENCES advisors(id),
+  action      TEXT NOT NULL,
+  detail      TEXT,
+  created_at  INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_expa_order ON expediente_audit(order_id, id DESC);

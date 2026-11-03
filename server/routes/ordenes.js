@@ -72,12 +72,12 @@ router.post('/ordenes', (req, res) => {
   if (!title) return res.status(400).json({ error: 'Escribe un título para la orden.' });
   const monto = Math.max(0, Number(b.monto) || 0), km = Number.isFinite(Number(b.km)) ? Math.max(0, Math.round(Number(b.km))) : null;
   const now = Date.now();
-  const ev = Math.max(1, Math.min(20, Math.round(Number(b.ev_need) || 5)));
+  const ev = kind === 'prea' ? 5 : 3;                    // secciones del expediente según el tipo
   const row = {
     id: folio(), kind, status: STATUS[kind][0], title, detail: clean(b.detalle, 600),
     vin: clean(b.vin, 17) || null, km, amount: monto, rule_id: clean(b.rule_id, 20) || null,
     customer: clean(b.cliente, 80) || null, part: clean(b.pieza, 80) || null, unit: clean(b.unidad, 60) || null, svc_type: clean(b.tipo_servicio, 40) || null,
-    advisor_id: req.user.id, agency_id: req.user.agency.id, ev_have: Math.max(0, Math.min(ev, Math.round(Number(b.ev_have) || 0))), ev_need: ev, created_at: now, updated_at: now
+    advisor_id: req.user.id, agency_id: req.user.agency.id, ev_have: 0, ev_need: ev, created_at: now, updated_at: now
   };
   db.prepare(`INSERT INTO orders (id,kind,status,title,detail,vin,km,amount,rule_id,customer,part,unit,svc_type,advisor_id,agency_id,ev_have,ev_need,created_at,updated_at)
               VALUES (@id,@kind,@status,@title,@detail,@vin,@km,@amount,@rule_id,@customer,@part,@unit,@svc_type,@advisor_id,@agency_id,@ev_have,@ev_need,@created_at,@updated_at)`).run(row);

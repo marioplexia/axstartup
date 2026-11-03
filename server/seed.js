@@ -214,6 +214,19 @@ if (!db.prepare("SELECT 1 FROM settings WHERE key = 'cartera_seed'").get()) db.t
   db.prepare("SELECT id, advisor_id, created_at FROM orders WHERE kind='campana' AND status='realizada'").all().forEach((o, i) => crear({ id: o.id, advisor_id: o.advisor_id, amount: 2400 + i * 900 }, now - (2 + i) * DAY, null));
   db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('cartera_seed', '1')").run();
 })();
+
+// Expedientes: las órdenes que ya traían evidencias marcadas reciben archivos de ejemplo (sin contenido) en esas secciones.
+if (!db.prepare("SELECT 1 FROM settings WHERE key = 'exp_seed'").get()) db.transaction(() => {
+  const POR = { prea: ['evidencias', 'factura', 'firmados', 'cobro', 'destruccion'], servicio: ['evidencias', 'factura', 'firmados'], campana: ['evidencias', 'firmados', 'cobro'] };
+  const NOM = { evidencias: 'evidencias-ejemplo.pdf', factura: 'factura-ejemplo.pdf', firmados: 'documentos-firmados-ejemplo.pdf', cobro: 'comprobante-de-cobro-ejemplo.pdf', destruccion: 'destruccion-de-pieza-ejemplo.pdf' };
+  const ins = db.prepare("INSERT INTO expediente_files (order_id, section, name, mime, size, note, path, demo, advisor_id, created_at) VALUES (?,?,?,?,0,'Archivo de ejemplo',NULL,1,?,?)");
+  db.prepare("SELECT id, kind, ev_have, advisor_id, created_at FROM orders WHERE ev_have > 0").all().forEach(o => {
+    const sec = POR[o.kind] || POR.prea;
+    sec.slice(0, Math.min(o.ev_have, sec.length)).forEach((k, i) => ins.run(o.id, k, NOM[k], 'application/pdf', o.advisor_id, o.created_at + (i + 1) * 3600e3));
+  });
+  db.prepare("UPDATE orders SET ev_need = CASE kind WHEN 'prea' THEN 5 ELSE 3 END").run();
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('exp_seed', '1')").run();
+})();
 const c = t => db.prepare(`SELECT COUNT(*) n FROM ${t}`).get().n;
 console.log(`Base lista en ${DB_PATH}`);
 console.log(`  agencias: ${c('agencies')} · asesores: ${c('advisors')} · reglas: ${c('rules')} · piezas: ${c('rule_parts')} · palabras clave: ${c('rule_keywords')}`);
