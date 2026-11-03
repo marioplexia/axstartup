@@ -8,6 +8,7 @@ const zlib = require('zlib');
 
 const PORT = Number(process.env.PORT) || 3000;
 const FILE = path.join(__dirname, 'index.html');
+const REGISTRO = path.join(__dirname, 'registro.html');
 
 const HEADERS = {
   'Content-Type': 'text/html; charset=utf-8',
@@ -28,12 +29,13 @@ http.createServer((req, res) => {
     res.writeHead(405, { Allow: 'GET, HEAD' });
     return res.end();
   }
-  fs.readFile(FILE, (err, html) => {
+  const file = (url === '/registro' || url === '/registro.html') ? REGISTRO : FILE;
+  fs.readFile(file, (err, html) => {
     if (err) {
       res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-      return res.end('No se encontró index.html');
+      return res.end('No se encontró la página');
     }
-    // Cualquier ruta devuelve la app (el login y la navegación los resuelve el propio index.html)
+    // /registro es la pantalla de alta; cualquier otra ruta devuelve la app (el login lo resuelve index.html)
     if (/\bgzip\b/.test(req.headers['accept-encoding'] || '')) {
       res.writeHead(200, { ...HEADERS, 'Content-Encoding': 'gzip' });
       return res.end(req.method === 'HEAD' ? undefined : zlib.gzipSync(html));

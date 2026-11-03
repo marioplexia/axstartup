@@ -2033,10 +2033,12 @@ SB.enter=async function(user){
 SB.signOut=async function(){try{await SB.c.auth.signOut()}catch(_){}try{localStorage.removeItem(RS.K)}catch(_){}location.reload()};
 SB.init=function(){
   $('#lgForm').addEventListener('submit',SB.submit);
-  $('#lgTabUp').addEventListener('click',function(){SB.lgMode('up')});
+  /* el alta de cuentas vive en su propia pantalla (registro.html): sin librerías y con verificación del perfil */
+  SB.toRegistro=function(){location.href=location.protocol==='file:'?'registro.html':'registro'};
+  $('#lgTabUp').addEventListener('click',SB.toRegistro);
   $('#lgTabIn').addEventListener('click',function(){SB.lgMode('in')});
-  $('#lgAltP').addEventListener('click',function(e){if(e.target.id==='lgAlt')SB.lgMode(SB.mode==='in'?'up':'in')});
-  if(location.hash==='#registro')SB.lgMode('up');
+  $('#lgAltP').addEventListener('click',function(e){if(e.target.id==='lgAlt')SB.toRegistro()});
+  if(location.hash==='#registro')SB.toRegistro();
   if(!window.supabase||!window.supabase.createClient){SB.conn('✗ No cargó la librería de Supabase (revisa tu conexión o un bloqueador de anuncios) y recarga.',true);SB.lgMsg('No se pudo cargar el servicio. Revisa tu conexión y recarga.',true);return}
   SB.c=window.supabase.createClient(SB.url,SB.key);
   SB.loadAgencies();

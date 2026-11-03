@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crear cuenta · Ax AI Garantías</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#14141a;--mute:#6b6b76;--line:#dcdbe0;--soft:#f1f0ed;--brand:#111114;--on-brand:#fff;--ok:#1f8a4c;--okbg:#e6f4ec;--err:#c0392b;--errbg:#fdecea;--focus:#14141a;--hero:#0d0d10;--hero-ink:#f3f3f6;--hero-mute:#9a9aa6}
+@media(prefers-color-scheme:dark){:root{--bg:#0b0b0e;--card:#16161b;--ink:#f3f3f6;--mute:#9a9aa6;--line:#2e2e37;--soft:#1d1d23;--brand:#f3f3f6;--on-brand:#111;--ok:#4ac17b;--okbg:#12281c;--err:#ff8a7d;--errbg:#33150f;--focus:#f3f3f6;--hero:#050507}}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{min-height:100vh;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
+.hero{background:var(--hero);color:var(--hero-ink);padding:48px clamp(28px,5vw,72px);display:flex;flex-direction:column;justify-content:space-between;gap:32px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.logo{width:32px;height:32px;border-radius:8px;background:#fff;color:#000;display:grid;place-items:center;font-weight:800;font-size:13px}
+.hero h1{margin:0 0 14px;font-size:clamp(28px,3.4vw,42px);line-height:1.1;letter-spacing:-.03em;font-weight:700}
+.hero p{margin:0;color:var(--hero-mute);max-width:42ch}
+.hero ul{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:14px}
+.hero li{display:flex;gap:12px;align-items:flex-start;color:var(--hero-ink)}
+.hero li i{flex:none;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;font-style:normal;font-size:12px}
+.hero small{color:var(--hero-mute)}
+.panel{display:grid;place-items:center;padding:32px 20px}
+.card{width:100%;max-width:440px}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--mute);margin-bottom:18px;padding:5px 10px;border:1px solid var(--line);border-radius:99px;background:var(--card)}
+.status i{width:8px;height:8px;border-radius:50%;background:#e0a100}
+.status.ok i{background:var(--ok)}.status.bad i{background:var(--err)}.status.bad{color:var(--err)}
+h2{margin:0 0 6px;font-size:28px;letter-spacing:-.025em}
+.sub{margin:0 0 24px;color:var(--mute)}
+.field{margin:0 0 16px}
+label{display:block;margin:0 0 6px;font-size:13px;font-weight:600}
+.ctl{position:relative}
+input,select{width:100%;height:46px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;appearance:none;-webkit-appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--mute) 50%),linear-gradient(135deg,var(--mute) 50%,transparent 50%);background-position:calc(100% - 20px) 20px,calc(100% - 15px) 20px;background-size:5px 5px;background-repeat:no-repeat;padding-right:38px}
+input:focus,select:focus{outline:none;border-color:var(--focus);box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 14%,transparent)}
+.field.bad input,.field.bad select{border-color:var(--err)}
+.hint{margin:6px 0 0;font-size:12.5px;color:var(--mute);min-height:18px}
+.field.bad .hint{color:var(--err)}
+.eye{position:absolute;right:6px;top:6px;height:34px;padding:0 10px;border:0;background:none;color:var(--mute);font:inherit;font-size:13px;cursor:pointer;border-radius:8px}
+.eye:hover{background:var(--soft)}
+.meter{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px}
+.meter i{height:4px;border-radius:2px;background:var(--line);transition:background .2s}
+.go{width:100%;height:48px;margin-top:6px;border:0;border-radius:10px;background:var(--brand);color:var(--on-brand);font:inherit;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.go:disabled{opacity:.65;cursor:wait}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:r .7s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+.alert{display:none;margin:0 0 16px;padding:11px 14px;border-radius:10px;background:var(--errbg);color:var(--err);font-size:14px}
+.alert.on{display:block}
+.alt{margin:22px 0 0;text-align:center;color:var(--mute);font-size:14px}
+.alt a{color:var(--ink);font-weight:600}
+.retry{margin-left:8px;border:0;background:none;color:inherit;text-decoration:underline;cursor:pointer;font:inherit}
+/* éxito */
+.done{text-align:center}
+.tick{width:64px;height:64px;border-radius:50%;background:var(--okbg);color:var(--ok);display:grid;place-items:center;margin:0 auto 18px;font-size:30px}
+.steps{list-style:none;margin:22px 0;padding:0;text-align:left;display:grid;gap:10px}
+.steps li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.steps li b{display:block;font-size:14px}.steps li span{color:var(--mute);font-size:13px;word-break:break-word}
+.steps .c{flex:none;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-size:12px;margin-top:1px}
+.go.link{text-decoration:none}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}.hero{padding:24px 22px;gap:18px}.hero ul,.hero small{display:none}.hero h1{font-size:24px;margin-bottom:6px}.panel{padding:24px 18px 40px}}
+@media(prefers-reduced-motion:reduce){.spin{animation-duration:2s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="hero">
+    <div class="brand"><span class="logo">Ax</span>Ax AI Garantías</div>
+    <div>
+      <h1>Armar una PREA ya no es trabajo manual.</h1>
+      <p>Regístrate como asesor de tu agencia y deja que el agente aprenda de cada garantía aceptada.</p>
+      <ul>
+        <li><i>✓</i><span>Formularios de garantía listos para copiar y pegar</span></li>
+        <li><i>✓</i><span>Estimación de lo que pagará planta, aprendida de pagos reales</span></li>
+        <li><i>✓</i><span>Expedientes, cartera y bitácora de tu agencia en un solo lugar</span></li>
+      </ul>
+    </div>
+    <small>Tus datos se guardan en tu proyecto de Supabase.</small>
+  </aside>
+
+  <main class="panel">
+    <div class="card">
+      <section id="vForm">
+        <div class="status" id="st" role="status"><i></i><span>Conectando…</span></div>
+        <h2>Crea tu cuenta</h2>
+        <p class="sub">Tarda menos de un minuto. Usarás tu correo y contraseña para entrar.</p>
+
+        <div class="alert" id="al" role="alert"></div>
+
+        <form id="f" novalidate>
+          <div class="field" id="fName">
+            <label for="name">Nombre completo</label>
+            <input id="name" autocomplete="name" placeholder="Ej. Lucía Ortega">
+            <p class="hint"></p>
+          </div>
+          <div class="field" id="fEmail">
+            <label for="email">Correo</label>
+            <input id="email" type="email" autocomplete="email" inputmode="email" placeholder="tu@correo.com">
+            <p class="hint"></p>
+          </div>
+          <div class="field" id="fAg">
+            <label for="ag">Agencia</label>
+            <select id="ag"><option value="">Cargando agencias…</option></select>
+            <p class="hint"></p>
+          </div>
+          <div class="field" id="fPass">
+            <label for="pass">Contraseña</label>
+            <div class="ctl"><input id="pass" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres"><button class="eye" type="button" id="eye" aria-label="Mostrar contraseña">Mostrar</button></div>
+            <div class="meter" id="meter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+            <p class="hint" id="passHint">Usa 8 caracteres o más; mezcla letras y números.</p>
+          </div>
+          <div class="field" id="fPass2">
+            <label for="pass2">Confirma tu contraseña</label>
+            <input id="pass2" type="password" autocomplete="new-password" placeholder="Repite la contraseña">
+            <p class="hint"></p>
+          </div>
+          <button class="go" id="go" type="submit">Crear cuenta</button>
+        </form>
+        <p class="alt">¿Ya tienes cuenta? <a href="./" id="toLogin">Inicia sesión</a></p>
+      </section>
+
+      <section id="vOk" class="done" hidden>
+        <div class="tick">✓</div>
+        <h2>¡Cuenta creada!</h2>
+        <p class="sub" id="okSub">Tu perfil ya quedó guardado.</p>
+        <ul class="steps" id="okSteps"></ul>
+        <a class="go link" id="enter" href="./">Entrar a Ax AI Garantías</a>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+'use strict';
+var URL_='https://fjmzzghptxkcoarymmzn.supabase.co';
+var KEY='sb_publishable_XzONBrrwd2x76JCReSbcPQ_E1gEAP-4';
+var STORE='sb-fjmzzghptxkcoarymmzn-auth-token';   // misma clave que usa la app principal
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var home=location.protocol==='file:'?'index.html':'./';
+$('#toLogin').href=home;$('#enter').href=home;
+
+/* ---------- red: fetch directo a Supabase (sin librerías) ---------- */
+function api(path,opt){
+  opt=opt||{};
+  var h={apikey:KEY};
+  if(opt.token)h.Authorization='Bearer '+opt.token;       // solo con un JWT real de usuario
+  if(opt.body)h['Content-Type']='application/json';
+  var ctl=new AbortController(),t=setTimeout(function(){ctl.abort()},15000);
+  return fetch(URL_+path,{method:opt.method||'GET',headers:h,body:opt.body?JSON.stringify(opt.body):undefined,signal:ctl.signal})
+    .then(function(r){clearTimeout(t);return r.text().then(function(tx){var j=null;try{j=tx?JSON.parse(tx):null}catch(_){}return {ok:r.ok,status:r.status,data:j,raw:tx}})},
+          function(e){clearTimeout(t);var x=new Error(e&&e.name==='AbortError'?'timeout':'network');x.net=true;throw x});
+}
+
+/* ---------- estado de conexión y agencias ---------- */
+function setSt(cls,txt,retry){var s=$('#st');s.className='status '+cls;s.innerHTML='<i></i><span>'+esc(txt)+'</span>'+(retry?'<button type="button" class="retry" id="rt">Reintentar</button>':'');if(retry)$('#rt').onclick=loadAg}
+function loadAg(){
+  setSt('','Conectando…');$('#ag').innerHTML='<option value="">Cargando agencias…</option>';
+  api('/rest/v1/agencies?select=id,name,region&order=region.asc,id.asc').then(function(r){
+    if(!r.ok||!Array.isArray(r.data))throw Object.assign(new Error('http'),{res:r});
+    var sel=$('#ag');sel.innerHTML='<option value="">Selecciona tu agencia</option>';var g={};
+    r.data.forEach(function(a){if(!g[a.region]){var og=document.createElement('optgroup');og.label=a.region;sel.appendChild(og);g[a.region]=og}var o=document.createElement('option');o.value=a.id;o.textContent=a.name;g[a.region].appendChild(o)});
+    setSt('ok','Conectado a Supabase · '+r.data.length+(r.data.length===1?' agencia':' agencias'));
+  }).catch(function(e){
+    $('#ag').innerHTML='<option value="">No se pudieron cargar las agencias</option>';
+    var why=e.net?(e.message==='timeout'?'Supabase no responde (red lenta o bloqueada)':'No se pudo conectar (red, VPN o bloqueador de anuncios)'):'Supabase respondió '+(e.res?e.res.status+' '+((e.res.data&&(e.res.data.message||e.res.data.hint))||''):'con un error');
+    setSt('bad',why,true);
+  });
+}
+
+/* ---------- validación ---------- */
+function mark(id,msg){var f=$('#'+id);f.classList.toggle('bad',!!msg);var h=f.querySelector('.hint');if(msg)h.textContent=msg;else if(id==='fPass')h.textContent='Usa 8 caracteres o más; mezcla letras y números.';else h.textContent='';return !msg}
+var EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function vName(){var v=$('#name').value.trim();return mark('fName',v.length<2?'Escribe tu nombre completo.':'')}
+function vEmail(){return mark('fEmail',EMAIL.test($('#email').value.trim())?'':'Escribe un correo válido.')}
+function vAg(){return mark('fAg',$('#ag').value?'':'Selecciona tu agencia.')}
+function vPass(){var v=$('#pass').value;return mark('fPass',v.length<8?'La contraseña debe tener al menos 8 caracteres.':'')}
+function vPass2(){return mark('fPass2',$('#pass2').value===$('#pass').value&&$('#pass2').value?'':'Las contraseñas no coinciden.')}
+function score(v){var s=0;if(v.length>=8)s++;if(v.length>=12)s++;if(/[a-z]/.test(v)&&/[A-Z]/.test(v))s++;if(/\d/.test(v)&&/[^A-Za-z0-9]/.test(v)||(/\d/.test(v)&&/[A-Za-z]/.test(v)&&v.length>=10))s++;return Math.min(s,4)}
+$('#pass').addEventListener('input',function(){var s=score(this.value),c=['#c0392b','#e67e22','#e0a100','#1f8a4c'];$$('#meter i').forEach(function(i,k){i.style.background=k<s&&this.value?c[Math.max(0,s-1)]:''},this)});
+function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
+$('#name').addEventListener('blur',vName);$('#email').addEventListener('blur',vEmail);$('#ag').addEventListener('change',vAg);$('#pass').addEventListener('blur',vPass);$('#pass2').addEventListener('blur',vPass2);
+$('#eye').addEventListener('click',function(){var p=$('#pass'),show=p.type==='password';p.type=$('#pass2').type=show?'text':'password';this.textContent=show?'Ocultar':'Mostrar';this.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña')});
+
+/* ---------- errores de Supabase Auth, en español ---------- */
+function authErr(r){
+  var d=r.data||{},code=d.error_code||d.code||'',msg=d.msg||d.message||d.error_description||d.error||'';
+  if(/user_already_exists|already registered|already been registered/i.test(code+' '+msg))return 'Ese correo ya tiene cuenta. Inicia sesión.';
+  if(/weak_password|easy to guess|pwned/i.test(code+' '+msg))return 'Esa contraseña es muy común o apareció en filtraciones. Elige otra.';
+  if(/signup_disabled|not allowed/i.test(code+' '+msg))return 'El registro de cuentas está desactivado en Supabase.';
+  if(/email_address_invalid|validate email|invalid format/i.test(code+' '+msg))return 'Supabase no aceptó ese correo. Revisa que esté bien escrito.';
+  if(/rate_limit|rate limit|too many/i.test(code+' '+msg)||r.status===429)return 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
+  if(/error sending|smtp|unexpected_failure/i.test(code+' '+msg))return 'Supabase no pudo enviar el correo de confirmación. Inténtalo de nuevo en unos minutos.';
+  return 'No se pudo crear la cuenta ('+(r.status||'?')+(code?' · '+code:'')+'): '+(msg||'respuesta inesperada de Supabase');
+}
+function showErr(m){var a=$('#al');a.textContent=m;a.classList.toggle('on',!!m);if(m)a.scrollIntoView({block:'nearest',behavior:'smooth'})}
+
+/* ---------- alta ---------- */
+var busy=false;
+$('#f').addEventListener('submit',function(e){
+  e.preventDefault();if(busy)return;showErr('');
+  var ok=[vName(),vEmail(),vAg(),vPass(),vPass2()].every(Boolean);
+  if(!ok){var bad=document.querySelector('.field.bad input,.field.bad select');if(bad)bad.focus();return}
+  var name=$('#name').value.trim(),email=$('#email').value.trim().toLowerCase(),pass=$('#pass').value,ag=Number($('#ag').value);
+  busy=true;var b=$('#go');b.disabled=true;b.innerHTML='<span class="spin"></span>Creando tu cuenta…';
+  api('/auth/v1/signup',{method:'POST',body:{email:email,password:pass,data:{name:name,agency_id:ag}}})
+  .then(function(r){
+    if(!r.ok)throw Object.assign(new Error('auth'),{res:r});
+    var d=r.data||{};
+    if(d.user&&d.user.identities&&!d.user.identities.length)throw Object.assign(new Error('auth'),{res:{status:422,data:{error_code:'user_already_exists'}}});
+    if(!d.access_token)return {pending:true,email:email};       // la confirmación por correo está activa
+    return verify(d);
+  })
+  .then(done)
+  .catch(function(e){
+    showErr(e.net?(e.message==='timeout'?'Supabase tardó demasiado en responder. Revisa tu conexión e inténtalo de nuevo.':'No se pudo conectar con Supabase. Revisa tu red, tu VPN o desactiva el bloqueador de anuncios para este sitio.'):e.res?authErr(e.res):'Ocurrió un error inesperado: '+(e.message||e));
+  })
+  .then(function(){busy=false;b.disabled=false;b.textContent='Crear cuenta'});
+});
+
+/* confirma de verdad que el perfil quedó guardado en la base (y lo repara si faltara) */
+function verify(s){
+  var tok=s.access_token,uid=s.user&&s.user.id;
+  var q='/rest/v1/profiles?select=name,role,agencies(name)&id=eq.'+encodeURIComponent(uid);
+  var get=function(){return api(q,{token:tok}).then(function(r){return r.ok&&Array.isArray(r.data)?r.data[0]:null})};
+  return get().then(function(p){
+    if(p)return p;
+    return api('/rest/v1/rpc/ensure_profile',{method:'POST',token:tok,body:{}}).then(get);
+  }).then(function(p){
+    try{localStorage.setItem(STORE,JSON.stringify({access_token:tok,refresh_token:s.refresh_token,expires_in:s.expires_in,expires_at:s.expires_at||Math.floor(Date.now()/1000)+(s.expires_in||3600),token_type:s.token_type||'bearer',user:s.user}))}catch(_){}
+    return {session:s,profile:p};
+  });
+}
+
+function done(x){
+  $('#vForm').hidden=true;$('#vOk').hidden=false;window.scrollTo(0,0);
+  var L=$('#okSteps');
+  if(x.pending){
+    $('#okSub').textContent='Te enviamos un correo para confirmar tu cuenta.';
+    L.innerHTML='<li><span class="c">✓</span><div><b>Usuario creado en Supabase</b><span>'+esc(x.email)+'</span></div></li><li><span class="c">✉</span><div><b>Confirma tu correo</b><span>Abre el mensaje que te enviamos y luego inicia sesión.</span></div></li>';
+    $('#enter').textContent='Ir a iniciar sesión';return;
+  }
+  var p=x.profile,u=x.session.user||{};
+  L.innerHTML='<li><span class="c">✓</span><div><b>Usuario creado en Supabase</b><span>'+esc(u.email||'')+'</span></div></li>'+
+    (p?'<li><span class="c">✓</span><div><b>Perfil de asesor guardado</b><span>'+esc(p.name)+' · '+(p.role==='admin'?'administrador':'asesor')+' · '+esc((p.agencies&&p.agencies.name)||'sin agencia')+'</span></div></li>'
+       :'<li><span class="c" style="background:#e0a100">!</span><div><b>Cuenta creada, perfil pendiente</b><span>Se completará al iniciar sesión.</span></div></li>')+
+    '<li><span class="c">✓</span><div><b>Sesión iniciada</b><span>Ya puedes entrar a la aplicación.</span></div></li>';
+  if(p&&p.role==='admin')$('#okSub').textContent='Tu cuenta es de administrador.';
+}
+
+loadAg();
+})();
+</script>
+</body>
+</html>
