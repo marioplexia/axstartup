@@ -20,6 +20,7 @@ const row = (o) => ({
   fecha: fecha(o.created_at), resuelta: o.resolved_at ? fecha(o.resolved_at) : null, monto: Math.round(o.amount || 0),
   descripcion: (o.detail || o.title || '').slice(0, 160), vin: o.vin || null, km: o.km, regla: o.rule_id || null,
   pieza: o.part || null, estado_pieza: o.part_status ? PIEZA[o.part_status] : null, llegada: o.due_at && o.part_status === 'pedida' ? fecha(o.due_at) : null,
+  cierre: o.closed_at ? `Cerrada (cobrada el ${fecha(o.closed_at)})` : (o.status === 'rechazada' ? 'Rechazada' : 'Activa'),
   unidad: o.unit || null, tipo_servicio: o.svc_type || null, expediente: `${o.ev_have}/${o.ev_need}`, expediente_completo: o.ev_have >= o.ev_need
 });
 
@@ -34,6 +35,8 @@ function buscar(user, alcance, f) {
   if (f.cliente) { where += ' AND LOWER(IFNULL(o.customer,\'\')) LIKE ?'; args.push('%' + String(f.cliente).toLowerCase() + '%'); }
   if (f.texto) { where += " AND (LOWER(o.id) LIKE ? OR LOWER(o.title) LIKE ? OR LOWER(o.detail) LIKE ? OR LOWER(IFNULL(o.vin,'')) LIKE ? OR LOWER(IFNULL(o.part,'')) LIKE ?)"; const l = '%' + String(f.texto).toLowerCase() + '%'; args.push(l, l, l, l, l); }
   if (f.expediente_incompleto) where += ' AND o.ev_have < o.ev_need';
+  if (f.cierre === 'activa') where += " AND o.closed_at IS NULL AND o.status != 'rechazada'";
+  if (f.cierre === 'cerrada') where += ' AND o.closed_at IS NOT NULL';
   const col = ['aprobada', 'rechazada', 'pagada', 'cerrada', 'realizada'].includes(f.estado) ? 'o.resolved_at' : 'o.created_at';   // aprobadas/pagadas: por fecha de resolución
   if (f.desde) { where += ` AND ${col} >= ?`; args.push(f.desde); }
   if (f.hasta) { where += ` AND ${col} <= ?`; args.push(f.hasta); }

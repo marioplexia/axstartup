@@ -18,7 +18,8 @@ const STATUS = {
 const RESUELTOS = ['aprobada', 'pagada', 'realizada', 'cerrada', 'rechazada'];
 const PARTES = ['por_pedir', 'pedida', 'en_planta', 'recibida'];
 
-const sel = `SELECT o.*, a.name AS advisor_name, g.name AS agency_name
+const sel = `SELECT o.*, a.name AS advisor_name, g.name AS agency_name,
+             (SELECT CASE WHEN c.paid_at IS NOT NULL THEN 'pagado' ELSE 'por_cobrar' END FROM cobros c WHERE c.order_id = o.id ORDER BY c.id DESC LIMIT 1) AS cobro_estado
              FROM orders o LEFT JOIN advisors a ON a.id = o.advisor_id LEFT JOIN agencies g ON g.id = o.agency_id`;
 
 function scope(user) {                               // el asesor ve su agencia; el admin ve todas
@@ -49,6 +50,10 @@ router.get('/ordenes', (req, res) => {
   if (req.query.estado) { where += ' AND o.status = ?'; args.push(String(req.query.estado)); }
   if (req.query.asesor) { where += ' AND o.advisor_id = ?'; args.push(String(req.query.asesor)); }
   if (req.query.incompletos === '1') where += ' AND o.ev_have < o.ev_need';
+  const cierre = String(req.query.cierre || '');
+  if (cierre === 'activa') where += " AND o.closed_at IS NULL AND o.status != 'rechazada'";
+  else if (cierre === 'cerrada') where += ' AND o.closed_at IS NOT NULL';
+  else if (cierre === 'rechazada') where += " AND o.status = 'rechazada' AND o.closed_at IS NULL";
   const d = s => { const t = new Date(s + 'T00:00:00'); return isNaN(t) ? null : t.getTime(); };
   if (req.query.desde && d(req.query.desde) != null) { where += ' AND o.created_at >= ?'; args.push(d(req.query.desde)); }
   if (req.query.hasta && d(req.query.hasta) != null) { where += ' AND o.created_at < ?'; args.push(d(req.query.hasta) + DAY); }
@@ -62,7 +67,8 @@ router.get('/ordenes', (req, res) => {
   const base = db.prepare(sel + ' WHERE o.kind = ?' + sc.sql).all(tipo && STATUS[tipo] ? tipo : 'prea', ...sc.args);
   const porEstado = {}; base.forEach(o => { porEstado[o.status] = (porEstado[o.status] || 0) + 1; });
   const asesores = db.prepare(`SELECT DISTINCT a.id, a.name FROM orders o JOIN advisors a ON a.id = o.advisor_id WHERE 1=1${sc.sql} ORDER BY a.name`).all(...sc.args);
-  res.json({ items, total: items.length, tpu: tpuStats(base), porEstado, asesores });
+  const cc = db.prepare(`SELECT COUNT(*) t, SUM(o.closed_at IS NULL AND o.status != 'rechazada') a, SUM(o.closed_at IS NOT NULL) c, SUM(o.status = 'rechazada' AND o.closed_at IS NULL) r FROM orders o WHERE 1=1${sc.sql}`).get(...sc.args);
+  res.json({ items, total: items.length, tpu: tpuStats(base), porEstado, asesores, cierre: { todas: cc.t || 0, activas: cc.a || 0, cerradas: cc.c || 0, rechazadas: cc.r || 0 } });
 });
 
 router.post('/ordenes', (req, res) => {
@@ -115,7 +121,8 @@ router.patch('/ordenes/:id', (req, res) => {
     else if (pst === 'en_planta') { pord = pord || now; due = now; }
     else if (pst === 'por_pedir') { pord = null; due = null; }
   }
-  db.prepare('UPDATE orders SET status=?, resolved_at=?, ev_have=?, part_status=?, part_ordered_at=?, due_at=?, updated_at=? WHERE id=?').run(status, resolved, ev, pst, pord, due, now, o.id);
+  const closed = status === 'cerrada' ? (o.closed_at || now) : (o.status === 'cerrada' ? null : o.closed_at);   // cerrada = cobrada
+  db.prepare('UPDATE orders SET status=?, resolved_at=?, ev_have=?, part_status=?, part_ordered_at=?, due_at=?, closed_at=?, updated_at=? WHERE id=?').run(status, resolved, ev, pst, pord, due, closed, now, o.id);
   const nuevo = db.prepare(sel + ' WHERE o.id = ?').get(o.id);
   try { require('./cartera').sync(nuevo); } catch (e) { console.error('cartera:', e.message); }
   res.json(nuevo);

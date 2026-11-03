@@ -227,6 +227,13 @@ if (!db.prepare("SELECT 1 FROM settings WHERE key = 'exp_seed'").get()) db.trans
   db.prepare("UPDATE orders SET ev_need = CASE kind WHEN 'prea' THEN 5 ELSE 3 END").run();
   db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('exp_seed', '1')").run();
 })();
+
+// Cierre de órdenes (una sola vez): una orden está cerrada cuando ya se cobró.
+if (!db.prepare("SELECT 1 FROM settings WHERE key = 'closed_seed'").get()) db.transaction(() => {
+  db.prepare("UPDATE orders SET closed_at = COALESCE(resolved_at, updated_at) WHERE closed_at IS NULL AND ((kind = 'campana' AND status = 'cerrada') OR (kind = 'servicio' AND status = 'pagada'))").run();
+  db.prepare("UPDATE orders SET closed_at = (SELECT MAX(c.paid_at) FROM cobros c WHERE c.order_id = orders.id AND c.paid_at IS NOT NULL) WHERE closed_at IS NULL AND EXISTS (SELECT 1 FROM cobros c WHERE c.order_id = orders.id AND c.paid_at IS NOT NULL)").run();
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('closed_seed', '1')").run();
+})();
 const c = t => db.prepare(`SELECT COUNT(*) n FROM ${t}`).get().n;
 console.log(`Base lista en ${DB_PATH}`);
 console.log(`  agencias: ${c('agencies')} · asesores: ${c('advisors')} · reglas: ${c('rules')} · piezas: ${c('rule_parts')} · palabras clave: ${c('rule_keywords')}`);

@@ -99,3 +99,12 @@ Una sección queda completa cuando tiene al menos un archivo; el avance se refle
 | `GET expedientes/:orden` | Checklist, archivos, avance y auditoría |
 | `POST expedientes/:orden/:seccion/archivos?nombre=&nota=` | Sube un archivo (cuerpo binario, cabecera `X-Mime`) |
 | `GET/PATCH/DELETE expedientes/archivos/:id` | Descarga, edita la nota o elimina |
+
+## Órdenes activas y cerradas
+
+En **Bitácora → Órdenes** las órdenes se ven como historial, de la más reciente a la más antigua y agrupadas por fecha. Por defecto se muestran las **activas**.
+Una orden pasa a **cerrada** solo cuando se marca como **cobrada**: con «Marcar como cobrada» en su expediente (Expedientes) o al registrar el pago del cobro en Cartera. «Reabrir orden» la regresa a activa.
+Solo se puede cobrar una PREA aprobada, un servicio pagado o una campaña realizada. Las rechazadas tienen su propio filtro.
+
+- `GET /api/garantias/ordenes?cierre=activa|cerrada|rechazada` (y `cierre` con los conteos en la respuesta)
+- `POST /api/garantias/expedientes/:orden/cobro` `{cobrado}`

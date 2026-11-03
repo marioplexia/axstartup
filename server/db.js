@@ -15,7 +15,7 @@ db.exec(fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8'));
 {
   const have = db.prepare('PRAGMA table_info(orders)').all().map(c => c.name);
   [['customer', 'TEXT'], ['part', 'TEXT'], ['part_status', 'TEXT'], ['part_ordered_at', 'INTEGER'],
-   ['due_at', 'INTEGER'], ['unit', 'TEXT'], ['svc_type', 'TEXT']]
+   ['due_at', 'INTEGER'], ['unit', 'TEXT'], ['svc_type', 'TEXT'], ['closed_at', 'INTEGER']]
     .forEach(([n, t]) => { if (!have.includes(n)) db.exec(`ALTER TABLE orders ADD COLUMN ${n} ${t}`); });
 }
 

@@ -84,7 +84,9 @@ function local(user, alcance, msg) {
   const cl = db.prepare(`SELECT DISTINCT customer c FROM orders WHERE customer IS NOT NULL`).all().map(x => x.c).find(c => q.includes(norm(c)));
   if (cl) f.cliente = cl;
   if (kind) f.tipo = kind;
-  const st = estadoDe(q, kind);
+  const cie = /sin cerrar|\bactiv[ao]s?\b/.test(q) ? 'activa' : /\bcerrad[ao]s?\b|\bcobrad[ao]s?\b/.test(q) ? 'cerrada' : null;
+  if (cie) f.cierre = cie;
+  const st = estadoDe(cie ? q.replace(/cerrad[ao]s?|cobrad[ao]s?/g, '') : q, kind);
   if (st) f.estado = st;
   const cuenta = /cuantas?|cuantos?|total|numero de|how many/.test(q);
 
@@ -152,7 +154,7 @@ function local(user, alcance, msg) {
   }
   const b = D.buscar(user, alcance, { ...f, limite: 12 });
   const nom = kind ? { prea: 'PREA', servicio: 'servicio', campana: 'campaña' }[kind] + (b.total === 1 ? '' : 's') : (b.total === 1 ? 'orden' : 'órdenes');
-  const filtro = [f.estado ? D.ESTADO[f.estado].toLowerCase() + (b.total === 1 ? '' : 's') : '', f.cliente ? 'de ' + f.cliente : ''].filter(Boolean).join(' ');
+  const filtro = [f.cierre ? (f.cierre === 'activa' ? 'activa' : 'cerrada') + (b.total === 1 ? '' : 's') : '', f.estado ? D.ESTADO[f.estado].toLowerCase() + (b.total === 1 ? '' : 's') : '', f.cliente ? 'de ' + f.cliente : ''].filter(Boolean).join(' ');
   if (!b.total) return `No encontré ${nom}${filtro ? ' ' + filtro : ''}${L}.`;
   const cols = kind === 'campana' ? [COLS.orden, COLS.cliente, COLS.unidad, COLS.estado, COLS.fecha] : kind === 'servicio' ? [COLS.orden, COLS.cliente, COLS.serv, COLS.fecha, COLS.monto] : [COLS.orden, COLS.tipo, COLS.cliente, COLS.estado, COLS.fecha, COLS.monto];
   const head = `${cuenta ? 'Tienes' : 'Encontré'} **${b.total} ${nom}${filtro ? ' ' + filtro : ''}**${L}.`;
@@ -164,7 +166,7 @@ const TOOLS = [
   { name: 'buscar_ordenes', description: 'Busca órdenes de la agencia (PREAs, servicios y campañas) con filtros. Devuelve el total y hasta 40 órdenes recientes.', input_schema: { type: 'object', properties: {
     tipo: { type: 'string', enum: ['prea', 'servicio', 'campana'] }, estado: { type: 'string', enum: ['preaprobada', 'aprobada', 'rechazada', 'atencion', 'pendiente', 'pagada', 'realizada', 'cerrada'] },
     estado_pieza: { type: 'string', enum: ['por_pedir', 'pedida', 'en_planta', 'recibida'] }, cliente: { type: 'string' }, texto: { type: 'string', description: 'folio, VIN, pieza o palabra del detalle' },
-    expediente_incompleto: { type: 'boolean' }, desde: { type: 'string', description: 'fecha ISO yyyy-mm-dd' }, hasta: { type: 'string', description: 'fecha ISO yyyy-mm-dd' }, limite: { type: 'integer' } } } },
+    expediente_incompleto: { type: 'boolean' }, cierre: { type: 'string', enum: ['activa', 'cerrada'], description: 'activa = aún no cobrada; cerrada = ya cobrada' }, desde: { type: 'string', description: 'fecha ISO yyyy-mm-dd' }, hasta: { type: 'string', description: 'fecha ISO yyyy-mm-dd' }, limite: { type: 'integer' } } } },
   { name: 'resumen', description: 'Totales por tipo y estado, piezas, expedientes incompletos y monto aprobado/cobrado en un periodo.', input_schema: { type: 'object', properties: { desde: { type: 'string' }, hasta: { type: 'string' } } } },
   { name: 'detalle_orden', description: 'Todos los datos de una orden por su folio (G-…, GA… o S-…).', input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
   { name: 'reglas_aprendidas', description: 'Reglas de garantía que ha aprendido el agente.', input_schema: { type: 'object', properties: { texto: { type: 'string' } } } },

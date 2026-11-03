@@ -544,11 +544,14 @@ textarea,input{font:inherit;color:inherit}
 .cal-g button.sel{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}.cal-g button.out{visibility:hidden}.cal-g button.today span:first-child{font-weight:600;color:var(--fg)}
 .cal-g button i{font-style:normal;font-size:11px;font-weight:600;color:var(--b-amber)}
 /* tabla de órdenes */
+.tbl tr.grp td{padding:20px 14px 9px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;cursor:default;border-bottom:1px solid var(--line)}.tbl tr.grp,.tbl tr.grp:hover{background:none;cursor:default}.tbl tr.grp td span{opacity:.75;letter-spacing:0;text-transform:none}
+.cob{font-size:12.5px;color:var(--muted);white-space:nowrap}.cob.ok{color:var(--b-green);font-weight:500}.cob.wait{color:var(--b-amber);font-weight:500}
+.ord-h .bit-seg{margin:0;height:38px;align-items:center}.ord-h .bit-seg.sm button{height:36px}
 .ord-h{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:26px}
 .tbl{margin-top:18px;overflow:auto}.tbl table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
 .tbl th{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
 .tbl td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:middle}.tbl tbody tr{cursor:pointer}.tbl tbody tr:hover{background:var(--hover)}
-.tbl td.r,.tbl th.r{text-align:right;font-variant-numeric:tabular-nums}.tbl code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em}.tbl .tdd{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.tbl td.r,.tbl th.r{text-align:right;font-variant-numeric:tabular-nums}.tbl code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em;white-space:nowrap}.tbl .tdd{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
 .nf{margin-top:20px;padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
 .nf label{display:grid;gap:5px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.nf .wide{grid-column:1/-1}
 .nf .brow{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;align-items:center}.nf .err{margin-right:auto;color:var(--b-red);font-size:12.5px}
@@ -792,7 +795,7 @@ textarea,input{font:inherit;color:inherit}
 .ex-b{height:36px;display:inline-flex;align-items:center;gap:9px;padding:0 15px;border:1px solid var(--hm-line);border-radius:10px;background:var(--hm-card);font-size:13px;font-weight:500;white-space:nowrap}.ex-b:hover{border-color:var(--hm-sel)}.ex-b .ic{width:15px;height:15px}
 .ex-b.dk{background:var(--send-on);color:var(--send-fg);border-color:var(--send-on)}.ex-b.sm{height:30px;padding:0 11px;font-size:12px}.ex-b:disabled{opacity:.55;cursor:default}
 .ex-pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:12px;border:1px solid;font-size:11.5px;font-weight:500;white-space:nowrap}.ex-pill .ic{width:13px;height:13px}
-.ex-pill.am{color:var(--b-amber);background:var(--b-amber-bg);border-color:var(--b-amber-line)}.ex-pill.gr{color:var(--hm-green);background:var(--b-green-bg);border-color:var(--hm-pill)}
+.ex-pill.nu{color:var(--hm-mut);background:var(--surface);border-color:var(--hm-line)}.ex-pill.am{color:var(--b-amber);background:var(--b-amber-bg);border-color:var(--b-amber-line)}.ex-pill.gr{color:var(--hm-green);background:var(--b-green-bg);border-color:var(--hm-pill)}
 .ex-tabs{display:flex;gap:8px;margin-top:20px;padding-bottom:18px;border-bottom:1px solid var(--hm-line)}
 .ex-tab{height:36px;display:inline-flex;align-items:center;gap:9px;padding:0 15px;border:1px solid var(--hm-line);border-radius:9px;background:var(--hm-card);font-size:13px;font-weight:500}.ex-tab .ic{width:15px;height:15px}
 .ex-tab[aria-selected="true"]{background:var(--send-on);color:var(--send-fg);border-color:var(--send-on)}
@@ -2205,7 +2208,7 @@ P.arrow='<path d="M7 17 17 7M7 7h10v10"/>';
 P.clock='<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>';
 P.checkc='<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>';
 P.chevl='<path d="m15 18-6-6 6-6"/>';P.chevr='<path d="m9 18 6-6-6-6"/>';
-var BT={tab:'bitacora',kind:'prea',estado:'',q:'',m:{asesor:'',desde:'',hasta:'',incompletos:false},pop:false,cal:false,calM:null,calDay:'',per:'semana',data:null,perf:null,open:null,form:false,err:'',seq:0,t:0};
+var BT={tab:'bitacora',cierre:'activa',kind:'prea',estado:'',q:'',m:{asesor:'',desde:'',hasta:'',incompletos:false},pop:false,cal:false,calM:null,calDay:'',per:'semana',data:null,perf:null,open:null,form:false,err:'',seq:0,t:0};
 var BK={prea:'PREAs',servicio:'Servicios',campana:'Campañas'};
 var BST={preaprobada:'PREAPROBADA',aprobada:'APROBADA',rechazada:'RECHAZADA',atencion:'REQUIERE ATENCIÓN',pendiente:'PENDIENTE',pagada:'PAGADA',realizada:'REALIZADA',cerrada:'CERRADA'};
 var BSF={prea:['preaprobada','aprobada','rechazada','atencion'],servicio:['pendiente','pagada','atencion'],campana:['pendiente','realizada','cerrada','rechazada','atencion']};
@@ -2217,6 +2220,7 @@ var bitEl=$('#viewBit');
 function bitApi(m,u,b){return AX.api(m,'/api/garantias'+u,b)}
 function bitQuery(withKind){
   var q=[];if(withKind&&BT.kind)q.push('tipo='+BT.kind);
+  if(BT.tab==='ordenes'&&BT.cierre)q.push('cierre='+BT.cierre);
   if(BT.estado)q.push('estado='+BT.estado);if(BT.q)q.push('q='+encodeURIComponent(BT.q));
   if(BT.m.asesor)q.push('asesor='+encodeURIComponent(BT.m.asesor));if(BT.m.desde)q.push('desde='+BT.m.desde);
   if(BT.m.hasta)q.push('hasta='+BT.m.hasta);if(BT.m.incompletos)q.push('incompletos=1');
@@ -2252,6 +2256,7 @@ function bitItem(o){
      '<div><span>VIN</span><b>'+escA(o.vin||'—')+'</b></div><div><span>Kilometraje</span><b>'+(o.km!=null?o.km.toLocaleString('es-MX')+' km':'—')+'</b></div>'+
      '<div><span>Monto estimado</span><b>'+mxn(o.amount)+'</b></div><div><span>Regla del agente</span><b>'+escA(o.rule_id||'Sin regla')+'</b></div>'+
      '<div><span>Registrada</span><b>'+new Date(o.created_at).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})+'</b></div>'+
+     '<div><span>Cierre</span><b>'+(o.closed_at?'Cerrada · cobrada el '+bd(o.closed_at):'Activa · se cierra al cobrarla')+'</b></div>'+
      '<div><span>'+(o.resolved_at?'Resuelta':'Tiempo abierta')+'</span><b>'+(o.resolved_at?new Date(o.resolved_at).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})+' · ':'')+days.toFixed(1)+' d</b></div></div>'+
      (o.part?'<div class="bi-g"><div><span>Pieza</span><b>'+escA(o.part)+'</b></div><div><span>Estado de la pieza</span><b>'+({por_pedir:'Por pedir',pedida:'Pedida'+(o.due_at?' · llega '+bd(o.due_at):''),en_planta:'En planta',recibida:'Recibida'}[o.part_status]||'Sin autorizar')+'</b></div></div>':'')+
      (o.unit?'<div class="bi-g"><div><span>Unidad</span><b>'+escA(o.unit)+'</b></div></div>':'')+
@@ -2304,9 +2309,17 @@ function tabOrdenes(){
    '<label>Título<input class="f-in" id="nfN" maxlength="160" placeholder="PREA, Servicio de 20,000 km…" required></label><label>Cliente<input class="f-in" id="nfC" maxlength="80"></label><label>VIN<input class="f-in" id="nfV" maxlength="17"></label>'+
    '<label>Kilometraje<input class="f-in" id="nfK" type="number" min="0"></label><label>Monto estimado (MXN)<input class="f-in" id="nfM" type="number" min="0" step="0.01"></label>'+
    '<label class="wide">Detalle<textarea class="f-in" id="nfD" maxlength="600"></textarea></label><div class="brow"><span class="err" id="nfE" role="alert"></span><button type="button" class="bit-btn" data-nf="0">Cancelar</button><button class="bit-btn dk" type="submit">Crear orden</button></div></form>':'';
-  var rows=items.map(function(o){return '<tr data-row="'+o.id+'" data-kind="'+o.kind+'" tabindex="0"><td><code>'+escA(o.id)+'</code></td><td>'+BK[o.kind].replace(/s$/,'')+'</td><td><div class="tdd">'+escA(o.detail||o.title)+'</div></td><td>'+escA(o.advisor_name||'—')+'</td><td class="r">'+mxn(o.amount)+'</td><td><span class="badge '+o.status+'">'+BST[o.status]+'</span></td><td>'+bd(o.created_at)+'</td></tr>'}).join('');
-  return '<div class="ord-h"><div class="bit-srch">'+svg('search')+'<input id="bitQ" type="search" placeholder="Buscar por folio, VIN o asesor..." aria-label="Buscar" value="'+escA(BT.q)+'"></div><span class="sp" style="flex:1"></span><button class="bit-btn dk" data-nf="1">'+svg('plus')+'Nueva orden</button></div>'+f+
-   (items.length?'<div class="tbl"><table><thead><tr><th>Folio</th><th>Tipo</th><th>Descripción</th><th>Asesor</th><th class="r">Monto</th><th>Estado</th><th>Registrada</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty-b"><b>Sin órdenes</b>Crea una con «Nueva orden» o envía una PREA desde el agente.</div>')+
+  var cz=d?d.cierre:{activas:0,cerradas:0,rechazadas:0,todas:0};
+  var chips='<div class="bit-seg sm" role="group" aria-label="Estado de la orden">'+[['activa','Activas',cz.activas],['cerrada','Cerradas',cz.cerradas],['rechazada','Rechazadas',cz.rechazadas],['','Todas',cz.todas]].map(function(c){return '<button data-cie="'+c[0]+'" aria-pressed="'+(BT.cierre===c[0])+'">'+c[1]+' · '+c[2]+'</button>'}).join('')+'</div>';
+  var bucket=function(t){var n=new Date(),d0=new Date(n.getFullYear(),n.getMonth(),n.getDate()).getTime(),dd=Math.floor((d0-new Date(new Date(t).getFullYear(),new Date(t).getMonth(),new Date(t).getDate()).getTime())/864e5);
+    if(dd<=0)return 'Hoy';if(dd===1)return 'Ayer';if(dd<7)return 'Esta semana';var m=new Date(t).toLocaleDateString('es-MX',{month:'long',year:'numeric'});return m.charAt(0).toUpperCase()+m.slice(1)};
+  var cobroTxt=function(o){return o.closed_at?'<span class="cob ok">Cobrada · '+bd(o.closed_at).slice(5).split('-').reverse().join('/')+'</span>':o.status==='rechazada'?'<span class="cob">—</span>':o.cobro_estado==='por_cobrar'?'<span class="cob wait">Por cobrar</span>':'<span class="cob">Sin cobrar</span>'};
+  var rows='',last='',cnt={};items.forEach(function(o){var k=bucket(o.created_at);cnt[k]=(cnt[k]||0)+1});
+  items.forEach(function(o){var k=bucket(o.created_at);if(k!==last){last=k;rows+='<tr class="grp"><td colspan="8">'+k+' <span>· '+cnt[k]+(cnt[k]===1?' orden':' órdenes')+'</span></td></tr>'}
+    rows+='<tr data-row="'+o.id+'" data-kind="'+o.kind+'" tabindex="0"><td><code>'+escA(o.id)+'</code></td><td>'+BK[o.kind].replace(/s$/,'')+'</td><td><div class="tdd">'+escA(o.detail||o.title)+'</div></td><td>'+escA(o.advisor_name||'—')+'</td><td class="r">'+mxn(o.amount)+'</td><td><span class="badge '+o.status+'">'+BST[o.status]+'</span></td><td>'+cobroTxt(o)+'</td><td>'+bd(o.created_at)+'</td></tr>'});
+  var vacio={activa:'No hay órdenes activas. Cuando una orden se cobre en Expedientes pasará a Cerradas.',cerrada:'Aún no hay órdenes cerradas. Una orden se cierra cuando se marca como cobrada en su expediente.',rechazada:'No hay órdenes rechazadas.','':'Crea una con «Nueva orden» o envía una PREA desde el agente.'}[BT.cierre];
+  return '<div class="ord-h"><div class="bit-srch">'+svg('search')+'<input id="bitQ" type="search" placeholder="Buscar por folio, VIN o asesor..." aria-label="Buscar" value="'+escA(BT.q)+'"></div>'+chips+'<span class="sp" style="flex:1"></span><button class="bit-btn dk" data-nf="1">'+svg('plus')+'Nueva orden</button></div>'+f+
+   (items.length?'<div class="tbl"><table><thead><tr><th>Folio</th><th>Tipo</th><th>Descripción</th><th>Asesor</th><th class="r">Monto</th><th>Estado</th><th>Cobro</th><th>Registrada</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty-b"><b>Sin órdenes</b>'+vacio+'</div>')+
    '<p class="bit-count">'+items.length+(items.length===1?' orden':' órdenes')+'</p>';
 }
 function tabDesempeno(){
@@ -2353,6 +2366,7 @@ bitEl.addEventListener('click',async function(e){
   if(t.dataset.day!==undefined){BT.calDay=BT.calDay===q('day')?'':q('day');bitRender();return}
   if(t.dataset.clear){BT.m={asesor:'',desde:'',hasta:'',incompletos:false};bitLoad();bitRender();return}
   if(t.dataset.retry){BT.err='';bitLoad();return}
+  if(t.dataset.cie!==undefined){BT.cierre=q('cie');BT.data=null;bitRender();bitLoad();return}
   if(t.dataset.nf!==undefined){BT.form=q('nf')==='1';bitRender();return}
   if(t.dataset.exp){EX.id=t.dataset.exp;EX.det=null;EX.tab='check';showView('exp');return}
   if(t.dataset.ev||t.dataset.set||t.dataset.part){
@@ -2808,7 +2822,7 @@ var exEl=$('#viewExp');
 var EXK={prea:'PREA',servicio:'Servicio',campana:'Campaña'},EXI={prea:'file',servicio:'wrench',campana:'megaphone'};
 var exCap=function(s){s=(BST[s]||s).toLowerCase();return s.charAt(0).toUpperCase()+s.slice(1)};
 var exSz=function(n){return n<1024?n+' B':n<1048576?(n/1024).toFixed(n<10240?1:0)+' KB':(n/1048576).toFixed(1)+' MB'};
-var exCobro=function(c){return c==='pagado'?'Pagado':c==='por_cobrar'?'Por cobrar':'—'};
+var exCobro=function(c){return c==='cobrada'?'Cobrada':c==='pagado'?'Pagado':c==='por_cobrar'?'Por cobrar':'—'};
 async function exLoad(){
   if(!AX.on)return exRender();
   try{
@@ -2870,13 +2884,13 @@ function exSecCard(s){
 function exDetail(){
   var d=EX.det;if(!d)return '<div class="exp-empty">Cargando…</div>';
   var o=d.orden,pend=d.secciones.filter(function(s){return s.estado!=='completo'}),done=d.avance>=100;
-  var cobro=d.cobro?(d.cobro.estado==='pagado'?'Pagado':'Por cobrar · '+d.cobro.dias+' d'):'Sin cobro';
+  var cobro=d.cerrada?'Cobrada el '+hmF(d.cerrada):d.cobro?(d.cobro.estado==='pagado'?'Pagado':'Por cobrar · '+d.cobro.dias+' d'):'Sin cobro';
   var head='<div class="ex-dh"><div class="ex-dhi"><div><small>Expediente · '+EXK[o.tipo].toUpperCase()+'</small><h1>'+escA(o.id)+'</h1><p>'+escA(o.detalle||o.titulo||'')+'</p></div><button class="ex-x" data-back="1" aria-label="Cerrar expediente">'+svg('x')+'</button></div></div>';
   var kp='<div class="ex-kp"><div class="ex-k"><span>Status</span><b>'+escA(BST[o.status]||o.status)+'</b></div><div class="ex-k"><span>Monto</span><b>'+hmM(o.monto)+'</b></div><div class="ex-k"><span>Cobro</span><b>'+cobro+'</b></div><div class="ex-k"><span>Avance</span><b>'+d.avance+'%</b></div></div>';
   var ck='<div class="ex-ck">'+d.secciones.map(function(s){return '<div'+(s.estado==='completo'?' class="ok"':'')+'>'+svg(s.estado==='completo'?'checkc':'circle')+'<span>'+escA(s.corto)+'</span><em>'+(s.estado==='completo'?'Completo':'Pendiente')+'</em></div>'}).join('')+'</div>'+
     '<p class="ex-miss">'+(pend.length?'Falta por completar: '+pend.map(function(s){return '<b>'+escA(s.corto)+'</b>'}).join(', '):'<b>Expediente completo.</b> Todas las secciones tienen sus archivos.')+'</p>';
-  var sh='<div class="ex-sh"><h2>'+svg('clip2')+'Expediente de la '+EXK[o.tipo]+' '+escA(o.id)+' <span class="ex-pill '+(done?'gr':'am')+'">'+svg(done?'check':'alert')+(done?'Completo':'En proceso')+' · '+d.avance+'%</span></h2>'+
-    '<div class="ex-sr2"><span>'+d.documentos+(d.documentos===1?' documento':' documentos')+'</span><button class="ex-b" data-pdf="1">'+svg('file')+'Resumen PDF</button></div><p>Evidencias, factura, documentos firmados, cobro y destrucción de la pieza. Todo queda guardado en la nube.</p></div>';
+  var sh='<div class="ex-sh"><h2>'+svg('clip2')+'Expediente de la '+EXK[o.tipo]+' '+escA(o.id)+' <span class="ex-pill '+(done?'gr':'am')+'">'+svg(done?'check':'alert')+(done?'Completo':'En proceso')+' · '+d.avance+'%</span> <span class="ex-pill '+(d.cerrada?'gr':'nu')+'">'+(d.cerrada?'Cerrada · cobrada':'Activa')+'</span></h2>'+
+    '<div class="ex-sr2"><span>'+d.documentos+(d.documentos===1?' documento':' documentos')+'</span><button class="ex-b" data-pdf="1">'+svg('file')+'Resumen PDF</button>'+(d.cerrada?'<button class="ex-b" data-cobrar="0">Reabrir orden</button>':'<button class="ex-b dk" data-cobrar="1"'+(d.puede_cobrar?'':' disabled title="Disponible cuando la orden esté aprobada, pagada o realizada"')+'>'+(EX.cc?'¿Confirmar cobro?':'Marcar como cobrada')+'</button>')+'</div><p>Evidencias, factura, documentos firmados, cobro y destrucción de la pieza. Todo queda guardado en la nube.</p></div>';
   var tabs='<div class="ex-tabs" role="tablist"><button class="ex-tab" role="tab" data-etab="check" aria-selected="'+(EX.tab==='check')+'">'+svg('checklist')+'Checklist</button><button class="ex-tab" role="tab" data-etab="aud" aria-selected="'+(EX.tab==='aud')+'">'+svg('history')+'Auditoría ('+d.auditoria.length+')</button></div>';
   var body;
   if(EX.tab==='aud')body='<div class="ex-box"><header><b>Auditoría del expediente</b><span>Quién cargó o eliminó cada archivo</span></header><div class="ex-au">'+(d.auditoria.length?d.auditoria.map(function(a){return '<div><small>'+new Date(a.ts).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})+'</small><span>'+escA(a.autor)+'</span><span><b style="font-weight:500">'+escA(a.accion)+'</b>'+(a.detalle?'<br><small>'+escA(a.detalle)+'</small>':'')+'</span></div>'}).join(''):'<div style="grid-template-columns:1fr"><small>Aún no hay movimientos. Aquí aparecerá cada archivo que se cargue o elimine.</small></div>')+'</div></div>';
@@ -2944,7 +2958,7 @@ async function exPdf(){
     pages.push(cur);carSave(pdfBlob(pages),'expediente-'+o.id+'.pdf');toast('Resumen descargado');
   }catch(e){console.error(e);toast('No se pudo generar el resumen')}
 }
-function exOpen(id){EX.id=id;EX.det=null;EX.tab='check';EX.menu=null;EX.conf=null;exRender();exLoad();exEl.scrollTop=0}
+function exOpen(id){EX.cc=false;EX.id=id;EX.det=null;EX.tab='check';EX.menu=null;EX.conf=null;exRender();exLoad();exEl.scrollTop=0}
 function exBack(){EX.id=null;EX.det=null;EX.conf=null;exRender();exLoad();exEl.scrollTop=0}
 exEl.addEventListener('click',async function(e){
   var t=e.target.closest('button,[data-open],[data-lb],[data-lbx]');if(!t||!exEl.contains(t))return;var q=t.dataset;
@@ -2960,6 +2974,11 @@ exEl.addEventListener('click',async function(e){
   if(q.eest){EX.estado=EX.estado===q.eest?'':q.eest;exLoad();exRender();return}
   if(q.etab){EX.tab=q.etab;exRender();return}
   if(q.up){EX.pick=q.up;var fi=$('#exFileIn');fi.value='';fi.click();return}
+  if(q.cobrar){
+    if(q.cobrar==='1'&&!EX.cc){EX.cc=true;exRender();return}
+    EX.cc=false;
+    try{await bitApi('POST','/expedientes/'+encodeURIComponent(EX.id)+'/cobro',{cobrado:q.cobrar==='1'});toast(q.cobrar==='1'?'Orden cobrada y cerrada':'Orden reabierta');await exLoad()}catch(er){toast(er.message||'No se pudo actualizar la orden');exRender()}
+    return}
   if(q.pdf){exPdf();return}
   if(q.fdl){try{var b=await exBlob(q.fdl,true),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=q.fn||'archivo';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},3000)}catch(er){toast(er.message||'No se pudo descargar')}return}
   if(q.fask){EX.conf=q.fask;exRender();return}

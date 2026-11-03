@@ -7,6 +7,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { db, DB_PATH } = require('../db');
 const { requireAuth } = require('./auth');
+const { setCobrado, puedeCobrar } = require('../closing');
 
 const router = express.Router();
 const FILES_DIR = process.env.FILES_DIR || path.join(path.dirname(DB_PATH), 'files');
@@ -53,7 +54,7 @@ router.get('/expedientes', requireAuth, (req, res) => {
   let items = rows.map(o => {
     const total = (POR_TIPO[o.kind] || POR_TIPO.prea).length, hechas = Math.min(o.hechas, total);
     return { id: o.id, tipo: o.kind, status: o.status, cliente: o.customer, vin: o.vin, detalle: o.detail, monto: Math.round(o.amount || 0), hechas, total, asesor: o.advisor_name, creada: o.created_at,
-      cobro: o.cobro_billed == null ? null : (o.cobro_paid ? 'pagado' : 'por_cobrar') };
+      cobro: o.closed_at ? 'cobrada' : (o.cobro_billed == null ? null : (o.cobro_paid ? 'pagado' : 'por_cobrar')), cerrada: !!o.closed_at };
   });
   const tot = items.length, comp = items.filter(i => i.hechas >= i.total).length;
   if (req.query.estado === 'completo') items = items.filter(i => i.hechas >= i.total);
@@ -72,6 +73,7 @@ router.get('/expedientes/:orden', requireAuth, (req, res) => {
   const adv = db.prepare('SELECT name FROM advisors WHERE id = ?').get(o.advisor_id);
   res.json({
     orden: { id: o.id, tipo: o.kind, status: o.status, detalle: o.detail, titulo: o.title, vin: o.vin, km: o.km, cliente: o.customer, monto: Math.round(o.amount || 0), asesor: adv && adv.name, creada: o.created_at },
+    cerrada: o.closed_at || null, puede_cobrar: puedeCobrar(o) || !!o.closed_at,
     cobro: cobro ? { estado: cobro.paid_at ? 'pagado' : 'por_cobrar', total: cobro.total, dias: cobro.paid_at ? null : Math.floor((Date.now() - cobro.billed_at) / 864e5) } : null,
     secciones, hechas, total: secciones.length, avance: Math.round(100 * hechas / secciones.length), documentos: files.length,
     auditoria: db.prepare('SELECT u.id, u.action AS accion, u.detail AS detalle, u.created_at AS ts, IFNULL(a.name, \'Sistema\') AS autor FROM expediente_audit u LEFT JOIN advisors a ON a.id = u.advisor_id WHERE u.order_id = ? ORDER BY u.id DESC LIMIT 200').all(o.id)
@@ -129,6 +131,17 @@ router.patch('/expedientes/archivos/:id', requireAuth, express.json(), (req, res
   db.prepare('UPDATE expediente_files SET note = ? WHERE id = ?').run(clean(req.body && req.body.nota, 300) || null, r.f.id);
   audit(r.o, req.user, 'Editó la nota', r.f.name);
   res.json({ ok: true });
+});
+
+/* ---- Cobrada = orden cerrada ---- */
+router.post('/expedientes/:orden/cobro', requireAuth, (req, res) => {
+  const o = orden(req.params.orden, req.user);
+  if (!o) return res.status(404).json({ error: 'Orden no encontrada.' });
+  const cobrado = !!(req.body && req.body.cobrado);
+  if (cobrado && !puedeCobrar(o)) return res.status(400).json({ error: 'Solo se puede marcar como cobrada una PREA aprobada, un servicio pagado o una campaña realizada.' });
+  const n = setCobrado(o, cobrado, req.user.id);
+  audit(o, req.user, cobrado ? 'Marcó la orden como cobrada' : 'Reabrió la orden', cobrado ? 'La orden pasó a cerrada.' : 'La orden volvió a estar activa.');
+  res.json({ ok: true, cerrada: n.closed_at || null, status: n.status });
 });
 
 router.SECCIONES = POR_TIPO;

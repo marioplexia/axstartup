@@ -44,7 +44,9 @@ router.post('/cartera/:id/pago', (req, res) => {
   const sc = scope(req.user), c = db.prepare(sel + ' AND c.id = ?' + sc.sql).get(req.params.id, ...sc.args);
   if (!c) return res.status(404).json({ error: 'Cobro no encontrado.' });
   const pagado = !!(req.body && req.body.pagado);
-  db.prepare('UPDATE cobros SET paid_at = ? WHERE id = ?').run(pagado ? Date.now() : null, c.id);
+  const ord = c.order_id && db.prepare('SELECT * FROM orders WHERE id = ?').get(c.order_id);
+  if (ord) require('../closing').setCobrado(ord, pagado, req.user.id);
+  else db.prepare('UPDATE cobros SET paid_at = ? WHERE id = ?').run(pagado ? Date.now() : null, c.id);
   db.prepare('INSERT INTO cobro_comments (cobro_id, advisor_id, text, created_at) VALUES (?,?,?,?)').run(c.id, req.user.id, pagado ? 'Pago registrado.' : 'Cobro reabierto.', Date.now());
   res.json(out(db.prepare(sel + ' AND c.id = ?').get(c.id)));
 });
