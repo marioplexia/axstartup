@@ -1,6 +1,6 @@
 import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 import { ZodError } from 'zod';
-import { verifyToken, type Principal } from './auth.js';
+import { makeAuthProvider, type AuthProvider, type Principal } from './auth.js';
 import type { Role } from './db/pool.js';
 import { makeLlm, type LlmClient } from './llm/client.js';
 import { preaRoutes } from './routes/prea.js';
@@ -12,7 +12,7 @@ import { ordersRoutes } from './routes/orders.js';
 
 declare module 'fastify' { interface FastifyRequest { principal?: Principal } }
 
-export interface Deps { llm: LlmClient }
+export interface Deps { llm: LlmClient; auth: AuthProvider }
 
 export function requireRole(req: FastifyRequest, ...roles: Role[]) {
   if (!req.principal || !roles.includes(req.principal.role)) throw Object.assign(new Error('rol no autorizado'), { statusCode: 403 });
@@ -24,7 +24,7 @@ export function assertAgency(p: Principal, agencyId: string) {
 }
 
 export async function buildServer(deps: Partial<Deps> = {}): Promise<FastifyInstance> {
-  const d: Deps = { llm: deps.llm ?? makeLlm() };
+  const d: Deps = { llm: deps.llm ?? makeLlm(), auth: deps.auth ?? makeAuthProvider() }; // sin proveedor válido para el entorno, falla al arrancar
   // El logger solo registra método, ruta y estado: nunca cuerpos ni cabeceras (datos personales).
   const app = Fastify({ forceCloseConnections: true, logger: process.env.NODE_ENV === 'test' || process.env.VITEST || process.env.LOG_LEVEL === 'silent' ? false : { level: process.env.LOG_LEVEL ?? 'info', serializers: {
     req: r => ({ method: r.method, url: r.url?.split('?')[0] }), res: r => ({ statusCode: r.statusCode }) } } });
@@ -35,7 +35,7 @@ export async function buildServer(deps: Partial<Deps> = {}): Promise<FastifyInst
     // EventSource no permite cabeceras: solo para el stream se acepta ?access_token= (el logger no registra la query).
     if (!token && req.url.startsWith('/events/stream')) token = (req.query as { access_token?: string }).access_token;
     if (!token) return reply.code(401).send({ error: 'no autenticado' });
-    try { req.principal = await verifyToken(token); } catch { return reply.code(401).send({ error: 'token inválido' }); }
+    try { req.principal = await d.auth.verify(token); } catch { return reply.code(401).send({ error: 'token inválido' }); }
   });
 
   app.setErrorHandler((err: any, _req, reply) => {

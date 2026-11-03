@@ -38,7 +38,7 @@ El rol de conexión debe poder hacer `SET ROLE axai_app` (superusuario, o la mig
 
 ## API
 
-Autenticación: `Authorization: Bearer <JWT HS256>` con claims `sub`, `group_id`, `role` (`advisor`/`reviewer`/`owner`) y `agency_id` (asesores). En `/events/stream` también se acepta `?access_token=` (EventSource no manda cabeceras; el logger nunca registra la query).
+Autenticación (ver `docs/auth.md`): detrás de la interfaz `AuthProvider`; hoy solo existe el proveedor de desarrollo (únicamente con `NODE_ENV=development`) y Supabase Auth está pendiente. `Authorization: Bearer <JWT HS256>` con claims `sub`, `group_id`, `role` (`advisor`/`reviewer`/`owner`) y `agency_id` (asesores). En `/events/stream` también se acepta `?access_token=` (EventSource no manda cabeceras; el logger nunca registra la query).
 
 | Endpoint | Roles | Descripción |
 |---|---|---|
