@@ -617,9 +617,13 @@ textarea,input{font:inherit;color:inherit}
 .hm-bars .tr{display:grid;gap:3px}.hm-bars .r{display:flex;align-items:center;gap:7px;min-width:0}.hm-bars .r i{display:block;height:8px;border-radius:0 2px 2px 0;background:var(--hm-org);min-width:2px;transition:width .4s}.hm-bars .r.c i{background:var(--hm-cmp);height:5px}.hm-bars .r b{font-weight:500;color:var(--fg);font-size:10px}
 .hm-empty{padding:34px 12px;text-align:center;color:var(--hm-mut);font-size:13px}
 /* pantallas de detalle */
-.hm-pre{padding-bottom:0}.hm-post{padding-top:0}
-.hm-fxw{position:relative;height:150px;margin-top:20px;background:#000;overflow:hidden}
+/* El saludo vive dentro de la animación (siempre sobre negro, texto blanco) */
+.hm-post{padding-top:0}
+.hm-fxw{position:relative;height:190px;background:#000;overflow:hidden}
+.hm-fxw::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.4) 45%,rgba(0,0,0,0) 78%)}
 .hm-fx{display:block;position:absolute;inset:0}
+.hm-fxt{position:relative;z-index:2;height:100%;display:flex;align-items:center;padding-top:0;padding-bottom:0}
+.hm-fxt .hm-h1{color:#fff;text-shadow:0 2px 22px rgba(0,0,0,.7)}
 .hm-post .hm-tools{margin-top:22px}
 .hm-top{display:flex;flex-wrap:wrap;align-items:center;gap:20px}
 .hm-back{height:36px;display:inline-flex;align-items:center;gap:10px;padding:0 16px;border:1px solid var(--hm-line);border-radius:8px;background:var(--hm-card);font-size:13px;font-weight:500}.hm-back .ic{width:15px;height:15px}
@@ -647,7 +651,7 @@ textarea,input{font:inherit;color:inherit}
 .hm-tw .o{color:var(--hm-green);font-weight:600;font-size:13px;text-decoration:none}.hm-tw .o:hover{text-decoration:underline;text-underline-offset:3px}
 .hm-tw .m{font-variant-numeric:tabular-nums;white-space:nowrap}
 .pl{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}.pl.ok{background:var(--hm-pill);color:var(--hm-green)}
-@media (max-width:900px){.hm-fxw{height:110px}.hm-grid{grid-template-columns:1fr}.hm-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.hm-sr{margin-left:0;width:100%}.hm-kpi{flex:1 1 150px}}
+@media (max-width:900px){.hm-fxw{height:150px}.hm-grid{grid-template-columns:1fr}.hm-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.hm-sr{margin-left:0;width:100%}.hm-kpi{flex:1 1 150px}}
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -2297,10 +2301,11 @@ var FX=(function(){
     if(!reduce)raf=requestAnimationFrame(frame);
   }
   function draw(t){
+    t*=.4;
     var P=W<700?9:11,cols=Math.ceil(W/P),rows=Math.floor((H-6)/P),r0=P*.29;
     cx.setTransform(dpr,0,0,dpr,0,0);cx.fillStyle='#000';cx.fillRect(0,0,W,H);
     var g=cx.createLinearGradient(0,H*.4,0,H);g.addColorStop(0,'rgba(10,40,150,0)');g.addColorStop(1,'rgba(22,76,214,.6)');cx.fillStyle=g;cx.fillRect(0,0,W,H);
-    var ramp=reduce?1:1-Math.pow(1-Math.min(1,t/1.6),3),breathe=reduce?0:.5+.5*Math.sin(t*1.1),I=ramp*(1-.3*breathe)+(1-ramp)*.35,fl=Math.floor(t*14);
+    var ramp=reduce?1:1-Math.pow(1-Math.min(1,t/1.6),3),breathe=reduce?0:.5+.5*Math.sin(t*1.1),I=ramp*(1-.3*breathe)+(1-ramp)*.35,fl=Math.floor(t*9);
     for(var c=0;c<cols;c++){
       var gap=hs(c,3,Math.floor(t*2.2))>.62?1:0,short=Math.min(rows-3,Math.floor(sm(c*.42+t*.55)*(2+gap*3)));
       for(var k=0;k<rows-short;k++){
@@ -2325,11 +2330,11 @@ var FX=(function(){
 function homeRender(){
   if(S.view!=='inicio')return;
   var a=document.activeElement,id=a&&homeEl.contains(a)&&a.id,pos=a&&a.selectionStart;
-  var wrap=function(x,c){return '<div class="hm-in'+(c?' '+c:'')+'">'+x+'</div>'},slot='<div class="hm-fxw" id="hmFxSlot"></div>';
-  var h1='<h1 class="hm-h1">'+hmGreet()+', '+escA(AX.name)+'</h1>',html;
-  if(!AX.on)html=wrap(h1,'hm-pre')+slot+wrap('<div class="hm-empty">Conecta el backend: el tablero se alimenta del servidor. Abre la app desde el sitio del servidor e inicia sesión.</div>','hm-post');
+  var wrap=function(x,c){return '<div class="hm-in'+(c?' '+c:'')+'">'+x+'</div>'};
+  var h1='<h1 class="hm-h1">'+hmGreet()+', '+escA(AX.name)+'</h1>',slot='<div class="hm-fxw" id="hmFxSlot"><div class="hm-in hm-fxt">'+h1+'</div></div>',html;
+  if(!AX.on)html=slot+wrap('<div class="hm-empty">Conecta el backend: el tablero se alimenta del servidor. Abre la app desde el sitio del servidor e inicia sesión.</div>','hm-post');
   else if(HM.err)html=wrap('<div class="hm-empty">'+HM.err+'<br><button class="hm-b" data-retry="1" style="margin:12px auto 0">Reintentar</button></div>');
-  else if(HM.view==='home')html=wrap(h1,'hm-pre')+slot+wrap(hmHome(),'hm-post');
+  else if(HM.view==='home')html=slot+wrap(hmHome(),'hm-post');
   else html=wrap(hmDetail());
   $('#hmRoot').innerHTML=html;
   var sl=$('#hmFxSlot');if(sl)FX.mount(sl);
