@@ -56,3 +56,16 @@ y una pantalla de detalle por tarjeta (con búsqueda, filtros y «Descargar list
 
 Todos aceptan `asesor=<id>`. Un asesor solo ve su agencia. Los datos de ejemplo (12 meses de PREAs, piezas, campañas y servicios) se cargan una sola vez.
 En la Bitácora, al abrir una orden con pieza puedes marcarla como pedida o en planta; al aprobar una PREA su pieza pasa a «por pedir».
+
+## Mi Agente (chat)
+
+Pantalla **Mi Agente**: el mismo chat del Agente de Garantías, para preguntar sobre PREAs, servicios, campañas, piezas y expedientes
+(«¿qué piezas me faltan por pedir?», «estado de la PREA GA3957», «campañas pendientes de cobro»…). Las conversaciones se guardan por asesor.
+
+- **Con IA:** define `ANTHROPIC_API_KEY` (y opcionalmente `CHAT_MODEL`, por defecto `claude-sonnet-5-5`). El modelo consulta los datos con herramientas de solo lectura y no inventa cifras.
+- **Sin clave:** responde un motor local por reglas que lee las mismas tablas (conteos, listas, folios, clientes, periodos, piezas, expedientes, cobros, TPU y reglas).
+
+| Endpoint | Qué hace |
+|---|---|
+| `POST /api/garantias/chat` `{mensaje, hilo?, alcance?}` | Responde y guarda el mensaje (`alcance`: `agencia` o `mias`) |
+| `GET /api/garantias/chat/hilos` · `GET …/hilos/:id` · `DELETE …/hilos/:id` | Historial de conversaciones del asesor |

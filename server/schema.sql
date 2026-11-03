@@ -124,3 +124,21 @@ CREATE TABLE IF NOT EXISTS orders (
   updated_at  INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_orders_agency ON orders(agency_id, kind, created_at DESC);
+
+-- Conversaciones de «Mi Agente»
+CREATE TABLE IF NOT EXISTS chat_threads (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  advisor_id  TEXT NOT NULL REFERENCES advisors(id) ON DELETE CASCADE,
+  title       TEXT NOT NULL,
+  created_at  INTEGER NOT NULL,
+  updated_at  INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_threads_adv ON chat_threads(advisor_id, updated_at DESC);
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  thread_id  INTEGER NOT NULL REFERENCES chat_threads(id) ON DELETE CASCADE,
+  role       TEXT NOT NULL CHECK (role IN ('user','assistant')),
+  content    TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_msgs_thread ON chat_messages(thread_id, id);

@@ -445,6 +445,15 @@ textarea,input{font:inherit;color:inherit}
 .gmf .gfa:hover{background:#eaf3ff}.gmf .gfa:disabled{opacity:.5;cursor:default}
 .gmf .gfb.sent{border-style:solid;background:#effaf4;border-color:#a8dcc0;color:var(--g-ok)}
 
+/* Mi Agente: sin selector de marca ni adjuntos; listas y tablas dentro de las respuestas */
+.app[data-agent="mi"] #brandHost,.app[data-agent="mi"] #evBtn,.app[data-agent="mi"] #plusBtn{display:none}
+.ai-body ul{margin:0 0 14px;padding-left:22px}.ai-body ul:last-child{margin-bottom:0}
+.ai-body .tbw{overflow-x:auto;margin:0 0 14px;border:1px solid var(--card-line);border-radius:10px}.ai-body .tbw:last-child{margin-bottom:0}
+.ai-body table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.45}
+.ai-body th,.ai-body td{overflow-wrap:normal;word-break:normal}
+.ai-body th{text-align:left;font-size:10.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--card-line);white-space:nowrap;background:var(--surface)}
+.ai-body td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}.ai-body tr:last-child td{border-bottom:0}
+.ai-body td:first-child{white-space:nowrap;font-weight:500}
 /* ---------- Bitácora de órdenes (Órdenes · Bitácora · Desempeño) ---------- */
 :root{--b-amber:#b45309;--b-amber-bg:#fff8e6;--b-amber-line:#f1d48a;--b-green:#0a9b63;--b-green-bg:#e9f8f1;--b-red:#d93025;--b-red-bg:#fdeceb;--b-orange:#e8710a;--b-orange-bg:#fff1e3;--b-track:#ecebe7}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--b-amber:#f0b44c;--b-amber-bg:#2b2412;--b-amber-line:#5c4a1c;--b-green:#2ed18e;--b-green-bg:#12261d;--b-red:#ff7a70;--b-red-bg:#2e1715;--b-orange:#ff9a3d;--b-orange-bg:#2e1f10;--b-track:#2a2a28}}
@@ -674,7 +683,7 @@ textarea,input{font:inherit;color:inherit}
         <button class="nav" data-view="agent" data-i="file" aria-current="true">Agente de Garantías</button>
         <div class="grp" style="margin-top:22px">Sistema de registro</div>
         <button class="nav" data-view="inicio" data-i="home">Inicio</button>
-        <button class="nav" data-view="chat" data-i="chat">Chatea con tus Registros</button>
+        <button class="nav" data-view="chat" data-i="chat">Mi Agente</button>
         <button class="nav" data-view="bitacora" data-i="clip">Bitácora</button>
         <button class="nav" data-view="exp" data-i="folderopen">Expedientes</button>
         <button class="nav" data-view="cobros" data-i="dollar">Agente de Cobros</button>
@@ -869,12 +878,12 @@ $('#userBtn').addEventListener('click',function(){
   else toast('Sesión: mariogarantias');
 });
 
-var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',chat:'Chatea con tus Registros',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia'};
-function isMain(id){return id==='agent'||id==='cobros'}
+var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',chat:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia'};
+function isMain(id){return id==='agent'||id==='cobros'||id==='chat'}
 function showView(id){
   S.view=id;var main=isMain(id);document.querySelector('.main').dataset.v=id;
-  if(main){var ag=id==='cobros'?'cobros':'garantias';if(ag!==S.agent)setAgent(ag)}
-  $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':v==='agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
+  if(main){var ag=id==='cobros'?'cobros':id==='chat'?'mi':'garantias';if(ag!==S.agent)setAgent(ag)}
+  $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':S.agent==='mi'?v==='chat':v==='agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
   var adm=id==='admin',bit=id==='bitacora';stage.hidden=!main;var hom=id==='inicio';$('#viewPh').hidden=main||adm||bit||hom;$('#viewBit').hidden=!bit;$('#viewHome').hidden=!hom;$('#viewAdmin').hidden=!adm;
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(bit)bitShow();
@@ -959,20 +968,30 @@ var COBROS_HIST=[
   {t:'PREA de sensor de oxígeno',s:'Ayer',q:COBROS_REFS[1].q},
   {t:'PREA de frenos',s:'21 oct',q:COBROS_REFS[3].q}
 ];
+var MI_REFS=[
+  {t:'PREAs aprobadas',s:'Este mes',q:'¿Cuántas PREAs aprobé en los últimos 6 meses?'},
+  {t:'Piezas por pedir',s:'PREAs ya autorizadas',q:'¿Qué piezas me faltan por pedir?'},
+  {t:'Campañas por cobrar',s:'Realizadas sin cobro',q:'¿Qué campañas están pendientes de cobro?'},
+  {t:'Expedientes incompletos',s:'Evidencia pendiente',q:'¿Qué expedientes están incompletos?'},
+  {t:'Servicios cobrados',s:'Este mes',q:'¿Cuánto he cobrado este mes?'},
+  {t:'Estado de una PREA',s:'Por folio',q:'¿Cuál es el estado de la PREA GA3957?'}
+];
+var MI_HIST=[];
 var AG={
+  mi:{crumb:'Mi Agente',title:'¿En qué te ayudo hoy?',ph:'Pregúntame sobre tus PREAs, servicios, campañas, piezas o expedientes…',menu:['Toda la agencia','Solo mis órdenes'],menuDefault:'Toda la agencia',ev:'Evidencia',ref:'Preguntas sugeridas',refs:MI_REFS,hist:MI_HIST},
   garantias:{crumb:'Agente de Garantías',title:'Trabajemos en tu próxima PREA',ph:'Describe tu caso de garantía…',menu:PREAS,menuDefault:'Nueva PREA',ev:'Evidencia',ref:'Casos de referencia',refs:REFS,hist:HIST},
   cobros:{crumb:'Agente de Cobros',title:'Cobremos tu próxima PREA',ph:'Indica qué PREA quieres facturar…',menu:['PREA a cobrar','Todas las aprobadas','Pendientes de pago'],menuDefault:'PREA a cobrar',ev:'Factura',ref:'PREA aprobadas',refs:COBROS_REFS,hist:COBROS_HIST}
 };
-function curView(){return S.agent==='cobros'?'cobros':'agent'}
+function curView(){return S.agent==='cobros'?'cobros':S.agent==='mi'?'chat':'agent'}
 function setAgent(a){
   resetChat();
-  S.agent=a;var c=AG[a];
+  S.agent=a;var c=AG[a];app.dataset.agent=a;if(a==='mi')miHist();
   S.prea=c.menuDefault;$('#preaLabel').textContent=c.menuDefault;
   $('#evLbl').textContent=c.ev;$('#refLbl').textContent=c.ref;
   ta.placeholder=c.ph;typeTok++;ta.value='';S.files=[];renderFiles();
   titleEl.textContent=c.title;replayIntro();autosize();updateSend();
 }
-function histBuild(m){head(m,'Conversaciones recientes');AG[S.agent].hist.forEach(function(h){item(m,{icon:'chat',t:h.t,s:h.s,fn:function(){loadHistory(h)}})})}
+function histBuild(m){head(m,AG[S.agent].hist.length?'Conversaciones recientes':'Aún no hay conversaciones');AG[S.agent].hist.forEach(function(h){item(m,{icon:'chat',t:h.t,s:h.s,fn:function(){loadHistory(h)}})})}
 menu('#histChip',histBuild);
 menu('#histTop',histBuild,{right:true});
 
@@ -1030,7 +1049,7 @@ function enterChat(title){
   syncCrumb();
 }
 function resetChat(){
-  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;
+  S.hilo=null;if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
     flip(function(){stage.dataset.state='home';thread.hidden=true;ta.placeholder=AG[S.agent].ph;autosize()});
@@ -1072,12 +1091,27 @@ function inl(s){
   if((s.match(/\*\*/g)||[]).length%2){var i=s.lastIndexOf('**');s=s.slice(0,i)+s.slice(i+2)}
   return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
 }
+function mdTable(ls){
+  var cells=function(l){return l.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(function(c){return inl(c.trim())})};
+  var head=cells(ls[0]),body=ls.slice(1).filter(function(l){return !/^\s*\|?\s*:?-{3,}/.test(l)}).map(cells);
+  return '<div class="tbw"><table><thead><tr>'+head.map(function(c){return '<th>'+c+'</th>'}).join('')+'</tr></thead><tbody>'+body.map(function(r){return '<tr>'+head.map(function(_,i){return '<td>'+(r[i]||'')+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>';
+}
 function md(src,caret){
-  var blocks=src.replace(/\s+$/,'').split(/\n{2,}/).filter(Boolean),ch=caret?'<span class="caret"></span>':'';
-  return blocks.map(function(b,i){
-    var last=i===blocks.length-1,c=last?ch:'',ls=b.split('\n');
-    if(ls.every(function(l){return /^>\s?/.test(l)}))return '<blockquote>'+inl(ls.map(function(l){return l.replace(/^>\s?/,'')}).join(' '))+c+'</blockquote>';
-    if(ls.every(function(l){return /^\d+\.(\s|$)/.test(l)}))return '<ol>'+ls.map(function(l,j){return '<li>'+inl(l.replace(/^\d+\.\s?/,''))+(last&&j===ls.length-1?c:'')+'</li>'}).join('')+'</ol>';
+  var blocks=src.replace(/\s+$/,'').split(/\n{2,}/).filter(Boolean),ch=caret?'<span class="caret"></span>':'',out=[];
+  blocks.forEach(function(b,bi){
+    var runs=[];
+    b.split('\n').forEach(function(l){
+      var t=/^>\s?/.test(l)?'bq':/^\d+\.(\s|$)/.test(l)?'ol':/^[-•*]\s+/.test(l)?'ul':/^\s*\|/.test(l)?'tbl':'p',r=runs[runs.length-1];
+      if(r&&r.t===t)r.l.push(l);else runs.push({t:t,l:[l]});
+    });
+    runs.forEach(function(r,ri){out.push({r:r,last:bi===blocks.length-1&&ri===runs.length-1})});
+  });
+  return out.map(function(o){
+    var r=o.r,c=o.last?ch:'',ls=r.l;
+    if(r.t==='bq')return '<blockquote>'+inl(ls.map(function(l){return l.replace(/^>\s?/,'')}).join(' '))+c+'</blockquote>';
+    if(r.t==='ol')return '<ol>'+ls.map(function(l,j){return '<li>'+inl(l.replace(/^\d+\.\s?/,''))+(o.last&&j===ls.length-1?c:'')+'</li>'}).join('')+'</ol>';
+    if(r.t==='ul')return '<ul>'+ls.map(function(l,j){return '<li>'+inl(l.replace(/^[-•*]\s+/,''))+(o.last&&j===ls.length-1?c:'')+'</li>'}).join('')+'</ul>';
+    if(r.t==='tbl')return mdTable(ls)+c;
     return '<p>'+inl(ls.join(' '))+c+'</p>';
   }).join('');
 }
@@ -1707,12 +1741,13 @@ $('#adPasteGo').addEventListener('click',function(){
   try{var p=parseRecs(t,'');adImport(p.ok,'Texto pegado',p.bad).then(function(){if(p.ok.length)$('#adPaste').value=''})}catch(err){adImpMsg('No pude leer el texto: '+err.message,true)}
 });
 
-async function stream(el,text,my){
+async function stream(el,text,my,sc){
+  sc=sc||1;
   var tokens=text.match(/\S+\s*|\s+/g)||[],acc='';
   for(var k=0;k<tokens.length;k++){
     if(my.aborted)break;
     acc+=tokens[k];el.innerHTML=md(acc,true);toBottom();
-    await nap(14+Math.random()*26+(/[.:?]\s*$/.test(tokens[k])?60:0),my);
+    await nap((14+Math.random()*26+(/[.:?]\s*$/.test(tokens[k])?60:0))*sc,my);
   }
   el.innerHTML=md(acc,false);return acc;
 }
@@ -1911,7 +1946,39 @@ async function runCobros(text,files){
   }
   finish(my);
 }
-function start(text,files){return S.agent==='cobros'?runCobros(text,files):run(text,files)}
+var MI_THINK='<span class="thinking">Consultando tus registros<span class="dots"><i></i><i></i><i></i></span></span>';
+function miRel(t){var d=new Date(t),n=new Date(),dd=Math.floor((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);return dd<=0?'Hoy':dd===1?'Ayer':d.toLocaleDateString('es-MX',{day:'numeric',month:'short'})}
+async function miHist(){
+  if(!AX.on)return;
+  try{var l=await bitApi('GET','/chat/hilos');MI_HIST.length=0;l.forEach(function(h){MI_HIST.push({t:h.title,s:miRel(h.updated_at),id:h.id})})}catch(_){}
+}
+async function runMi(text,files){
+  var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
+  var w=addAssistant(),body=$('.ai-body',w),acts=$('.ai-actions',w),full='';
+  body.innerHTML=MI_THINK;toBottom();
+  try{
+    if(!AX.on)throw new Error('offline');
+    var r=await bitApi('POST','/chat',{mensaje:text,hilo:S.hilo||undefined,alcance:S.prea==='Solo mis órdenes'?'mias':'agencia'});
+    if(!my.aborted){S.hilo=r.hilo;full=r.respuesta}
+  }catch(e){if(!my.aborted)full=e.message==='offline'?'Para consultar tus registros necesito el servidor. Abre la app desde el sitio del servidor e inicia sesión.':'No pude consultar tus registros en este momento. Revisa tu conexión e inténtalo de nuevo.'}
+  if(full&&!my.aborted)full=await stream(body,full,my,.4);
+  else if(my.aborted)body.innerHTML=full?md(full,false):'<p class="muted">Respuesta detenida.</p>';
+  w._text=full.replace(/\*\*/g,'').replace(/^> /gm,'');
+  if(w.isConnected&&full)acts.hidden=false;
+  finish(my);miHist();
+}
+async function loadMiThread(h){
+  showView('chat');resetChat();enterChat(h.t);
+  try{
+    var r=await bitApi('GET','/chat/hilos/'+h.id);S.hilo=h.id;
+    r.mensajes.forEach(function(m){
+      if(m.role==='user'){addUser(m.content,[]);return}
+      var w=addAssistant();$('.ai-body',w).innerHTML=md(m.content,false);w._text=m.content.replace(/\*\*/g,'');$('.ai-actions',w).hidden=false;
+    });
+    S.last=null;toBottom(true);
+  }catch(_){toast('No se pudo abrir la conversación')}
+}
+function start(text,files){return S.agent==='cobros'?runCobros(text,files):S.agent==='mi'?runMi(text,files):run(text,files)}
 
 function onSend(){
   if(S.streaming){if(S.ctrl)S.ctrl.aborted=true;return}
@@ -1924,6 +1991,7 @@ function onSend(){
   start(text,files);
 }
 async function loadHistory(h){
+  if(S.agent==='mi')return loadMiThread(h);
   showView(curView());resetChat();
   enterChat(h.t);addUser(h.q,[]);
   var txt;

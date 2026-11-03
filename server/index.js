@@ -7,6 +7,7 @@ const { router: auth } = require('./routes/auth');
 const garantias = require('./routes/garantias');
 const ordenes = require('./routes/ordenes');
 const inicio = require('./routes/inicio');
+const chat = require('./routes/chat');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -23,6 +24,7 @@ app.get('/api/agencias', (req, res, next) => { req.url = '/agencias'; auth(req, 
 app.use('/api/garantias', garantias);
 app.use('/api/garantias', ordenes);
 app.use('/api/garantias', inicio);
+app.use('/api/garantias', chat);
 
 // Pantallas de acceso y la app
 app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
