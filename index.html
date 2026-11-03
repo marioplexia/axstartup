@@ -530,6 +530,13 @@ textarea,input{font:inherit;color:inherit}
 .an-ev .pv{margin-top:6px;border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.4;background:color-mix(in srgb,var(--an-3) 10%,var(--card));border:1px solid color-mix(in srgb,var(--an-3) 35%,var(--card-line))}
 .an-ev .pv.no{background:var(--surface);border-color:var(--card-line);color:var(--muted)}
 .an-tip{position:fixed;z-index:60;pointer-events:none;max-width:260px;background:var(--fg);color:var(--bg);font:12px/1.4 var(--f-ui);padding:6px 9px;border-radius:7px;white-space:pre-line;box-shadow:var(--shadow)}
+.an-f{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--faint);min-width:130px;flex:1}
+.an-f input,.an-ra input,.an-ra select{height:30px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:13px var(--f-ui);padding:0 8px;min-width:0}
+.an-form{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;border:1px dashed var(--card-line);border-radius:10px;padding:12px;margin:6px 0}
+.an-ra{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.an-ra input{width:130px}.an-ra select{max-width:190px}
+.an-how{margin:10px 0 0;padding-left:20px;font-size:12.5px;color:var(--muted);line-height:1.55}.an-how li{margin-bottom:4px}.an-how b{color:var(--fg)}
+.an-act{display:inline-flex;flex-wrap:wrap;gap:6px;margin-left:8px;align-items:center;vertical-align:middle}.an-act a{font-size:12.5px}
+.gmf .gfc{height:28px;padding:0 10px;border-radius:6px;border:1px solid #b9cfee;background:#fff;color:var(--g-acc);font:500 12px var(--f-ui);cursor:pointer}.gmf .gfc:hover{background:#eaf3ff}
 @media (max-width:640px){.an-bd{padding:10px}.an-hm .c{height:34px;font-size:11.5px}}
 </style>
 
@@ -731,7 +738,7 @@ function showView(id){
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':(v==='agent'||v==='inicio')):v===id;b.setAttribute('aria-current',on?'true':'false')});
   var adm=id==='admin';stage.hidden=!main;$('#viewPh').hidden=main||adm;$('#viewAdmin').hidden=!adm;
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
-  if(adm){adRender();anBuild()}
+  if(adm){adRender();anShow()}
   else{crumb.textContent=AG[S.agent].crumb;syncCrumb()}
   if(mq.matches)setSb(false);
 }
@@ -1177,7 +1184,7 @@ function buildPreaCard(ctx,steps){
    H('Tarifa Mano de Obra',g.fm(g.RT))+H('Tiempo adicionales','0')+H('Tiempo OLH','0')+
    '<div class="ghd">No se encontraron líneas.</div><table class="gtb"><thead><tr><th>Tipo de adicionales/otros</th><th>Cantidad</th></tr></thead><tbody><tr><td colspan="2">&nbsp;</td></tr></tbody></table>'+
    H('Total de elementos adicionales','0.00')+gr('Total bruto',null,{f:13})+H('Deducible','0.00')+H('Código de autorización','')+H('Asignado a','')+H('Estado','<span class="gst">POR CAPTURAR</span>')+
-   '<div class="gbk"><b>Respaldo del agente</b><ul><li>'+basis(ctx)+'</li><li>Tiempo estándar de la operación: '+ctx.h.toFixed(1)+' h.</li>'+ctx.parts.map(function(p){return '<li>'+p.no+' · '+esc(p.d)+' · cant. '+p.q+' · '+g.fm(p.pr)+' c/u</li>'}).join('')+'</ul></div>'+
+   '<div class="gbk"><b>Respaldo del agente</b><ul><li>'+basis(ctx)+'</li><li>Tiempo estándar de la operación: '+ctx.h.toFixed(1)+' h.</li>'+ctx.parts.map(function(p){return '<li>'+p.no+' · '+esc(p.d)+' · cant. '+p.q+' · '+g.fm(p.pr)+' c/u</li>'}).join('')+AX.estLine(ctx)+AX.checksHtml(ctx)+'</ul></div>'+
    '<div class="gfb"><span>¿Qué respondió el fabricante en su portal? Tu respuesta enseña al agente.</span><button class="gfa" type="button" data-r="ok">Fue aceptada</button><button class="gfa" type="button" data-r="no">Fue rechazada</button></div>'+
    '</div>';
   w.innerHTML='<div class="cu"><div class="cu-bar"><div class="cu-dots"><i></i><i></i><i></i></div><div class="cu-url">'+svg('search')+'<span>Análisis de la PREA</span></div><span class="cu-tag">Simulación</span></div>'+
@@ -1197,8 +1204,8 @@ document.addEventListener('click',function(e){
   if(b.classList.contains('gfa')){
     var bar=b.parentNode,cx=f._ctx;if(!cx)return;
     $$('.gfa',bar).forEach(function(x){x.disabled=true});
-    if(b.dataset.r==='ok'){var o=RS.learn(ctxToRec(cx));bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia.</span>'}
-    else{if(cx.ruleId)RS.reject(cx.ruleId);bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+'</span>'}
+    if(b.dataset.r==='ok'){if(cx._ox)AX.act(cx._ox,'aceptacion');var o=RS.learn(ctxToRec(cx));bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia; registra ahí el pago cuando llegue.</span>'}
+    else{bar.className='gfb';bar.innerHTML='<span>¿Por qué la rechazó planta? Esto enseña al agente qué validar.</span>'+AX.CA.map(function(c,i){return '<button class="gfc" type="button" data-c="'+i+'">'+esc(c.n)+'</button>'}).join('')}
     return;
   }
   if(b.classList.contains('gall')){
@@ -1209,6 +1216,12 @@ document.addEventListener('click',function(e){
     b.classList.add('done');b.querySelector('span').textContent='Copiado';toast(it[0]+' copiado');
     setTimeout(function(){b.classList.remove('done');b.querySelector('span').textContent='Copiar'},1600);
   });
+});
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('.gmf .gfc');if(!b)return;
+  var f=b.closest('.gmf'),cx=f&&f._ctx;if(!cx)return;var c=+b.dataset.c,bar=b.closest('.gfb');
+  if(cx._ox)AX.act(cx._ox,'rechazo',c);if(cx.ruleId)RS.reject(cx.ruleId);
+  bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado: '+esc(AX.CA[c].n)+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId:'')+'. Da seguimiento en el tablero de agencia; si se repite, el sistema crea una regla de validación.</span>';
 });
 async function simulatePrea(card,ctx,my){
   var stx=$('.cu-txt',card),lis=$$('.steps li',card),form=$('.gmf',card),F=form._F;
@@ -1234,6 +1247,7 @@ async function simulatePrea(card,ctx,my){
     el.textContent=it[1];el.classList.remove('pend');el.classList.add('filled');r.classList.add('on');
     await w(260);
   }
+  if(!ctx._ox)ctx._ox=AX.fromCtx(ctx).id;
   $('.gall',form).disabled=false;
   step(4,'done',F.length+' campos listos para copiar');
   say('Formulario listo. Copia cada campo o todo junto.');card.firstElementChild.classList.add('done');
@@ -1265,7 +1279,7 @@ RS.seed=function(){
   CASES.forEach(function(c,i){
     var k=GMCODES[c.sys]||GMCODES['Diagnóstico general'],n=SEEDN[i]||5,pm={};
     c.parts.forEach(function(p){pm[p[0]]={d:p[1],q:p[2],pr:p[3],n:n}});
-    var r={id:'R-'+('000'+(i+1)).slice(-4),sys:c.sys,q:k.q,c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,hSum:c.h*n,parts:pm,kw:SEEDKW[i]||[],n:n,rej:0,status:'activa',created:now-864e5*(30-i),updated:now-864e5*(3+i),src:{base:n,historico:0,asesor:0},dist:{}};
+    var r={id:'R-'+('000'+(i+1)).slice(-4),sys:c.sys,q:k.q,c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,hSum:c.h*n,parts:pm,kw:SEEDKW[i]||[],n:n,rej:0,status:'activa',act:now-864e5*(30-i),created:now-864e5*(30-i),updated:now-864e5*(3+i),src:{base:n,historico:0,asesor:0},dist:{}};
     ADVISORS.forEach(function(a){r.dist[a.id]=r.created});
     rules.push(r);
   });
@@ -1341,7 +1355,7 @@ RS.pump=async function(){
       r.dist[a.id]=Date.now();RS.log('distribuida',r.id,'Regla '+r.id+' enviada al agente de '+a.name);RS.save();RS.emit();
     }
     r=RS.byId(id);
-    if(r){r.status='activa';RS.log('activada',r.id,'Regla '+r.id+' activa y distribuida a '+ADVISORS.length+' asesores');RS.save();RS.emit()}
+    if(r){r.status='activa';r.act=Date.now();RS.log('activada',r.id,'Regla '+r.id+' activa y distribuida a '+ADVISORS.length+' asesores');RS.save();RS.emit()}
   }
   RS.busy=false;RS.emit();
 };
@@ -1349,7 +1363,8 @@ RS.setStatus=function(id,st){
   var r=RS.byId(id);if(!r)return;
   if(st==='aprobar'){RS.log('activada',r.id,'Aprobaste la regla '+r.id+'; se distribuye a los asesores');RS.distribute(r);return}
   if(st==='pausar'){r.status='pausada';RS.log('pausada',r.id,'Regla '+r.id+' pausada: los agentes dejan de usarla')}
-  if(st==='reanudar'){r.status=ADVISORS.every(function(a){return r.dist[a.id]})?'activa':'aprendizaje';RS.log('activada',r.id,'Regla '+r.id+' reanudada')}
+  if(st==='revisada'){delete r.review;RS.log('info',r.id,'Regla '+r.id+' marcada como revisada')}
+  if(st==='reanudar'){r.act=r.act||Date.now();r.status=ADVISORS.every(function(a){return r.dist[a.id]})?'activa':'aprendizaje';RS.log('activada',r.id,'Regla '+r.id+' reanudada')}
   if(st==='eliminar'){RS.d.rules=RS.d.rules.filter(function(x){return x.id!==id});RS.log('pausada',id,'Regla '+id+' eliminada del catálogo')}
   RS.save();RS.emit();
 };
@@ -1466,12 +1481,13 @@ function adRender(){
     if(r.status==='por-aprobar')acts+='<button class="bt pri" data-act="aprobar" data-id="'+r.id+'">Aprobar y distribuir</button>';
     if(r.status==='activa'||r.status==='aprendizaje')acts+='<button class="bt" data-act="pausar" data-id="'+r.id+'">Pausar</button>';
     if(r.status==='pausada')acts+='<button class="bt" data-act="reanudar" data-id="'+r.id+'">Reanudar</button>';
+    if(r.review)acts+='<button class="bt pri" data-act="revisada" data-id="'+r.id+'">Marcar revisada</button>';
     acts+='<button class="bt dng" data-act="eliminar" data-id="'+r.id+'">Eliminar</button>';
     var parts=Object.keys(r.parts).map(function(no){var p=r.parts[no];return '<li><b>'+esc(no)+'</b> '+esc(p.d)+' · cant. '+p.q+' · $'+p.pr.toLocaleString('es-MX')+' <em>'+p.n+' de '+r.n+' PREAs</em></li>'}).join('');
     return '<div class="rl'+(o?' open':'')+(r._new?' fresh':'')+'" data-id="'+r.id+'"><button class="rl-h" data-tog="'+r.id+'"><span class="rid">'+r.id+'</span><span class="rq"><b>'+esc(r.q[1].toLowerCase())+'</b><small>'+esc(r.sys)+' · '+esc(r.op)+' · '+RS.toCase(r).h.toFixed(1)+' h</small></span>'+
       '<span class="rc"><span class="cb"><i style="width:'+cf+'%"></i></span><small>'+r.n+' PREAs · '+cf+'%</small></span>'+
       '<span class="rd"><span class="dots">'+ADVISORS.map(function(a){return '<i class="'+(r.dist[a.id]?'on':'')+'"></i>'}).join('')+'</span><small>'+got+'/'+nAdv+'</small></span>'+
-      '<span class="bg s-'+r.status+'">'+ST_LBL[r.status]+'</span></button>'+
+      '<span class="bg s-'+r.status+'">'+ST_LBL[r.status]+'</span>'+(r.review?'<span class="bg s-por-aprobar" title="'+esc(r.review.why)+'">Por revisar</span>':'')+'</button>'+
       '<div class="rl-b"><div class="rl-g"><div><span>Queja</span>'+esc(r.q.join(' - '))+'</div><div><span>Causa</span>'+esc(r.c.join(' - '))+'</div><div><span>Corrección</span>'+esc(r.r.join(' - '))+'</div><div><span>Operación</span>'+esc(r.op)+' · '+esc(r.opd)+'</div></div>'+
       '<div class="rl-s"><span>Aprendida de: '+r.src.base+' base · '+r.src.historico+' históricas · '+r.src.asesor+' de asesores · '+r.rej+' rechazos</span><span>Palabras clave: '+esc(r.kw.join(', ')||'—')+'</span></div>'+
       '<ul class="rl-p">'+parts+'</ul><div class="rl-a">'+acts+'</div></div></div>';
@@ -1781,37 +1797,200 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='Escape'){closeMenu();var s=$('.scrim');if(s)s.remove()}
 });
 
-/* ---------- Aprendizaje y analítica (dentro del Tablero de agencia) ---------- */
-var AN={d:null,built:false,gT:{regla:1,causa:1,pieza:1,modelo:1,agencia:1},gL:1.4,map:'agencia',mon:'agencia',ord:0};
-var AN_AG=['Morelia','Uruapan','Zamora','Pátzcuaro','Lázaro Cárdenas'];
-var AN_MD=['Aveo','Onix','Tracker','Equinox','Silverado','Spark'];
-var AN_CN=[
+/* ---------- Bucle de aprendizaje: casos reales, rechazos, reglas de validación y analítica ---------- */
+var AX={K:'axai.casos.v1',d:null,mem:null,subs:[],bc:null};
+AX.CA=[
+ {n:'Mano de obra sobre el estándar',k:/mano de obra|horas|tiempo|estandar|tarifa/,fix:'ajusta las horas al tiempo estándar',vr:'Validar tiempo estándar'},
+ {n:'Pieza no cubierta',k:/pieza|cobertura|cubiert|parte|refaccion/,fix:'cambia la pieza o adjunta la justificación',vr:'Verificar cobertura de la pieza'},
+ {n:'Falta de evidencia',k:/evidencia|foto|diagnostico|soporte|document/,fix:'agrega fotos y diagnóstico',vr:'Checklist de evidencia'},
+ {n:'Queja o causa mal redactada',k:/queja|redaccion|causa|correccion|descripcion/,fix:'reescribe queja, causa y corrección',vr:'Plantilla queja-causa-corrección'},
+ {n:'Operación incorrecta',k:/operacion|codigo/,fix:'cambia la operación por la que corresponde',vr:'Operación sugerida por queja'},
+ {n:'Vigencia o kilometraje',k:/vigencia|kilometraje|km|vencid|garantia/,fix:'documenta kilometraje y vigencia',vr:'Validar vigencia y kilometraje'},
+ {n:'Otra causa',k:null,fix:'corrige lo que indicó planta',vr:null}];
+var AN_CA=AX.CA,AN={d:null,built:false,dirty:true,gT:{regla:1,causa:1,pieza:1,modelo:1,agencia:1},gL:1.4,map:'agencia',mon:'agencia',ord:0,open:{},form:false};
+var AN_AG=[],AN_MD=[],AN_CN=[],AN_RU=[];
+var AN_CC=['--an-1','--an-2','--an-3','--an-4','--an-5','--an-6'];
+AX.cause=function(t){var s=norm(t);for(var i=0;i<AX.CA.length-1;i++)if(AX.CA[i].k.test(s))return i;return AX.CA.length-1};
+AX.seed=function(){return {v:1,orders:[],seq:0,vr:[],vseq:0,cal:{},alerts:{},cfg:{thRej:5,minAfter:30}}};
+AX.load=function(){var raw=null;try{raw=localStorage.getItem(AX.K)}catch(_){raw=AX.mem}try{AX.d=raw?JSON.parse(raw):null}catch(_){AX.d=null}if(!AX.d||!AX.d.orders)AX.d=AX.seed()};
+AX.save=function(){var s=JSON.stringify(AX.d);AX.mem=s;try{localStorage.setItem(AX.K,s)}catch(_){}if(AX.bc){try{AX.bc.postMessage('s')}catch(_){}}};
+AX.on=function(f){AX.subs.push(f)};
+AX.emit=function(){AN.dirty=true;AX.subs.forEach(function(f){try{f()}catch(e){console.error(e)}})};
+AX.commit=function(){AX.save();RS.save();RS.emit();AX.emit()};
+AX.byId=function(id){return AX.d.orders.filter(function(o){return o.id===id})[0]};
+AX.status=function(o){if(o.paid!=null)return 'pagada';var l=o.rounds[o.rounds.length-1];return l.k==='denegada'?'denegada':l.k==='aceptacion'?'aceptada':l.k==='rechazo'?'rechazada':'revision'};
+AX.add=function(o){var d=AX.d;o.id=++d.seq;if(o.paid===undefined)o.paid=null;o.rules=o.rules||[];d.orders.push(o);AX.learn();AX.commit();return o};
+AX.act=function(id,a,x){
+  var o=AX.byId(id);if(!o)return;var t=Date.now(),st=AX.status(o),lc=null;
+  o.rounds.forEach(function(r){if(r.k==='rechazo')lc=r.c});
+  if(a==='rechazo'&&(st==='revision'))o.rounds.push({t:t,k:'rechazo',c:x});
+  else if(a==='correccion'&&st==='rechazada')o.rounds.push({t:t,k:'correccion',c:lc==null?6:lc});
+  else if(a==='aceptacion'&&(st==='revision'))o.rounds.push({t:t,k:'aceptacion'});
+  else if(a==='denegada'&&st!=='pagada'&&st!=='denegada')o.rounds.push({t:t,k:'denegada'});
+  else if(a==='pago'&&st==='aceptada'&&x>0){o.paid=Math.round(x);o.tPay=t}
+  else return false;
+  AX.learn();AX.commit();return true;
+};
+AX.activeVr=function(){return AX.d.vr.filter(function(v){return v.status==='activa'})};
+var AX_MODELS=['Aveo','Onix','Tracker','Equinox','Silverado','Spark','Cheyenne','Captiva','Trax','Blazer','Suburban','Tahoe','Sonic','Malibu','Camaro','Colorado','Beat'];
+AX.estFor=function(c){var lab=c.h*420,e0=Math.round((lab+c.partsTot*.92)/10)*10,cal=AX.d.cal[c.sys]||1;return {est0:e0,est:Math.round(e0*cal/10)*10,cal:cal,bill:Math.round((lab+c.partsTot)/10)*10}};
+AX.fromCtx=function(c){
+  var txt=norm(c.rawText||''),md='Sin modelo';AX_MODELS.forEach(function(m){if(md==='Sin modelo'&&txt.indexOf(norm(m))>=0)md=m});
+  var e=AX.estFor(c),t=Date.now();
+  return AX.add({t0:t,ag:'FAME Morelia',md:md,sys:c.sys,pt:c.parts[0]?c.parts[0].d:'Sin pieza',est0:e.est0,est:e.est,cal:e.cal,bill:e.bill,rounds:[{t:t,k:'envio'}],rules:AX.activeVr().map(function(v){return v.id}),src:'agente'});
+};
+AX.checks=function(c){
+  return AX.activeVr().map(function(v){
+    var ok=true,t='';
+    if(v.cause===0)t='Tiempo de trabajo '+c.h.toFixed(1)+' h = estándar de la operación '+c.op+'.';
+    else if(v.cause===1){ok=!!c.matched;t=ok?'Piezas coinciden con la regla '+c.ruleId+' ('+c.ruleN+' PREAs aceptadas).':'Sin regla de catálogo para este caso: confirma la cobertura de cada pieza antes de enviar.'}
+    else if(v.cause===2){ok=c.files&&c.files.length>0;t=ok?c.files.length+' archivo(s) de evidencia adjunto(s).':'No hay evidencia adjunta: agrega fotos del diagnóstico y de la falla.'}
+    else if(v.cause===3){ok=!!c.matched;t=ok?'Queja, causa y corrección usan la redacción aceptada de la regla '+c.ruleId+'.':'Redacción sin regla de referencia: revisa que queja, causa y corrección sean coherentes.'}
+    else if(v.cause===4){ok=!!c.matched;t=ok?'Operación '+c.op+' coincide con la queja según la regla '+c.ruleId+'.':'Operación elegida por criterio general: confirma que corresponde a la queja.'}
+    else if(v.cause===5){ok=c.km<=100000;t=ok?'Kilometraje '+c.kmTxt+' km dentro de la garantía básica.':'Kilometraje '+c.kmTxt+' km: verifica la cobertura aplicable.'}
+    return {id:v.id,n:v.n,ok:ok,t:t};
+  });
+};
+AX.estLine=function(c){var e=AX.estFor(c);return '<li>Estimado de pago de planta: '+mx0(e.est)+(e.cal!==1?' (recalibrado ×'+e.cal.toFixed(2)+' por un cambio de planta)':'')+'.</li>'};
+AX.checksHtml=function(c){return AX.checks(c).map(function(k){return '<li>'+(k.ok?'✓':'⚠')+' <b>'+k.id+' '+esc(k.n)+'</b>: '+esc(k.t)+'</li>'}).join('')};
+
+/* --- aprendizaje: crea reglas desde rechazos, evalúa las existentes y reacciona a alertas --- */
+AX.evalRule=function(v,D){
+  var kn=function(f){return D.orders.filter(function(o){return o.fc!==-2&&f(o)})},b=kn(function(o){return o.t0<v.act}),a=kn(function(o){return o.t0>=v.act});
+  var kb=b.filter(function(o){return o.fc===v.cause}).length,ka=a.filter(function(o){return o.fc===v.cause}).length,pb=b.length?kb/b.length:0,pa=a.length?ka/a.length:0,m=AX.d.cfg.minAfter,verdict;
+  if(a.length<m||b.length<m)verdict='pocos';else if(pa>=pb)verdict='sin-efecto';else if(anWil(ka,a.length)[1]<pb)verdict='funciona';else verdict='incierto';
+  return {pb:pb,pa:pa,nb:b.length,na:a.length,verdict:verdict,t:Date.now()};
+};
+AX.learn=function(){
+  var d=AX.d,now=Date.now(),D=anPrep();if(!D)return;
+  var cnt=AX.CA.map(function(){return 0});
+  D.orders.forEach(function(o){o.rounds.forEach(function(r){if(r.k==='rechazo')cnt[r.c]++})});
+  for(var c=0;c<AX.CA.length-1;c++){
+    if(cnt[c]>=d.cfg.thRej&&!d.vr.some(function(v){return v.cause===c})){
+      var id='V-'+('0'+(++d.vseq)).slice(-2),auto=RS.d.cfg.auto;
+      d.vr.push({id:id,cause:c,n:AX.CA[c].vr,act:auto?now:null,status:auto?'activa':'por-aprobar',created:now});
+      RS.log(auto?'creada':'por-aprobar','',auto?'Regla de validación '+id+' ('+AX.CA[c].vr+'): '+cnt[c]+' rechazos por «'+AX.CA[c].n.toLowerCase()+'». Ya se aplica a las PREAs nuevas':'Regla de validación '+id+' lista tras '+cnt[c]+' rechazos por «'+AX.CA[c].n.toLowerCase()+'»; espera tu aprobación');
+    }
+  }
+  d.vr.forEach(function(v){
+    if(v.status!=='activa'||!v.act)return;
+    v.ev=AX.evalRule(v,D);
+    if(v.ev.verdict==='sin-efecto'&&!v.keep){v.status='por-revisar';RS.log('por-aprobar','',v.id+' ('+v.n+') no bajó su causa de rechazo tras '+v.ev.na+' casos ('+pc(v.ev.pb)+' → '+pc(v.ev.pa)+'). Pasa a revisión y deja de aplicarse')}
+  });
+  anCtl().forEach(function(c){
+    var nm=AN_CN[c.cn].n,al=d.alerts[nm];
+    if(c.sig&&!(al&&al.state==='abierta')){
+      d.alerts[nm]={t:now,w:c.sig.w,shift:c.shift,state:'abierta',ackW:al?al.ackW:0};
+      RS.d.rules.forEach(function(r){if(r.sys===nm&&!r.review)r.review={t:now,why:'Planta cambió el pago de '+nm}});
+      RS.log('por-aprobar','','Alerta de patrón en '+nm+': el pago cambió '+(c.shift>0?'+':'')+(c.shift*100).toFixed(0)+'%. Reglas del catálogo marcadas por revisar');
+    }else if(c.sig&&al&&al.state==='abierta')al.shift=c.shift;
+  });
+};
+AX.alertAct=function(nm,a){
+  var d=AX.d,al=d.alerts[nm],D=AN.d;if(!al||!D)return;
+  if(a==='recalibrar'){
+    var cn=AN_CN.map(function(c){return c.n}).indexOf(nm),xs=D.orders.filter(function(o){return o.st==='pagada'&&o.cn===cn&&o.w>=al.w});
+    if(xs.length){var cal=anAvg(xs.map(function(o){return o.paid/o.est0}));d.cal[nm]=+cal.toFixed(4);al.state='recalibrada';RS.log('activada','','Estimado de '+nm+' recalibrado a ×'+cal.toFixed(2)+' del tabulador anterior. Las PREAs nuevas usan el nuevo factor')}
+  }else{al.state='descartada';RS.log('info','','Alerta de '+nm+' descartada')}
+  al.ackW=D.W;AX.save();RS.save();AX.learn();AX.commit();
+};
+AX.vrSet=function(id,a){
+  var d=AX.d,v=d.vr.filter(function(x){return x.id===id})[0];if(!v)return;
+  if(a==='eliminar')d.vr=d.vr.filter(function(x){return x.id!==id});
+  else if(a==='pausar')v.status='pausada';
+  else if(a==='aprobar'||a==='reanudar'){v.status='activa';if(!v.act)v.act=Date.now();delete v.ev}
+  else if(a==='mantener'){v.status='activa';v.keep=true}
+  RS.log(a==='pausar'||a==='eliminar'?'pausada':'activada','','Regla de validación '+id+(a==='eliminar'?' eliminada':a==='pausar'?' pausada':' activa'));
+  AX.learn();AX.commit();
+};
+
+/* --- importación --- */
+AX.template='fecha,agencia,modelo,sistema,pieza,estimado,cobrado,pagado,estatus,causas_de_rechazo\n15/03/2026,FAME Morelia,Silverado,Transmisión,Cuerpo de válvulas,9800,10400,9650,pagada,mano de obra;pieza no cubierta\n02/04/2026,FAME Morelia,Onix,Motor,Cadena de distribución,4200,4500,,rechazada,falta de evidencia\n20/04/2026,FAME Uruapan,Tracker,Infoentretenimiento,Pantalla táctil,5200,5600,5100,pagada,\n';
+function axDate(s){s=String(s||'').trim();var m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);if(m){var y=+m[3];if(y<100)y+=2000;return new Date(y,+m[2]-1,+m[1],9).getTime()}m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3],9).getTime();var t=Date.parse(s);return isNaN(t)?null:t}
+function axNum(s){var n=parseFloat(String(s||'').replace(/[$\s,]/g,''));return isNaN(n)?null:n}
+AX.recFrom=function(o){
+  var n={};Object.keys(o).forEach(function(k){n[norm(k).trim().replace(/\s+/g,'_')]=o[k]});
+  var g=function(){for(var i=0;i<arguments.length;i++){var v=n[arguments[i]];if(v!=null&&String(v).trim()!=='')return String(v).trim()}return ''};
+  var t0=axDate(g('fecha','fecha_de_envio','fecha_prea')),est=axNum(g('estimado','estimado_de_pago','est')),bill=axNum(g('cobrado','facturado','monto_cobrado','total')),paid=axNum(g('pagado','pago','monto_pagado'));
+  if(!t0||!(est>0||bill>0))return null;
+  if(!(est>0))est=bill;if(!(bill>0))bill=est;
+  var stt=norm(g('estatus','estado','resultado')),causes=g('causas_de_rechazo','causas','causa_de_rechazo','rechazos','motivo').split(/[;|]/).map(function(x){return x.trim()}).filter(Boolean).map(AX.cause);
+  var rd=[{t:t0,k:'envio'}],t=t0,D3=3*864e5;
+  var accepted=/acept|aprob|pagad/.test(stt)||(paid>0),denied=/deneg|negad/.test(stt),open=/rechaz/.test(stt)&&!denied;
+  if(open&&!causes.length)causes=[6];
+  causes.forEach(function(c,i){t+=D3;rd.push({t:t,k:'rechazo',c:c});var more=i<causes.length-1||accepted||(!open&&!denied);if(more){t+=D3;rd.push({t:t,k:'correccion',c:c})}});
+  var o={t0:t0,ag:g('agencia','sucursal','reparador')||'Sin agencia',md:g('modelo')||'Sin modelo',sys:g('sistema','concepto','familia')||'Sin concepto',pt:(g('pieza','piezas').split(/[;|]/)[0]||'Sin pieza').trim(),est0:est,est:est,bill:bill,paid:null,rounds:rd,src:'importación'};
+  if(denied)rd.push({t:t+D3,k:'denegada'});
+  else if(accepted){t+=2*864e5;rd.push({t:t,k:'aceptacion'});if(paid>0){o.paid=Math.round(paid);o.tPay=t+7*864e5}}
+  o.key=[t0,o.ag,o.md,o.sys,o.pt,est,bill].join('|');
+  return o;
+};
+AX.import=function(text){
+  var rows,t=String(text||'').trim(),bad=0,dup=0,ok=0;
+  if(/^[\[{]/.test(t)){var j=JSON.parse(t);rows=Array.isArray(j)?j:(j.orders||[])}else rows=parseCSV(t);
+  var seen={};AX.d.orders.forEach(function(o){if(o.key)seen[o.key]=1});
+  rows.forEach(function(r){var o=AX.recFrom(r);if(!o){bad++;return}if(seen[o.key]){dup++;return}seen[o.key]=1;o.id=++AX.d.seq;o.rules=[];AX.d.orders.push(o);ok++});
+  if(ok){RS.log('importacion','','Se cargaron '+ok+' PREAs con su resultado real para aprender de los rechazos');AX.learn();AX.commit()}
+  return {ok:ok,bad:bad,dup:dup};
+};
+AX.exportAll=function(){return JSON.stringify({ax:AX.d,rs:RS.d,at:Date.now()})};
+AX.restore=function(text){
+  var j=JSON.parse(text);if(!j.ax||!Array.isArray(j.ax.orders))throw new Error('El archivo no es un respaldo válido');
+  AX.d=j.ax;if(j.rs&&j.rs.rules)RS.d=j.rs;AX.learn();AX.commit();
+};
+AX.clear=function(){AX.d=AX.seed();AN.d=null;AX.commit()};
+
+/* --- datos de demostración (simulados) --- */
+var DM_AG=['Morelia','Uruapan','Zamora','Pátzcuaro','Lázaro Cárdenas'],DM_MD=['Aveo','Onix','Tracker','Equinox','Silverado','Spark'];
+var DM_CN=[
  {n:'Motor',m:4200,s:.05,b:0,p:['Cadena de distribución','Banda de accesorios','Tensor hidráulico','Sensor de posición']},
  {n:'Transmisión',m:9800,s:.08,b:-.02,p:['Cuerpo de válvulas','Solenoide de cambios','Convertidor de par','Sensor de velocidad']},
  {n:'Eléctrico',m:3100,s:.06,b:.01,p:['Sensor de oxígeno','Módulo de control','Bobina de encendido','Arnés']},
  {n:'Lubricación',m:2600,s:.04,b:0,p:['Junta de cárter','Retén de cigüeñal','Bomba de aceite','Soporte de filtro']},
  {n:'Infoentretenimiento',m:5200,s:.09,b:-.03,p:['Pantalla táctil','Módulo de radio','Antena','Actualización de software']},
  {n:'Frenos',m:3900,s:.05,b:0,p:['Disco delantero','Balata','Cilindro maestro','Sensor ABS']}];
-var AN_CA=[
- {n:'Mano de obra sobre el estándar',p:.14,fix:'ajusta las horas al tiempo estándar'},
- {n:'Pieza no cubierta',p:.10,fix:'cambia la pieza o adjunta la justificación'},
- {n:'Falta de evidencia',p:.12,fix:'agrega fotos y diagnóstico'},
- {n:'Queja o causa mal redactada',p:.09,fix:'reescribe queja, causa y corrección'},
- {n:'Operación incorrecta',p:.07,fix:'cambia la operación por la que corresponde'},
- {n:'Vigencia o kilometraje',p:.05,fix:'documenta kilometraje y vigencia'}];
-var AN_RU=[
- {id:'RG-1',n:'Validar tiempo estándar',wk:6,f:.35},
- {id:'RG-2',n:'Verificar cobertura de la pieza',wk:9,f:.4},
- {id:'RG-3',n:'Checklist de evidencia',wk:12,f:.3},
- {id:'RG-4',n:'Plantilla queja-causa-corrección',wk:14,f:.45},
- {id:'RG-5',n:'Operación sugerida por queja',wk:17,f:.4},
- {id:'RG-6',n:'Validar vigencia y kilometraje',wk:20,f:.35}];
-var AN_MC=[[1,1,1,1.1,1,1.5],[1,.9,1,1,1.2,1],[1,1,2.1,1.3,1,1],[1.9,1,1,1,1.2,1],[1.2,2.3,1,1,1,1],[.9,1,1,1.4,1.6,1]];
-var AN_AC=[[1,1,1,1,1,1],[1,1,1.7,1,1,1],[.8,1,1,.9,1,1],[1,1,1.3,1.8,1,1],[1,1.4,1,1,.9,1]];
-var AN_PM=[[1,0,0,2.1],[2,0,1,2.4],[4,0,2,2.4],[0,0,4,1.8],[3,2,1,2.0],[5,1,5,1.7]];
-var AN_CC=['--an-1','--an-2','--an-3','--an-4','--an-5','--an-6'];
-
+var DM_P=[.14,.10,.12,.09,.07,.05],DM_RW=[[6,.35],[9,.4],[12,.3],[14,.45],[17,.4],[20,.35]];
+var DM_MC=[[1,1,1,1.1,1,1.5],[1,.9,1,1,1.2,1],[1,1,2.1,1.3,1,1],[1.9,1,1,1,1.2,1],[1.2,2.3,1,1,1,1],[.9,1,1,1.4,1.6,1]];
+var DM_AC=[[1,1,1,1,1,1],[1,1,1.7,1,1,1],[.8,1,1,.9,1,1],[1,1,1.3,1.8,1,1],[1,1.4,1,1,.9,1]];
+var DM_PM=[[1,0,0,2.1],[2,0,1,2.4],[4,0,2,2.4],[0,0,4,1.8],[3,2,1,2.0],[5,1,5,1.7]];
 function anPRNG(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+AX.demo=function(){
+  var rnd=anPRNG(20260311),W=26,DAY=864e5,now=Date.now(),d=AX.d;
+  var nrm=function(){var u=1-rnd(),v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(6.2831853*v)};
+  var d0=new Date(now);d0.setHours(0,0,0,0);var wk0=d0.getTime()-((d0.getDay()+6)%7)*DAY-(W-1)*7*DAY;
+  var pick=function(w){var r=rnd()*w.reduce(function(a,b){return a+b},0),i=0;while(i<w.length-1&&r>=w[i]){r-=w[i];i++}return i};
+  var pm=function(cn,pt,ca){var m=1;DM_PM.forEach(function(x){if(x[0]===cn&&x[1]===pt&&x[2]===ca)m=x[3]});return m};
+  var rf=function(ci,t){var ta=wk0+DM_RW[ci][0]*7*DAY;if(t<ta)return 1;return 1-(1-DM_RW[ci][1])*Math.min(1,(t-ta)/(14*DAY))};
+  for(var w=0;w<W;w++){
+    var n=Math.round(38+8*rnd()+w*.4);
+    for(var k=0;k<n;k++){
+      var ag=pick([.34,.2,.18,.14,.14]),md=pick([.2,.22,.18,.15,.13,.12]),cn=pick([.22,.18,.16,.14,.16,.14]),pt=Math.floor(rnd()*4);
+      var t0=Math.min(wk0+w*7*DAY+rnd()*7*DAY,now-rnd()*DAY),est=Math.round(DM_CN[cn].m*Math.exp(.28*nrm())/10)*10,bill=Math.round(est*(1.05+.07*rnd())/10)*10;
+      var o={t0:t0,ag:'FAME '+DM_AG[ag],md:DM_MD[md],sys:DM_CN[cn].n,pt:DM_CN[cn].p[pt],est0:est,est:est,bill:bill,paid:null,rounds:[{t:t0,k:'envio'}],demo:1,src:'demo',rules:[],id:++d.seq};
+      var t=t0,prev=-1,acc=null;
+      for(var r=1;r<=5;r++){
+        var hit=-1;
+        if(r<5){var u=rnd(),cum=0;for(var c=0;c<6;c++){cum+=.42*DM_P[c]*DM_MC[md][c]*DM_AC[ag][c]*pm(cn,pt,c)*rf(c,t)*(r>1?.5:1)*(c===prev?.4:1);if(hit<0&&u<cum)hit=c}}
+        var td=t+(2+Math.floor(rnd()*6))*DAY;
+        if(td>now)break;
+        if(hit<0){o.rounds.push({t:td,k:'aceptacion'});acc=td;break}
+        o.rounds.push({t:td,k:'rechazo',c:hit});prev=hit;
+        if(rnd()<.04+.03*r){o.rounds.push({t:td,k:'denegada'});break}
+        var tc=td+(1+Math.floor(rnd()*14))*DAY;
+        if(tc>now)break;
+        o.rounds.push({t:tc,k:'correccion',c:hit});t=tc;
+      }
+      if(acc){var tp=acc+(7+Math.floor(rnd()*15))*DAY;if(tp<=now){var cc=DM_CN[cn],sg=cc.s*(1-.35*Math.min(1,w/20)),ra=(1+cc.b)*(1+sg*nrm());if(cn===1&&w>=18)ra*=.88;o.paid=Math.round(est*ra/10)*10;o.tPay=tp}}
+      d.orders.push(o);
+    }
+  }
+  DM_RW.forEach(function(rw,i){if(!d.vr.some(function(v){return v.cause===i}))d.vr.push({id:'V-'+('0'+(++d.vseq)).slice(-2),cause:i,n:AX.CA[i].vr,act:wk0+rw[0]*7*DAY,status:'activa',created:wk0+rw[0]*7*DAY,demo:1})});
+  RS.log('importacion','','Se cargaron datos de demostración (PREAs simuladas con rechazos, rondas y pagos)');
+  AX.learn();AX.commit();
+};
+AX.undemo=function(){var d=AX.d;d.orders=d.orders.filter(function(o){return !o.demo});d.vr=d.vr.filter(function(v){return !v.demo});d.alerts={};d.cal={};RS.d.rules.forEach(function(r){delete r.review});AX.learn();AX.commit()};
+
+/* ----- utilidades ----- */
 var anQ=function(a,p){a=a.slice().sort(function(x,y){return x-y});if(!a.length)return 0;var i=(a.length-1)*p,lo=Math.floor(i),hi=Math.ceil(i);return a[lo]+(a[hi]-a[lo])*(i-lo)};
 var anAvg=function(a){return a.length?a.reduce(function(s,x){return s+x},0)/a.length:0};
 var anSum=function(a,f){return a.reduce(function(s,x){return s+f(x)},0)};
@@ -1824,118 +2003,105 @@ var fd=function(t){return new Date(t).toLocaleDateString('es-MX',{day:'numeric',
 function anSvg(w,h,body,label){return '<svg class="an-svg" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="'+ea(label||'Gráfica')+'">'+body+'</svg>'}
 function anSc(d0,d1,r0,r1){var k=(r1-r0)/((d1-d0)||1);return function(v){return r0+(v-d0)*k}}
 function anTicks(lo,hi,n){var s=(hi-lo)/n||1,m=Math.pow(10,Math.floor(Math.log10(s))),f=s/m;s=(f<1.5?1:f<3?2:f<7?5:10)*m;var o=[],v=Math.ceil(lo/s-1e-9)*s;for(;v<=hi+1e-9;v+=s)o.push(+v.toFixed(10));return o}
+var anWd=function(w){return AN.d.wk0+w*7*AN.d.DAY};
+function anCard(id,title,sub,body){return '<div class="an-sec" id="'+id+'"><div class="ad-card"><div class="ad-ch"><h3>'+title+'</h3><small>'+sub+'</small></div><div class="an-bd">'+body+'</div></div></div>'}
+function anEmpty(t){return '<div class="empty" style="padding:18px 6px">'+t+'</div>'}
+function anSafe(id,title,sub,fn){try{return fn()}catch(e){console.error(e);return anCard(id,title,sub,anEmpty('Esta gráfica necesita más datos para calcularse.'))}}
 
-/* ----- datos de demostración (simulados, deterministas) ----- */
-function anGen(){
-  var rnd=anPRNG(20260311),W=26,DAY=864e5,now=Date.now();
-  var nrm=function(){var u=1-rnd(),v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(6.2831853*v)};
-  var d0=new Date(now);d0.setHours(0,0,0,0);
-  var wk0=d0.getTime()-((d0.getDay()+6)%7)*DAY-(W-1)*7*DAY;
-  var pick=function(w){var r=rnd()*w.reduce(function(a,b){return a+b},0),i=0;while(i<w.length-1&&r>=w[i]){r-=w[i];i++}return i};
-  var pm=function(cn,pt,ca){var m=1;AN_PM.forEach(function(x){if(x[0]===cn&&x[1]===pt&&x[2]===ca)m=x[3]});return m};
-  var rf=function(ci,t){var ta=wk0+AN_RU[ci].wk*7*DAY;if(t<ta)return 1;return 1-(1-AN_RU[ci].f)*Math.min(1,(t-ta)/(14*DAY))};
-  var O=[],id=0;
-  for(var w=0;w<W;w++){
-    var n=Math.round(38+8*rnd()+w*.4);
-    for(var k=0;k<n;k++){
-      var ag=pick([.34,.2,.18,.14,.14]),md=pick([.2,.22,.18,.15,.13,.12]),cn=pick([.22,.18,.16,.14,.16,.14]),pt=Math.floor(rnd()*4);
-      var t0=Math.min(wk0+w*7*DAY+rnd()*7*DAY,now-rnd()*DAY);
-      var est=Math.round(AN_CN[cn].m*Math.exp(.28*nrm())/10)*10,bill=Math.round(est*(1.05+.07*rnd())/10)*10;
-      var o={id:++id,w:w,t0:t0,ag:ag,md:md,cn:cn,pt:pt,est:est,bill:bill,rounds:[{t:t0,k:'envio'}],nrej:0,fc:-2,st:'revision',paid:null,tAcc:null,tPay:null};
-      var t=t0,prev=-1;
-      for(var r=1;r<=5;r++){
-        var hit=-1;
-        if(r<5){var u=rnd(),cum=0;for(var c=0;c<6;c++){cum+=.42*AN_CA[c].p*AN_MC[md][c]*AN_AC[ag][c]*pm(cn,pt,c)*rf(c,t)*(r>1?.5:1)*(c===prev?.4:1);if(hit<0&&u<cum)hit=c}}
-        var td=t+(2+Math.floor(rnd()*6))*DAY;
-        if(td>now){o.st='revision';break}
-        if(hit<0){o.rounds.push({t:td,k:'aceptacion'});o.tAcc=td;o.st='aceptada';break}
-        o.rounds.push({t:td,k:'rechazo',c:hit});o.nrej++;if(o.fc===-2)o.fc=hit;prev=hit;
-        if(rnd()<.04+.03*r){o.rounds.push({t:td,k:'denegada'});o.st='denegada';break}
-        var tc=td+(1+Math.floor(rnd()*14))*DAY;
-        if(tc>now){o.st='rechazada';break}
-        o.rounds.push({t:tc,k:'correccion',c:hit});t=tc;
-      }
-      if(o.rounds.length>1&&o.fc===-2)o.fc=-1;
-      if(o.st==='aceptada'){
-        var tp=o.tAcc+(7+Math.floor(rnd()*15))*DAY;
-        if(tp<=now){var cc=AN_CN[cn],sg=cc.s*(1-.35*Math.min(1,w/20)),ra=(1+cc.b)*(1+sg*nrm());if(cn===1&&w>=18)ra*=.88;o.st='pagada';o.tPay=tp;o.paid=Math.round(est*ra/10)*10}
-      }
-      O.push(o);
-    }
-  }
+/* ----- preparación de datos reales ----- */
+function anPrep(){
+  var os=AX.d.orders,now=Date.now(),DAY=864e5;
+  AN_RU=[];
+  if(!os.length){AN.d=null;AN_AG=[];AN_MD=[];AN_CN=[];return null}
+  var cntBy=function(f){var m={};os.forEach(function(o){m[o[f]]=(m[o[f]]||0)+1});return Object.keys(m).sort(function(a,b){return m[b]-m[a]||(a<b?-1:1)})};
+  AN_AG=cntBy('ag');AN_MD=cntBy('md');var cs=cntBy('sys');
+  AN_CN=cs.map(function(n){var ps={};os.forEach(function(o){if(o.sys===n)ps[o.pt]=(ps[o.pt]||0)+1});return {n:n,p:Object.keys(ps).sort(function(a,b){return ps[b]-ps[a]})}});
+  var d0=new Date(Math.min.apply(null,os.map(function(o){return o.t0})));d0.setHours(0,0,0,0);
+  var wk0=d0.getTime()-((d0.getDay()+6)%7)*DAY,W=Math.max(1,Math.floor((now-wk0)/(7*DAY))+1);
+  var O=os.map(function(o){
+    var cn=cs.indexOf(o.sys),st=AX.status(o),nrej=0,tAcc=null,r1=o.rounds[1];
+    o.rounds.forEach(function(r){if(r.k==='rechazo')nrej++;if(r.k==='aceptacion')tAcc=r.t});
+    return {id:o.id,t0:o.t0,w:Math.min(W-1,Math.floor((o.t0-wk0)/(7*DAY))),ag:AN_AG.indexOf(o.ag),md:AN_MD.indexOf(o.md),cn:cn,pt:AN_CN[cn].p.indexOf(o.pt),est:o.est,est0:o.est0||o.est,bill:o.bill,rounds:o.rounds,nrej:nrej,
+      fc:!r1?-2:r1.k==='rechazo'?r1.c:r1.k==='aceptacion'?-1:6,st:st,paid:o.paid,tAcc:tAcc,tPay:o.tPay||null,src:o.src};
+  });
   var D={orders:O,W:W,wk0:wk0,now:now,DAY:DAY,bw:[]};
   for(var i=0;i<W;i++)D.bw.push([]);
   O.forEach(function(o){D.bw[o.w].push(o)});
-  D.wk=anWeekly(D);
+  D.ws=Math.max(1,Math.round(W/6));
+  AN.d=D;D.wk=anWeekly(D);
+  AX.d.vr.forEach(function(v){if(v.act)AN_RU.push({id:v.id,n:v.n,act:v.act,kind:'val',cause:v.cause})});
+  RS.d.rules.forEach(function(r){var act=r.act||(r.status==='activa'?r.created:null);if(act&&r.status!=='pausada'&&cs.indexOf(r.sys)>=0&&O.filter(function(o){return o.cn===cs.indexOf(r.sys)}).length>=5)AN_RU.push({id:r.id,n:r.q[1].toLowerCase(),act:act,kind:'cat',cause:-1,sys:cs.indexOf(r.sys)})});
+  AN_RU.sort(function(a,b){return a.act-b.act});
+  AN_RU.forEach(function(r){r.wk=(r.act-wk0)/(7*DAY)});
   return D;
 }
 function anWeekly(D){
   var out=[];
   for(var w=0;w<D.W;w++){
     var os=D.bw[w],kn=os.filter(function(o){return o.fc!==-2}),rj=kn.filter(function(o){return o.fc>=0});
-    var res=os.filter(function(o){return o.st==='pagada'||o.st==='aceptada'||o.st==='denegada'});
-    var acc=os.filter(function(o){return o.st==='pagada'||o.st==='aceptada'}),pd=os.filter(function(o){return o.st==='pagada'});
+    var res=os.filter(function(o){return o.st==='pagada'||o.st==='aceptada'||o.st==='denegada'}),acc=os.filter(function(o){return o.st==='pagada'||o.st==='aceptada'}),pd=os.filter(function(o){return o.st==='pagada'});
     out.push({w:w,n:os.length,kn:kn.length,rej:kn.length>=8?rj.length/kn.length:null,
-      rnd:(res.length/os.length>=.8&&acc.length>=8)?anAvg(acc.map(function(o){return o.nrej+1})):null,nr:acc.length,
+      rnd:(os.length&&res.length/os.length>=.8&&acc.length>=8)?anAvg(acc.map(function(o){return o.nrej+1})):null,nr:acc.length,
       err:pd.length>=8?anAvg(pd.map(function(o){return Math.abs(o.est-o.paid)/o.paid})):null,ne:pd.length});
   }
   return out;
 }
-var anWd=function(w){return AN.d.wk0+w*7*AN.d.DAY};
-function anCard(id,title,sub,body){return '<div class="an-sec" id="'+id+'"><div class="ad-card"><div class="ad-ch"><h3>'+title+'</h3><small>'+sub+'</small></div><div class="an-bd">'+body+'</div></div></div>'}
 
 /* ----- 1. Curva de aprendizaje ----- */
 function anLine(pts,fmt,lo,hi,name){
-  var D=AN.d,W=640,H=190,L=42,R=10,T=26,B=24,X=anSc(0,D.W-1,L,W-R),Y=anSc(lo,hi,H-B,T),g='';
+  var D=AN.d,W=640,H=190,L=42,R=10,T=26,B=24,X=anSc(0,Math.max(1,D.W-1),L,W-R),Y=anSc(lo,hi,H-B,T),g='';
   anTicks(lo,hi,4).forEach(function(v){g+='<line class="an-gr" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="an-t" x="'+(L-6)+'" y="'+(Y(v)+3.5)+'" text-anchor="end">'+fmt(v)+'</text>'});
-  for(var w=0;w<D.W;w+=4)g+='<text class="an-t" x="'+X(w)+'" y="'+(H-6)+'" text-anchor="middle">'+fd(anWd(w))+'</text>';
-  AN_RU.forEach(function(r,i){var x=X(r.wk);g+='<line class="an-rl" x1="'+x+'" x2="'+x+'" y1="'+(T-4)+'" y2="'+(H-B)+'"/><g data-tip="'+ea(r.id+' · '+r.n+'\nActiva desde el '+fd(anWd(r.wk)))+'"><circle class="an-rb" cx="'+x+'" cy="'+(T-12)+'" r="8"/><text class="an-rn" x="'+x+'" y="'+(T-8.5)+'">'+(i+1)+'</text></g>'});
+  for(var w=0;w<D.W;w+=D.ws)g+='<text class="an-t" x="'+X(w)+'" y="'+(H-6)+'" text-anchor="middle">'+fd(anWd(w))+'</text>';
+  AN_RU.forEach(function(r,i){if(r.wk<0||r.wk>D.W-1)return;var x=X(r.wk),c=r.kind==='cat'?'var(--an-2)':'var(--an-3)';g+='<line class="an-rl" style="stroke:'+c+'" x1="'+x+'" x2="'+x+'" y1="'+(T-4)+'" y2="'+(H-B)+'"/><g data-tip="'+ea(r.id+' · '+r.n+'\nActiva desde el '+fd(r.act))+'"><circle cx="'+x+'" cy="'+(T-12)+'" r="8" fill="'+c+'"/><text class="an-rn" x="'+x+'" y="'+(T-8.5)+'">'+(i+1)+'</text></g>'});
   var d='',pen=false;
   pts.forEach(function(p){if(p.y==null){pen=false;return}d+=(pen?'L':'M')+X(p.w).toFixed(1)+' '+Y(Math.min(hi,p.y)).toFixed(1);pen=true});
+  if(!d)g+='<text class="an-t" x="'+(W/2)+'" y="'+(H/2)+'" text-anchor="middle">Aún no hay semanas con casos suficientes (mín. 8)</text>';
   g+='<path class="an-ln" d="'+d+'"/>';
   pts.forEach(function(p){if(p.y!=null)g+='<circle class="an-pt" cx="'+X(p.w)+'" cy="'+Y(Math.min(hi,p.y))+'" r="3.4" data-tip="'+ea('Semana del '+fd(anWd(p.w))+'\n'+fmt(p.y)+' · '+p.n+' casos')+'"/>'});
   return anSvg(W,H,g,name);
 }
-function anCurva(){
-  var D=AN.d,wk=D.wk,mxv=function(k){return Math.max.apply(null,wk.map(function(w){return w[k]||0}))};
-  var c1=anLine(wk.map(function(w){return {w:w.w,y:w.rej,n:w.kn}}),function(v){return pc(v,0)},0,Math.ceil(mxv('rej')*20)/20+.05,'Tasa de rechazo a la primera por semana');
-  var c2=anLine(wk.map(function(w){return {w:w.w,y:w.rnd,n:w.nr}}),function(v){return v.toFixed(1)},1,Math.max(2,Math.ceil(mxv('rnd')*4)/4+.1),'Rondas hasta aceptación por semana');
-  var c3=anLine(wk.map(function(w){return {w:w.w,y:w.err,n:w.ne}}),function(v){return pc(v,0)},0,Math.ceil(mxv('err')*20)/20+.03,'Error del estimado por semana');
-  var kn=function(f){return D.orders.filter(function(o){return o.fc!==-2&&f(o)})};
-  var rows=AN_RU.map(function(r,i){
-    var b=kn(function(o){return o.w<r.wk}),a=kn(function(o){return o.w>=r.wk});
-    var kb=b.filter(function(o){return o.fc===i}).length,ka=a.filter(function(o){return o.fc===i}).length,pb=b.length?kb/b.length:0,pa=a.length?ka/a.length:0;
-    return anBA(r.id+' · '+r.n,'Ataca: '+AN_CA[i].n,pb,b.length,kb,pa,a.length,ka);
-  });
-  var g0=kn(function(o){return o.w<AN_RU[0].wk}),g1=kn(function(o){return o.w>=AN_RU[5].wk}),k0=g0.filter(function(o){return o.fc>=0}).length,k1=g1.filter(function(o){return o.fc>=0}).length;
-  rows.push(anBA('Global: antes de RG-1 vs. después de RG-6','Rechazo en la primera ronda, cualquier causa',k0/g0.length,g0.length,k0,k1/g1.length,g1.length,k1,1));
-  var leg='<div class="an-leg">'+AN_RU.map(function(r,i){return '<span><b class="rn">'+(i+1)+'</b>'+r.id+' '+r.n+' · '+fd(anWd(r.wk))+'</span>'}).join('')+'</div>';
-  var body='<div class="an-g3"><div><p class="an-ct">Rechazo a la primera</p><p class="an-cs">% de PREAs rechazadas en el primer envío</p>'+c1+'</div><div><p class="an-ct">Rondas hasta aceptación</p><p class="an-cs">Promedio de envíos por PREA aceptada</p>'+c2+'</div><div><p class="an-ct">Error del estimado</p><p class="an-cs">Diferencia promedio contra lo pagado</p>'+c3+'</div></div>'+leg+
-   '<p class="an-note">Cada línea verde vertical marca el día en que se activó una regla. Se omiten las semanas recientes cuando aún hay muchas PREAs sin resolver (las rondas y el error se sesgarían a la baja).</p>'+
-   '<h3 style="font-size:13.5px;margin:18px 0 6px">Antes y después de cada regla</h3><div class="an-tbw"><table class="an-tb"><thead><tr><th>Regla</th><th>Antes</th><th>Después</th><th class="r">Cambio</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>'+
-   '<div class="an-box"><b>Es correlación, no prueba.</b> Una baja después de activar una regla no demuestra que la regla la causó: en el mismo periodo cambian el mix de casos, los asesores, las políticas de planta y la temporada. Cada tasa lleva su intervalo de 95% y el número de casos; con pocos casos, el cambio puede ser ruido. Para probar causalidad habría que activar la regla solo en algunos asesores o agencias y comparar contra los demás.</div>';
-  return anCard('anCurva','Curva de aprendizaje','Datos de demostración',body);
-}
 function anBA(name,sub,pb,nb,kb,pa,na,ka,tot){
   var ib=anWil(kb,nb),ia=anWil(ka,na),dp=(pa-pb)*100,few=na<100||nb<100,cls=Math.abs(dp)<.5?'eq':dp<0?'dn':'up';
-  var cell=function(p,n,i){return '<b>'+pc(p)+'</b><small>'+pc(i[0],0)+'–'+pc(i[1],0)+' · n='+n+'</small>'};
-  return '<tr'+(tot?' class="an-tot"':'')+'><td>'+esc(name)+'<small>'+esc(sub)+'</small></td><td>'+cell(pb,nb,ib)+'</td><td>'+cell(pa,na,ia)+'</td><td class="r"><span class="an-chg '+cls+'">'+(dp>0?'+':dp<0?'−':'')+Math.abs(dp).toFixed(1)+' pp</span>'+(few?'<span class="an-few">pocos casos</span>':'')+'</td></tr>';
+  var cell=function(p,n,i){return n?'<b>'+pc(p)+'</b><small>'+pc(i[0],0)+'–'+pc(i[1],0)+' · n='+n+'</small>':'<small>Sin casos</small>'};
+  return '<tr'+(tot?' class="an-tot"':'')+'><td>'+esc(name)+'<small>'+esc(sub)+'</small></td><td>'+cell(pb,nb,ib)+'</td><td>'+cell(pa,na,ia)+'</td><td class="r">'+(nb&&na?'<span class="an-chg '+cls+'">'+(dp>0?'+':dp<0?'−':'')+Math.abs(dp).toFixed(1)+' pp</span>'+(few?'<span class="an-few">pocos casos</span>':''):'—')+'</td></tr>';
+}
+function anCurva(){
+  var D=AN.d,wk=D.wk,mxv=function(k){return Math.max.apply(null,wk.map(function(w){return w[k]||0}))};
+  var c1=anLine(wk.map(function(w){return {w:w.w,y:w.rej,n:w.kn}}),function(v){return pc(v,0)},0,Math.max(.1,Math.ceil(mxv('rej')*20)/20+.05),'Tasa de rechazo a la primera por semana');
+  var c2=anLine(wk.map(function(w){return {w:w.w,y:w.rnd,n:w.nr}}),function(v){return v.toFixed(1)},1,Math.max(2,Math.ceil(mxv('rnd')*4)/4+.1),'Rondas hasta aceptación por semana');
+  var c3=anLine(wk.map(function(w){return {w:w.w,y:w.err,n:w.ne}}),function(v){return pc(v,0)},0,Math.max(.1,Math.ceil(mxv('err')*20)/20+.03),'Error del estimado por semana');
+  var kn=function(f){return D.orders.filter(function(o){return o.fc!==-2&&f(o)})};
+  var rows=AN_RU.map(function(r){
+    var f=r.kind==='val'?function(o){return o.fc===r.cause}:function(o){return o.cn===r.sys&&o.fc>=0},pop=r.kind==='val'?function(){return true}:function(o){return o.cn===r.sys};
+    var b=kn(function(o){return o.t0<r.act&&pop(o)}),a=kn(function(o){return o.t0>=r.act&&pop(o)});
+    var kb=b.filter(f).length,ka=a.filter(f).length;
+    return anBA(r.id+' · '+r.n,r.kind==='val'?'Ataca: '+AN_CA[r.cause].n:'Regla del catálogo · familia '+AN_CN[r.sys].n,b.length?kb/b.length:0,b.length,kb,a.length?ka/a.length:0,a.length,ka);
+  });
+  if(AN_RU.length>1){var f0=AN_RU[0].act,f1=AN_RU[AN_RU.length-1].act,g0=kn(function(o){return o.t0<f0}),g1=kn(function(o){return o.t0>=f1}),k0=g0.filter(function(o){return o.fc>=0}).length,k1=g1.filter(function(o){return o.fc>=0}).length;
+    rows.push(anBA('Global: antes de la primera regla vs. después de la última','Rechazo en la primera ronda, cualquier causa',g0.length?k0/g0.length:0,g0.length,k0,g1.length?k1/g1.length:0,g1.length,k1,1))}
+  var leg='<div class="an-leg">'+(AN_RU.map(function(r,i){return '<span><b class="rn" style="background:var('+(r.kind==='cat'?'--an-2':'--an-3')+')">'+(i+1)+'</b>'+r.id+' '+esc(r.n)+' · '+fd(r.act)+'</span>'}).join('')||'<span>Aún no hay reglas activas con fecha de activación.</span>')+'</div>';
+  var body='<div class="an-g3"><div><p class="an-ct">Rechazo a la primera</p><p class="an-cs">% de PREAs rechazadas en el primer envío</p>'+c1+'</div><div><p class="an-ct">Rondas hasta aceptación</p><p class="an-cs">Promedio de envíos por PREA aceptada</p>'+c2+'</div><div><p class="an-ct">Error del estimado</p><p class="an-cs">Diferencia promedio contra lo pagado</p>'+c3+'</div></div>'+leg+
+   '<p class="an-note">Cada línea vertical marca el día en que se activó una regla (verde: regla de validación aprendida de rechazos; naranja: regla del catálogo). Se omiten las semanas con pocos casos o muchas PREAs sin resolver, porque sesgarían la curva.</p>'+
+   '<h3 style="font-size:13.5px;margin:18px 0 6px">Antes y después de cada regla</h3>'+(rows.length?'<div class="an-tbw"><table class="an-tb"><thead><tr><th>Regla</th><th>Antes</th><th>Después</th><th class="r">Cambio</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>':anEmpty('Todavía no hay reglas activas. Se crean solas cuando una causa de rechazo se repite '+AX.d.cfg.thRej+' veces.'))+
+   '<div class="an-box"><b>Es correlación, no prueba.</b> Una baja después de activar una regla no demuestra que la regla la causó: en el mismo periodo cambian el mix de casos, los asesores, las políticas de planta y la temporada. Cada tasa lleva su intervalo de 95% y el número de casos; con pocos casos, el cambio puede ser ruido. Para probar causalidad habría que activar la regla solo en algunos asesores o agencias y comparar contra los demás.</div>';
+  return anCard('anCurva','Curva de aprendizaje','Rechazos, rondas y error por semana',body);
 }
 
-/* ----- 2. Calibración del estimado ----- */
+/* ----- 2. Calibración ----- */
 function anCalib(){
   var D=AN.d,pd=D.orders.filter(function(o){return o.st==='pagada'});
+  if(pd.length<8)return anCard('anCalib','Calibración del estimado','Estimado contra pagado',anEmpty('Necesita al menos 8 PREAs con pago registrado ('+pd.length+' hoy). Registra el pago cuando planta lo deposite.'));
   var er=function(o){return Math.abs(o.est-o.paid)/o.paid},errs=pd.map(er),e80=anQ(errs,.8),mape=anAvg(errs),bias=anAvg(pd.map(function(o){return (o.est-o.paid)/o.paid})),in10=errs.filter(function(e){return e<=.1}).length/errs.length;
   var mx=anQ(pd.map(function(o){return Math.max(o.est,o.paid)}),.98)*1.05,W=520,H=400,L=56,R=12,T=12,B=36,X=anSc(0,mx,L,W-R),Y=anSc(0,mx,H-B,T),g='';
   anTicks(0,mx,5).forEach(function(v){g+='<line class="an-gr" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="an-t" x="'+(L-6)+'" y="'+(Y(v)+3.5)+'" text-anchor="end">'+mk(v)+'</text><text class="an-t" x="'+X(v)+'" y="'+(H-B+15)+'" text-anchor="middle">'+mk(v)+'</text>'});
   g+='<polygon fill="var(--an-1)" opacity=".1" points="'+X(0)+','+Y(0)+' '+X(mx*(1-e80))+','+Y(mx)+' '+X(mx)+','+Y(mx)+' '+X(mx)+','+Y(mx/(1+e80))+'"/>';
   g+='<line x1="'+X(0)+'" y1="'+Y(0)+'" x2="'+X(mx)+'" y2="'+Y(mx)+'" stroke="var(--fg)" stroke-width="1.2" stroke-dasharray="5 4"/>';
-  pd.forEach(function(o){if(o.est<=mx&&o.paid<=mx)g+='<circle cx="'+X(o.est).toFixed(1)+'" cy="'+Y(o.paid).toFixed(1)+'" r="2.5" fill="var(' +AN_CC[o.cn]+')" opacity=".6" data-tip="'+ea(AN_CN[o.cn].n+'\nEstimado '+mx0(o.est)+' · Pagado '+mx0(o.paid)+'\nError '+((o.est-o.paid)/o.paid*100).toFixed(1)+'%')+'"/>'});
+  pd.forEach(function(o){if(o.est<=mx&&o.paid<=mx)g+='<circle cx="'+X(o.est).toFixed(1)+'" cy="'+Y(o.paid).toFixed(1)+'" r="2.5" fill="var('+AN_CC[o.cn%6]+')" opacity=".6" data-tip="'+ea(AN_CN[o.cn].n+'\nEstimado '+mx0(o.est)+' · Pagado '+mx0(o.paid)+'\nError '+((o.est-o.paid)/o.paid*100).toFixed(1)+'%')+'"/>'});
   g+='<text class="an-t" x="'+((L+W-R)/2)+'" y="'+(H-4)+'" text-anchor="middle">Estimado por el agente</text><text class="an-t" transform="translate(12 '+((T+H-B)/2)+') rotate(-90)" text-anchor="middle">Pagado por planta</text>';
-  var leg='<div class="an-leg">'+AN_CN.map(function(c,i){return '<span><i style="background:var('+AN_CC[i]+')"></i>'+c.n+'</span>'}).join('')+'<span><i style="background:var(--an-1);opacity:.25"></i>Banda: 80% de los casos caen aquí (±'+pc(e80,0)+')</span></div>';
+  var leg='<div class="an-leg">'+AN_CN.map(function(c,i){return '<span><i style="background:var('+AN_CC[i%6]+')"></i>'+esc(c.n)+'</span>'}).join('')+'<span><i style="background:var(--an-1);opacity:.25"></i>Banda: 80% de los casos caen aquí (±'+pc(e80,0)+')</span></div>';
   var rows=AN_CN.map(function(c,i){
-    var xs=pd.filter(function(o){return o.cn===i}),es=xs.map(er),b=anAvg(xs.map(function(o){return (o.est-o.paid)/o.paid}));
-    return '<tr><td>'+c.n+'</td><td class="r">'+xs.length+'</td><td class="r"><span class="an-mini" style="width:'+Math.round(es.length?anAvg(es)*500:0)+'px"></span> <b>'+pc(anAvg(es))+'</b></td><td class="r">'+(b>0?'+':'−')+pc(Math.abs(b))+'</td><td class="r">±'+pc(anQ(es,.8),0)+'</td></tr>';
+    var xs=pd.filter(function(o){return o.cn===i});if(!xs.length)return '';var es=xs.map(er),b=anAvg(xs.map(function(o){return (o.est-o.paid)/o.paid}));
+    return '<tr><td>'+esc(c.n)+'</td><td class="r">'+xs.length+'</td><td class="r"><span class="an-mini" style="width:'+Math.min(120,Math.round(anAvg(es)*500))+'px"></span> <b>'+pc(anAvg(es))+'</b></td><td class="r">'+(b>0?'+':'−')+pc(Math.abs(b))+'</td><td class="r">±'+pc(anQ(es,.8),0)+'</td></tr>';
   }).join('');
   var kp=function(l,v,s){return '<div class="kp"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
   var body='<div class="an-kpi">'+kp('Error promedio',pc(mape),'sobre '+pd.length+' PREAs pagadas')+kp('Dentro de ±10%',pc(in10,0),'de las PREAs pagadas')+kp('Sesgo',(bias>0?'+':'−')+pc(Math.abs(bias)),bias>0?'tiende a sobreestimar':'tiende a subestimar')+kp('Banda del 80%','±'+pc(e80,0),'úsala como margen de seguridad')+'</div>'+
@@ -1947,17 +2113,18 @@ function anCalib(){
 function anMoney(){
   var D=AN.d,gs={},keys=[];
   D.orders.forEach(function(o){
-    var k,l;if(AN.mon==='agencia'){k=o.ag;l=AN_AG[o.ag]}else{var d=new Date(o.t0);k=d.getFullYear()*12+d.getMonth();l=d.toLocaleDateString('es-MX',{month:'short'})}
+    var k,l;if(AN.mon==='agencia'){k=o.ag;l=AN_AG[o.ag]}else{var d=new Date(o.t0);k=d.getFullYear()*12+d.getMonth();l=d.toLocaleDateString('es-MX',{month:'short'})+' '+String(d.getFullYear()).slice(2)}
     var g=gs[k];if(!g){g=gs[k]={k:k,l:l,bill:0,pag:0,rec:0,cob:0,det:0,den:0,n:0,nd:0};keys.push(k)}
     g.bill+=o.bill;g.n++;
     if(o.st==='pagada'){g.pag+=Math.min(o.paid,o.bill);g.rec+=Math.max(0,o.bill-o.paid)}else if(o.st==='rechazada'){g.det+=o.bill;g.nd++}else if(o.st==='denegada')g.den+=o.bill;else g.cob+=o.bill;
   });
   keys.sort(function(a,b){return a-b});var G=keys.map(function(k){return gs[k]});
+  if(AN.mon==='agencia')G.sort(function(a,b){return b.bill-a.bill});
   var T=G.reduce(function(a,g){['bill','pag','rec','cob','det','den','n','nd'].forEach(function(f){a[f]+=g[f]});return a},{bill:0,pag:0,rec:0,cob:0,det:0,den:0,n:0,nd:0});
   var W=640,H=270,L=52,R=10,T0=14,B=28,mxv=Math.max.apply(null,G.map(function(g){return g.bill}))*1.08,Y=anSc(0,mxv,H-B,T0),bw=Math.min(70,(W-L-R)/G.length*.6),g='';
   anTicks(0,mxv,4).forEach(function(v){g+='<line class="an-gr" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="an-t" x="'+(L-6)+'" y="'+(Y(v)+3.5)+'" text-anchor="end">'+mk(v)+'</text>'});
   var parts=[['pag','Pagado','--an-3'],['rec','Recorte de planta','--an-2'],['cob','En revisión o por pagar','--an-1'],['det','Detenido en PREA rechazadas','--an-bad'],['den','Denegado','--an-gray']];
-  G.forEach(function(gr,i){var cx=L+(W-L-R)*(i+.5)/G.length,y0=0;parts.forEach(function(p){var v=gr[p[0]];if(v<=0)return;var ya=Y(y0+v),yb=Y(y0);g+='<rect x="'+(cx-bw/2)+'" y="'+ya+'" width="'+bw+'" height="'+Math.max(0,yb-ya)+'" fill="var('+p[2]+')" data-tip="'+ea(gr.l+'\n'+p[1]+': '+mx0(v)+' ('+pc(v/gr.bill,0)+' de lo cobrado)')+'"/>';y0+=v});g+='<text class="an-tb2" x="'+cx+'" y="'+(H-9)+'" text-anchor="middle">'+esc(gr.l)+'</text>'});
+  G.forEach(function(gr,i){var cx=L+(W-L-R)*(i+.5)/G.length,y0=0;parts.forEach(function(p){var v=gr[p[0]];if(v<=0)return;var ya=Y(y0+v),yb=Y(y0);g+='<rect x="'+(cx-bw/2)+'" y="'+ya+'" width="'+bw+'" height="'+Math.max(0,yb-ya)+'" fill="var('+p[2]+')" data-tip="'+ea(gr.l+'\n'+p[1]+': '+mx0(v)+' ('+pc(v/gr.bill,0)+' de lo cobrado)')+'"/>';y0+=v});g+='<text class="an-tb2" x="'+cx+'" y="'+(H-9)+'" text-anchor="middle">'+esc(gr.l.replace(/^FAME /,''))+'</text>'});
   var leg='<div class="an-leg">'+parts.map(function(p){return '<span><i style="background:var('+p[2]+')"></i>'+p[1]+'</span>'}).join('')+'</div>';
   var rows=G.map(function(r){return '<tr><td>'+esc(r.l)+'</td><td class="r">'+mx0(r.bill)+'</td><td class="r">'+mx0(r.pag)+'</td><td class="r">'+pc(r.pag/r.bill,0)+'</td><td class="r">'+mx0(r.det)+' <small style="display:inline">('+r.nd+')</small></td></tr>'}).join('')+'<tr class="an-tot"><td>Total</td><td class="r">'+mx0(T.bill)+'</td><td class="r">'+mx0(T.pag)+'</td><td class="r">'+pc(T.pag/T.bill,0)+'</td><td class="r">'+mx0(T.det)+' <small style="display:inline">('+T.nd+')</small></td></tr>';
   var kp=function(l,v,s,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
@@ -1966,17 +2133,19 @@ function anMoney(){
 }
 function anDinero(){return anCard('anDinero','Dinero en juego','Cobrado contra pagado y monto detenido','<div id="anMon">'+anMoney()+'</div>')}
 
-/* ----- conteos de rechazos ----- */
+/* ----- conteos ----- */
 function anCounts(){
   var D=AN.d;if(D.cnt)return D.cnt;
-  var C={tot:0,c:[0,0,0,0,0,0],m:{},a:{},p:{},nm:[],na:[],np:{}};
-  AN_MD.forEach(function(_,i){C.m[i]=[0,0,0,0,0,0];C.nm[i]=0});AN_AG.forEach(function(_,i){C.a[i]=[0,0,0,0,0,0];C.na[i]=0});
+  var z=function(){return AN_CA.map(function(){return 0})};
+  var C={tot:0,c:z(),m:{},a:{},p:{},nm:[],na:[],np:{}};
+  AN_MD.forEach(function(_,i){C.m[i]=z();C.nm[i]=0});AN_AG.forEach(function(_,i){C.a[i]=z();C.na[i]=0});
   D.orders.forEach(function(o){
-    C.nm[o.md]++;C.na[o.ag]++;var pk=o.cn*10+o.pt;if(!C.p[pk]){C.p[pk]=[0,0,0,0,0,0];C.np[pk]=0}C.np[pk]++;
+    C.nm[o.md]++;C.na[o.ag]++;var pk=o.cn*1000+o.pt;if(!C.p[pk]){C.p[pk]=z();C.np[pk]=0}C.np[pk]++;
     o.rounds.forEach(function(r){if(r.k==='rechazo'){C.tot++;C.c[r.c]++;C.m[o.md][r.c]++;C.a[o.ag][r.c]++;C.p[pk][r.c]++}});
   });
   return D.cnt=C;
 }
+var anRowSum=function(a){return a.reduce(function(s,x){return s+x},0)};
 
 /* ----- 4. Grafo del cerebro ----- */
 var AN_GC={regla:'--an-3',causa:'--an-bad',pieza:'--an-4',modelo:'--an-1',agencia:'--an-2'};
@@ -1984,21 +2153,19 @@ function anGraphBuild(){
   var C=anCounts(),L=AN.gL,N=[],E=[],ix={};
   var add=function(id,t,l,v,tip){ix[id]=N.length;N.push({id:id,t:t,l:l,v:v,tip:tip,x:0,y:0,vis:false})};
   AN_CA.forEach(function(c,i){add('c'+i,'causa',c.n,C.c[i],'Causa de rechazo\n'+C.c[i]+' rechazos')});
-  AN_RU.forEach(function(r,i){add('r'+i,'regla',r.id+' '+r.n,C.c[i],'Regla activa desde el '+fd(anWd(r.wk)))});
-  AN_MD.forEach(function(m,i){add('m'+i,'modelo',m,anSum(C.m[i],function(x){return x}),'Modelo')});
-  AN_AG.forEach(function(m,i){add('a'+i,'agencia',m,anSum(C.a[i],function(x){return x}),'Agencia')});
-  var pks=[];AN_CN.forEach(function(c,ci){c.p.forEach(function(p,pi){var k=ci*10+pi;pks.push(k);add('p'+k,'pieza',p,anSum(C.p[k],function(x){return x}),c.n)})});
-  AN_CA.forEach(function(c,i){E.push({a:'r'+i,b:'c'+i,w:C.c[i],lift:2,tip:c.n+' → '+AN_RU[i].id+'\nLa regla nace de '+C.c[i]+' rechazos'})});
-  var link=function(src,arr,rowTot,minN,pre,label){
-    arr.forEach(function(row,k){var rt=rowTot(k);if(!rt)return;row.forEach(function(n,ci){if(n<minN)return;var lift=(n/rt)/(C.c[ci]/C.tot);if(lift>=L)E.push({a:pre+k,b:'c'+ci,w:n,lift:lift,tip:label(k)+' → '+AN_CA[ci].n+'\n'+n+' rechazos · '+lift.toFixed(1)+'× lo normal'})})});
-  };
-  link('m',AN_MD.map(function(_,i){return C.m[i]}),function(k){return anSum(C.m[k],function(x){return x})},10,'m',function(k){return AN_MD[k]});
-  link('a',AN_AG.map(function(_,i){return C.a[i]}),function(k){return anSum(C.a[k],function(x){return x})},10,'a',function(k){return AN_AG[k]});
-  var pr=pks.map(function(k){return C.p[k]});
-  pr.forEach(function(row,j){var k=pks[j],rt=anSum(row,function(x){return x});if(!rt)return;row.forEach(function(n,ci){if(n<6)return;var lift=(n/rt)/(C.c[ci]/C.tot);if(lift>=L)E.push({a:'p'+k,b:'c'+ci,w:n,lift:lift,tip:AN_CN[Math.floor(k/10)].p[k%10]+' → '+AN_CA[ci].n+'\n'+n+' rechazos · '+lift.toFixed(1)+'× lo normal'})})});
-  E=E.filter(function(e){return AN.gT[N[ix[e.a]].t]&&AN.gT[N[ix[e.b]].t]});
+  AX.d.vr.forEach(function(v){add('v'+v.id,'regla',v.id+' '+v.n,C.c[v.cause],'Regla de validación · '+({activa:'activa',pausada:'pausada','por-aprobar':'por aprobar','por-revisar':'por revisar'}[v.status]||v.status)+(v.act?'\nActiva desde el '+fd(v.act):''));E.push({a:'v'+v.id,b:'c'+v.cause,w:C.c[v.cause],lift:2,tip:AN_CA[v.cause].n+' → '+v.id+'\nLa regla nace de '+C.c[v.cause]+' rechazos'})});
+  var top=function(arr,f,n){return arr.map(function(_,i){return i}).sort(function(a,b){return f(b)-f(a)}).slice(0,n)};
+  top(AN_MD,function(i){return anRowSum(C.m[i])},8).forEach(function(i){add('m'+i,'modelo',AN_MD[i],anRowSum(C.m[i]),'Modelo')});
+  top(AN_AG,function(i){return anRowSum(C.a[i])},8).forEach(function(i){add('a'+i,'agencia',AN_AG[i],anRowSum(C.a[i]),'Agencia')});
+  var pks=Object.keys(C.p).sort(function(a,b){return anRowSum(C.p[b])-anRowSum(C.p[a])}).slice(0,24);
+  pks.forEach(function(k){add('p'+k,'pieza',AN_CN[Math.floor(k/1000)].p[k%1000],anRowSum(C.p[k]),AN_CN[Math.floor(k/1000)].n)});
+  var link=function(id,row,minN,name){var rt=anRowSum(row);if(!rt)return;row.forEach(function(n,ci){if(n<minN)return;var lift=(n/rt)/(C.c[ci]/C.tot);if(lift>=L)E.push({a:id,b:'c'+ci,w:n,lift:lift,tip:name+' → '+AN_CA[ci].n+'\n'+n+' rechazos · '+lift.toFixed(1)+'× lo normal'})})};
+  top(AN_MD,function(i){return anRowSum(C.m[i])},8).forEach(function(i){link('m'+i,C.m[i],8,AN_MD[i])});
+  top(AN_AG,function(i){return anRowSum(C.a[i])},8).forEach(function(i){link('a'+i,C.a[i],8,AN_AG[i])});
+  pks.forEach(function(k){link('p'+k,C.p[k],5,AN_CN[Math.floor(k/1000)].p[k%1000])});
+  E=E.filter(function(e){return N[ix[e.a]]&&N[ix[e.b]]&&AN.gT[N[ix[e.a]].t]&&AN.gT[N[ix[e.b]].t]});
   var deg={};E.forEach(function(e){deg[e.a]=(deg[e.a]||0)+1;deg[e.b]=(deg[e.b]||0)+1});
-  N.forEach(function(n){n.vis=!!AN.gT[n.t]&&(n.t==='causa'||n.t==='regla'||!!deg[n.id])});
+  N.forEach(function(n){n.vis=!!AN.gT[n.t]&&(n.t==='causa'?n.v>0:n.t==='regla'||!!deg[n.id])});
   E=E.filter(function(e){return N[ix[e.a]].vis&&N[ix[e.b]].vis});
   return {N:N,E:E,ix:ix};
 }
@@ -2006,7 +2173,7 @@ function anGraph(){
   var host=$('#anGraphBox');if(!host)return;
   var G=AN.G=anGraphBuild(),W=1000,H=620,anc={agencia:.07,modelo:.25,causa:.47,pieza:.7,regla:.94},cnt={},seen={};
   var vis=G.N.filter(function(n){return n.vis});vis.forEach(function(n){cnt[n.t]=(cnt[n.t]||0)+1});
-  vis.forEach(function(n){var i=seen[n.t]=(seen[n.t]||0);seen[n.t]++;n.x=anc[n.t]*W;n.y=H*(i+.5)/cnt[n.t];n.r=6+Math.min(10,Math.sqrt(n.v)*.55)});
+  vis.forEach(function(n){var i=seen[n.t]=(seen[n.t]||0);seen[n.t]++;n.x=anc[n.t]*W;n.y=H*(i+.5)/cnt[n.t];n.r=6+Math.min(10,Math.sqrt(n.v)*.55);n.fx=0});
   var E=G.E,ix=G.ix;
   function tick(a){
     for(var i=0;i<vis.length;i++)for(var j=i+1;j<vis.length;j++){var p=vis[i],q=vis[j],dx=q.x-p.x,dy=q.y-p.y,d2=Math.max(dx*dx+dy*dy,30),f=6500/d2*a,d=Math.sqrt(d2);dx=dx/d*f;dy=dy/d*f;if(!p.fx){p.x-=dx;p.y-=dy}if(!q.fx){q.x+=dx;q.y+=dy}}
@@ -2036,138 +2203,239 @@ function anGraph(){
 }
 function anGrafoCard(){
   var chips=['regla','causa','pieza','modelo','agencia'].map(function(t){return '<button class="an-chip" type="button" data-an="gt:'+t+'" aria-pressed="'+(AN.gT[t]?'true':'false')+'"><i style="background:var('+AN_GC[t]+')"></i>'+{regla:'Reglas',causa:'Causas',pieza:'Piezas',modelo:'Modelos',agencia:'Agencias'}[t]+'</button>'}).join('');
-  var body='<div class="an-ctl">'+chips+'<label>Mostrar vínculos con concentración ≥ <select id="anGL"><option value="1.2">1.2×</option><option value="1.4">1.4×</option><option value="1.8">1.8×</option><option value="2.2">2.2×</option></select></label><small id="anGraphInfo" style="color:var(--faint);font-size:12px"></small></div><div class="an-graph" id="anGraphBox"></div>'+
-   '<p class="an-note">Cada causa de rechazo origina una regla. Un modelo, pieza o agencia se conecta a una causa solo si la concentra más de lo normal (la “concentración” compara su parte de rechazos con la parte general de esa causa). El tamaño del nodo es el número de rechazos. Pasa el cursor para resaltar sus vínculos y arrastra los nodos para reacomodar. Los nodos son catálogos (reglas, causas, piezas, modelos, agencias): no contienen VIN, folios ni nombres de personas.</p>';
+  var body='<div class="an-ctl">'+chips+'<label>Mostrar vínculos con concentración ≥ <select id="anGL">'+['1.2','1.4','1.8','2.2'].map(function(v){return '<option value="'+v+'"'+(parseFloat(v)===AN.gL?' selected':'')+'>'+v+'×</option>'}).join('')+'</select></label><small id="anGraphInfo" style="color:var(--faint);font-size:12px"></small></div><div class="an-graph" id="anGraphBox"></div>'+
+   '<p class="an-note">Cada regla de validación nace de una causa de rechazo. Un modelo, pieza o agencia se conecta a una causa solo si la concentra más de lo normal (su parte de rechazos contra la parte general de esa causa). El tamaño del nodo es el número de rechazos. Pasa el cursor para resaltar sus vínculos y arrastra los nodos para reacomodar. Los nodos son catálogos: no contienen VIN, folios ni nombres de personas.</p>';
   return anCard('anGrafo','Grafo del cerebro','Reglas, causas, piezas, modelos y agencias',body);
 }
 
 /* ----- 5. Mapa de calor ----- */
 function anHeat(){
-  var C=anCounts(),by=AN.map==='agencia',cols=by?AN_AG:AN_MD,src=by?C.a:C.m,den=by?C.na:C.nm,vals=[],all=[];
-  var cell=function(ci,k){return src[k][ci]/den[k]*100};
-  AN_CA.forEach(function(_,ci){cols.forEach(function(_2,k){all.push({ci:ci,k:k,v:cell(ci,k)})})});
-  var mxv=Math.max.apply(null,all.map(function(x){return x.v})),top=all.slice().sort(function(a,b){return b.v-a.v}).slice(0,3),isTop=function(ci,k){return top.some(function(t){return t.ci===ci&&t.k===k})};
-  var h='<div class="an-hm" style="grid-template-columns:minmax(120px,1.5fr) repeat('+cols.length+',minmax(0,1fr))"><span></span>'+cols.map(function(c,k){return '<span class="h">'+esc(c)+'<br>('+den[k]+')</span>'}).join('');
-  AN_CA.forEach(function(ca,ci){h+='<span class="rl2">'+ca.n+'</span>';cols.forEach(function(_,k){var v=cell(ci,k);h+='<span class="c'+(isTop(ci,k)?' tp':'')+'" style="background:color-mix(in srgb,var(--an-bad) '+Math.round(v/mxv*70)+'%,transparent)" data-tip="'+ea(ca.n+' · '+cols[k]+'\n'+src[k][ci]+' rechazos en '+den[k]+' órdenes\n'+v.toFixed(1)+' por cada 100')+'">'+v.toFixed(1)+'</span>'})});
+  var C=anCounts(),by=AN.map==='agencia',names=by?AN_AG:AN_MD,src=by?C.a:C.m,den=by?C.na:C.nm;
+  var cols=names.map(function(_,i){return i}).sort(function(a,b){return den[b]-den[a]}).slice(0,8);
+  var cell=function(ci,k){return den[k]?src[k][ci]/den[k]*100:0},all=[];
+  AN_CA.forEach(function(_,ci){cols.forEach(function(k){all.push({ci:ci,k:k,v:cell(ci,k)})})});
+  var mxv=Math.max.apply(null,all.map(function(x){return x.v}))||1,top=all.slice().sort(function(a,b){return b.v-a.v}).slice(0,3).filter(function(t){return t.v>0}),isTop=function(ci,k){return top.some(function(t){return t.ci===ci&&t.k===k})};
+  var h='<div class="an-hm" style="grid-template-columns:minmax(120px,1.5fr) repeat('+cols.length+',minmax(0,1fr))"><span></span>'+cols.map(function(k){return '<span class="h">'+esc(names[k].replace(/^FAME /,''))+'<br>('+den[k]+')</span>'}).join('');
+  AN_CA.forEach(function(ca,ci){h+='<span class="rl2">'+ca.n+'</span>';cols.forEach(function(k){var v=cell(ci,k);h+='<span class="c'+(isTop(ci,k)?' tp':'')+'" style="background:color-mix(in srgb,var(--an-bad) '+Math.round(v/mxv*70)+'%,transparent)" data-tip="'+ea(ca.n+' · '+names[k]+'\n'+src[k][ci]+' rechazos en '+den[k]+' órdenes\n'+v.toFixed(1)+' por cada 100')+'">'+v.toFixed(1)+'</span>'})});
   h+='</div>';
   var ctl='<div class="an-ctl"><button class="bt'+(by?' on':'')+'" data-an="map:agencia" type="button">Causa por agencia</button><button class="bt'+(!by?' on':'')+'" data-an="map:modelo" type="button">Causa por modelo</button></div>';
-  var tp='<div class="an-top"><b style="align-self:center">Dónde mirar primero:</b>'+top.map(function(t){return '<span><b>'+AN_CA[t.ci].n+'</b> en '+esc(cols[t.k])+' · '+t.v.toFixed(1)+' por cada 100 órdenes</span>'}).join('')+'</div>';
+  var tp='<div class="an-top"><b style="align-self:center">Dónde mirar primero:</b>'+(top.map(function(t){return '<span><b>'+AN_CA[t.ci].n+'</b> en '+esc(names[t.k])+' · '+t.v.toFixed(1)+' por cada 100 órdenes</span>'}).join('')||'<span>Aún no hay rechazos registrados.</span>')+'</div>';
   return ctl+h+tp+'<p class="an-note">Cada celda son rechazos por cada 100 órdenes enviadas; entre paréntesis, las órdenes de esa columna. Más rojo, más rechazos. Se cuentan todas las rondas de rechazo, no solo la primera.</p>';
 }
 function anMapa(){return anCard('anMapa','Mapa de calor de causas','Por agencia y por modelo','<div id="anHeat">'+anHeat()+'</div>')}
 
-/* ----- 6. Pronóstico de cartera ----- */
+/* ----- 6. Pronóstico ----- */
 function anPron(){
   var D=AN.d,O=D.orders,res=O.filter(function(o){return o.st==='pagada'||o.st==='aceptada'||o.st==='denegada'});
-  var pAg=function(ag,upto){var rs=res.filter(function(o){return o.ag===ag&&(upto==null||o.w<upto)});return rs.length?rs.filter(function(o){return o.st!=='denegada'}).length/rs.length:.92};
-  var rats=function(cn,upto,last){var xs=O.filter(function(o){return o.st==='pagada'&&o.cn===cn&&(upto==null||o.w<upto)&&(last==null||o.w>=D.W-last)});return xs.map(function(o){return o.paid/o.est})};
-  var rat=function(cn,upto,last){var r=rats(cn,upto,last);if(r.length<4)r=rats(cn,upto,null);return r.length?anAvg(r):1};
   var open=O.filter(function(o){return o.st==='revision'||o.st==='rechazada'||o.st==='aceptada'});
-  var pool=AN_CN.map(function(_,cn){var r=rats(cn,null,8);return r.length>=6?r:rats(cn,null,null)});
+  if(!open.length)return anCard('anPron','Pronóstico de cartera por cobrar','Cuánto va a entrar',anEmpty('No hay PREAs abiertas. Cuando envíes PREAs nuevas, aquí verás cuánto se espera cobrar.'));
+  var pAg=function(ag,upto){var rs=res.filter(function(o){return o.ag===ag&&(upto==null||o.w<upto)});return rs.length>=5?rs.filter(function(o){return o.st!=='denegada'}).length/rs.length:.92};
+  var rats=function(cn,upto,last){return O.filter(function(o){return o.st==='pagada'&&o.cn===cn&&(upto==null||o.w<upto)&&(last==null||o.w>=D.W-last)}).map(function(o){return o.paid/o.est})};
+  var rat=function(cn,upto,last){var r=rats(cn,upto,last);if(r.length<4)r=rats(cn,upto,null);return r.length?anAvg(r):1};
+  var pool=AN_CN.map(function(_,cn){var r=rats(cn,null,8);if(r.length<6)r=rats(cn,null,null);return r.length?r:[1]});
   var pa=AN_AG.map(function(_,a){return pAg(a)}),rnd=anPRNG(99),S=1500,tot=[],ags=AN_AG.map(function(){return []});
-  for(var s=0;s<S;s++){var t=0,a=[0,0,0,0,0];open.forEach(function(o){if(o.st!=='aceptada'&&rnd()>pa[o.ag])return;var v=o.est*pool[o.cn][Math.floor(rnd()*pool[o.cn].length)];t+=v;a[o.ag]+=v});tot.push(t);a.forEach(function(v,i){ags[i].push(v)})}
-  var exp=anSum(open,function(o){return o.est*(o.st==='aceptada'?1:pa[o.ag])*rat(o.cn,null,8)});
-  var p10=anQ(tot,.1),p90=anQ(tot,.9),nominal=anSum(open,function(o){return o.est});
-  // backtest
-  var bt=[];for(var w=6;w<=D.W-9;w++){var co=D.bw[w],f=anSum(co,function(o){return o.est*pAg(o.ag,w)*rat(o.cn,w,null)}),ac=anSum(co,function(o){return o.st==='pagada'?o.paid:0});bt.push({w:w,f:f,a:ac,e:(f-ac)/ac})}
-  var wd=1.28*Math.sqrt(anAvg(bt.map(function(b){return b.e*b.e})));p10*=1-wd;p90*=1+wd;var mae=anAvg(bt.map(function(b){return Math.abs(b.e)})),bias=anAvg(bt.map(function(b){return b.e}));
-  var rows=AN_AG.map(function(n,i){var os=open.filter(function(o){return o.ag===i}),e=anSum(os,function(o){return o.est*(o.st==='aceptada'?1:pa[i])*rat(o.cn,null,8)});return '<tr><td>'+n+'</td><td class="r">'+os.length+'</td><td class="r">'+mx0(anSum(os,function(o){return o.est}))+'</td><td class="r">'+pc(pa[i],0)+'</td><td class="r"><b>'+mx0(e)+'</b></td><td class="r">'+mk(anQ(ags[i],.1)*(1-wd))+' – '+mk(anQ(ags[i],.9)*(1+wd))+'</td></tr>'}).join('')+'<tr class="an-tot"><td>Cartera total</td><td class="r">'+open.length+'</td><td class="r">'+mx0(nominal)+'</td><td class="r">—</td><td class="r">'+mx0(exp)+'</td><td class="r">'+mk(p10)+' – '+mk(p90)+'</td></tr>';
+  for(var s=0;s<S;s++){var t=0,a=AN_AG.map(function(){return 0});open.forEach(function(o){if(o.st!=='aceptada'&&rnd()>pa[o.ag])return;var v=o.est*pool[o.cn][Math.floor(rnd()*pool[o.cn].length)];t+=v;a[o.ag]+=v});tot.push(t);a.forEach(function(v,i){ags[i].push(v)})}
+  var expf=function(o){return o.est*(o.st==='aceptada'?1:pa[o.ag])*rat(o.cn,null,8)},exp=anSum(open,expf),p10=anQ(tot,.1),p90=anQ(tot,.9),nominal=anSum(open,function(o){return o.est});
+  var bt=[];for(var w=6;w<=D.W-9;w++){var co=D.bw[w];if(!co.length)continue;var f=anSum(co,function(o){return o.est*pAg(o.ag,w)*rat(o.cn,w,null)}),ac=anSum(co,function(o){return o.st==='pagada'?o.paid:0});if(ac>0)bt.push({w:w,f:f,a:ac,e:(f-ac)/ac})}
+  var hasBt=bt.length>=3,mae=hasBt?anAvg(bt.map(function(b){return Math.abs(b.e)})):null,bias=hasBt?anAvg(bt.map(function(b){return b.e})):null,wd=hasBt?1.28*Math.sqrt(anAvg(bt.map(function(b){return b.e*b.e}))):.1;
+  p10*=1-wd;p90*=1+wd;
+  var rows=AN_AG.map(function(n,i){var os=open.filter(function(o){return o.ag===i});if(!os.length)return '';return '<tr><td>'+esc(n)+'</td><td class="r">'+os.length+'</td><td class="r">'+mx0(anSum(os,function(o){return o.est}))+'</td><td class="r">'+pc(pa[i],0)+'</td><td class="r"><b>'+mx0(anSum(os,expf))+'</b></td><td class="r">'+mk(anQ(ags[i],.1)*(1-wd))+' – '+mk(anQ(ags[i],.9)*(1+wd))+'</td></tr>'}).join('')+'<tr class="an-tot"><td>Cartera total</td><td class="r">'+open.length+'</td><td class="r">'+mx0(nominal)+'</td><td class="r">—</td><td class="r">'+mx0(exp)+'</td><td class="r">'+mk(p10)+' – '+mk(p90)+'</td></tr>';
   var lo=Math.min(p10,exp)*.9,hi=Math.max(nominal,p90)*1.02,RX=anSc(lo,hi,0,100);
-  var W=640,H=200,L=50,R=10,T=14,B=26,mxv=Math.max.apply(null,bt.map(function(b){return Math.max(b.f,b.a)}))*1.1,X=anSc(0,bt.length,L,W-R),Y=anSc(0,mxv,H-B,T),bw=(W-L-R)/bt.length*.55,g='';
-  anTicks(0,mxv,4).forEach(function(v){g+='<line class="an-gr" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="an-t" x="'+(L-6)+'" y="'+(Y(v)+3.5)+'" text-anchor="end">'+mk(v)+'</text>'});
-  bt.forEach(function(b,i){var cx=X(i+.5);g+='<rect x="'+(cx-bw/2)+'" y="'+Y(b.a)+'" width="'+bw+'" height="'+(H-B-Y(b.a))+'" fill="var(--an-3)" opacity=".75" data-tip="'+ea('Semana del '+fd(anWd(b.w))+'\nPagado: '+mx0(b.a)+'\nPronóstico: '+mx0(b.f)+'\nError: '+(b.e>0?'+':'')+(b.e*100).toFixed(1)+'%')+'"/><rect x="'+(cx-bw/2-2)+'" y="'+(Y(b.f)-1.5)+'" width="'+(bw+4)+'" height="3" fill="var(--an-1)"/>';if(i%3===0)g+='<text class="an-t" x="'+cx+'" y="'+(H-8)+'" text-anchor="middle">'+fd(anWd(b.w))+'</text>'});
   var kp=function(l,v,s,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
-  var body='<div class="an-kpi">'+kp('Por entrar (esperado)',mk(exp),open.length+' PREAs abiertas','ok')+kp('Rango probable',mk(p10)+' – '+mk(p90),'80% de las simulaciones')+kp('Estimado sin ajustar',mk(nominal),'antes de probabilidad de aceptación')+kp('Error histórico del pronóstico','±'+pc(mae,0),'por semana · sesgo '+(bias>0?'+':'−')+pc(Math.abs(bias),0))+'</div>'+
-   '<div class="an-range"><i style="left:'+RX(p10)+'%;width:'+(RX(p90)-RX(p10))+'%"></i><u style="left:'+RX(exp)+'%"></u></div><div class="an-leg" style="margin-top:0"><span>Escala: '+mk(lo)+' a '+mk(hi)+' · la marca es lo esperado y la franja es el rango</span></div>'+
-   '<div class="an-tbw" style="margin-top:10px"><table class="an-tb"><thead><tr><th>Agencia</th><th class="r">PREAs abiertas</th><th class="r">Estimado</th><th class="r">Prob. de aceptación</th><th class="r">Esperado</th><th class="r">Rango 80%</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
-   '<h3 style="font-size:13.5px;margin:18px 0 2px">¿Qué tan bien acertó antes?</h3><p class="an-cs">Cada semana: lo que se habría pronosticado con lo aprendido hasta entonces (línea azul) contra lo que planta pagó (barra verde)</p>'+anSvg(W,H,g,'Pronóstico contra pagado por semana')+
+  var bth='';
+  if(hasBt){var W=640,H=200,L=50,R=10,T=14,B=26,mxb=Math.max.apply(null,bt.map(function(b){return Math.max(b.f,b.a)}))*1.1,X=anSc(0,bt.length,L,W-R),Y=anSc(0,mxb,H-B,T),bw=(W-L-R)/bt.length*.55,g='';
+    anTicks(0,mxb,4).forEach(function(v){g+='<line class="an-gr" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="an-t" x="'+(L-6)+'" y="'+(Y(v)+3.5)+'" text-anchor="end">'+mk(v)+'</text>'});
+    bt.forEach(function(b,i){var cx=X(i+.5);g+='<rect x="'+(cx-bw/2)+'" y="'+Y(b.a)+'" width="'+bw+'" height="'+(H-B-Y(b.a))+'" fill="var(--an-3)" opacity=".75" data-tip="'+ea('Semana del '+fd(anWd(b.w))+'\nPagado: '+mx0(b.a)+'\nPronóstico: '+mx0(b.f)+'\nError: '+(b.e>0?'+':'')+(b.e*100).toFixed(1)+'%')+'"/><rect x="'+(cx-bw/2-2)+'" y="'+(Y(b.f)-1.5)+'" width="'+(bw+4)+'" height="3" fill="var(--an-1)"/>';if(i%Math.max(1,Math.round(bt.length/5))===0)g+='<text class="an-t" x="'+cx+'" y="'+(H-8)+'" text-anchor="middle">'+fd(anWd(b.w))+'</text>'});
+    bth='<h3 style="font-size:13.5px;margin:18px 0 2px">¿Qué tan bien acertó antes?</h3><p class="an-cs">Cada semana: lo que se habría pronosticado con lo aprendido hasta entonces (línea azul) contra lo que planta pagó (barra verde)</p>'+anSvg(W,H,g,'Pronóstico contra pagado por semana');
+  }else bth='<p class="an-note">Aún no hay suficientes semanas con pagos para medir el error histórico del pronóstico (necesita al menos 3 semanas de órdenes ya cobradas). El rango usa un margen provisional de ±'+pc(wd,0)+'.</p>';
+  var body='<div class="an-kpi">'+kp('Por entrar (esperado)',mk(exp),open.length+' PREAs abiertas','ok')+kp('Rango probable',mk(p10)+' – '+mk(p90),'80% de las simulaciones')+kp('Estimado sin ajustar',mk(nominal),'antes de probabilidad de aceptación')+kp('Error histórico del pronóstico',hasBt?'±'+pc(mae,0):'—',hasBt?'por semana · sesgo '+(bias>0?'+':'−')+pc(Math.abs(bias),0):'sin historial suficiente')+'</div>'+
+   '<div class="an-range"><i style="left:'+RX(p10)+'%;width:'+Math.max(1,RX(p90)-RX(p10))+'%"></i><u style="left:'+RX(exp)+'%"></u></div><div class="an-leg" style="margin-top:0"><span>Escala: '+mk(lo)+' a '+mk(hi)+' · la marca es lo esperado y la franja es el rango</span></div>'+
+   '<div class="an-tbw" style="margin-top:10px"><table class="an-tb"><thead><tr><th>Agencia</th><th class="r">PREAs abiertas</th><th class="r">Estimado</th><th class="r">Prob. de aceptación</th><th class="r">Esperado</th><th class="r">Rango 80%</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+bth+
    '<p class="an-note">Esperado = estimado × probabilidad de aceptación observada de la agencia × razón pagado/estimado de las últimas 8 semanas del concepto. Las PREAs ya aceptadas cuentan al 100%. El rango sale de 1,500 simulaciones con los errores históricos de pago, ampliado con el error semanal del propio pronóstico; no cubre eventos como un cambio de tabulador (ver alertas).</p>';
   return anCard('anPron','Pronóstico de cartera por cobrar','Cuánto va a entrar',body);
 }
 
-/* ----- 7. Alertas de cambio de patrón ----- */
+/* ----- 7. Alertas ----- */
 function anCtl(){
-  var D=AN.d;if(D.ctl)return D.ctl;
-  var out=AN_CN.map(function(c,cn){
-    var pd=D.orders.filter(function(o){return o.st==='pagada'&&o.cn===cn}),base=pd.filter(function(o){return o.w<12}).map(function(o){return o.paid/o.est}),mu=anAvg(base),sd=Math.sqrt(anAvg(base.map(function(x){return (x-mu)*(x-mu)})));
-    var pts=[];for(var w=0;w<D.W;w++){var xs=pd.filter(function(o){return o.w===w}).map(function(o){return o.paid/o.est});if(xs.length>=3){var m=anAvg(xs),lim=3*sd/Math.sqrt(xs.length);pts.push({w:w,m:m,n:xs.length,lo:mu-lim,hi:mu+lim,out:m<mu-lim||m>mu+lim})}}
+  var D=AN.d;if(!D)return [];if(D.ctl)return D.ctl;
+  var bwk=Math.min(12,Math.floor(D.W/2));
+  return D.ctl=AN_CN.map(function(c,cn){
+    var pd=D.orders.filter(function(o){return o.st==='pagada'&&o.cn===cn}),base=pd.filter(function(o){return o.w<bwk}).map(function(o){return o.paid/o.est});
+    var al=AX.d.alerts[c.n],ack=al?al.ackW:0;
+    if(base.length<15)return {cn:cn,ins:true,pts:[],sig:null};
+    var mu=anAvg(base),sd=Math.sqrt(anAvg(base.map(function(x){return (x-mu)*(x-mu)}))),pts=[];
+    for(var w=0;w<D.W;w++){var xs=pd.filter(function(o){return o.w===w}).map(function(o){return o.paid/o.est});if(xs.length>=3){var m=anAvg(xs),lim=3*sd/Math.sqrt(xs.length);pts.push({w:w,m:m,n:xs.length,lo:mu-lim,hi:mu+lim,out:m<mu-lim||m>mu+lim})}}
     var sig=null,run=0,last=0;
-    pts.forEach(function(p,i){if(p.w<12)return;var sd2=p.m>mu?1:-1;run=sd2===last?run+1:1;last=sd2;if(!sig&&(p.out||run>=8))sig={w:p.w,why:p.out?'salió del rango de ±3σ':'8 semanas seguidas del mismo lado'}});
-    var shift=null;if(sig){var after=pts.filter(function(p){return p.w>=sig.w});shift=anAvg(after.map(function(p){return p.m}))/mu-1}
+    pts.forEach(function(p){if(p.w<bwk||p.w<ack)return;var sd2=p.m>mu?1:-1;run=sd2===last?run+1:1;last=sd2;if(!sig&&(p.out||run>=8))sig={w:p.w,why:p.out?'salió del rango de ±3σ':'8 semanas seguidas del mismo lado'}});
+    var shift=null;if(sig)shift=anAvg(pts.filter(function(p){return p.w>=sig.w}).map(function(p){return p.m}))/mu-1;
     return {cn:cn,mu:mu,sd:sd,pts:pts,sig:sig,shift:shift};
   });
-  return D.ctl=out;
 }
 function anAlertBar(){
-  var al=anCtl().filter(function(c){return c.sig});
-  return al.length?'<div class="an-alertbar">'+al.map(function(c){return '<div class="an-al"><i>!</i><div><b>Posible cambio de tabulador en '+AN_CN[c.cn].n+'.</b> Desde la semana del '+fd(anWd(c.sig.w))+' planta paga '+pc(Math.abs(c.shift),0)+(c.shift<0?' menos':' más')+' de lo estimado y el pago '+c.sig.why+'. Revisa los precios y tiempos vigentes de planta para ese concepto y actualiza el estimado. <a href="#anAlert" data-an="goto:anAlert">Ver gráfico de control</a></div></div>'}).join('')+'</div>':'';
+  var al=[];anCtl().forEach(function(c){var a=AX.d.alerts[AN_CN[c.cn].n];if(a&&a.state==='abierta')al.push({c:c,a:a,n:AN_CN[c.cn].n})});
+  return al.length?'<div class="an-alertbar">'+al.map(function(x){var sh=x.a.shift;return '<div class="an-al"><i>!</i><div><b>Posible cambio de tabulador en '+esc(x.n)+'.</b> Desde la semana del '+fd(anWd(x.a.w))+' planta paga '+pc(Math.abs(sh),0)+(sh<0?' menos':' más')+' de lo estimado. Las reglas del catálogo de ese concepto quedaron marcadas «Por revisar». <span class="an-act"><button class="bt pri" data-an="alert:recalibrar:'+ea(x.n)+'" type="button">Recalibrar estimado</button><button class="bt" data-an="alert:descartar:'+ea(x.n)+'" type="button">Descartar</button><a data-an="goto:anAlert">Ver gráfico</a></span></div></div>'}).join('')+'</div>':'';
 }
 function anAlert(){
   var D=AN.d,cs=anCtl(),cards=cs.map(function(c){
-    var W=300,H=150,L=36,R=8,T=10,B=22,all=c.pts.reduce(function(a,p){a.push(p.m,p.lo,p.hi);return a},[]),lo=Math.min.apply(null,all)-.02,hi=Math.max.apply(null,all)+.02,X=anSc(0,D.W-1,L,W-R),Y=anSc(lo,hi,H-B,T),g='';
+    var nm=AN_CN[c.cn].n,al=AX.d.alerts[nm],badge=c.ins?'<span class="an-chg eq">sin datos</span>':al&&al.state==='abierta'?'<span class="an-chg up">alerta</span>':al&&al.state==='recalibrada'?'<span class="an-chg dn">recalibrado ×'+(AX.d.cal[nm]||1).toFixed(2)+'</span>':'<span class="an-chg dn">estable</span>';
+    if(c.ins||!c.pts.length)return '<div><p class="an-ct">'+esc(nm)+' '+badge+'</p><p class="an-cs">Promedio semanal de pagado ÷ estimado</p>'+anEmpty('Necesita 15 PREAs pagadas en la línea base.')+'</div>';
+    var W=300,H=150,L=36,R=8,T=10,B=22,all=c.pts.reduce(function(a,p){a.push(p.m,p.lo,p.hi);return a},[]),lo=Math.min.apply(null,all)-.02,hi=Math.max.apply(null,all)+.02,X=anSc(0,Math.max(1,D.W-1),L,W-R),Y=anSc(lo,hi,H-B,T),g='';
     anTicks(lo,hi,3).forEach(function(v){g+='<line class="an-gr" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="an-t" x="'+(L-5)+'" y="'+(Y(v)+3.5)+'" text-anchor="end">'+v.toFixed(2)+'</text>'});
-    for(var w=0;w<D.W;w+=6)g+='<text class="an-t" x="'+X(w)+'" y="'+(H-6)+'" text-anchor="middle">'+fd(anWd(w))+'</text>';
-    if(c.pts.length){var up=c.pts.map(function(p){return X(p.w).toFixed(1)+','+Y(p.hi).toFixed(1)}),dn=c.pts.slice().reverse().map(function(p){return X(p.w).toFixed(1)+','+Y(p.lo).toFixed(1)});g+='<polygon fill="var(--an-1)" opacity=".1" points="'+up.concat(dn).join(' ')+'"/>'}
+    for(var w=0;w<D.W;w+=Math.max(2,D.ws*1.5|0))g+='<text class="an-t" x="'+X(w)+'" y="'+(H-6)+'" text-anchor="middle">'+fd(anWd(w))+'</text>';
+    var up=c.pts.map(function(p){return X(p.w).toFixed(1)+','+Y(p.hi).toFixed(1)}),dn=c.pts.slice().reverse().map(function(p){return X(p.w).toFixed(1)+','+Y(p.lo).toFixed(1)});g+='<polygon fill="var(--an-1)" opacity=".1" points="'+up.concat(dn).join(' ')+'"/>';
     g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(c.mu)+'" y2="'+Y(c.mu)+'" stroke="var(--fg)" stroke-dasharray="4 3" opacity=".6"/>';
-    if(c.sig)g+='<line class="an-rl" style="stroke:var(--an-bad)" x1="'+X(c.sig.w)+'" x2="'+X(c.sig.w)+'" y1="'+T+'" y2="'+(H-B)+'"/>';
+    if(al&&al.state==='abierta'||c.sig)g+='<line class="an-rl" style="stroke:var(--an-bad)" x1="'+X((al&&al.w)||c.sig.w)+'" x2="'+X((al&&al.w)||c.sig.w)+'" y1="'+T+'" y2="'+(H-B)+'"/>';
     g+='<polyline class="an-ln" style="stroke-width:1.5" points="'+c.pts.map(function(p){return X(p.w).toFixed(1)+','+Y(p.m).toFixed(1)}).join(' ')+'"/>';
     c.pts.forEach(function(p){g+='<circle cx="'+X(p.w)+'" cy="'+Y(p.m)+'" r="'+(p.out?4:3)+'" fill="'+(p.out?'var(--an-bad)':'var(--an-1)')+'" stroke="var(--card)" stroke-width="1.2" data-tip="'+ea('Semana del '+fd(anWd(p.w))+'\nPagado/estimado: '+p.m.toFixed(3)+'\nRango: '+p.lo.toFixed(3)+' – '+p.hi.toFixed(3)+' · n='+p.n+(p.out?'\nFuera de control':''))+'"/>'});
-    return '<div><p class="an-ct">'+AN_CN[c.cn].n+(c.sig?' <span class="an-chg up">alerta</span>':' <span class="an-chg dn">estable</span>')+'</p><p class="an-cs">Promedio semanal de pagado ÷ estimado</p>'+anSvg(W,H,g,'Gráfico de control de '+AN_CN[c.cn].n)+'</div>';
+    return '<div><p class="an-ct">'+esc(nm)+' '+badge+'</p><p class="an-cs">Promedio semanal de pagado ÷ estimado</p>'+anSvg(W,H,g,'Gráfico de control de '+nm)+'</div>';
   }).join('');
-  var body='<div class="an-g3">'+cards+'</div><p class="an-note">Línea punteada: promedio de las primeras 12 semanas. Franja: ±3 desviaciones (ancho según los casos de cada semana). Un punto rojo está fuera del rango; también se alerta con 8 semanas seguidas del mismo lado. Si planta cambia un tabulador, el pago se separa del estimado y salta el aviso arriba.</p>';
+  var body='<div class="an-g3">'+cards+'</div><p class="an-note">Línea punteada: promedio de la línea base (primeras semanas). Franja: ±3 desviaciones (ancho según los casos de cada semana). Un punto rojo está fuera del rango; también se alerta con 8 semanas seguidas del mismo lado. Al saltar una alerta, las reglas del catálogo de ese concepto se marcan «Por revisar» y puedes recalibrar el estimado con un clic.</p>';
   return anCard('anAlert','Alertas de cambio de patrón','Gráfico de control del pago por concepto',body);
 }
 
-/* ----- 8. Trazabilidad por orden ----- */
+/* ----- 8. Trazabilidad ----- */
 function anTraza(){
   var D=AN.d,ol=D.orders.filter(function(o){return o.nrej>0}).sort(function(a,b){return b.t0-a.t0}).slice(0,60);AN.ol=ol;
-  var sel='<div class="an-ctl"><label>Orden <select id="anOrd">'+ol.map(function(o,i){return '<option value="'+i+'">#'+('0000'+o.id).slice(-4)+' · '+AN_MD[o.md]+' · '+AN_AG[o.ag]+' · '+AN_CN[o.cn].n+' · '+(o.nrej+1)+' rondas</option>'}).join('')+'</select></label></div>';
-  return anCard('anTraza','Trazabilidad por orden','El hilo entre planta y asesor',sel+'<div id="anTl"></div><p class="an-note">Las órdenes se identifican con un número interno de la analítica, sin VIN ni folio. “Habría evitado” compara la fecha de cada rechazo con la fecha de activación de la regla que ataca esa causa.</p>');
+  if(!ol.length)return anCard('anTraza','Trazabilidad por orden','El hilo entre planta y asesor',anEmpty('Todavía no hay órdenes con rechazos.'));
+  if(AN.ord>=ol.length)AN.ord=0;
+  var sel='<div class="an-ctl"><label>Orden <select id="anOrd">'+ol.map(function(o,i){return '<option value="'+i+'"'+(i===AN.ord?' selected':'')+'>#'+('0000'+o.id).slice(-4)+' · '+esc(AN_MD[o.md])+' · '+esc(AN_AG[o.ag])+' · '+esc(AN_CN[o.cn].n)+' · '+(o.nrej+1)+' rondas</option>'}).join('')+'</select></label></div>';
+  return anCard('anTraza','Trazabilidad por orden','El hilo entre planta y asesor',sel+'<div id="anTl"></div><p class="an-note">Las órdenes se identifican con un número interno de la analítica, sin VIN ni folio. «Habría evitado» compara la fecha de cada rechazo con la fecha de activación de la regla que ataca esa causa.</p>');
 }
 function anTlRender(){
-  var o=AN.ol[AN.ord];if(!o)return;var ev='',avoid=0,rej=0,rnd=0;
+  var o=AN.ol&&AN.ol[AN.ord],host=$('#anTl');if(!o||!host)return;var ev='',avoid=0,rej=0,rnd=0,cnt=anCounts().c;
   o.rounds.forEach(function(r){
     var d='<span class="w">'+fd(r.t)+'</span>';
-    if(r.k==='envio'){rnd++;ev+='<div class="an-ev k-envio"><b>Asesor envía la PREA</b>'+d+'<p>Ronda '+rnd+' · '+AN_CN[o.cn].n+' · '+AN_CN[o.cn].p[o.pt]+' · estimado '+mx0(o.est)+'</p></div>'}
-    else if(r.k==='rechazo'){rej++;var ru=AN_RU[r.c],ta=AN.d.wk0+ru.wk*7*AN.d.DAY,was=r.t>=ta;if(!was)avoid++;
-      ev+='<div class="an-ev k-rechazo"><b>Planta rechaza</b>'+d+'<p>'+AN_CA[r.c].n+'</p><div class="pv'+(was?' no':'')+'"><b>'+ru.id+' · '+ru.n+'.</b> '+(was?'Ya estaba activa desde el '+fd(ta)+' y esta ronda ocurrió de todos modos: las reglas reducen el rechazo, no lo eliminan.':'Habría evitado esta ronda. Se activó el '+fd(ta)+', '+Math.max(1,Math.round((ta-r.t)/864e5))+' días después.')+'</div></div>'}
+    if(r.k==='envio'){rnd++;ev+='<div class="an-ev k-envio"><b>Asesor envía la PREA</b>'+d+'<p>Ronda '+rnd+' · '+esc(AN_CN[o.cn].n)+' · '+esc(AN_CN[o.cn].p[o.pt]||'')+' · estimado '+mx0(o.est)+'</p></div>'}
+    else if(r.k==='rechazo'){rej++;var v=AX.d.vr.filter(function(x){return x.cause===r.c})[0],pv;
+      if(!v)pv='<div class="pv no">Aún no existe una regla para esta causa. Se crea sola al llegar a '+AX.d.cfg.thRej+' rechazos (hay '+cnt[r.c]+').</div>';
+      else if(!v.act)pv='<div class="pv no"><b>'+v.id+' · '+esc(v.n)+'.</b> Está lista y espera tu aprobación.</div>';
+      else if(r.t>=v.act)pv='<div class="pv no"><b>'+v.id+' · '+esc(v.n)+'.</b> Ya estaba activa desde el '+fd(v.act)+' y esta ronda ocurrió de todos modos: las reglas reducen el rechazo, no lo eliminan.</div>';
+      else{avoid++;pv='<div class="pv"><b>'+v.id+' · '+esc(v.n)+'.</b> Habría evitado esta ronda. Se activó el '+fd(v.act)+', '+Math.max(1,Math.round((v.act-r.t)/864e5))+' días después.</div>'}
+      ev+='<div class="an-ev k-rechazo"><b>Planta rechaza</b>'+d+'<p>'+AN_CA[r.c].n+'</p>'+pv+'</div>'}
     else if(r.k==='correccion'){rnd++;ev+='<div class="an-ev k-correccion"><b>Asesor corrige y reenvía</b>'+d+'<p>'+AN_CA[r.c].fix.replace(/^./,function(c){return c.toUpperCase()})+'. Ronda '+rnd+'.</p></div>'}
     else if(r.k==='aceptacion')ev+='<div class="an-ev k-aceptacion"><b>Planta acepta</b>'+d+'<p>Después de '+o.nrej+(o.nrej===1?' rechazo':' rechazos')+'.</p></div>';
     else if(r.k==='denegada')ev+='<div class="an-ev k-denegada"><b>Planta deniega la PREA</b>'+d+'<p>No se recupera el cobro de '+mx0(o.bill)+'.</p></div>';
   });
-  if(o.st==='pagada')ev+='<div class="an-ev k-pago"><b>Planta paga</b><span class="w">'+fd(o.tPay)+'</span><p>'+mx0(o.paid)+' contra '+mx0(o.est)+' estimados ('+((o.paid-o.est)/o.est*100>=0?'+':'')+((o.paid-o.est)/o.est*100).toFixed(1)+'%).</p></div>';
+  if(o.st==='pagada')ev+='<div class="an-ev k-pago"><b>Planta paga</b><span class="w">'+(o.tPay?fd(o.tPay):'')+'</span><p>'+mx0(o.paid)+' contra '+mx0(o.est)+' estimados ('+((o.paid-o.est)/o.est*100>=0?'+':'')+((o.paid-o.est)/o.est*100).toFixed(1)+'%).</p></div>';
   else if(o.st==='aceptada')ev+='<div class="an-ev k-pago"><b>Aceptada, pendiente de pago</b><p>Se espera cerca de '+mx0(o.est)+'.</p></div>';
   else if(o.st==='rechazada')ev+='<div class="an-ev k-rechazo"><b>Esperando corrección del asesor</b><p>'+mx0(o.bill)+' detenidos en esta PREA.</p></div>';
   else if(o.st==='revision')ev+='<div class="an-ev"><b>En revisión de planta</b><p>Aún sin resolución.</p></div>';
-  $('#anTl').innerHTML='<p class="an-note" style="margin:0 0 12px"><b>'+rej+(rej===1?' rechazo':' rechazos')+'</b>, de los cuales las reglas habrían evitado <b>'+avoid+'</b> si hubieran estado activas.</p><div class="an-tl">'+ev+'</div>';
+  host.innerHTML='<p class="an-note" style="margin:0 0 12px"><b>'+rej+(rej===1?' rechazo':' rechazos')+'</b>, de los cuales las reglas habrían evitado <b>'+avoid+'</b> si hubieran estado activas.</p><div class="an-tl">'+ev+'</div>';
 }
 
-/* ----- armado y eventos ----- */
-function anBuild(){
-  var root=$('#anRoot');if(!root||AN.built)return;
-  AN.built=true;AN.d=anGen();
-  var nav=[['anCurva','Curva de aprendizaje'],['anCalib','Calibración'],['anDinero','Dinero en juego'],['anGrafo','Grafo'],['anMapa','Mapa de calor'],['anPron','Pronóstico'],['anAlert','Alertas'],['anTraza','Trazabilidad']];
-  root.innerHTML='<div class="an-sec" style="margin-top:20px"><div class="ad-head" style="margin-bottom:8px"><div><h2 style="font-size:19px">Aprendizaje y analítica</h2><p>Qué tanto aprende el sistema, qué tan bien predice y cuánto dinero hay en juego</p></div></div><div class="an-demo"><b>Datos de demostración.</b> Estas gráficas se calculan con ~1,200 PREAs simuladas de 26 semanas (5 agencias, 6 modelos, 6 conceptos). Las reglas, las causas y el cambio de tabulador son ejemplos para mostrar la lectura; al conectar tus PREAs reales cambian los números, no el diseño.</div><div id="anAlertBar">'+anAlertBar()+'</div></div>'+
-   '<nav class="an-nav" aria-label="Secciones de analítica">'+nav.map(function(n){return '<a data-an="goto:'+n[0]+'">'+n[1]+'</a>'}).join('')+'</nav>'+anCurva()+anCalib()+anDinero()+anGrafoCard()+anMapa()+anPron()+anAlert()+anTraza();
-  $('#anGL').value=String(AN.gL);
-  anGraph();anTlRender();
+/* ----- secciones de captura, seguimiento y reglas ----- */
+var AN_ST={revision:['En revisión','eq'],rechazada:['Rechazada','up'],aceptada:['Aceptada · por pagar','dn'],pagada:['Pagada','dn'],denegada:['Denegada','up']};
+function anDatos(){
+  var os=AX.d.orders,nd=os.filter(function(o){return o.demo}).length,rej=0,paid=0;
+  os.forEach(function(o){o.rounds.forEach(function(r){if(r.k==='rechazo')rej++});if(o.paid!=null)paid++});
+  var vr=AX.d.vr,act=vr.filter(function(v){return v.status==='activa'}).length,kp=function(l,v,s,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
+  var dl=function(id,l,ph,v){return '<label class="an-f"><span>'+l+'</span><input id="'+id+'" list="'+id+'L" placeholder="'+ph+'" value="'+ea(v||'')+'"></label>'};
+  var opt=function(id,a){return '<datalist id="'+id+'L">'+a.map(function(x){return '<option value="'+ea(x)+'">'}).join('')+'</datalist>'};
+  var form=AN.form?'<div class="an-form">'+dl('nfAg','Agencia','FAME Morelia',AN_AG[0]||'FAME Morelia')+dl('nfMd','Modelo','Silverado')+dl('nfSys','Sistema o concepto','Transmisión')+dl('nfPt','Pieza','Cuerpo de válvulas')+'<label class="an-f"><span>Estimado ($)</span><input id="nfEst" inputmode="decimal" placeholder="9800"></label><label class="an-f"><span>Cobrado ($)</span><input id="nfBill" inputmode="decimal" placeholder="10400"></label><button class="bt pri" data-an="data:save" type="button">Registrar orden</button>'+opt('nfAg',AN_AG)+opt('nfMd',AN_MD)+opt('nfSys',AN_CN.map(function(c){return c.n}))+opt('nfPt',[].concat.apply([],AN_CN.map(function(c){return c.p})))+'</div>':'';
+  var body='<div class="an-kpi">'+kp('PREAs registradas',os.length,nd?(os.length-nd)+' reales · '+nd+' de demostración':'con su resultado real')+kp('Rechazos de planta',rej,'de donde aprende el sistema')+kp('Reglas de validación',vr.length,act+' activas · se aplican a cada PREA nueva',act?'ok':'')+kp('Pagos registrados',paid,'alimentan calibración y pronóstico')+'</div>'+
+   '<div class="an-ctl"><button class="bt pri" data-an="data:import" type="button">Importar PREAs (CSV o JSON)</button><button class="bt" data-an="data:template" type="button">Plantilla CSV</button><button class="bt" data-an="data:newform" type="button">'+(AN.form?'Cancelar':'Registrar una orden')+'</button>'+(nd?'<button class="bt" data-an="data:undemo" type="button">Quitar datos de demostración</button>':'<button class="bt" data-an="data:demo" type="button">Cargar demostración</button>')+'<span class="sp" style="flex:1"></span><button class="bt" data-an="data:export" type="button">Exportar respaldo</button><button class="bt" data-an="data:restore" type="button">Restaurar respaldo</button><button class="bt dng" data-an="data:clear" type="button">Borrar casos</button></div>'+
+   '<input type="file" id="anFile" accept=".csv,.json,.txt" hidden><input type="file" id="anRest" accept=".json" hidden>'+form+'<p class="imp-msg" id="anMsg" role="status" style="margin:6px 0">'+esc(AN.msg||'')+'</p>'+
+   '<ol class="an-how"><li><b>Se captura solo.</b> Cada PREA que armas en el Agente de Garantías se registra con su estimado. Tú indicas qué respondió el fabricante (aceptada, rechazada y por qué) y, al final, cuánto pagó.</li><li><b>Aprende de los rechazos.</b> Cuando una causa se repite '+AX.d.cfg.thRej+' veces, el sistema crea una regla de validación y la aplica a las PREAs nuevas (si eliges aprobación manual, espera tu visto bueno).</li><li><b>Se evalúa sola.</b> Si una regla no baja su causa de rechazo tras '+AX.d.cfg.minAfter+' casos, pasa a revisión y deja de aplicarse.</li><li><b>Reacciona a cambios de planta.</b> Si el pago se sale de rango, avisa, marca las reglas del catálogo por revisar y te deja recalibrar el estimado.</li></ol>'+
+   '<p class="an-note">Las columnas del CSV son: fecha, agencia, modelo, sistema, pieza, estimado, cobrado, pagado, estatus (aceptada, pagada, rechazada, denegada o en revisión) y causas_de_rechazo (separadas por «;»). No se guardan VIN ni folios. Los datos viven en este navegador: usa «Exportar respaldo» para llevarlos a otro equipo o compartirlos.</p>';
+  return anCard('anDatos','Datos y bucle de aprendizaje','Captura, importación y respaldo',body);
+}
+function anSeg(){
+  var os=AX.d.orders.filter(function(o){var s=AX.status(o);return s==='revision'||s==='rechazada'||s==='aceptada'}).sort(function(a,b){return b.t0-a.t0}),shown=os.slice(0,25);
+  var rows=shown.map(function(o){
+    var s=AX.status(o),lab=AN_ST[s],a='';
+    if(s==='revision')a='<select id="oxc'+o.id+'" aria-label="Causa del rechazo">'+AX.CA.map(function(c,i){return '<option value="'+i+'">'+esc(c.n)+'</option>'}).join('')+'</select><button class="bt" data-an="ox:rechazo:'+o.id+'" type="button">Rechazada</button><button class="bt" data-an="ox:aceptacion:'+o.id+'" type="button">Aceptada</button><button class="bt dng" data-an="ox:denegada:'+o.id+'" type="button">Denegada</button>';
+    else if(s==='rechazada')a='<button class="bt pri" data-an="ox:correccion:'+o.id+'" type="button">Corregida y reenviada</button><button class="bt dng" data-an="ox:denegada:'+o.id+'" type="button">Denegada</button>';
+    else a='<input id="oxp'+o.id+'" inputmode="decimal" placeholder="Monto pagado" aria-label="Monto pagado"><button class="bt pri" data-an="ox:pago:'+o.id+'" type="button">Registrar pago</button>';
+    var lc=null;o.rounds.forEach(function(r){if(r.k==='rechazo')lc=r.c});
+    return '<tr><td><b>#'+('0000'+o.id).slice(-4)+'</b><small>'+fd(o.t0)+(o.src==='agente'?' · agente':o.demo?' · demo':'')+'</small></td><td>'+esc(o.md)+'<small>'+esc(o.sys)+' · '+esc(o.pt)+'</small></td><td class="r">'+mx0(o.est)+'</td><td><span class="an-chg '+lab[1]+'">'+lab[0]+'</span>'+(s==='rechazada'&&lc!=null?'<small>'+esc(AX.CA[lc].n)+'</small>':'')+'</td><td><div class="an-ra">'+a+'</div></td></tr>';
+  }).join('');
+  var body=rows?'<div class="an-tbw"><table class="an-tb"><thead><tr><th>Orden</th><th>Unidad</th><th class="r">Estimado</th><th>Estado</th><th>¿Qué respondió planta?</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+(os.length>shown.length?'<p class="an-note">Mostrando las 25 más recientes de '+os.length+' abiertas.</p>':''):anEmpty('No hay órdenes abiertas. Arma una PREA en el Agente de Garantías, o registra una arriba.');
+  return anCard('anSeg','Seguimiento de órdenes','Registra el resultado de cada PREA',body+'<p class="an-note">Cada rechazo con su causa y cada pago registrado alimentan las reglas, la calibración, el pronóstico y las alertas.</p>');
+}
+function anReglas(){
+  var vr=AX.d.vr,vl={funciona:['Funciona','dn'],incierto:['Incierto','eq'],'sin-efecto':['Sin efecto','up'],pocos:['Pocos casos','eq']};
+  var rows=vr.map(function(v){
+    var ev=v.ev,applied=AX.d.orders.filter(function(o){return o.rules&&o.rules.indexOf(v.id)>=0}).length,a='';
+    if(v.status==='por-aprobar')a='<button class="bt pri" data-an="vr:aprobar:'+v.id+'" type="button">Aprobar</button>';
+    else if(v.status==='por-revisar')a='<button class="bt" data-an="vr:mantener:'+v.id+'" type="button">Mantener activa</button><button class="bt" data-an="vr:pausar:'+v.id+'" type="button">Pausar</button>';
+    else if(v.status==='pausada')a='<button class="bt" data-an="vr:reanudar:'+v.id+'" type="button">Reanudar</button>';
+    else a='<button class="bt" data-an="vr:pausar:'+v.id+'" type="button">Pausar</button>';
+    a+='<button class="bt dng" data-an="vr:eliminar:'+v.id+'" type="button">Eliminar</button>';
+    var stl={activa:'Activa',pausada:'Pausada','por-aprobar':'Por aprobar','por-revisar':'Por revisar'}[v.status];
+    return '<tr><td><b>'+v.id+'</b> '+esc(v.n)+(v.demo?' <small style="display:inline">· demo</small>':'')+'<small>Ataca: '+esc(AX.CA[v.cause].n)+'</small></td><td><span class="bg s-'+(v.status==='por-revisar'?'por-aprobar':v.status)+'">'+stl+'</span></td><td>'+(v.act?fd(v.act):'—')+'<small>aplicada en '+applied+' PREAs</small></td><td>'+(ev?'<b>'+pc(ev.pb)+' → '+pc(ev.pa)+'</b> <span class="an-chg '+vl[ev.verdict][1]+'">'+vl[ev.verdict][0]+'</span><small>antes n='+ev.nb+' · después n='+ev.na+'</small>':'<small>Sin evaluar</small>')+'</td><td><div class="an-ra">'+a+'</div></td></tr>';
+  }).join('');
+  return anCard('anReglas','Reglas de validación aprendidas','Nacen de los rechazos y se aplican en el Agente de Garantías',(rows?'<div class="an-tbw"><table class="an-tb"><thead><tr><th>Regla</th><th>Estado</th><th>Activa desde</th><th>¿Funciona? (rechazo por esta causa)</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>':anEmpty('Aún no hay reglas de validación. Aparecen cuando una causa de rechazo se repite '+AX.d.cfg.thRej+' veces.'))+'<p class="an-note">La evaluación compara la tasa de rechazo por esa causa antes y después de activar la regla (es correlación, no prueba). Con menos de '+AX.d.cfg.minAfter+' casos de cada lado no se emite veredicto.</p>');
+}
+
+/* ----- armado, render y eventos ----- */
+function anRender(){
+  var root=$('#anRoot');if(!root)return;var adm=$('#viewAdmin'),sc=adm.scrollTop,D=anPrep();AN.dirty=false;
+  var nav=[['anDatos','Datos'],['anSeg','Seguimiento'],['anReglas','Reglas aprendidas'],['anCurva','Curva de aprendizaje'],['anCalib','Calibración'],['anDinero','Dinero'],['anGrafo','Grafo'],['anMapa','Mapa de calor'],['anPron','Pronóstico'],['anAlert','Alertas'],['anTraza','Trazabilidad']];
+  var nd=AX.d.orders.some(function(o){return o.demo});
+  var head='<div class="an-sec" style="margin-top:20px"><div class="ad-head" style="margin-bottom:8px"><div><h2 style="font-size:19px">Aprendizaje y analítica</h2><p>Qué tanto aprende el sistema, qué tan bien predice y cuánto dinero hay en juego</p></div></div>'+(nd?'<div class="an-demo"><b>Hay datos de demostración.</b> Son PREAs simuladas para mostrar la lectura de cada gráfica; no son tus casos. Quítalas en «Datos» cuando importes los reales.</div>':'')+'<div id="anAlertBar">'+(D?anAlertBar():'')+'</div></div>';
+  var html=head+'<nav class="an-nav" aria-label="Secciones de analítica">'+nav.map(function(n){return '<a data-an="goto:'+n[0]+'">'+n[1]+'</a>'}).join('')+'</nav>'+anDatos()+anSeg()+anReglas();
+  if(D)html+=anSafe('anCurva','Curva de aprendizaje','',anCurva)+anSafe('anCalib','Calibración del estimado','',anCalib)+anSafe('anDinero','Dinero en juego','',anDinero)+anGrafoCard()+anSafe('anMapa','Mapa de calor de causas','',anMapa)+anSafe('anPron','Pronóstico de cartera por cobrar','',anPron)+anSafe('anAlert','Alertas de cambio de patrón','',anAlert)+anSafe('anTraza','Trazabilidad por orden','',anTraza);
+  else html+=anCard('anVacio','Gráficas de aprendizaje','Aparecen con los primeros casos',anEmpty('Todavía no hay PREAs registradas. Importa tu histórico, arma PREAs en el Agente de Garantías o carga la demostración para ver cómo se leen las gráficas.'));
+  root.innerHTML=html;
+  if(D){try{anGraph()}catch(e){console.error(e)}anTlRender()}
+  adm.scrollTop=sc;
+}
+var anRaf=0;
+function anSched(){if(anRaf)return;anRaf=requestAnimationFrame(function(){anRaf=0;if(S.view==='admin')anRender()})}
+function anShow(){if(!AN.built){AN.built=true;anInit()}if(AN.dirty)anRender()}
+function anDownload(name,text,type){var a=document.createElement('a'),u=URL.createObjectURL(new Blob([text],{type:type}));a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(u)},500)}
+function anInit(){
+  var root=$('#anRoot');
+  AX.on(anSched);
   var tip=document.createElement('div');tip.className='an-tip';tip.hidden=true;document.body.appendChild(tip);
   var mv=function(e){var x=e.clientX+12,y=e.clientY+14;tip.style.left=Math.min(x,innerWidth-tip.offsetWidth-8)+'px';tip.style.top=Math.min(y,innerHeight-tip.offsetHeight-8)+'px'};
   root.addEventListener('pointerover',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');if(!t){tip.hidden=true;return}tip.textContent=t.getAttribute('data-tip');tip.hidden=false;mv(e)});
   root.addEventListener('pointermove',function(e){if(!tip.hidden)mv(e)});
   root.addEventListener('pointerleave',function(){tip.hidden=true});
+  var msg=function(t){AN.msg=t;var m=$('#anMsg');if(m)m.textContent=t};
   root.addEventListener('click',function(e){
-    var b=e.target.closest('[data-an]');if(!b)return;var p=b.dataset.an.split(':'),k=p[0],v=p[1];
+    var b=e.target.closest('[data-an]');if(!b)return;var p=b.dataset.an.split(':'),k=p[0],v=p[1],x=p.slice(2).join(':');
     if(k==='goto'){e.preventDefault();var s=document.getElementById(v);if(s)s.scrollIntoView({behavior:'smooth',block:'start'})}
     else if(k==='mon'){AN.mon=v;$('#anMon').innerHTML=anMoney()}
     else if(k==='map'){AN.map=v;$('#anHeat').innerHTML=anHeat()}
     else if(k==='gt'){AN.gT[v]=AN.gT[v]?0:1;b.setAttribute('aria-pressed',AN.gT[v]?'true':'false');anGraph()}
+    else if(k==='alert')AX.alertAct(x,v);
+    else if(k==='vr')AX.vrSet(x,v);
+    else if(k==='ox'){
+      var id=+x,ok;
+      if(v==='rechazo'){var s2=$('#oxc'+id);ok=AX.act(id,'rechazo',s2?+s2.value:6)}
+      else if(v==='pago'){var i2=$('#oxp'+id),amt=axNum(i2&&i2.value);if(!(amt>0)){toast('Escribe el monto pagado');return}ok=AX.act(id,'pago',amt)}
+      else ok=AX.act(id,v);
+      if(ok)toast('Resultado registrado');
+    }
+    else if(k==='data'){
+      if(v==='import')$('#anFile').click();
+      else if(v==='restore')$('#anRest').click();
+      else if(v==='template')anDownload('plantilla-casos.csv',AX.template,'text/csv');
+      else if(v==='export')anDownload('axai-respaldo-'+new Date().toISOString().slice(0,10)+'.json',AX.exportAll(),'application/json');
+      else if(v==='newform'){AN.form=!AN.form;anRender()}
+      else if(v==='demo'){msg('Datos de demostración cargados.');AX.demo()}
+      else if(v==='undemo'){msg('Datos de demostración eliminados.');AX.undemo()}
+      else if(v==='clear'){if(confirm('Esto borra todas las PREAs registradas y las reglas de validación. El catálogo de reglas no se toca. ¿Continuar?')){msg('Casos borrados.');AX.clear()}}
+      else if(v==='save'){
+        var g=function(i){return ($(i).value||'').trim()},est=axNum(g('#nfEst')),bill=axNum(g('#nfBill'))||est;
+        if(!(est>0)){msg('Escribe el monto estimado.');return}
+        AN.form=false;msg('Orden registrada.');
+        AX.add({t0:Date.now(),ag:g('#nfAg')||'Sin agencia',md:g('#nfMd')||'Sin modelo',sys:g('#nfSys')||'Sin concepto',pt:g('#nfPt')||'Sin pieza',est0:est,est:est,bill:bill,rounds:[{t:Date.now(),k:'envio'}],src:'manual'});
+      }
+    }
   });
   root.addEventListener('change',function(e){
-    if(e.target.id==='anGL'){AN.gL=parseFloat(e.target.value);anGraph()}
-    else if(e.target.id==='anOrd'){AN.ord=+e.target.value;anTlRender()}
+    var t=e.target;
+    if(t.id==='anGL'){AN.gL=parseFloat(t.value);anGraph()}
+    else if(t.id==='anOrd'){AN.ord=+t.value;anTlRender()}
+    else if(t.id==='anFile'&&t.files[0]){var f=t.files[0],fr=new FileReader();fr.onload=function(){try{var r=AX.import(String(fr.result));msg(r.ok?'Listo: '+r.ok+' PREAs cargadas'+(r.dup?' · '+r.dup+' repetidas omitidas':'')+(r.bad?' · '+r.bad+' filas sin fecha o monto omitidas':'')+'.':'No encontré PREAs nuevas'+(r.dup?' ('+r.dup+' ya estaban cargadas)':'')+(r.bad?'. Revisa que cada fila tenga fecha y monto estimado o cobrado':'')+'.');anRender()}catch(err){msg('No pude leer el archivo: '+err.message);anRender()}};fr.readAsText(f);t.value=''}
+    else if(t.id==='anRest'&&t.files[0]){var f2=t.files[0],fr2=new FileReader();fr2.onload=function(){if(!confirm('Esto reemplaza los casos y el catálogo actuales con los del respaldo. ¿Continuar?'))return;try{AX.restore(String(fr2.result));msg('Respaldo restaurado.');anRender()}catch(err){msg('No pude restaurar: '+err.message);anRender()}};fr2.readAsText(f2);t.value=''}
   });
 }
+AX.load();
+try{AX.bc=new BroadcastChannel('axai-casos');AX.bc.onmessage=function(){AX.load();AX.emit()}}catch(_){}
+try{window.addEventListener('storage',function(e){if(e.key===AX.K){AX.load();AX.emit()}})}catch(_){}
 
 updateSend();
 setTimeout(function(){try{if(!mq.matches)ta.focus({preventScroll:true})}catch(_){}},900);
