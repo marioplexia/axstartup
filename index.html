@@ -420,7 +420,7 @@ textarea,input{font:inherit;color:inherit}
 .ad-live{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
 .ad-live i{width:8px;height:8px;border-radius:50%;background:#2fa866;animation:caret 1.4s ease-in-out infinite}
 .ad-live.busy i{background:#c58a1a;animation-duration:.6s}
-.ad-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.ad-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
 .kp{border:1px solid var(--card-line);border-radius:12px;background:var(--card);padding:14px 16px;display:flex;flex-direction:column;gap:2px}
 .kp span{font-size:12.5px;color:var(--muted)}.kp b{font-size:28px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.kp small{font-size:12px;color:var(--faint)}
 .kp.warn b{color:#b7791f}.kp.ok b{color:#1f8a4c}
@@ -605,7 +605,7 @@ textarea,input{font:inherit;color:inherit}
           <label>Activar con <select id="adThr"><option value="2">2 PREAs</option><option value="3">3 PREAs</option><option value="5">5 PREAs</option></select></label>
           <label>Distribución <select id="adDist"><option value="auto">Automática</option><option value="manual">Con mi aprobación</option></select></label>
           <span class="sp"></span>
-          <button class="bt" id="adSim" type="button">Simular PREA de un asesor</button>
+          <button class="bt" id="adSim" type="button" hidden>Simular PREA de un asesor</button>
           <button class="bt pri" id="adImpBtn" type="button" aria-expanded="false">Enseñar con PREAs aceptadas</button>
         </div>
         <div class="ad-imp" id="adImp" hidden>
@@ -614,7 +614,7 @@ textarea,input{font:inherit;color:inherit}
             <input type="file" id="adFile" accept=".csv,.json,.txt" hidden>
             <button class="bt" type="button" onclick="document.getElementById('adFile').click()">Elegir archivo</button>
             <button class="bt" type="button" id="adTpl">Descargar plantilla CSV</button>
-            <button class="bt" type="button" id="adSample">Cargar histórico de ejemplo (19 PREAs)</button>
+            <button class="bt" type="button" id="adSample" hidden>Cargar histórico de ejemplo (19 PREAs)</button>
             <button class="bt dng" type="button" id="adReset">Restablecer catálogo</button>
           </div>
           <textarea id="adPaste" placeholder="O pega aquí las PREAs en CSV o JSON…" aria-label="Pegar PREAs aceptadas"></textarea>
@@ -722,7 +722,7 @@ function showView(id){
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':(v==='agent'||v==='inicio')):v===id;b.setAttribute('aria-current',on?'true':'false')});
   var adm=id==='admin';stage.hidden=!main;$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat';$('#viewAdmin').hidden=!adm;$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
-  if(adm)adRender();
+  if(adm){adRender();AD.loadExp()}
   else if(id==='exp'||id==='bitacora'||id==='chat'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else RC.open()}
   else{crumb.textContent=AG[S.agent].crumb;syncCrumb()}
   if(mq.matches)setSb(false);
@@ -1295,9 +1295,9 @@ RS.toCase=function(r){
   var keep=arr.filter(function(x){return x.p.n>=r.n*0.5});if(!keep.length)keep=arr.slice(0,1);
   return {sys:r.sys,op:r.op,opd:r.opd,h:r1(r.hSum/Math.max(r.n,1)),parts:keep.map(function(x){return [x.no,x.p.d,x.p.q,x.p.pr]})};
 };
-RS.note=function(hit){RS.d.stats.q++;if(hit)RS.d.stats.hit++;RS.save();RS.emit()};
+RS.note=function(hit){};  /* las consultas se cuentan desde la tabla expedientes */
 RS.mk=function(rec){
-  var id='R-'+('000'+(++RS.d.seq)).slice(-4),pm={};
+  var mx=RS.d.rules.reduce(function(a,r){return Math.max(a,parseInt(String(r.id).slice(2),10)||0)},0);RS.d.seq=Math.max(RS.d.seq||0,mx)+1;var id='R-'+('000'+RS.d.seq).slice(-4),pm={};
   rec.parts.forEach(function(p){pm[p.no]={d:p.d,q:p.q,pr:p.pr,n:0}});
   var kw=(rec.kw||[]).concat(words(rec.kwText||rec.q[1])).filter(function(w,i,a){return a.indexOf(w)===i}).slice(0,10);
   return {id:id,sys:rec.sys||'Por clasificar',q:rec.q,c:rec.c,r:rec.r,op:rec.op,opd:rec.opd,h:rec.h,hSum:0,parts:pm,kw:kw,n:0,rej:0,status:'aprendizaje',created:Date.now(),updated:Date.now(),src:{base:0,historico:0,asesor:0},dist:{},_new:true};
@@ -1425,7 +1425,8 @@ SB.push=async function(){
   SB.pushing=true;SB.dirty=false;
   try{
     var db=SB.c,d=RS.d,res;
-    if(SB.wipe){
+    var isAdmin=!!(SB.user&&SB.user.role==='admin');
+    if(SB.wipe&&isAdmin){
       res=await db.from('agency_rules').delete().neq('id','');if(res.error)throw res.error;
       res=await db.from('agency_log').delete().gte('id',0);if(res.error)throw res.error;
       SB.cache={};SB.logSeen={};SB.wipe=false;
@@ -1433,12 +1434,12 @@ SB.push=async function(){
     var seen={},rows=[],strs={};
     d.rules.forEach(function(r){seen[r.id]=1;var row=SB.toRow(r),s=JSON.stringify(row);if(SB.cache[r.id]!==s){rows.push(row);strs[r.id]=s}});
     if(rows.length){res=await db.from('agency_rules').upsert(rows);if(res.error)throw res.error;for(var k in strs)SB.cache[k]=strs[k]}
-    var gone=Object.keys(SB.cache).filter(function(id){return !seen[id]});
+    var gone=isAdmin?Object.keys(SB.cache).filter(function(id){return !seen[id]}):[];
     if(gone.length){res=await db.from('agency_rules').delete().in('id',gone);if(res.error)throw res.error;gone.forEach(function(id){delete SB.cache[id]})}
     var logs=d.log.filter(function(e){return !SB.logSeen[e.t+'|'+e.msg]});
     if(logs.length){res=await db.from('agency_log').upsert(logs.map(function(e){return {t:e.t,type:e.type,rule:e.rule||'',msg:e.msg}}),{onConflict:'t,msg',ignoreDuplicates:true});if(res.error)throw res.error;logs.forEach(function(e){SB.logSeen[e.t+'|'+e.msg]=1})}
     var st={id:1,cfg:d.cfg,stats:d.stats,seq:d.seq},ss=JSON.stringify(st);
-    if(ss!==SB.stateStr){res=await db.from('agency_state').upsert(st);if(res.error)throw res.error;SB.stateStr=ss}
+    if(isAdmin&&ss!==SB.stateStr){res=await db.from('agency_state').upsert(st);if(res.error)throw res.error;SB.stateStr=ss}
   }catch(e){SB.fail(e);SB.dirty=true;setTimeout(function(){SB.push()},8000)}
   SB.pushing=false;SB.quiet=Date.now()+1500;
   if(SB.dirty&&!SB.tm)SB.schedule();
@@ -1719,6 +1720,8 @@ SB.enter=async function(user){
     await SB.pull(true);
     SB.loadHist();
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
+      if(p.table==='expedientes'){AD.loadExp();return}
+      if(p.table==='activity')return;
       if(p.table==='profiles'){SB.loadAdvisors().then(function(){return SB.pull()}).catch(SB.fail);return}
       if(SB.pushing||SB.dirty||Date.now()<SB.quiet)return;
       clearTimeout(SB.pt);SB.pt=setTimeout(function(){SB.pull()},500);
@@ -1754,7 +1757,13 @@ function ctxToRec(c){
 }
 
 /* ---------- Tablero de agencia ---------- */
-var AD={filter:'todas',q:'',open:{},raf:0};
+var AD={filter:'todas',q:'',open:{},raf:0,exp:[]};
+AD.loadExp=async function(){
+  if(!SB.c||!SB.entered)return;
+  var r=await SB.c.from('expedientes').select('user_id,status,rule_id,created_at').order('created_at',{ascending:false}).limit(2000);
+  if(r.error){SB.fail(r.error);return}
+  AD.exp=r.data;adSched();
+};
 var ST_LBL={activa:'Activa',aprendizaje:'En aprendizaje','por-aprobar':'Por aprobar',distribuyendo:'Distribuyendo',pausada:'Pausada'};
 function hms(ts){var d=new Date(ts),p=function(n){return ('0'+n).slice(-2)};return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())}
 function ago(ts){var s=Math.max(0,Math.round((Date.now()-ts)/1000));if(s<60)return 'hace '+s+' s';var m=Math.round(s/60);if(m<60)return 'hace '+m+' min';var h=Math.round(m/60);if(h<48)return 'hace '+h+' h';return 'hace '+Math.round(h/24)+' d'}
@@ -1764,9 +1773,10 @@ function adRender(){
   var learn=rules.filter(function(r){return r.status==='aprendizaje'||r.status==='por-aprobar'||r.status==='distribuyendo'}).length;
   var pend=rules.filter(function(r){return r.status==='por-aprobar'}).length;
   var tot=rules.reduce(function(a,r){return a+r.n},0);
-  var rate=d.stats.q?Math.round(100*d.stats.hit/d.stats.q):null;
+  var eq=AD.exp.length,eh=AD.exp.filter(function(x){return x.rule_id}).length,ea_=AD.exp.filter(function(x){return x.status==='aceptada'}).length,er=AD.exp.filter(function(x){return x.status==='rechazada'}).length;
+  var rate=eq?Math.round(100*eh/eq):null,acc=ea_+er?Math.round(100*ea_/(ea_+er)):null;
   var K=function(l,v,s,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
-  $('#adKpi').innerHTML=K('Reglas en el catálogo',rules.length,act+' activas')+K('En aprendizaje',learn,pend?pend+' por aprobar':'Necesitan '+d.cfg.th+' PREAs',pend?'warn':'')+K('PREAs aprendidas',tot,'aceptadas por el fabricante')+K('Consultas resueltas con regla',rate==null?'—':rate+'%',d.stats.q?d.stats.hit+' de '+d.stats.q+' consultas':'Aún sin consultas','ok');
+  $('#adKpi').innerHTML=K('Reglas en el catálogo',rules.length,act+' activas')+K('En aprendizaje',learn,pend?pend+' por aprobar':'Necesitan '+d.cfg.th+' PREAs',pend?'warn':'')+K('PREAs aprendidas',tot,'aceptadas por el fabricante')+K('Consultas resueltas con regla',rate==null?'—':rate+'%',eq?eh+' de '+eq+' PREAs':'Aún sin PREAs','ok')+K('Aceptación del fabricante',acc==null?'—':acc+'%',ea_+er?ea_+' aceptadas · '+er+' rechazadas':'Sin respuestas todavía','ok');
   var nb=$('#adBadge');if(nb){nb.textContent=pend||'';nb.hidden=!pend}
   $('#adThr').value=String(d.cfg.th);$('#adDist').value=d.cfg.auto?'auto':'manual';
   $('#adLive span').textContent=RS.busy?'Distribuyendo…':'En vivo';$('#adLive').classList.toggle('busy',RS.busy);
@@ -1810,7 +1820,8 @@ function adRender(){
   var live=rules.filter(function(r){return r.status==='activa'||r.status==='distribuyendo'});
   $('#adAdv').innerHTML=ADVISORS.map(function(a){
     var got=live.filter(function(r){return r.dist[a.id]}).length,pc=live.length?Math.round(100*got/live.length):100;
-    return '<div class="av"><span class="avt">'+esc(a.name.charAt(0).toUpperCase())+'</span><div class="avb"><b>'+esc(a.name)+(a.tag?' <em>'+a.tag+'</em>':'')+'</b><span class="cb"><i style="width:'+pc+'%"></i></span><small>'+got+' de '+live.length+' reglas recibidas</small></div></div>';
+    var mine=AD.exp.filter(function(x){return x.user_id===a.id}),macc=mine.filter(function(x){return x.status==='aceptada'}).length;
+    return '<div class="av"><span class="avt">'+esc(a.name.charAt(0).toUpperCase())+'</span><div class="avb"><b>'+esc(a.name)+(a.tag?' <em>'+a.tag+'</em>':'')+'</b><span class="cb"><i style="width:'+pc+'%"></i></span><small>'+got+' de '+live.length+' reglas recibidas · '+mine.length+' PREAs · '+macc+' aceptadas</small></div></div>';
   }).join('');
 }
 function adSched(){if(AD.raf)return;AD.raf=requestAnimationFrame(function(){AD.raf=0;if(S.view==='admin')adRender();else{var nb=$('#adBadge');if(nb){var p=RS.d.rules.filter(function(r){return r.status==='por-aprobar'}).length;nb.textContent=p||'';nb.hidden=!p}}})}
@@ -1834,7 +1845,7 @@ $('#adDist').addEventListener('change',function(e){RS.cfg('auto',e.target.value=
 $('#adSim').addEventListener('click',function(){var o=RS.simAdvisor();toast(o.kind==='creada'?'Un asesor aceptó una PREA: regla nueva '+o.rule.id:'Un asesor aceptó una PREA: se reforzó '+o.rule.id)});
 $('#adImpBtn').addEventListener('click',function(){var p=$('#adImp');p.hidden=!p.hidden;this.setAttribute('aria-expanded',String(!p.hidden))});
 $('#adSample').addEventListener('click',function(){adImport(RS.sample(),'Histórico de ejemplo')});
-$('#adReset').addEventListener('click',function(){if(confirm('Esto borra las reglas aprendidas y vuelve al catálogo base. ¿Continuar?')){AD.open={};RS.reset();adImpMsg('Catálogo restablecido.')}});
+$('#adReset').addEventListener('click',function(){if(confirm('Esto borra las reglas aprendidas de TODA la agencia y vuelve al catálogo base. ¿Continuar?')){AD.open={};RS.reset();adImpMsg('Catálogo restablecido.')}});
 $('#adTpl').addEventListener('click',function(){var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(RS.template);a.download='plantilla-preas-aceptadas.csv';document.body.appendChild(a);a.click();a.remove()});
 $('#adFile').addEventListener('change',function(e){
   var f=e.target.files[0];if(!f)return;
