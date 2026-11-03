@@ -11,6 +11,14 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 db.exec(fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8'));
 
+// Migración: columnas del tablero de inicio (cliente, pieza, unidad, tipo de servicio)
+{
+  const have = db.prepare('PRAGMA table_info(orders)').all().map(c => c.name);
+  [['customer', 'TEXT'], ['part', 'TEXT'], ['part_status', 'TEXT'], ['part_ordered_at', 'INTEGER'],
+   ['due_at', 'INTEGER'], ['unit', 'TEXT'], ['svc_type', 'TEXT']]
+    .forEach(([n, t]) => { if (!have.includes(n)) db.exec(`ALTER TABLE orders ADD COLUMN ${n} ${t}`); });
+}
+
 // Confianza de una regla: misma fórmula que RS.conf en index.html
 function confidence(r) {
   const tot = r.n + 2 * (r.rej || 0);

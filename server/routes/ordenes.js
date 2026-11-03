@@ -13,9 +13,10 @@ const TPU_DIAS = 8;                                  // tiempo por unidad: regis
 const STATUS = {
   prea:     ['preaprobada', 'aprobada', 'rechazada', 'atencion'],
   servicio: ['pendiente', 'pagada', 'atencion'],
-  campana:  ['pendiente', 'realizada', 'rechazada', 'atencion']
+  campana:  ['pendiente', 'realizada', 'cerrada', 'rechazada', 'atencion']
 };
-const RESUELTOS = ['aprobada', 'pagada', 'realizada'];
+const RESUELTOS = ['aprobada', 'pagada', 'realizada', 'cerrada', 'rechazada'];
+const PARTES = ['por_pedir', 'pedida', 'en_planta', 'recibida'];
 
 const sel = `SELECT o.*, a.name AS advisor_name, g.name AS agency_name
              FROM orders o LEFT JOIN advisors a ON a.id = o.advisor_id LEFT JOIN agencies g ON g.id = o.agency_id`;
@@ -75,10 +76,11 @@ router.post('/ordenes', (req, res) => {
   const row = {
     id: folio(), kind, status: STATUS[kind][0], title, detail: clean(b.detalle, 600),
     vin: clean(b.vin, 17) || null, km, amount: monto, rule_id: clean(b.rule_id, 20) || null,
+    customer: clean(b.cliente, 80) || null, part: clean(b.pieza, 80) || null, unit: clean(b.unidad, 60) || null, svc_type: clean(b.tipo_servicio, 40) || null,
     advisor_id: req.user.id, agency_id: req.user.agency.id, ev_have: Math.max(0, Math.min(ev, Math.round(Number(b.ev_have) || 0))), ev_need: ev, created_at: now, updated_at: now
   };
-  db.prepare(`INSERT INTO orders (id,kind,status,title,detail,vin,km,amount,rule_id,advisor_id,agency_id,ev_have,ev_need,created_at,updated_at)
-              VALUES (@id,@kind,@status,@title,@detail,@vin,@km,@amount,@rule_id,@advisor_id,@agency_id,@ev_have,@ev_need,@created_at,@updated_at)`).run(row);
+  db.prepare(`INSERT INTO orders (id,kind,status,title,detail,vin,km,amount,rule_id,customer,part,unit,svc_type,advisor_id,agency_id,ev_have,ev_need,created_at,updated_at)
+              VALUES (@id,@kind,@status,@title,@detail,@vin,@km,@amount,@rule_id,@customer,@part,@unit,@svc_type,@advisor_id,@agency_id,@ev_have,@ev_need,@created_at,@updated_at)`).run(row);
   res.status(201).json(db.prepare(sel + ' WHERE o.id = ?').get(row.id));
 });
 
@@ -104,7 +106,16 @@ router.patch('/ordenes/:id', (req, res) => {
     if (!Number.isFinite(n) || n < 0 || n > o.ev_need) return res.status(400).json({ error: 'Evidencias fuera de rango.' });
     ev = n;
   }
-  db.prepare('UPDATE orders SET status=?, resolved_at=?, ev_have=?, updated_at=? WHERE id=?').run(status, resolved, ev, now, o.id);
+  let pst = o.part_status, pord = o.part_ordered_at, due = o.due_at;
+  if (o.kind === 'prea' && status === 'aprobada' && o.part && !pst) pst = 'por_pedir';   // PREA autorizada: hay que pedir la pieza
+  if (b.part_status !== undefined) {
+    if (!o.part || !PARTES.includes(b.part_status)) return res.status(400).json({ error: 'Estado de pieza no válido.' });
+    pst = b.part_status;
+    if (pst === 'pedida') { pord = now; due = now + Math.max(1, Math.min(60, Math.round(Number(b.eta_dias) || 7))) * DAY; }
+    else if (pst === 'en_planta') { pord = pord || now; due = now; }
+    else if (pst === 'por_pedir') { pord = null; due = null; }
+  }
+  db.prepare('UPDATE orders SET status=?, resolved_at=?, ev_have=?, part_status=?, part_ordered_at=?, due_at=?, updated_at=? WHERE id=?').run(status, resolved, ev, pst, pord, due, now, o.id);
   res.json(db.prepare(sel + ' WHERE o.id = ?').get(o.id));
 });
 
@@ -135,7 +146,7 @@ router.get('/desempeno', (req, res) => {
     periodo, desde,
     preas: { total: preas.length, preaprobadas: cnt('prea', 'preaprobada'), aprobadas: aprob, rechazadas: rech, atencion: cnt('prea', 'atencion') },
     servicios: { total: cnt('servicio'), pendientes: cnt('servicio', 'pendiente'), pagados: cnt('servicio', 'pagada'), cobros_hoy: cobrosServ },
-    campanas: { total: cnt('campana'), pendientes: cnt('campana', 'pendiente'), realizadas: cnt('campana', 'realizada'), rechazadas: cnt('campana', 'rechazada') },
+    campanas: { total: cnt('campana'), pendientes: cnt('campana', 'pendiente'), realizadas: cnt('campana', ['realizada', 'cerrada']), rechazadas: cnt('campana', 'rechazada') },
     cobros_dia: cobrosHoy,
     ciclo_promedio: ciclo,
     precision: aprob + rech ? Math.round(100 * aprob / (aprob + rech)) : null,

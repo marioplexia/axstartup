@@ -124,6 +124,71 @@ if (!db.prepare('SELECT 1 FROM orders LIMIT 1').get()) db.transaction(() => {
   const t = now - 1.2 * DAY;
   ins.run('S-' + code(7), 'servicio', 'pendiente', 'Servicio de 20,000 km', 'Cambio de aceite y filtros, rotación de llantas y revisión de frenos.', null, 20000, 2380, 'a2', ag, 0, 3, t, t);
 })();
+
+// Datos de ejemplo del tablero de inicio (una sola vez): PREAs aprobadas/negadas de los últimos 12 meses,
+// piezas en pedido, campañas y servicios realizados. Todo ficticio.
+if (!db.prepare("SELECT 1 FROM settings WHERE key = 'home_seed'").get()) db.transaction(() => {
+  const ag = db.prepare('SELECT id FROM agencies WHERE name = ?').get('Chevrolet FAME Morelia').id;
+  const ins = db.prepare(`INSERT OR IGNORE INTO orders (id,kind,status,title,detail,vin,km,amount,advisor_id,agency_id,ev_have,ev_need,created_at,resolved_at,updated_at,customer,part,part_status,part_ordered_at,due_at,unit,svc_type)
+                          VALUES (@id,@kind,@status,@title,@detail,@vin,@km,@amount,@advisor_id,@agency_id,@ev_have,@ev_need,@created_at,@resolved_at,@updated_at,@customer,@part,@part_status,@part_ordered_at,@due_at,@unit,@svc_type)`);
+  let sd = 11; const rnd = () => (sd = (sd * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const pick = (a, i) => a[(i == null ? Math.floor(rnd() * a.length) : i) % a.length];
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const CLIENTES = ['Industrias del Norte', 'Grupo Andamio', 'Talleres Riviera', 'Comercial Salcedo', 'Logística Brava', 'Herrajes Unión', 'Metalúrgica Faro', 'Distribuidora Cela', 'Transportes del Bajío', 'Constructora Altavista'];
+  const PIEZAS = ['Solenoide de transmisión', 'Sensor de oxígeno banco 1', 'Bomba de aceite', 'Tensor de cadena de distribución', 'Módulo de infoentretenimiento', 'Disco de freno delantero', 'Junta de tapa de punterías', 'Sensor de presión de aceite', 'Válvula EGR', 'Compresor de aire acondicionado', 'Amortiguador delantero', 'Alternador'];
+  const QUEJAS = ['ruido metálico en arranque en frío', 'luz de motor encendida', 'cambios bruscos en transmisión', 'fuga de aceite', 'pantalla que se reinicia', 'vibración al frenar'];
+  const UNIDADES = ['Silverado 2025', 'Aveo 2026', 'Equinox 2025', 'Tracker 2026', 'Onix 2026', 'Captiva 2025'];
+  const ADV = ['a1', 'a2', 'a3', 'a4'], CH = 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789';
+  const vin = () => 'LZW' + Array.from({ length: 14 }, () => CH[Math.floor(rnd() * CH.length)]).join('');
+  let folio = 3957;
+  const base = (o, i) => ({ vin: null, km: null, amount: 0, advisor_id: ADV[i % 4], agency_id: ag, ev_have: 5, ev_need: 5, resolved_at: null,
+    customer: null, part: null, part_status: null, part_ordered_at: null, due_at: null, unit: null, svc_type: null, detail: '', title: 'PREA', ...o });
+  const nextId = () => { const id = 'GA' + folio; folio += 13; return id; };
+
+  // PREAs: ventana actual (42 aprobadas, 7 negadas) y ventana previa (39 y 8)
+  const prea = (status, createdDays, i, extra) => {
+    const t = now - createdDays * DAY, cyc = (1 + Math.floor(rnd() * 5) + rnd()) * DAY, v = vin(), km = 3000 + Math.floor(rnd() * 80000);
+    ins.run(base({ id: nextId(), kind: 'prea', status, created_at: t, resolved_at: t + cyc, updated_at: t + cyc, vin: v, km,
+      amount: i === 0 ? 12000 : Math.round(9000 + rnd() * 90000), customer: pick(CLIENTES, i),
+      detail: `Chevrolet en garantía, VIN ${v}, ${km.toLocaleString('es-MX')} km. Cliente reporta ${pick(QUEJAS)}.`, ...extra }, i));
+  };
+  const est = shuffle([...Array(11).fill('en_planta'), ...Array(22).fill('pedida'), ...Array(9).fill('por_pedir')]);
+  for (let i = 0; i < 42; i++) {
+    const t = now - (175 - i * 3.8) * DAY, e = est[i], part = pick(PIEZAS, i + 3);
+    const ord = e === 'pedida' ? Math.min(now - DAY, Math.max(t + 3 * DAY, now - (1 + rnd() * 60) * DAY)) : e === 'en_planta' ? t + 2.5 * DAY : null;
+    const due = e === 'pedida' ? now + (3 + Math.floor(rnd() * 26)) * DAY : e === 'en_planta' ? (ord + (5 + Math.floor(rnd() * 8)) * DAY) : null;
+    prea('aprobada', 175 - i * 3.8, i, { part, part_status: e, part_ordered_at: ord, due_at: due });
+  }
+  for (let j = 0; j < 7; j++) prea('rechazada', 170 - j * 22, j + 1, {});
+  for (let i = 0; i < 39; i++) prea('aprobada', 355 - i * 4.1, i + 5, { part: pick(PIEZAS, i), part_status: 'recibida', part_ordered_at: now - (352 - i * 4.1) * DAY, due_at: now - (345 - i * 4.1) * DAY });
+  for (let j = 0; j < 8; j++) prea('rechazada', 350 - j * 18, j + 2, {});
+  // dos PREAs que requieren atención
+  for (let j = 0; j < 2; j++) { const t = now - (3.5 + j * 0.4) * DAY, v = vin(); ins.run(base({ id: nextId(), kind: 'prea', status: 'atencion', created_at: t, updated_at: t, vin: v, km: 22000 + j * 9000, amount: 14500 + j * 3200, customer: pick(CLIENTES, j + 6), ev_have: 2, detail: `Chevrolet en garantía, VIN ${v}. Falta evidencia del diagnóstico para enviar la PREA.` }, j)); }
+
+  // Campañas: 12 este mes (4 cerradas, 4 realizadas, 4 pendientes) y 10 el mes anterior
+  const mes0 = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime(), pmes0 = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).getTime();
+  const camp = (status, from, to, i) => {
+    const t = from + rnd() * Math.max(1, to - from);
+    ins.run(base({ id: nextId(), kind: 'campana', status, title: 'Campaña ' + pick(['23N45', '24V12', '24S07', '23N78'], i), created_at: t, updated_at: t, amount: 0,
+      customer: pick(CLIENTES, i + 2), unit: pick(UNIDADES, i) + ' · Unidad ' + String(1 + (i * 5) % 14).padStart(2, '0'),
+      resolved_at: status === 'pendiente' ? null : t + 0.5 * DAY, due_at: status === 'pendiente' ? now + (4 + i * 3) * DAY : null, ev_need: 3, ev_have: status === 'pendiente' ? 0 : 3,
+      detail: 'Campaña de seguridad del fabricante' }, i));
+  };
+  shuffle([...Array(4).fill('cerrada'), ...Array(4).fill('realizada'), ...Array(4).fill('pendiente')]).forEach((s, i) => camp(s, mes0, now, i));
+  shuffle([...Array(9).fill('cerrada'), ...Array(1).fill('pendiente')]).forEach((s, i) => camp(s, pmes0, mes0 - 1, i + 20));
+
+  // Servicios realizados: este mes y el anterior, por tipo
+  const SERV = { 'Mantenimiento': [7, 6], 'Reparación': [6, 5], 'Instalación': [4, 3], 'Diagnóstico': [3, 2], 'Inspección': [2, 2] };
+  let k = 0;
+  Object.entries(SERV).forEach(([tipo, [a, b]]) => [[a, mes0, now], [b, pmes0, mes0 - 1]].forEach(([n, f, t]) => {
+    for (let i = 0; i < n; i++, k++) {
+      const c = f + rnd() * Math.max(1, t - f);
+      ins.run(base({ id: nextId(), kind: 'servicio', status: 'pagada', title: tipo, svc_type: tipo, created_at: c, resolved_at: c + 0.2 * DAY, updated_at: c, amount: Math.round(1500 + rnd() * 5000),
+        customer: pick(CLIENTES, k), detail: tipo + ' de ' + pick(UNIDADES, k), ev_need: 3, ev_have: 3 }, k));
+    }
+  }));
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('home_seed', '1')").run();
+})();
 const c = t => db.prepare(`SELECT COUNT(*) n FROM ${t}`).get().n;
 console.log(`Base lista en ${DB_PATH}`);
 console.log(`  agencias: ${c('agencies')} · asesores: ${c('advisors')} · reglas: ${c('rules')} · piezas: ${c('rule_parts')} · palabras clave: ${c('rule_keywords')}`);

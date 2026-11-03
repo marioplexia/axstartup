@@ -40,3 +40,19 @@ Cada PREA que prepara el agente se registra sola; al pulsar «Fue aceptada» o �
 | `GET /api/garantias/desempeno?periodo=dia\|semana\|mes` | Totales, cobros del día, ciclo promedio y precisión |
 
 Un asesor solo ve las órdenes de su agencia; el administrador ve todas.
+
+## Inicio (tablero)
+
+Pantalla **Inicio**: saludo con el nombre del asesor, tarjetas de PREAs aprobadas, piezas en pedido, campañas y servicios realizados,
+y una pantalla de detalle por tarjeta (con búsqueda, filtros y «Descargar lista» en CSV). Las órdenes salen de la tabla `orders`.
+
+| Endpoint (`/api/garantias/inicio/…`) | Qué devuelve |
+|---|---|
+| `preas?meses=3\|6\|12&anio=` · `preas/lista?q=` | Aprobadas, negadas, comparación con el periodo anterior y tasa de aprobación |
+| `piezas?meses=` · `piezas/lista?estado=&q=` | Piezas por pedir / pedidas / en planta y serie acumulada |
+| `campanas?periodo=mes\|mes_pasado\|3m` · `campanas/lista?estado=&q=` | Campañas cerradas, realizadas (por cobrar) y pendientes |
+| `servicios?periodo=` · `servicios/lista?tipo=&q=` | Servicios pagados por tipo |
+| `acciones` · `asesores` | Acciones recomendadas y asesores para el filtro |
+
+Todos aceptan `asesor=<id>`. Un asesor solo ve su agencia. Los datos de ejemplo (12 meses de PREAs, piezas, campañas y servicios) se cargan una sola vez.
+En la Bitácora, al abrir una orden con pieza puedes marcarla como pedida o en planta; al aprobar una PREA su pieza pasa a «por pedir».
