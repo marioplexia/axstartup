@@ -102,3 +102,25 @@ CREATE TABLE IF NOT EXISTS settings (
 
 -- Evita duplicar eventos cuando varios clientes reenvían la misma bitácora
 CREATE UNIQUE INDEX IF NOT EXISTS idx_log_uniq ON rule_log(ts, type, rule_id, msg);
+
+-- Órdenes de la bitácora (PREAs, servicios y campañas)
+CREATE TABLE IF NOT EXISTS orders (
+  id          TEXT PRIMARY KEY,                  -- folio 'G-MVZVD1RQ'
+  kind        TEXT NOT NULL CHECK (kind IN ('prea','servicio','campana')),
+  status      TEXT NOT NULL,                     -- preaprobada|aprobada|rechazada|atencion|pendiente|pagada|realizada
+  insurer     TEXT NOT NULL DEFAULT 'General Motors de México',
+  title       TEXT NOT NULL,
+  detail      TEXT NOT NULL DEFAULT '',
+  vin         TEXT,
+  km          INTEGER,
+  amount      REAL NOT NULL DEFAULT 0,
+  rule_id     TEXT,
+  advisor_id  TEXT REFERENCES advisors(id),
+  agency_id   INTEGER REFERENCES agencies(id),
+  ev_have     INTEGER NOT NULL DEFAULT 0,        -- evidencias del expediente cargadas
+  ev_need     INTEGER NOT NULL DEFAULT 5,
+  created_at  INTEGER NOT NULL,
+  resolved_at INTEGER,                           -- aprobación / pago / realización
+  updated_at  INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_orders_agency ON orders(agency_id, kind, created_at DESC);

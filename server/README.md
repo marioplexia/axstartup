@@ -25,3 +25,18 @@ docker run -p 3000:3000 -v ax-data:/data -e JWT_SECRET=cambia-esto -e AX_MODO_PR
 
 En Render: *New → Blueprint* y elige este repo/rama; crea el servicio con disco y `JWT_SECRET` automático.
 Cualquier host con Docker y un volumen en `/data` sirve (Fly.io, Railway, un VPS).
+
+## Bitácora de órdenes
+
+Pantalla **Bitácora** de la app (pestañas *Órdenes*, *Bitácora* y *Desempeño*), conectada a la tabla `orders`.
+Los datos de ejemplo (17 PREAs de la última semana y 1 servicio) se cargan con `npm run db:init` si la tabla está vacía.
+Cada PREA que prepara el agente se registra sola; al pulsar «Fue aceptada» o «Fue rechazada» cambia su estado.
+
+| Endpoint | Qué hace |
+|---|---|
+| `GET /api/garantias/ordenes?tipo=&estado=&q=&desde=&hasta=&asesor=&incompletos=1` | Lista con filtros, TPU (8 días) y conteos |
+| `POST /api/garantias/ordenes` | Crea una orden (`tipo`: prea, servicio, campana) |
+| `PATCH /api/garantias/ordenes/:id` | Cambia `status` o `ev_have` (evidencias del expediente) |
+| `GET /api/garantias/desempeno?periodo=dia\|semana\|mes` | Totales, cobros del día, ciclo promedio y precisión |
+
+Un asesor solo ve las órdenes de su agencia; el administrador ve todas.

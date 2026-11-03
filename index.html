@@ -3,7 +3,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;450;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
 <style>
 /* Layout: sidebar negra fija + columna principal; el composer vive al centro (inicio) o abajo (chat) y se anima entre ambos. */
 :root{
@@ -441,6 +441,129 @@ textarea,input{font:inherit;color:inherit}
 .gmf .gfa{height:28px;padding:0 12px;border-radius:6px;border:1px solid #b9cfee;background:#fff;color:var(--g-acc);font:500 12px var(--f-ui);cursor:pointer}
 .gmf .gfa:hover{background:#eaf3ff}.gmf .gfa:disabled{opacity:.5;cursor:default}
 .gmf .gfb.sent{border-style:solid;background:#effaf4;border-color:#a8dcc0;color:var(--g-ok)}
+
+/* ---------- Bitácora de órdenes (Órdenes · Bitácora · Desempeño) ---------- */
+:root{--b-amber:#b45309;--b-amber-bg:#fff8e6;--b-amber-line:#f1d48a;--b-green:#0a9b63;--b-green-bg:#e9f8f1;--b-red:#d93025;--b-red-bg:#fdeceb;--b-orange:#e8710a;--b-orange-bg:#fff1e3;--b-track:#ecebe7}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--b-amber:#f0b44c;--b-amber-bg:#2b2412;--b-amber-line:#5c4a1c;--b-green:#2ed18e;--b-green-bg:#12261d;--b-red:#ff7a70;--b-red-bg:#2e1715;--b-orange:#ff9a3d;--b-orange-bg:#2e1f10;--b-track:#2a2a28}}
+:root[data-theme="dark"]{--b-amber:#f0b44c;--b-amber-bg:#2b2412;--b-amber-line:#5c4a1c;--b-green:#2ed18e;--b-green-bg:#12261d;--b-red:#ff7a70;--b-red-bg:#2e1715;--b-orange:#ff9a3d;--b-orange-bg:#2e1f10;--b-track:#2a2a28}
+.bit{flex:1;min-height:0;overflow:auto;animation:fadein .4s both}
+.bit-in{max-width:1180px;margin:0 auto;padding:18px max(28px,env(safe-area-inset-right,0px)) 72px max(28px,env(safe-area-inset-left,0px))}
+.bit-eye{display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0 0 30px 0}
+.bit-eye::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--fg)}
+.bit-h1{font-family:var(--f-ui);font-weight:300;font-size:clamp(38px,6vw,68px);letter-spacing:-.04em;line-height:1.02;margin:0}
+.bit-mail{margin:18px 0 0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);overflow-wrap:anywhere}
+.bit-tabs{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-top:30px}
+.bit-tabs>div{display:flex;gap:26px}
+.bit-tab{padding:0 0 14px;font-size:14.5px;color:var(--muted);border-bottom:1.5px solid transparent;margin-bottom:-1px}
+.bit-tab:hover{color:var(--fg)}.bit-tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg);font-weight:450}
+.bit-seg{display:inline-flex;border:1px solid var(--card-line);border-radius:7px;background:var(--card);overflow:hidden;margin-bottom:10px}
+.bit-seg button{height:30px;padding:0 15px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.bit-seg button:hover{color:var(--fg)}.bit-seg button[aria-pressed="true"]{background:var(--send-on);color:var(--send-fg);font-weight:500}
+.bit-seg.sm button{height:27px;padding:0 13px;font-size:12px}
+.bit-bar .bit-seg{margin:0;height:38px;align-items:center;max-width:100%;overflow-x:auto}.bit-bar .bit-seg.sm button{height:36px;padding:0 12px}
+.bit-seg.up button{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+.bit-box{border:1px solid var(--card-line);border-radius:12px;background:var(--card)}
+.bit-sub{margin-top:24px}
+/* TPU */
+.tpu{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 36px;padding:24px 26px;margin-top:22px}
+.tpu-l{min-width:220px}
+.lbl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tpu-big{display:flex;align-items:baseline;gap:10px;margin-top:12px}.tpu-big b{font-weight:400;font-size:30px;letter-spacing:-.02em;line-height:1}.tpu-big span{font-size:13px;color:var(--muted)}
+.tpu-note{font-size:12.5px;margin-top:14px}
+.tpu-r{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:flex-start}
+.st b{display:block;font-weight:450;font-size:19px;margin-top:8px;font-variant-numeric:tabular-nums}
+.st b.ok{color:var(--b-green)}.st b.bad{color:var(--b-red)}
+.cum{min-width:164px}.cum .cr{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}.cum .cr b{font-size:13px;letter-spacing:0;color:var(--fg);font-weight:450}
+.bar{height:5px;border-radius:5px;background:var(--b-track);margin-top:10px;overflow:hidden}.bar i{display:block;height:100%;border-radius:5px;background:var(--b-green);transition:width .5s}
+/* barra de búsqueda y filtros */
+.bit-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;align-items:center;position:relative}
+.bit-srch{flex:1 1 200px;max-width:370px;min-width:180px;position:relative}
+.bit-srch .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--faint)}
+.bit-srch input{width:100%;height:38px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);padding:0 12px 0 36px;font-size:13.5px;color:var(--fg)}
+.bit-srch input::placeholder{color:var(--faint)}.bit-srch input:focus-visible{outline-offset:0}
+.bit-btn{height:38px;display:inline-flex;align-items:center;gap:8px;padding:0 13px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);font-size:13px;font-weight:450;white-space:nowrap}
+.bit-btn:hover{background:var(--hover)}.bit-btn.dk{background:var(--send-on);color:var(--send-fg);border-color:var(--send-on)}.bit-btn.dk:hover{filter:brightness(1.15);background:var(--send-on)}
+.bit-btn.on{border-color:var(--fg)}.bit-btn .ic{width:15px;height:15px}
+.bit-count{font-size:12px;color:var(--muted);margin:14px 0 0}
+.pop{position:absolute;right:0;top:46px;z-index:20;width:min(320px,100%);padding:16px;border:1px solid var(--card-line);border-radius:12px;background:var(--menu);box-shadow:var(--shadow-focus);display:grid;gap:12px}
+.pop label{display:grid;gap:5px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pop input[type=date],.pop select,.f-in{height:34px;border:1px solid var(--card-line);border-radius:7px;background:var(--card);color:var(--fg);padding:0 9px;font-size:13px;letter-spacing:0;text-transform:none;width:100%}
+.pop .chk{display:flex;align-items:center;gap:8px;letter-spacing:0;text-transform:none;font-size:13px;color:var(--fg)}
+.pop .brow{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+/* línea de tiempo */
+.tl{position:relative;margin-top:22px;padding-left:24px}
+.tl::before{content:"";position:absolute;left:6px;top:14px;bottom:0;width:1px;background:var(--line)}
+.bi{position:relative;padding:0 0 28px}
+.bi-dot{position:absolute;left:-24px;top:2px;width:13px;height:13px;border-radius:50%;border:1.5px solid var(--fg);background:var(--bg)}
+.bi.done .bi-dot{background:var(--b-green);border-color:var(--b-green)}.bi.bad .bi-dot{border-color:var(--b-red)}
+.bi-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.bi time{font-size:12px;letter-spacing:.06em;color:var(--muted);font-variant-numeric:tabular-nums}
+.bi-t{display:block;margin-top:12px;font-size:16px;font-weight:450;letter-spacing:-.005em}
+.bi-t:hover{text-decoration:underline;text-underline-offset:3px}
+.bi-s{margin-top:9px;font-size:14.5px;color:var(--muted)}
+.bi-m{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:12px;color:var(--muted);min-width:0}
+.bi-m code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em;flex:none}
+.bi-m .d{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.badge{flex:none;display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:5px;border:1px solid;font-size:10.5px;font-weight:600;letter-spacing:.1em;white-space:nowrap}
+.badge.preaprobada,.badge.pendiente{color:var(--b-amber);background:var(--b-amber-bg);border-color:var(--b-amber-line)}
+.badge.aprobada,.badge.pagada,.badge.realizada{color:var(--b-green);background:var(--b-green-bg);border-color:var(--b-green)}
+.badge.rechazada{color:var(--b-red);background:var(--b-red-bg);border-color:var(--b-red)}
+.badge.atencion{color:var(--b-orange);background:var(--b-orange-bg);border-color:var(--b-orange)}
+.evc{flex:none;display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:6px;border:1px solid var(--b-amber-line);background:var(--b-amber-bg);color:var(--b-amber);font-size:11.5px;font-weight:500}
+.evc.full{border-color:var(--b-green);background:var(--b-green-bg);color:var(--b-green)}.evc .ic{width:14px;height:14px}
+.bi-x{margin-top:16px;padding:18px 20px;border:1px solid var(--card-line);border-radius:12px;background:var(--surface);display:grid;gap:16px}
+.bi-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px 20px}
+.bi-g div{min-width:0}.bi-g span{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}.bi-g b{display:block;font-weight:450;font-size:13.5px;margin-top:4px;overflow-wrap:anywhere}
+.bi-p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.55}
+.bi-a{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bi-a .bit-btn{height:32px;font-size:12.5px}
+.stp{display:inline-flex;align-items:center;border:1px solid var(--card-line);border-radius:8px;background:var(--card);height:32px}
+.stp button{width:30px;text-align:center;font-size:16px}.stp button:disabled{opacity:.35;cursor:default}.stp span{padding:0 8px;font-size:12.5px;font-variant-numeric:tabular-nums}
+.empty-b{padding:44px 20px;text-align:center;color:var(--muted);font-size:14px}
+.empty-b b{display:block;color:var(--fg);font-weight:450;font-size:15px;margin-bottom:6px}
+/* calendario */
+.cal{margin-top:22px;padding:18px 20px}
+.cal-h{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.cal-h b{font-weight:450;font-size:15px}
+.cal-h button{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;border:1px solid var(--card-line)}.cal-h button:hover{background:var(--hover)}
+.cal-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-g .w{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:center;padding:4px 0}
+.cal-g button{min-height:56px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.cal-g button:hover{background:var(--hover)}.cal-g button.n{background:var(--b-amber-bg);border-color:var(--b-amber-line);color:var(--fg)}
+.cal-g button.sel{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}.cal-g button.out{visibility:hidden}.cal-g button.today span:first-child{font-weight:600;color:var(--fg)}
+.cal-g button i{font-style:normal;font-size:11px;font-weight:600;color:var(--b-amber)}
+/* tabla de órdenes */
+.ord-h{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:26px}
+.tbl{margin-top:18px;overflow:auto}.tbl table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+.tbl th{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500;text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:middle}.tbl tbody tr{cursor:pointer}.tbl tbody tr:hover{background:var(--hover)}
+.tbl td.r,.tbl th.r{text-align:right;font-variant-numeric:tabular-nums}.tbl code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em}.tbl .tdd{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.nf{margin-top:20px;padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.nf label{display:grid;gap:5px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.nf .wide{grid-column:1/-1}
+.nf .brow{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;align-items:center}.nf .err{margin-right:auto;color:var(--b-red);font-size:12.5px}
+.f-in{height:36px}textarea.f-in{height:auto;padding:8px 9px;min-height:64px;resize:vertical;font-family:inherit}
+/* desempeño */
+.pf-c3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:28px}
+.pf-card{padding:22px 24px 24px;display:flex;flex-direction:column;gap:18px}
+.pf-ch{display:flex;align-items:center;justify-content:space-between;gap:10px}.pf-ch .lbl{display:flex;align-items:center;gap:9px;color:var(--fg)}
+.pf-ch .lbl .ic{width:15px;height:15px}.pf-ch .ar{color:var(--faint);width:26px;height:26px;display:grid;place-items:center;border-radius:6px}.pf-ch .ar:hover{background:var(--hover);color:var(--fg)}
+.pf-ch .ar .ic{width:13px;height:13px}
+.pf-big{font-weight:300;font-size:64px;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.pf-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pf-mini div{border:1px solid var(--line);border-radius:9px;padding:10px 9px 10px 11px;background:var(--surface);min-width:0}
+.pf-mini span{display:block;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);white-space:nowrap}.pf-mini b{display:block;font-weight:450;font-size:22px;margin-top:5px;font-variant-numeric:tabular-nums}
+.c-o{color:var(--b-orange)}.c-g{color:var(--b-green)}.c-r{color:var(--b-red)}
+.pf-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:16px;border:1px solid var(--card-line);border-radius:12px;background:var(--card);overflow:hidden}
+.pf-strip>div{padding:30px 32px 34px;border-left:1px solid var(--line);min-width:0}.pf-strip>div:first-child{border-left:0}
+.pf-strip .lbl{display:flex;align-items:center;gap:7px}.pf-strip .lbl .ic{width:14px;height:14px}
+.pf-strip b.lgx{font-size:clamp(30px,3.4vw,52px);margin-top:34px}
+.pf-strip b{display:block;font-weight:300;font-size:clamp(40px,4.8vw,72px);letter-spacing:-.045em;line-height:1;margin-top:26px;font-variant-numeric:tabular-nums}
+.pf-c2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.pf-c2 .pf-card{gap:14px}.pf-v{font-weight:300;font-size:44px;letter-spacing:-.035em;line-height:1}.pf-v small{font-size:15px;color:var(--muted);letter-spacing:0;margin-left:6px;font-weight:400}
+.pf-n{font-size:12.5px;color:var(--muted);margin:0}
+.spark{display:flex;align-items:flex-end;gap:3px;height:54px}.spark i{flex:1;min-width:2px;border-radius:2px 2px 0 0;background:var(--b-track)}.spark i.on{background:var(--b-orange)}
+.spark-l{display:flex;justify-content:space-between;font-size:10.5px;color:var(--faint);letter-spacing:.06em}
+@media (max-width:980px){.pf-c3{grid-template-columns:1fr}.pf-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.pf-strip>div:nth-child(3){border-left:0}.pf-strip>div:nth-child(n+3){border-top:1px solid var(--line)}.pf-c2{grid-template-columns:1fr}}
+@media (max-width:640px){.pf-mini span{font-size:8.5px;letter-spacing:.04em}.bit-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.tpu{padding:20px}.bi-m .d{display:none}.pf-strip>div{padding:22px 20px 24px}.bit-srch{max-width:none}.cal-g button{min-height:44px;padding:4px 5px}.bit-tabs>div{gap:18px}}
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -524,6 +647,8 @@ textarea,input{font:inherit;color:inherit}
       <h2 id="phTitle"></h2>
       <p>Esta sección no forma parte de la réplica. Vuelve a Agente de Garantías para seguir con tu PREA.</p>
     </section>
+
+    <section class="bit" id="viewBit" hidden><div class="bit-in"></div></section>
 
     <section class="admin" id="viewAdmin" hidden>
       <div class="ad-in">
@@ -657,10 +782,11 @@ function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':(v==='agent'||v==='inicio')):v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin';stage.hidden=!main;$('#viewPh').hidden=main||adm;$('#viewAdmin').hidden=!adm;
+  var adm=id==='admin',bit=id==='bitacora';stage.hidden=!main;$('#viewPh').hidden=main||adm||bit;$('#viewBit').hidden=!bit;$('#viewAdmin').hidden=!adm;
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
+  if(bit)bitShow();
   if(adm)adRender();
-  else{crumb.textContent=AG[S.agent].crumb;syncCrumb()}
+  else if(!bit){crumb.textContent=AG[S.agent].crumb;syncCrumb()}
   if(mq.matches)setSb(false);
 }
 $$('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){showView(b.dataset.view)})});
@@ -1125,8 +1251,8 @@ document.addEventListener('click',function(e){
   if(b.classList.contains('gfa')){
     var bar=b.parentNode,cx=f._ctx;if(!cx)return;
     $$('.gfa',bar).forEach(function(x){x.disabled=true});
-    if(b.dataset.r==='ok'){var o=RS.learn(ctxToRec(cx));bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia.</span>'}
-    else{if(cx.ruleId)RS.reject(cx.ruleId);bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+'</span>'}
+    if(b.dataset.r==='ok'){bitResolve(cx,'aprobada');var o=RS.learn(ctxToRec(cx));bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia.</span>'}
+    else{bitResolve(cx,'rechazada');if(cx.ruleId)RS.reject(cx.ruleId);bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+'</span>'}
     return;
   }
   if(b.classList.contains('gall')){
@@ -1162,7 +1288,7 @@ async function simulatePrea(card,ctx,my){
     el.textContent=it[1];el.classList.remove('pend');el.classList.add('filled');r.classList.add('on');
     await w(260);
   }
-  $('.gall',form).disabled=false;
+  $('.gall',form).disabled=false;bitRegister(ctx,g);
   step(4,'done',F.length+' campos listos para copiar');
   say('Formulario listo. Copia cada campo o todo junto.');card.firstElementChild.classList.add('done');
 }
@@ -1746,6 +1872,198 @@ document.addEventListener('keydown',function(e){
 
 updateSend();
 setTimeout(function(){try{if(!mq.matches)ta.focus({preventScroll:true})}catch(_){}},900);
+
+/* ---------- Bitácora de órdenes: Órdenes · Bitácora · Desempeño (conectada al backend) ---------- */
+P.wrench='<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>';
+P.megaphone='<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>';
+P.gauge='<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>';
+P.calendar='<path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>';
+P.filter='<path d="M22 3H2l8 9.46V19l4 2v-8.54z"/>';
+P.arrow='<path d="M7 17 17 7M7 7h10v10"/>';
+P.clock='<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>';
+P.checkc='<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>';
+P.chevl='<path d="m15 18-6-6 6-6"/>';P.chevr='<path d="m9 18 6-6-6-6"/>';
+var BT={tab:'bitacora',kind:'prea',estado:'',q:'',m:{asesor:'',desde:'',hasta:'',incompletos:false},pop:false,cal:false,calM:null,calDay:'',per:'semana',data:null,perf:null,open:null,form:false,err:'',seq:0,t:0};
+var BK={prea:'PREAs',servicio:'Servicios',campana:'Campañas'};
+var BST={preaprobada:'PREAPROBADA',aprobada:'APROBADA',rechazada:'RECHAZADA',atencion:'REQUIERE ATENCIÓN',pendiente:'PENDIENTE',pagada:'PAGADA',realizada:'REALIZADA'};
+var BSF={prea:['preaprobada','aprobada','rechazada','atencion'],servicio:['pendiente','pagada','atencion'],campana:['pendiente','realizada','rechazada','atencion']};
+var BEND={prea:'aprobación',servicio:'pago',campana:'realización'};
+var escA=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var bd=function(t){var d=new Date(t),p=function(n){return (n<10?'0':'')+n};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())};
+var mxn=function(n){return '$'+Math.round(n||0).toLocaleString('es-MX')};
+var bitEl=$('#viewBit');
+function bitApi(m,u,b){return AX.api(m,'/api/garantias'+u,b)}
+function bitQuery(withKind){
+  var q=[];if(withKind&&BT.kind)q.push('tipo='+BT.kind);
+  if(BT.estado)q.push('estado='+BT.estado);if(BT.q)q.push('q='+encodeURIComponent(BT.q));
+  if(BT.m.asesor)q.push('asesor='+encodeURIComponent(BT.m.asesor));if(BT.m.desde)q.push('desde='+BT.m.desde);
+  if(BT.m.hasta)q.push('hasta='+BT.m.hasta);if(BT.m.incompletos)q.push('incompletos=1');
+  return q.length?'?'+q.join('&'):'';
+}
+async function bitLoad(){
+  if(!AX.on)return bitRender();
+  var my=++BT.seq;
+  try{
+    if(BT.tab==='desempeno')BT.perf=await bitApi('GET','/desempeno?periodo='+BT.per);
+    else BT.data=await bitApi('GET','/ordenes'+bitQuery(BT.tab==='bitacora'));
+    BT.err='';
+  }catch(e){if(e.message!=='sesión')BT.err='No se pudo conectar con el servidor.'}
+  if(my===BT.seq)bitRender();
+}
+function bitMark(){clearTimeout(BT.t);BT.t=setTimeout(bitLoad,0)}
+function bitAct(){var a=document.activeElement;return a&&bitEl.contains(a)&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)?a:null}
+
+function bitHdr(eye){
+  var mail=AX.on?AX.user.email:'';
+  return '<p class="bit-eye">Ax Ai · '+eye+'</p><h1 class="bit-h1">Agente de Garantías</h1>'+(mail?'<p class="bit-mail">'+escA(mail)+'</p>':'')+
+   '<div class="bit-tabs"><div role="tablist">'+[['ordenes','Órdenes'],['bitacora','Bitácora'],['desempeno','Desempeño']].map(function(t){return '<button class="bit-tab" role="tab" data-tab="'+t[0]+'" aria-selected="'+(BT.tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</div>'+
+   (BT.tab==='desempeno'?'<div class="bit-seg" role="group" aria-label="Periodo">'+[['dia','Día'],['semana','Semana'],['mes','Mes']].map(function(p){return '<button data-per="'+p[0]+'" aria-pressed="'+(BT.per===p[0])+'">'+p[1]+'</button>'}).join('')+'</div>':'')+'</div>';
+}
+function evChip(o){var f=o.ev_have>=o.ev_need;return '<span class="evc'+(f?' full':'')+'">'+svg('folder')+'Expediente '+o.ev_have+'/'+o.ev_need+'</span>'}
+function bitItem(o){
+  var open=BT.open===o.id,cls=o.status==='aprobada'||o.status==='pagada'||o.status==='realizada'?' done':(o.status==='rechazada'?' bad':'');
+  var days=((o.resolved_at||Date.now())-o.created_at)/864e5;
+  var x='';
+  if(open){
+    x='<div class="bi-x"><div class="bi-g">'+
+     '<div><span>Asesor</span><b>'+escA(o.advisor_name||'—')+'</b></div><div><span>Agencia</span><b>'+escA(o.agency_name||'—')+'</b></div>'+
+     '<div><span>VIN</span><b>'+escA(o.vin||'—')+'</b></div><div><span>Kilometraje</span><b>'+(o.km!=null?o.km.toLocaleString('es-MX')+' km':'—')+'</b></div>'+
+     '<div><span>Monto estimado</span><b>'+mxn(o.amount)+'</b></div><div><span>Regla del agente</span><b>'+escA(o.rule_id||'Sin regla')+'</b></div>'+
+     '<div><span>Registrada</span><b>'+new Date(o.created_at).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})+'</b></div>'+
+     '<div><span>'+(o.resolved_at?'Resuelta':'Tiempo abierta')+'</span><b>'+(o.resolved_at?new Date(o.resolved_at).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})+' · ':'')+days.toFixed(1)+' d</b></div></div>'+
+     (o.detail?'<p class="bi-p">'+escA(o.detail)+'</p>':'')+
+     '<div class="bi-a"><div class="stp" role="group" aria-label="Evidencias del expediente"><button data-ev="-1" data-id="'+o.id+'" aria-label="Quitar evidencia"'+(o.ev_have<=0?' disabled':'')+'>−</button><span>Evidencias '+o.ev_have+'/'+o.ev_need+'</span><button data-ev="1" data-id="'+o.id+'" aria-label="Agregar evidencia"'+(o.ev_have>=o.ev_need?' disabled':'')+'>+</button></div>'+
+     BSF[o.kind].filter(function(s){return s!==o.status}).map(function(s){return '<button class="bit-btn" data-set="'+s+'" data-id="'+o.id+'">'+(s==='atencion'?'Requiere atención':'Marcar '+BST[s].toLowerCase())+'</button>'}).join('')+'</div></div>';
+  }
+  return '<article class="bi'+cls+'"><span class="bi-dot"></span><div class="bi-top"><time datetime="'+bd(o.created_at)+'">'+bd(o.created_at)+'</time><span class="badge '+o.status+'">'+BST[o.status]+'</span></div>'+
+   '<button class="bi-t" data-open="'+o.id+'" aria-expanded="'+open+'">'+(o.kind==='prea'?'PREA '+escA(o.id):escA(o.title))+'</button>'+
+   '<div class="bi-s">Aseguradora: '+escA(o.insurer)+'</div>'+
+   '<div class="bi-m"><code>'+escA(o.id)+'</code><span>·</span><span class="d">'+escA(o.detail||o.title)+'</span>'+evChip(o)+'</div>'+x+'</article>';
+}
+function tpuBox(t){
+  var k=BT.kind;
+  return '<div class="bit-box tpu"><div class="tpu-l"><div class="lbl">TPU · Tiempo por unidad · '+BK[k].toUpperCase()+'</div><div class="tpu-big"><b>'+t.limite+'</b><span>días límite</span></div><div class="tpu-note lbl" style="letter-spacing:0;text-transform:none">Desde registro hasta '+BEND[k]+'</div></div>'+
+   '<div class="tpu-r"><div class="st"><div class="lbl">Promedio actual</div><b>'+t.promedio.toFixed(1)+' d</b></div>'+
+   '<div class="st"><div class="lbl">Dentro de TPU</div><b>'+t.dentro+'</b></div><div class="st"><div class="lbl">Fuera de TPU</div><b class="'+(t.fuera?'bad':'ok')+'">'+t.fuera+'</b></div>'+
+   '<div class="cum"><div class="cr"><span>Cumplimiento</span><b>'+t.cumplimiento+'%</b></div><div class="bar"><i style="width:'+t.cumplimiento+'%"></i></div></div></div></div>';
+}
+function calHtml(items){
+  var m=BT.calM||new Date(new Date().getFullYear(),new Date().getMonth(),1),y=m.getFullYear(),mo=m.getMonth(),first=new Date(y,mo,1),n=new Date(y,mo+1,0).getDate();
+  var cnt={};items.forEach(function(o){var k=bd(o.created_at);cnt[k]=(cnt[k]||0)+1});
+  var lead=(first.getDay()+6)%7,cells=['L','M','M','J','V','S','D'].map(function(w){return '<div class="w">'+w+'</div>'}).join(''),today=bd(Date.now());
+  for(var i=0;i<lead;i++)cells+='<button class="out" tabindex="-1" aria-hidden="true"></button>';
+  for(var d=1;d<=n;d++){var k=y+'-'+(mo<9?'0':'')+(mo+1)+'-'+(d<10?'0':'')+d,c=cnt[k]||0;
+    cells+='<button data-day="'+k+'" class="'+(c?'n ':'')+(BT.calDay===k?'sel ':'')+(k===today?'today':'')+'" aria-label="'+d+': '+c+' eventos"><span>'+d+'</span>'+(c?'<i>'+c+(c===1?' evento':' eventos')+'</i>':'')+'</button>'}
+  return '<div class="bit-box cal"><div class="cal-h"><button data-cal="-1" aria-label="Mes anterior">'+svg('chevl')+'</button><b>'+(function(t){return t.charAt(0).toUpperCase()+t.slice(1)})(m.toLocaleString('es-MX',{month:'long'}))+' '+y+'</b><button data-cal="1" aria-label="Mes siguiente">'+svg('chevr')+'</button></div><div class="cal-g">'+cells+'</div></div>';
+}
+function tabBitacora(){
+  var d=BT.data,items=d?d.items:[];
+  if(BT.calDay)items=items.filter(function(o){return bd(o.created_at)===BT.calDay});
+  var m=BT.m,nm=(m.asesor?1:0)+(m.desde?1:0)+(m.hasta?1:0)+(m.incompletos?1:0);
+  var seg='<div class="bit-seg sm" role="group" aria-label="Tipo de orden">'+['prea','servicio','campana'].map(function(k){return '<button data-kind="'+k+'" aria-pressed="'+(BT.kind===k)+'">'+BK[k]+'</button>'}).join('')+'</div>';
+  var fl='<div class="bit-seg sm up" role="group" aria-label="Estado">'+[''].concat(BSF[BT.kind]).map(function(s){return '<button data-est="'+s+'" aria-pressed="'+(BT.estado===s)+'">'+(s?BST[s]:'Todos')+'</button>'}).join('')+'</div>';
+  var pop=BT.pop?'<div class="pop" role="dialog" aria-label="Más filtros"><label>Asesor<select id="mfAs"><option value="">Todos</option>'+(d?d.asesores:[]).map(function(a){return '<option value="'+escA(a.id)+'"'+(m.asesor===a.id?' selected':'')+'>'+escA(a.name)+'</option>'}).join('')+'</select></label>'+
+    '<label>Desde<input type="date" id="mfDe" value="'+escA(m.desde)+'"></label><label>Hasta<input type="date" id="mfHa" value="'+escA(m.hasta)+'"></label>'+
+    '<label class="chk"><input type="checkbox" id="mfIn"'+(m.incompletos?' checked':'')+'> Solo con expediente incompleto</label><div class="brow"><button class="bit-btn" data-clear="1">Limpiar</button></div></div>':'';
+  var list=BT.cal?calHtml(d?d.items:[]):'';
+  var tl=items.length?'<div class="tl">'+items.map(bitItem).join('')+'</div>':'<div class="empty-b"><b>Sin eventos</b>'+(BT.q||BT.estado||nm||BT.calDay?'Ningún evento coincide con los filtros.':'Cuando envíes una PREA desde el agente aparecerá aquí.')+'</div>';
+  return '<div class="bit-sub">'+seg+'</div>'+(d?tpuBox(d.tpu):'')+
+   '<div class="bit-bar"><div class="bit-srch">'+svg('search')+'<input id="bitQ" type="search" placeholder="Buscar eventos, cliente u orden..." aria-label="Buscar" value="'+escA(BT.q)+'"></div>'+fl+
+   '<button class="bit-btn'+(nm?' on':'')+'" data-pop="1" aria-expanded="'+BT.pop+'">'+svg('filter')+'Más filtros'+(nm?' · '+nm:'')+'</button>'+
+   '<button class="bit-btn dk" data-calt="1" aria-pressed="'+BT.cal+'">'+svg('calendar')+(BT.cal?'Ver lista':'Ver calendario')+'</button>'+pop+'</div>'+
+   '<p class="bit-count" role="status">'+items.length+(items.length===1?' evento':' eventos')+(BT.calDay?' el '+BT.calDay+' · <button data-day="" style="text-decoration:underline">quitar día</button>':'')+'</p>'+list+(BT.cal&&!BT.calDay?'':tl);
+}
+function tabOrdenes(){
+  var d=BT.data,items=d?d.items:[];
+  var f=BT.form?'<form class="bit-box nf" id="nf" novalidate><label>Tipo<select class="f-in" id="nfT"><option value="prea">PREA</option><option value="servicio">Servicio</option><option value="campana">Campaña</option></select></label>'+
+   '<label>Título<input class="f-in" id="nfN" maxlength="160" placeholder="PREA, Servicio de 20,000 km…" required></label><label>VIN<input class="f-in" id="nfV" maxlength="17"></label>'+
+   '<label>Kilometraje<input class="f-in" id="nfK" type="number" min="0"></label><label>Monto estimado (MXN)<input class="f-in" id="nfM" type="number" min="0" step="0.01"></label>'+
+   '<label class="wide">Detalle<textarea class="f-in" id="nfD" maxlength="600"></textarea></label><div class="brow"><span class="err" id="nfE" role="alert"></span><button type="button" class="bit-btn" data-nf="0">Cancelar</button><button class="bit-btn dk" type="submit">Crear orden</button></div></form>':'';
+  var rows=items.map(function(o){return '<tr data-row="'+o.id+'" data-kind="'+o.kind+'" tabindex="0"><td><code>'+escA(o.id)+'</code></td><td>'+BK[o.kind].replace(/s$/,'')+'</td><td><div class="tdd">'+escA(o.detail||o.title)+'</div></td><td>'+escA(o.advisor_name||'—')+'</td><td class="r">'+mxn(o.amount)+'</td><td><span class="badge '+o.status+'">'+BST[o.status]+'</span></td><td>'+bd(o.created_at)+'</td></tr>'}).join('');
+  return '<div class="ord-h"><div class="bit-srch">'+svg('search')+'<input id="bitQ" type="search" placeholder="Buscar por folio, VIN o asesor..." aria-label="Buscar" value="'+escA(BT.q)+'"></div><span class="sp" style="flex:1"></span><button class="bit-btn dk" data-nf="1">'+svg('plus')+'Nueva orden</button></div>'+f+
+   (items.length?'<div class="tbl"><table><thead><tr><th>Folio</th><th>Tipo</th><th>Descripción</th><th>Asesor</th><th class="r">Monto</th><th>Estado</th><th>Registrada</th></tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty-b"><b>Sin órdenes</b>Crea una con «Nueva orden» o envía una PREA desde el agente.</div>')+
+   '<p class="bit-count">'+items.length+(items.length===1?' orden':' órdenes')+'</p>';
+}
+function tabDesempeno(){
+  var p=BT.perf;if(!p)return '<div class="empty-b">Cargando…</div>';
+  var mini=function(a){return '<div class="pf-mini">'+a.map(function(x){return '<div><span>'+x[0]+'</span><b class="'+(x[2]||'')+'">'+x[1]+'</b></div>'}).join('')+'</div>'};
+  var card=function(ic,l,k,big,m){return '<div class="bit-box pf-card"><div class="pf-ch"><span class="lbl">'+svg(ic)+l+'</span><button class="ar" data-go="'+k+'" aria-label="Ver '+l.toLowerCase()+' en la bitácora">'+svg('arrow')+'</button></div><div class="pf-big">'+big+'</div>'+mini(m)+'</div>'};
+  var max=Math.max.apply(null,p.serie.map(function(s){return s.n}).concat([1]));
+  var sp='<div class="spark" role="img" aria-label="PREAs registradas por '+(p.periodo==='dia'?'hora':'día')+'">'+p.serie.map(function(s){return '<i class="'+(s.n?'on':'')+'" style="height:'+Math.max(6,Math.round(100*s.n/max))+'%" title="'+s.k+': '+s.n+'"></i>'}).join('')+'</div><div class="spark-l"><span>'+(p.periodo==='dia'?'0:00':p.serie[0].k)+'</span><span>'+(p.periodo==='dia'?'23:00':p.serie[p.serie.length-1].k)+'</span></div>';
+  var per={dia:'hoy',semana:'los últimos 7 días',mes:'los últimos 30 días'}[p.periodo];
+  return '<div class="pf-c3">'+
+   card('file','PREAs','prea',p.preas.total,[['Preaprobadas',p.preas.preaprobadas,'c-o'],['Aprobadas',p.preas.aprobadas,'c-g'],['Rechazadas',p.preas.rechazadas,'c-o']])+
+   card('wrench','Servicios','servicio',p.servicios.total,[['Pendientes',p.servicios.pendientes],['Pagados',p.servicios.pagados,'c-g'],['Cobros hoy',mxn(p.servicios.cobros_hoy),'c-g']])+
+   card('megaphone','Campañas','campana',p.campanas.total,[['Pendientes',p.campanas.pendientes],['Realizadas',p.campanas.realizadas,'c-g'],['Rechazadas',p.campanas.rechazadas,'c-o']])+'</div>'+
+   '<div class="pf-strip"><div><div class="lbl">Preaprobadas</div><b class="c-o">'+p.preas.preaprobadas+'</b></div><div><div class="lbl">Aprobadas / pagadas</div><b class="c-g">'+(p.preas.aprobadas+p.servicios.pagados)+'</b></div>'+
+   '<div><div class="lbl">Rechazadas / en revisión</div><b class="c-o">'+(p.preas.rechazadas+p.preas.atencion)+'</b></div><div><div class="lbl">'+svg('checkc')+'Cobros del día</div><b class="c-g'+(mxn(p.cobros_dia).length>6?' lgx':'')+'">'+mxn(p.cobros_dia)+'</b></div></div>'+
+   '<div class="pf-c2"><div class="bit-box pf-card"><div class="pf-ch"><span class="lbl">'+svg('clock')+'Ciclo promedio</span></div><div class="pf-v">'+(p.ciclo_promedio==null?'—':p.ciclo_promedio.toFixed(1)+'<small>días</small>')+'</div><p class="pf-n">'+(p.ciclo_promedio==null?'Aún no hay PREAs aprobadas en el periodo.':'Del registro a la aprobación, límite de 8 días.')+'</p>'+sp+'</div>'+
+   '<div class="bit-box pf-card"><div class="pf-ch"><span class="lbl">'+svg('gauge')+'Precisión semántica</span></div><div class="pf-v">'+(p.precision==null?'—':p.precision+'<small>%</small>')+'</div><p class="pf-n">'+(p.precision==null?'Se calcula cuando el fabricante aprueba o rechaza PREAs.':'PREAs aprobadas sobre las resueltas en '+per+'.')+'</p>'+
+   '<div class="bar"><i style="width:'+(p.precision||0)+'%"></i></div><p class="pf-n">'+(p.cobertura_reglas==null?'':'Cobertura de reglas aprendidas: '+p.cobertura_reglas+'% de las PREAs.')+'</p></div></div>';
+}
+function bitRender(){
+  if(S.view!=='bitacora')return;
+  var a=bitAct(),id=a&&a.id,pos=a&&a.selectionStart,v=a&&a.value;
+  var eye={ordenes:'Órdenes de garantía',bitacora:'Bitácora de órdenes',desempeno:'Desempeño de garantías'}[BT.tab];
+  var body=!AX.on?'<div class="empty-b"><b>Conecta el backend</b>La bitácora se guarda en el servidor. Abre la app desde el sitio del servidor e inicia sesión.</div>':
+    BT.err?'<div class="empty-b"><b>'+BT.err+'</b><button class="bit-btn" data-retry="1" style="margin:12px auto 0">Reintentar</button></div>':
+    BT.tab==='desempeno'?tabDesempeno():(!BT.data?'<div class="empty-b">Cargando…</div>':BT.tab==='ordenes'?tabOrdenes():tabBitacora());
+  bitEl.querySelector('.bit-in').innerHTML=bitHdr(eye)+body;
+  if(id){var n=document.getElementById(id);if(n){n.focus();try{if(pos!=null&&n.type==='search')n.setSelectionRange(pos,pos)}catch(_){}}}
+}
+function bitShow(){bitRender();bitLoad()}
+bitEl.addEventListener('click',async function(e){
+  var t=e.target.closest('button,tr[data-row]');if(!t)return;
+  var q=function(k){return t.dataset[k]};
+  if(t.dataset.tab){BT.tab=q('tab');BT.data=null;BT.open=null;BT.q='';BT.estado='';BT.pop=false;BT.form=false;BT.calDay='';bitRender();bitLoad();return}
+  if(t.dataset.per){BT.per=q('per');BT.perf=null;bitRender();bitLoad();return}
+  if(t.dataset.kind&&t.closest('.bit-seg')){BT.kind=q('kind');BT.estado='';BT.open=null;BT.calDay='';BT.data=null;bitRender();bitLoad();return}
+  if(t.dataset.est!==undefined&&t.closest('.bit-seg')){BT.estado=q('est');BT.calDay='';bitLoad();bitRender();return}
+  if(t.dataset.go){BT.tab='bitacora';BT.kind=q('go');BT.estado='';BT.data=null;bitRender();bitLoad();return}
+  if(t.dataset.row){BT.tab='bitacora';BT.kind=q('kind');BT.q=q('row');BT.open=q('row');BT.data=null;bitRender();bitLoad();return}
+  if(t.dataset.open!==undefined){BT.open=BT.open===q('open')?null:q('open');bitRender();return}
+  if(t.dataset.pop){BT.pop=!BT.pop;bitRender();return}
+  if(t.dataset.calt){BT.cal=!BT.cal;BT.calDay='';bitRender();return}
+  if(t.dataset.cal){var m=BT.calM||new Date(new Date().getFullYear(),new Date().getMonth(),1);BT.calM=new Date(m.getFullYear(),m.getMonth()+(+q('cal')),1);bitRender();return}
+  if(t.dataset.day!==undefined){BT.calDay=BT.calDay===q('day')?'':q('day');bitRender();return}
+  if(t.dataset.clear){BT.m={asesor:'',desde:'',hasta:'',incompletos:false};bitLoad();bitRender();return}
+  if(t.dataset.retry){BT.err='';bitLoad();return}
+  if(t.dataset.nf!==undefined){BT.form=q('nf')==='1';bitRender();return}
+  if(t.dataset.ev||t.dataset.set){
+    var o=(BT.data.items.filter(function(x){return x.id===q('id')})[0]);if(!o)return;
+    var body=t.dataset.set?{status:q('set')}:{ev_have:o.ev_have+(+q('ev'))};
+    try{var r=await bitApi('PATCH','/ordenes/'+o.id,body);Object.assign(o,r);if(t.dataset.set)toast(r.kind==='prea'?'PREA '+r.id+': '+BST[r.status].toLowerCase():BST[r.status]+' · '+r.id);bitLoad()}catch(er){toast(er.message||'No se pudo actualizar')}
+  }
+});
+bitEl.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('tr[data-row]'))e.target.click()});
+var bitQT;
+bitEl.addEventListener('input',function(e){
+  if(e.target.id==='bitQ'){BT.q=e.target.value.trim();clearTimeout(bitQT);bitQT=setTimeout(bitLoad,250)}
+});
+bitEl.addEventListener('change',function(e){
+  var i=e.target.id,m=BT.m;
+  if(i==='mfAs')m.asesor=e.target.value;else if(i==='mfDe')m.desde=e.target.value;else if(i==='mfHa')m.hasta=e.target.value;else if(i==='mfIn')m.incompletos=e.target.checked;else return;
+  bitLoad();
+});
+bitEl.addEventListener('submit',async function(e){
+  if(e.target.id!=='nf')return;e.preventDefault();
+  var v=function(i){return document.getElementById(i).value.trim()},er=document.getElementById('nfE');
+  if(!v('nfN')){er.textContent='Escribe un título para la orden.';return}
+  try{
+    var o=await bitApi('POST','/ordenes',{tipo:v('nfT'),titulo:v('nfN'),vin:v('nfV'),km:v('nfK')===''?null:v('nfK'),monto:v('nfM'),detalle:v('nfD')});
+    BT.form=false;toast('Orden '+o.id+' creada');bitLoad();
+  }catch(x){er.textContent=x.message||'No se pudo crear la orden.'}
+});
+document.addEventListener('click',function(e){if(BT.pop&&S.view==='bitacora'&&!e.target.closest('.pop,[data-pop]')){BT.pop=false;bitRender()}});
+setInterval(function(){if(S.view==='bitacora'&&AX.on&&!document.hidden&&!BT.pop&&!BT.form&&!bitAct())bitLoad()},10000);
+/* La PREA que prepara el agente queda registrada en la bitácora del servidor */
+function bitRegister(ctx,g){
+  if(!AX.on||ctx.orderId||ctx.orderPending)return;ctx.orderPending=true;
+  bitApi('POST','/ordenes',{tipo:'prea',titulo:'PREA',vin:g.vin,km:ctx.km,monto:g.gross,rule_id:ctx.ruleId||'',ev_have:Math.min(5,(ctx.files||[]).length),ev_need:5,
+    detalle:(ctx.brand||'')+' en garantía, VIN '+g.vin+', '+ctx.kmTxt+' km. '+(ctx.rawText||'')}).then(function(o){ctx.orderId=o.id;toast('PREA '+o.id+' registrada en la bitácora');if(ctx.wantStatus)bitResolve(ctx,ctx.wantStatus);if(S.view==='bitacora')bitLoad()}).catch(function(){ctx.orderPending=false});
+}
+function bitResolve(ctx,status){if(!AX.on)return;ctx.wantStatus=status;if(!ctx.orderId)return;bitApi('PATCH','/ordenes/'+ctx.orderId,{status:status}).catch(function(){})}
+
 })();
 </script>
 

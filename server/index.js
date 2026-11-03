@@ -5,6 +5,7 @@ const cors = require('cors');
 const { db } = require('./db');
 const { router: auth } = require('./routes/auth');
 const garantias = require('./routes/garantias');
+const ordenes = require('./routes/ordenes');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -19,6 +20,7 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', auth);
 app.get('/api/agencias', (req, res, next) => { req.url = '/agencias'; auth(req, res, next); });
 app.use('/api/garantias', garantias);
+app.use('/api/garantias', ordenes);
 
 // Pantallas de acceso y la app
 app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));

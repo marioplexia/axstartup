@@ -101,6 +101,29 @@ const seed = db.transaction(() => {
 });
 
 seed();
+
+// Órdenes de ejemplo para la bitácora (solo si la tabla está vacía): 17 PREAs de la última semana y 1 servicio.
+if (!db.prepare('SELECT 1 FROM orders LIMIT 1').get()) db.transaction(() => {
+  const ag = db.prepare('SELECT id FROM agencies WHERE name = ?').get('Chevrolet FAME Morelia').id;
+  const ins = db.prepare(`INSERT INTO orders (id,kind,status,title,detail,vin,km,amount,advisor_id,agency_id,ev_have,ev_need,created_at,updated_at)
+                          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`);
+  const QUEJAS = ['Cliente reporta ruido metálico en arranque en frío', 'Luz de motor encendida, sensor de oxígeno banco 1',
+    'Cambios bruscos de segunda a tercera en transmisión', 'Fuga de aceite en tapa de punterías', 'Pantalla de infoentretenimiento se reinicia sola',
+    'Vibración al frenar a más de 80 km/h', 'Falla intermitente de aire acondicionado', 'Jaloneo en aceleración a baja velocidad'];
+  const CHARS = 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789';
+  let seedN = 7; const rnd = () => (seedN = (seedN * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const code = n => Array.from({ length: n }, () => CHARS[Math.floor(rnd() * CHARS.length)]).join('');
+  const adv = ['a1', 'a2', 'a3', 'a4'];
+  for (let i = 0; i < 17; i++) {
+    const t = now - Math.round((i === 0 ? 0.3 : i * 0.33 + rnd() * 0.2) * DAY);
+    const km = i === 0 ? 11115 : 4000 + Math.floor(rnd() * 70000), vin = i === 0 ? 'LZWMLMGN9RF130982' : 'LZW' + code(14);
+    ins.run('G-' + (i === 0 ? 'MVZVD1RQ' : code(8)), 'prea', 'preaprobada', 'PREA',
+      `Chevrolet en garantía, VIN ${vin}, ${km.toLocaleString('es-MX')} km. ${QUEJAS[i % QUEJAS.length]}. Diagnóstico y operación capturados por el asesor.`,
+      vin, km, Math.round(2500 + rnd() * 9000), adv[i % 4], ag, i % 5 === 3 ? 2 : 0, 5, t, t);
+  }
+  const t = now - 1.2 * DAY;
+  ins.run('S-' + code(7), 'servicio', 'pendiente', 'Servicio de 20,000 km', 'Cambio de aceite y filtros, rotación de llantas y revisión de frenos.', null, 20000, 2380, 'a2', ag, 0, 3, t, t);
+})();
 const c = t => db.prepare(`SELECT COUNT(*) n FROM ${t}`).get().n;
 console.log(`Base lista en ${DB_PATH}`);
 console.log(`  agencias: ${c('agencies')} · asesores: ${c('advisors')} · reglas: ${c('rules')} · piezas: ${c('rule_parts')} · palabras clave: ${c('rule_keywords')}`);
