@@ -7,6 +7,7 @@ import { preaRoutes } from './routes/prea.js';
 import { outcomeRoutes } from './routes/outcome.js';
 import { nightlyRoutes } from './routes/nightly.js';
 import { rulesRoutes } from './routes/rules.js';
+import { eventsRoutes } from './routes/events.js';
 
 declare module 'fastify' { interface FastifyRequest { principal?: Principal } }
 
@@ -24,14 +25,16 @@ export function assertAgency(p: Principal, agencyId: string) {
 export async function buildServer(deps: Partial<Deps> = {}): Promise<FastifyInstance> {
   const d: Deps = { llm: deps.llm ?? makeLlm() };
   // El logger solo registra método, ruta y estado: nunca cuerpos ni cabeceras (datos personales).
-  const app = Fastify({ logger: process.env.NODE_ENV === 'test' || process.env.VITEST ? false : { level: 'info', serializers: {
+  const app = Fastify({ forceCloseConnections: true, logger: process.env.NODE_ENV === 'test' || process.env.VITEST ? false : { level: 'info', serializers: {
     req: r => ({ method: r.method, url: r.url?.split('?')[0] }), res: r => ({ statusCode: r.statusCode }) } } });
 
   app.addHook('onRequest', async (req, reply) => {
     if (req.url === '/health') return;
-    const h = req.headers.authorization;
-    if (!h?.startsWith('Bearer ')) return reply.code(401).send({ error: 'no autenticado' });
-    try { req.principal = await verifyToken(h.slice(7)); } catch { return reply.code(401).send({ error: 'token inválido' }); }
+    let token = req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.slice(7) : undefined;
+    // EventSource no permite cabeceras: solo para el stream se acepta ?access_token= (el logger no registra la query).
+    if (!token && req.url.startsWith('/events/stream')) token = (req.query as { access_token?: string }).access_token;
+    if (!token) return reply.code(401).send({ error: 'no autenticado' });
+    try { req.principal = await verifyToken(token); } catch { return reply.code(401).send({ error: 'token inválido' }); }
   });
 
   app.setErrorHandler((err: any, _req, reply) => {
@@ -47,6 +50,7 @@ export async function buildServer(deps: Partial<Deps> = {}): Promise<FastifyInst
   await app.register(async i => outcomeRoutes(i));
   await app.register(async i => nightlyRoutes(i, d));
   await app.register(async i => rulesRoutes(i));
+  await app.register(async i => eventsRoutes(i));
   return app;
 }
 
