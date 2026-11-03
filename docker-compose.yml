@@ -1,0 +1,22 @@
+# Postgres local para `pnpm test`, `pnpm demo` y `pnpm dev`. Solo desarrollo: credenciales ficticias, nunca datos reales.
+services:
+  postgres:
+    image: postgres:16
+    container_name: axai-postgres
+    environment:
+      POSTGRES_USER: axai
+      POSTGRES_PASSWORD: axai
+      POSTGRES_DB: axai
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - axai-pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U axai -d axai"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  axai-pgdata:

@@ -9,10 +9,11 @@ Backend para **una marca (GM) y sus agencias** (las 5 del grupo FAME, una de ell
 
 ## Arranque rápido
 
-Requisitos: Node 22+, pnpm, Postgres 16 (Supabase o local).
+Requisitos: Node 22+, pnpm, Docker (o un Postgres 16). Guía completa desde cero: `docs/entorno.md`.
 
 ```bash
 pnpm install
+pnpm db:up                      # Postgres 16 en Docker (bases axai, axai_test, axai_demo)
 cp .env.example .env            # ajusta DATABASE_URL, JWT_SECRET
 pnpm db:migrate                 # aplica supabase/migrations/*.sql
 pnpm db:seed                    # GM + 5 agencias FAME (datos ficticios)
