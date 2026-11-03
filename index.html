@@ -737,10 +737,12 @@ textarea,input{font:inherit;color:inherit}
       <button class="axl-go" id="lgGo" type="submit">Entrar</button>
       <div class="axl-msg" id="lgMsg" role="alert"></div>
       <p class="axl-alt" id="lgAltP">¿No tienes cuenta? <a id="lgAlt">Crea una</a></p>
+      <p class="axl-hint" id="lgConn" style="text-align:center;margin-top:14px" role="status">Conectando con Supabase…</p>
     </form>
   </main>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+<script>window.supabase||document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"><\/script>')</script>
 <script>
 (function(){
 'use strict';
@@ -1937,17 +1939,30 @@ SB.lgMode=function(m){
   $('#lgAltP').innerHTML=up?'¿Ya tienes cuenta? <a id="lgAlt">Inicia sesión</a>':'¿No tienes cuenta? <a id="lgAlt">Crea una</a>';
   SB.lgMsg('');
 };
+SB.conn=function(t,err){var c=$('#lgConn');c.textContent=t;c.style.color=err?'#d92d20':''};
+/* detalle técnico del error, para poder reportarlo tal cual */
+SB.detail=function(e){
+  if(!e)return 'error desconocido';
+  var p=[];if(e.status)p.push('HTTP '+e.status);if(e.code)p.push(e.code);
+  var m=String(e.message||e);if(/failed to fetch|networkerror|load failed/i.test(m))m='el navegador no pudo llegar a Supabase (red, bloqueador de anuncios o URL incorrecta)';
+  if(e.hint)m+=' · '+e.hint;
+  return (p.length?p.join(' ')+' · ':'')+m};
 SB.loadAgencies=async function(){
   var sel=$('#lgAg');
   try{
-    var r=await SB.c.from('agencies').select('id,name,region').order('region').order('id');
+    var r=await Promise.race([SB.c.from('agencies').select('id,name,region').order('region').order('id'),
+      new Promise(function(_,no){setTimeout(function(){no(new Error('Supabase no respondió en 10 s (red o bloqueador)'))},10000)})]);
     if(r.error)throw r.error;
     sel.innerHTML='<option value="">Selecciona tu agencia</option>';var groups={};
     r.data.forEach(function(a){
       if(!groups[a.region]){var g=document.createElement('optgroup');g.label=a.region;sel.appendChild(g);groups[a.region]=g}
       var o=document.createElement('option');o.value=a.id;o.textContent=a.name;groups[a.region].appendChild(o);
     });
-  }catch(e){sel.innerHTML='<option value="">No se pudieron cargar las agencias</option>';SB.fail(e)}
+    SB.conn('✓ Conectado a Supabase · '+r.data.length+(r.data.length===1?' agencia':' agencias'));
+  }catch(e){
+    sel.innerHTML='<option value="">No se pudieron cargar las agencias</option>';
+    SB.conn('✗ Sin conexión con Supabase: '+SB.detail(e),true);
+  }
 };
 SB.errEs=function(e){var m=(e&&e.message)||'';
   if(/Invalid login/i.test(m))return 'Correo o contraseña incorrectos';
@@ -1960,7 +1975,8 @@ SB.errEs=function(e){var m=(e&&e.message)||'';
   if(/signups? (not allowed|are disabled|disabled)|not authorized/i.test(m))return 'El registro de cuentas está desactivado en Supabase (Authentication → Sign In / Providers).';
   if(/valid email|invalid format|unable to validate email/i.test(m))return 'Escribe un correo válido';
   if(/failed to fetch|networkerror|network request/i.test(m))return 'Sin conexión con el servidor';
-  return m?'No se pudo completar la acción: '+m:'No se pudo completar la acción'};
+  if(/weak|easy to guess|pwned|compromised/i.test(m))return 'Esa contraseña es demasiado común o está en filtraciones conocidas. Elige otra más segura.';
+  return 'No se pudo completar la acción: '+SB.detail(e)};
 SB.submit=async function(ev){
   ev.preventDefault();
   var email=$('#lgEmail').value.trim(),pass=$('#lgPass').value,ag=$('#lgAg').value,up=SB.mode==='up';
@@ -2021,7 +2037,7 @@ SB.init=function(){
   $('#lgTabIn').addEventListener('click',function(){SB.lgMode('in')});
   $('#lgAltP').addEventListener('click',function(e){if(e.target.id==='lgAlt')SB.lgMode(SB.mode==='in'?'up':'in')});
   if(location.hash==='#registro')SB.lgMode('up');
-  if(!window.supabase||!window.supabase.createClient){SB.lgMsg('No se pudo cargar el servicio. Revisa tu conexión y recarga.',true);return}
+  if(!window.supabase||!window.supabase.createClient){SB.conn('✗ No cargó la librería de Supabase (revisa tu conexión o un bloqueador de anuncios) y recarga.',true);SB.lgMsg('No se pudo cargar el servicio. Revisa tu conexión y recarga.',true);return}
   SB.c=window.supabase.createClient(SB.url,SB.key);
   SB.loadAgencies();
   SB.c.auth.onAuthStateChange(function(ev,sess){
