@@ -1198,7 +1198,7 @@ var MI_REFS=[
 ];
 var MI_HIST=[],PR_REFS_=[],PR_HIST_=[];
 var AG={
-  prueba:{crumb:'Probar al agente',title:'Probemos lo que aprendió el agente',ph:'Pregunta lo que quieras o sube una PREA para validarla…',menu:['Preguntar al agente','Validar una PREA'],menuDefault:'Preguntar al agente',ev:'Subir PREA',ref:'Preguntas de ejemplo',refs:PR_REFS_,hist:PR_HIST_},
+  prueba:{crumb:'Probar al agente',title:'Pídele una PREA al agente',ph:'Describe la reparación (modelo, año, km y falla) o sube una PREA para corregirla…',menu:['Preguntar al agente','Validar una PREA'],menuDefault:'Preguntar al agente',ev:'Subir PREA',ref:'Preguntas de ejemplo',refs:PR_REFS_,hist:PR_HIST_},
   mi:{crumb:'Mi Agente',title:'¿En qué te ayudo hoy?',ph:'Pregúntame sobre tus PREAs, servicios, campañas, piezas o expedientes…',menu:['Toda la agencia','Solo mis órdenes'],menuDefault:'Toda la agencia',ev:'Evidencia',ref:'Preguntas sugeridas',refs:MI_REFS,hist:MI_HIST},
   garantias:{crumb:'Agente de Garantías',title:'Trabajemos en tu próxima PREA',ph:'Describe tu caso de garantía…',menu:PREAS,menuDefault:'Nueva PREA',ev:'Evidencia',ref:'Casos de referencia',refs:REFS,hist:HIST},
   cobros:{crumb:'Agente de Cobros',title:'Cobremos tu próxima PREA',ph:'Indica qué PREA quieres facturar…',menu:['PREA a cobrar','Todas las aprobadas','Pendientes de pago'],menuDefault:'PREA a cobrar',ev:'Factura',ref:'PREA aprobadas',refs:COBROS_REFS,hist:COBROS_HIST}
@@ -1581,7 +1581,7 @@ function buildPreaCard(ctx,steps){
    '<div class="ghd">No se encontraron líneas.</div><table class="gtb"><thead><tr><th>Tipo de adicionales/otros</th><th>Cantidad</th></tr></thead><tbody><tr><td colspan="2">&nbsp;</td></tr></tbody></table>'+
    H('Total de elementos adicionales','0.00')+gr('Total bruto',null,{f:13})+H('Deducible','0.00')+H('Código de autorización','')+H('Asignado a','')+H('Estado','<span class="gst">POR CAPTURAR</span>')+
    '<div class="gbk"><b>Respaldo del agente</b><ul><li>'+basis(ctx)+'</li>'+(ctx.variantTxt?'<li>Variante aprendida de <b>'+esc(ctx.variantTxt)+'</b>.</li>':'')+(ctx.lessons||[]).slice(0,3).map(function(l){return '<li>Ojo: '+esc(l.p)+(l.c?' → '+esc(l.c):'')+'</li>'}).join('')+'<li>Tiempo estándar de la operación: '+ctx.h.toFixed(1)+' h.</li>'+ctx.parts.map(function(p){return '<li>'+p.no+' · '+esc(p.d)+' · cant. '+p.q+' · '+g.fm(p.pr)+' c/u</li>'}).join('')+'</ul></div>'+
-   '<div class="gfb"><span>¿Qué respondió el fabricante en su portal? Tu respuesta enseña al agente.</span><button class="gfa" type="button" data-r="ok">Fue aceptada</button><button class="gfa" type="button" data-r="no">Fue rechazada</button></div>'+
+   (ctx.prueba?'':'<div class="gfb"><span>¿Qué respondió el fabricante en su portal? Tu respuesta enseña al agente.</span><button class="gfa" type="button" data-r="ok">Fue aceptada</button><button class="gfa" type="button" data-r="no">Fue rechazada</button></div>')+
    '</div>';
   w.innerHTML='<div class="cu"><div class="cu-bar"><div class="cu-dots"><i></i><i></i><i></i></div><div class="cu-url">'+svg('search')+'<span>Análisis de la PREA</span></div><span class="cu-tag">Simulación</span></div>'+
     '<div class="cu-st" aria-live="polite"><span class="pulse"></span><span class="cu-txt">Leyendo la PREA…</span></div></div>'+
@@ -1873,7 +1873,7 @@ try{window.addEventListener('storage',function(e){if(e.key===RS.K){RS.load();RS.
 RS.d.rules.forEach(function(r){if(r.status==='distribuyendo'&&RS.q.indexOf(r.id)<0)RS.q.push(r.id)});
 if(RS.q.length)setTimeout(function(){RS.pump()},400);
 
-function basis(c){return c.matched?'Regla <b>'+c.ruleId+'</b>, aprendida de '+c.ruleN+' PREAs aceptadas · confianza '+c.ruleConf+'%.':'Sin regla para este caso: apliqué criterio general (confianza baja). Si el fabricante la acepta, indícalo abajo y el agente aprenderá.'}
+function basis(c){return c.matched?'Regla <b>'+c.ruleId+'</b>, aprendida de '+c.ruleN+(c.ruleN===1?' PREA aceptada':' PREAs aceptadas')+' · confianza '+c.ruleConf+'%.':'Sin regla para este caso: apliqué criterio general (confianza baja). Si el fabricante la acepta, indícalo abajo y el agente aprenderá.'}
 function ctxToRec(c){
   var k=c.codes||GMCODES[c.sys]||GMCODES['Diagnóstico general'],t=(c.rawText||c.queja||'SIN QUEJA');
   return {ruleId:c.ruleId||null,sys:c.matched?c.sys:'Por clasificar',q:c.matched?k.q:['NUEVA',(t.length>60?t.slice(0,57).replace(/\s+\S*$/,'')+'…':t).toUpperCase()],c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,parts:c.parts,kwText:t,src:'asesor',advisor:AX.name};
@@ -2469,7 +2469,7 @@ document.addEventListener('click',function(e){if(BT.pop&&S.view==='bitacora'&&!e
 setInterval(function(){if(S.view==='bitacora'&&AX.on&&!document.hidden&&!BT.pop&&!BT.form&&!bitAct())bitLoad()},10000);
 /* La PREA que prepara el agente queda registrada en la bitácora del servidor */
 function bitRegister(ctx,g){
-  if(!AX.on||ctx.orderId||ctx.orderPending)return;ctx.orderPending=true;
+  if(ctx.prueba||!AX.on||ctx.orderId||ctx.orderPending)return;ctx.orderPending=true;
   bitApi('POST','/ordenes',{tipo:'prea',titulo:'PREA',pieza:(ctx.parts&&ctx.parts[0]?ctx.parts[0].d:''),vin:g.vin,km:ctx.km,monto:g.gross,rule_id:ctx.ruleId||'',ev_need:5,
     detalle:(ctx.brand||'')+' en garantía, VIN '+g.vin+', '+ctx.kmTxt+' km. '+(ctx.rawText||'')}).then(function(o){ctx.orderId=o.id;toast('PREA '+o.id+' registrada en la bitácora');if(ctx.wantStatus)bitResolve(ctx,ctx.wantStatus);var fl=(ctx.files||[]).map(function(x){return x.file}).filter(Boolean);if(fl.length)exUpload(o.id,'evidencias',fl,'Adjunto desde el Agente de Garantías',true).then(function(n){if(n)toast(n+(n===1?' archivo guardado':' archivos guardados')+' en el expediente')});if(S.view==='bitacora')bitLoad()}).catch(function(){ctx.orderPending=false});
 }
@@ -3134,7 +3134,7 @@ function trRender(){
    '<div class="tr-stats"><div class="tr-st"><b>'+r.preas+'</b><span>PREAs aceptadas aprendidas</span></div><div class="tr-st"><b>'+r.pagos+'</b><span>Transacciones pagadas aprendidas</span></div><div class="tr-st"><b>'+r.reglas+'</b><span>Reglas moldeadas por documentos</span></div><div class="tr-st"><b>'+(r.revisar+r.pendientes)+'</b><span>Por revisar o leyéndose</span></div></div>'+
    trCard('prea',1,'PREAs aceptadas','Sube PREAs que la planta ya aceptó: <b>con una sola basta</b> para crear la regla y activarla. El agente lee el formulario y el <b>historial de comentarios</b> y aprende cómo se llenó cada campo, por qué se rechazó antes y cómo se corrigió. Si es parecida a otra pero de otro modelo o contexto, la guarda como variante. También puedes subir PREAs <b>rechazadas</b>: aprende del error y lo avisa la próxima vez.','Todavía no has subido PREAs aceptadas.')+
    trCard('pago',2,'Transacciones pagadas de planta','Sube solo transacciones que la planta ya pagó correctamente. El agente aprende el tiempo pagado, la tarifa, el precio de cada pieza y los ajustes, y los liga con su PREA para corregir horas y precios de las reglas.','Todavía no has subido transacciones pagadas.')+
-   '<section class="tr-card"><div class="tr-ch"><div><h3><i>3</i>Probar al agente</h3><p>Pregúntale lo que quieras o sube una PREA nueva. El agente responde con lo que aprendió: te muestra la PREA aceptada más parecida como ejemplo, los errores que tuvo y cómo se corrigieron, lo que pagó la planta y qué debes cambiar en la tuya.</p></div><button class="bt pri" data-trchat="1">Abrir chat de pruebas</button></div>'+
+   '<section class="tr-card"><div class="tr-ch"><div><h3><i>3</i>Probar al agente</h3><p>Describe la reparación que necesitas (modelo, año, kilometraje y falla) y el agente te entrega <b>el formulario de la PREA completo y llenado</b> con lo que aprendió de las PREAs aceptadas, ya corregidos los errores que tuvieron en el pasado. O sube tu PREA y te la corrige. También puedes preguntarle qué aprendió y por qué rechazaron una PREA.</p></div><button class="bt pri" data-trchat="1">Abrir chat de pruebas</button></div>'+
    '<div class="tr-pr"><p>¿Quieres probar el flujo sin tus archivos? Descarga los documentos de ejemplo (un Aveo 2024 con cambio de polea y un Equinox 2023), súbelos en los apartados 1 y 2 y valida la PREA con errores en el chat.</p></div>'+
    '<div class="tr-ex">'+(TR.ejemplos||[]).map(function(e){return '<button data-trej="'+escA(e.archivo)+'" title="'+escA(e.descripcion)+'">'+svg('dl','sm')+' '+escA(e.descripcion)+'</button>'}).join('')+'</div></section>';
   var keep=a&&trEl.contains(a)&&a.id;
@@ -3210,20 +3210,33 @@ $('#backTrain').addEventListener('click',function(){TR.tab='train';showView('adm
 
 /* ---------- Chat de pruebas (mismo chat, con archivos) ---------- */
 var PR_HIST=PR_HIST_,PR_REFS=PR_REFS_;PR_REFS.push(
-  {t:'¿Qué has aprendido?',s:'Resumen de lo aprendido',q:'¿Qué has aprendido?'},
-  {t:'Cambio de polea, Aveo 2024',s:'Caso descrito con palabras',q:'Quiero hacer una PREA de un cambio de polea de un Aveo 2024 de 40 mil km. ¿Cómo la lleno?'},
+  {t:'Polea tensora · Aveo 2024',s:'Pide la PREA completa',q:'Necesito una PREA para un cambio de polea tensora de un Aveo 2024 con 40 mil km.'},
+  {t:'Otro modelo · Onix 2025',s:'Caso parecido, no idéntico',q:'Hazme la PREA de un Onix 2025 con 27 mil km, chirrido de la banda al arrancar, cambio de polea tensora.'},
+  {t:'Corrige mi PREA',s:'Sube el archivo con el clip',q:'Corrige esta PREA y devuélvemela llena como debe ir.'},
   {t:'¿Por qué rechazaron una PREA?',s:'Errores del historial',q:'¿Por qué rechazaron la PREA del Aveo y cómo se corrigió?'},
-  {t:'¿Cuánto paga la planta?',s:'Pagos aprendidos',q:'¿Cuánto paga la planta por una polea tensora?'},
-  {t:'Validar una PREA',s:'Sube el archivo con el clip',q:'Valida esta PREA antes de enviarla.'}
+  {t:'¿Qué has aprendido?',s:'Resumen de lo aprendido',q:'¿Qué has aprendido?'}
 );
 var PR_THINK='<span class="thinking">Leyendo y consultando lo aprendido<span class="dots"><i></i><i></i><i></i></span></span>';
 async function prHist(){
   if(!AX.on)return;
   try{var l=await bitApi('GET','/entrenamiento/chat/hilos');PR_HIST.length=0;l.forEach(function(h){PR_HIST.push({t:h.title,s:miRel(h.updated_at),id:h.id})})}catch(_){}
 }
+function ctxDeFormulario(f,text,files){
+  /* misma estructura que usa el Agente de Garantías, pero con los datos de la PREA aceptada más parecida */
+  var c=ctxFrom(text||'',files||[],S.brand);
+  var pz=(f.piezas||[]).map(function(p){return {no:p.numero,d:p.descripcion,q:p.cantidad||1,pr:p.precio||0}});
+  c.sys=f.sistema;c.op=(f.operacion&&f.operacion.codigo)||c.op;c.opd=(f.operacion&&f.operacion.descripcion)||c.opd;c.h=+f.horas||c.h;c.hBad=+(c.h+.3).toFixed(1);
+  c.parts=pz;c.partsTot=f.total_piezas;c.labor=c.h*RATE;
+  if(f.km){c.km=f.km;c.kmTxt=f.km.toLocaleString('es-MX')}else{c.km='(captura el kilometraje exacto)';c.kmTxt='sin dato'}
+  c.codes={q:[f.queja.codigo,f.queja.texto],c:[f.causa.codigo,f.causa.texto],r:[f.correccion.codigo,f.correccion.texto]};
+  c.vinReal=f.vin||'(captura el VIN)';if(f.orden)c.wo=f.orden;
+  c.vehicle=f.vehiculo||c.vehicle;c.matched=true;c.ruleId=f.regla?f.regla.id:null;c.ruleN=f.regla?f.regla.n:1;c.ruleConf=f.regla?f.regla.confianza:0;
+  c.rawText=(f.descripcion||text||'').trim()||c.rawText;c.prueba=true;
+  return c;
+}
 async function runPrueba(text,files){
   var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
-  var w=addAssistant(),body=$('.ai-body',w),acts=$('.ai-actions',w),full='';
+  var w=addAssistant(),body=$('.ai-body',w),acts=$('.ai-actions',w),full='',form=null;
   body.innerHTML=PR_THINK;toBottom();
   try{
     if(!AX.on)throw new Error('offline');
@@ -3234,8 +3247,13 @@ async function runPrueba(text,files){
       if(r.status===401){AX.logout();throw new Error('sesión')}
       var j=await r.json().catch(function(){return{}});if(!r.ok)throw new Error(j.error||'No se pudo subir el archivo');ids.push(j.id);
     }
-    if(!my.aborted){var c=await bitApi('POST','/entrenamiento/chat',{mensaje:text,hilo:S.hilo||undefined,archivos:ids});S.hilo=c.hilo;full=c.respuesta}
+    if(!my.aborted){var c=await bitApi('POST','/entrenamiento/chat',{mensaje:text,hilo:S.hilo||undefined,archivos:ids});S.hilo=c.hilo;full=c.respuesta;if(c.formulario)form=c}
   }catch(e){if(!my.aborted)full=e.message==='offline'?'Para probar al agente necesito el servidor. Abre la app desde el sitio del servidor e inicia sesión.':(e.message&&e.message!=='sesión'?e.message:'No pude consultar al agente en este momento. Inténtalo de nuevo.')}
+  if(form&&!my.aborted){            // la respuesta principal: el formulario de la PREA llenándose, con cada campo copiable
+    var ctx=ctxDeFormulario(form.formulario,text,files);
+    await agentTurn(w,ctx,form.intro,STEPS,simulatePrea,form.final||' ',my,buildPreaCard);
+    w._text=(form.respuesta||'').replace(/\*\*/g,'');finish(my);prHist();return;
+  }
   if(full&&!my.aborted)full=await stream(body,full,my,.3);
   else if(my.aborted)body.innerHTML=full?md(full,false):'<p class="muted">Respuesta detenida.</p>';
   w._text=full.replace(/\*\*/g,'').replace(/^> /gm,'');

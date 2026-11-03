@@ -24,7 +24,7 @@ const DIC_PREA = {
   'queja': 'queja', 'causa': 'causa', 'correccion': 'correccion', 'operacion de trabajo': 'operacion', 'operacion': 'operacion',
   'tiempo de trabajo': 'horas', 'horas': 'horas', 'total tiempo': 'total_tiempo', 'total de piezas': 'total_piezas', 'numeros de pieza': 'piezas', 'piezas': 'piezas',
   'tarifa mano de obra': 'tarifa', 'total bruto': 'total', 'deducible': 'deducible', 'codigo de autorizacion': 'auth', 'estado': 'estado', 'estatus': 'estado',
-  'unidad de negocio': 'unidad', 'tipo de transaccion': 'tipo'
+  'unidad de negocio': 'unidad', 'tipo de transaccion': 'tipo', 'marca': 'marca', 'modelo': 'modelo', 'ano': 'anio', 'anio': 'anio', 'ano modelo': 'anio', 'ano del modelo': 'anio', 'ano del vehiculo': 'anio', 'descripcion del vehiculo': 'vehiculo'
 };
 const DIC_PAGO = {
   'referencia de pago': 'ref', 'fecha de pago': 'fecha', 'orden de trabajo': 'orden', 'codigo de autorizacion': 'auth', 'autorizacion': 'auth',
@@ -139,12 +139,15 @@ function parsePrea(texto) {
   const q = codigo(f.queja), c = codigo(f.causa), r = codigo(f.correccion), o = codigo(f.operacion);
   const coms = comentarios(com);
   let km = money(v('km')); if (km == null || km < 50) { const m = String(texto).match(/(\d{1,3}(?:[.,]\d{3})+|\d{4,6})\s*km\b/i); km = m ? money(m[1]) : null; }
-  const veh = vehiculo(v('vehiculo'), texto), vin = (v('vin').match(/[A-HJ-NPR-Z0-9]{17}/i) || String(texto).match(/\b[A-HJ-NPR-Z0-9]{17}\b/i) || [''])[0].toUpperCase();
+  const vtxt = v('vehiculo') || [v('marca'), v('modelo'), v('anio')].filter(Boolean).join(' ');
+  const veh = vehiculo(vtxt, texto), vin = (v('vin').match(/[A-HJ-NPR-Z0-9]{17}/i) || String(texto).match(/\b[A-HJ-NPR-Z0-9]{17}\b/i) || [''])[0].toUpperCase();
   const pz = piezas(f.piezas); const horas = money(v('horas')) ?? money(v('total_tiempo'));
   const ultPlanta = [...coms].reverse().find(x => x.origen === 'planta' && ['aceptacion', 'rechazo'].includes(x.tipo));
   const estado = estadoDe(v('estado')) || (ultPlanta ? (ultPlanta.tipo === 'aceptacion' ? 'aceptada' : 'rechazada') : null);
   const aceptada = [...coms].reverse().find(x => x.tipo === 'aceptacion');
   const sistema = inferirSistema([q.texto, c.texto, r.texto, o.texto].join(' '));
+  if (!veh.modelo && v('modelo')) { veh.modelo = v('modelo').split(' ')[0]; veh.modelo = veh.modelo[0].toUpperCase() + veh.modelo.slice(1).toLowerCase(); }
+  if (!veh.anio && (v('anio').match(/\b(19|20)\d{2}\b/) || [])[0]) veh.anio = +v('anio').match(/\b(19|20)\d{2}\b/)[0];
   const d = {
     tipo: 'prea', folio: v('folio'), orden: v('orden'), fecha: toIso(v('fecha')), vin, marca: veh.marca, modelo: veh.modelo, anio: veh.anio, km, sistema,
     queja: q, causa: c, correccion: r, operacion: { codigo: o.codigo, descripcion: o.texto }, horas, tarifa_mo: money(v('tarifa')), piezas: pz,

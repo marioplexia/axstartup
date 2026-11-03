@@ -12,6 +12,7 @@ const cod = c => c && (c.codigo || c.texto) ? [c.codigo, c.texto].filter(Boolean
 
 function conocimiento(agencyId) {
   const docs = db.prepare("SELECT * FROM train_docs WHERE agency_id = ? AND status = 'aprendida' AND kind IN ('prea','pago') ORDER BY id").all(agencyId).map(x => ({ ...x, d: JSON.parse(x.data || '{}') }));
+  docs.forEach(x => { if (x.kind === 'prea' && !x.d.modelo && x.texto) { const v = P.parseTexto(x.texto); x.d.modelo = v.modelo; x.d.anio = x.d.anio || v.anio; x.d.marca = x.d.marca || v.marca; } });
   const preas = docs.filter(x => x.kind === 'prea' && x.d._modo !== 'error'), negs = docs.filter(x => x.kind === 'prea' && x.d._modo === 'error'), pagos = docs.filter(x => x.kind === 'pago');
   preas.forEach(p => { p.pagos = pagos.filter(g => g.link_id === p.id); });
   const reglas = db.prepare('SELECT * FROM rules WHERE src_historico > 0 ORDER BY n DESC').all();
@@ -31,9 +32,10 @@ function puntuar(c, p) {
   if (c.km && d.km) { const dk = Math.abs(c.km - d.km); s += dk <= 5000 ? 1.5 : dk <= 15000 ? 0.5 : 0; }
   const nums = new Set((d.piezas || []).map(x => (x.numero || '').toUpperCase()));
   (c.piezas || []).forEach(x => { if (x.numero && nums.has(x.numero.toUpperCase())) s += 3; });
-  const hay = P.norm([d.queja && d.queja.texto, d.queja && d.queja.detalle, d.causa && d.causa.texto, d.correccion && d.correccion.texto, d.operacion && d.operacion.descripcion, ...(d.piezas || []).map(x => x.descripcion), d.modelo].join(' '));
+  const hay = P.norm([d.queja && d.queja.texto, d.queja && d.queja.detalle, d.causa && d.causa.texto, d.correccion && d.correccion.texto, d.operacion && d.operacion.descripcion, ...(d.piezas || []).map(x => x.descripcion), d.modelo, String(p.texto || '').slice(0, 5000)].join(' '));
   const pals = P.palabras([c.queja && c.queja.texto, c.queja && c.queja.detalle, c.causa && c.causa.texto, c.correccion && c.correccion.texto, c.operacion && c.operacion.descripcion, ...(c.piezas || []).map(x => x.descripcion), c._texto].join(' '));
   let h = 0; pals.forEach(w => { if (hay.includes(w) && h < 8) h++; });
+  const sis = P.inferirSistema(c._texto || ''); if (sis !== 'Por clasificar' && sis === d.sistema) s += 1;
   return s + h;
 }
 
@@ -145,6 +147,30 @@ function recomendacion(c, p) {
     row('Tiempo', h != null ? h + ' h' : '—', c.horas != null && h != null && c.horas !== h), row('Piezas', (d.piezas || []).map(x => `${x.numero} ×${x.cantidad || 1}`).join(', ') || '—', false)].join('\n');
 }
 
+// El formulario completo de la PREA, armado con lo aprendido: la PREA aceptada más parecida (con lo que realmente pagó la planta)
+function armarFormulario(cand, best, cmp) {
+  const d = best.d, pago = (best.pagos || [])[0] && best.pagos[0].d;
+  const horas = pago && pago.horas_pagadas != null ? pago.horas_pagadas : d.horas;
+  const piezas = (d.piezas || []).map(x => { const pg = pago && (pago.piezas || []).find(y => (y.numero || '').toUpperCase() === (x.numero || '').toUpperCase()); return { numero: x.numero, descripcion: x.descripcion, cantidad: x.cantidad || 1, precio: pg && pg.monto_pagado != null ? pg.monto_pagado : x.precio }; });
+  const tarifa = (pago && pago.tarifa_mo) || d.tarifa_mo || 420, tp = piezas.reduce((t, x) => t + (x.precio || 0) * x.cantidad, 0);
+  const regla = best.rule_id ? db.prepare('SELECT id, n, rej, status FROM rules WHERE id = ?').get(best.rule_id) : null;
+  const conf = regla ? (() => { const tot = regla.n + 2 * (regla.rej || 0); return Math.max(1, Math.min(98, Math.round(100 * (1 - Math.exp(-regla.n / 3)) * (regla.n / Math.max(tot, 1))))); })() : 0;
+  const veh = cand.modelo ? [cand.marca || d.marca, cand.modelo, cand.anio || d.anio].filter(Boolean).join(' ') : [d.marca, d.modelo, d.anio].filter(Boolean).join(' ');
+  return {
+    vehiculo: veh, km: cand.km || null, vin: cand.vin || '', orden: cand.orden || '', sistema: d.sistema || 'Por clasificar',
+    queja: d.queja, causa: d.causa, correccion: d.correccion, operacion: d.operacion, horas, tarifa, piezas, total_piezas: +tp.toFixed(2), total_bruto: +(horas * tarifa + tp).toFixed(2),
+    descripcion: (cand._doc && cand.queja && cand.queja.detalle) || d.queja.detalle || cand._texto || '', regla: regla ? { id: regla.id, n: regla.n, confianza: conf } : null,
+    base: { folio: d.folio || d.orden, orden: d.orden, vehiculo: [d.marca, d.modelo, d.anio].filter(Boolean).join(' '), km: d.km, aceptada: aceptadaEl(d), autorizacion: d.codigo_autorizacion },
+    cambios: (cmp || []).filter(x => x.n !== 'ok').length
+  };
+}
+function tablaFormulario(f) {
+  const row = (k, v) => `| ${k} | ${v} |`;
+  return ['| Campo | Valor |', '| --- | --- |', row('Vehículo', f.vehiculo || '—'), row('Kilometraje', f.km ? f.km.toLocaleString('en-US') + ' km' : '—'), row('Queja', cod(f.queja)), row('Causa', cod(f.causa)), row('Corrección', cod(f.correccion)),
+    row('Operación de trabajo', [f.operacion.codigo, f.operacion.descripcion].filter(Boolean).join(' · ') || '—'), row('Tiempo de trabajo', f.horas != null ? f.horas + ' h' : '—'),
+    row('Números de pieza', f.piezas.map(x => `${x.numero} ${x.descripcion} ×${x.cantidad} (${m2(x.precio)})`).join('; ') || '—'), row('Total de piezas', m2(f.total_piezas)), row('Tarifa mano de obra', m2(f.tarifa)), row('Total bruto', m2(f.total_bruto))].join('\n');
+}
+
 function resumenGeneral(k) {
   if (!k.preas.length && !k.pagos.length && !k.negs.length) return 'Todavía no he aprendido nada. Sube PREAs aceptadas y transacciones pagadas en **Tablero de agencia → Entrenamiento** y vuelve a preguntarme.';
   const temas = {}; k.preas.forEach(p => (p.d.lecciones || []).forEach(l => (l.temas || []).forEach(t => { temas[t] = (temas[t] || 0) + 1; })));
@@ -169,43 +195,49 @@ function preguntaErrores(k, q, top) {
   return '**Errores que encontré en el historial de comentarios y cómo se corrigieron**\n\n' + ls.map(p => `PREA ${p.d.folio || p.d.orden} · ${[p.d.modelo, p.d.anio].filter(Boolean).join(' ')}:\n${(p.d.lecciones).map(x => `- «${x.problema}»${x.correccion ? ' → ' + x.correccion : ''}`).join('\n')}`).join('\n\n');
 }
 
+const INFO = {
+  resumen: /que (has )?aprend|que sabes|resumen de (lo|todo)|conocimiento|todo lo que (has|sabes)|cuantas (prea|reglas)/,
+  pagos: /cuanto (paga|pago|pagan|pagaron|pagó)|pagos? de (la )?planta|transaccion(es)? pagada/,
+  errores: /por que (rechaz|negaron|la rechaz)|que errores|errores (comunes|del pasado|que)|lecciones|que reglas|lista de reglas/
+};
 function localResponder({ k, mensaje, cand, subido }) {
   const q = P.norm(mensaje || '');
-  if (!k.preas.length && !k.pagos.length && !k.negs.length) return resumenGeneral(k);
-  if (!subido && /^\s*(hola|buenas|buenos dias|buenas tardes|que tal|hey)\W*$/.test(q)) return '¡Hola! Soy el agente de pruebas. Pregúntame cualquier cosa de lo que aprendí o sube una PREA para ver cómo la corregiría con base en las PREAs aceptadas.';
-  const puntajes = k.preas.map(p => ({ p, s: puntuar(cand, p) })).sort((a, b) => b.s - a.s), top = puntajes.filter(x => x.s >= 4);
-  if (!subido) {
-    if (/pag(o|ó|a|aron|ada|adas)\b|tarifa|cuanto (paga|pago|pagan)|transaccion/.test(q) && !top.length) return preguntaPagos(k, mensaje);
-    if (/que (has )?aprend|que sabes|resumen|cuantas|cuantos|conocimiento|todo lo que/.test(q) && !top.length) return resumenGeneral(k);
-    if (/\breglas?\b/.test(q) && !top.length) return resumenGeneral(k);
-    if (/error|rechaz|lecci|por que|corrig/.test(q)) return preguntaErrores(k, mensaje, top);
+  const vacio = !k.preas.length && !k.pagos.length && !k.negs.length;
+  if (vacio) return { texto: resumenGeneral(k) };
+  if (!subido && /^\s*(hola|buenas|buenos dias|buenas tardes|que tal|hey)\W*$/.test(q)) return { texto: '¡Hola! Soy el agente de pruebas. Dime qué reparación necesitas (por ejemplo «cambio de polea tensora de un Aveo 2024 de 40 mil km») y te entrego la PREA completa, llena con lo que aprendí de las PREAs aceptadas. También puedes subir una PREA para corregirla.' };
+  const puntajes = k.preas.map(p => ({ p, s: puntuar(cand, p) })).sort((a, b) => b.s - a.s), top = puntajes.filter(x => x.s >= 1.5);
+  if (!subido) {                                   // preguntas explícitamente informativas (no piden una PREA)
+    if (INFO.pagos.test(q)) return { texto: preguntaPagos(k, mensaje) };
+    if (INFO.errores.test(q)) return { texto: /regla/.test(q) ? resumenGeneral(k) : preguntaErrores(k, mensaje, top) };
+    if (INFO.resumen.test(q)) return { texto: resumenGeneral(k) };
   }
   const rechazadas = rechazadasDe(k, cand);
-  if (!top.length) return `No tengo una PREA aceptada parecida a ${subido ? 'la que subiste' : 'ese caso'}.` + (rechazadas.length ? '\n\n' + negativosTxt(rechazadas) : '\n\n' + resumenGeneral(k));
-  const best = top[0].p, partes = [];
-  partes.push(subido ? `Analicé tu PREA${cand.resumen ? ' (' + cand.resumen + ')' : ''} y la comparé con lo que aprendí. Encontré **${top.length} ${top.length === 1 ? 'PREA aceptada parecida' : 'PREAs aceptadas parecidas'}**; la más cercana es esta:` : `Encontré **${top.length} ${top.length === 1 ? 'PREA aceptada parecida' : 'PREAs aceptadas parecidas'}**. Esto fue lo que sí funcionó:`);
-  partes.push(ejemplo(best));
-  const pg = pagoDe(best), ls = leccionesDe(best), rg = reglaDe(best), ot = leccionesClave(best);
-  const vb = [best.d.marca, best.d.modelo, best.d.anio].filter(Boolean).join(' '), vc = [cand.marca, cand.modelo, cand.anio].filter(Boolean).join(' ');
-  if (cand.modelo && best.d.modelo && P.norm(cand.modelo) !== P.norm(best.d.modelo)) partes.push(`⚠️ Es un caso parecido pero de **otro contexto**: el ejemplo es de un ${vb} y el tuyo de un ${vc}. La estructura aplica; confirma número de pieza, tiempo y precio para tu modelo.`);
-  if (ls) partes.push(ls);
-  if (ot) partes.push(ot);
-  if (rechazadas.length) partes.push(negativosTxt(rechazadas));
-  if (pg) partes.push(pg);
-  if (rg) partes.push(rg);
+  if (!top.length) {
+    const lista = k.preas.slice(0, 4).map(p => `- ${[p.d.marca, p.d.modelo, p.d.anio].filter(Boolean).join(' ') || 'sin vehículo'} · ${p.d.queja && p.d.queja.texto ? p.d.queja.texto.toLowerCase() : ''} (${p.d.operacion && p.d.operacion.codigo || '—'})`).join('\n');
+    return { texto: `Todavía no tengo una PREA aceptada parecida a ${subido ? 'la que subiste' : 'lo que me pides'}, así que no puedo llenarte el formulario sin inventar datos.\n\nDime el **modelo y año**, el **kilometraje**, la **falla** y la **pieza** que se cambió, o sube en *Entrenamiento* una PREA aceptada de ese caso. Esto es lo que sé hacer hoy:\n\n${lista}` + (rechazadas.length ? '\n\n' + negativosTxt(rechazadas) : '') };
+  }
+  const best = top[0].p, cmp = comparar(cand, best), f = armarFormulario(cand, best, cmp);
+  const parcial = top[0].s < 4;
+  const veh = [best.d.marca, best.d.modelo, best.d.anio].filter(Boolean).join(' ');
+  const intro = `${parcial ? 'No tengo una PREA exactamente igual, pero la más cercana que aprendí es' : 'Armé tu PREA con base en la PREA aceptada'} **${best.d.folio || best.d.orden}** (${veh || 'vehículo sin identificar'}${best.d.km ? ' · ' + best.d.km.toLocaleString('en-US') + ' km' : ''}${aceptadaEl(best.d) ? ' · aceptada el ' + fmt(aceptadaEl(best.d)) : ''}). Ya está llena abajo, con cada campo listo para copiar.`;
+  const fin = [];
+  if (cand.modelo && best.d.modelo && P.norm(cand.modelo) !== P.norm(best.d.modelo)) fin.push(`⚠️ Es un caso parecido pero de **otro contexto**: el ejemplo es de un ${veh} y el tuyo de un ${f.vehiculo}. La estructura aplica; confirma número de pieza, tiempo y precio para tu modelo.`);
   if (subido || cand.horas != null || (cand.piezas || []).length || (cand.causa && cand.causa.codigo)) {
-    const cmp = comparar(cand, best);
-    if (cmp.length) {
-      const e = cmp.filter(x => x.n === 'error'), a = cmp.filter(x => x.n === 'aviso'), o = cmp.filter(x => x.n === 'ok');
-      partes.push('**Revisión de tu PREA contra ese ejemplo**\n\n' + [...e.map(x => '- ❌ ' + x.t), ...a.map(x => '- ⚠️ ' + x.t), ...o.map(x => '- ✅ ' + x.t)].join('\n'));
-      if (e.length || a.length) partes.push(recomendacion(cand, best));
-    }
+    const e = cmp.filter(x => x.n === 'error'), a = cmp.filter(x => x.n === 'aviso'), o = cmp.filter(x => x.n === 'ok');
+    if (cmp.length) fin.push('**Lo que corregí de tu PREA**\n\n' + [...e.map(x => '- ❌ ' + x.t), ...a.map(x => '- ⚠️ ' + x.t), ...o.map(x => '- ✅ ' + x.t)].join('\n'));
   } else {
     const temas = [...new Set((best.d.lecciones || []).flatMap(l => l.temas || []))];
-    if (temas.length) partes.push(`**Antes de enviarla revisa:** ${temas.join(', ')}.`);
+    if (temas.length) fin.push(`**Antes de enviarla revisa:** ${temas.join(', ')}.`);
   }
-  if (top.length > 1) partes.push(variantesTxt(best, top.slice(1, 3)));
-  return partes.join('\n\n');
+  const ls = leccionesDe(best), ot = leccionesClave(best), pg = pagoDe(best), rg = reglaDe(best);
+  if (ls) fin.push(ls.replace('Errores que tuvo en el pasado y cómo se corrigieron', 'Errores que tuvo esa PREA y que ya evité en este formulario'));
+  if (ot) fin.push(ot);
+  if (rechazadas.length) fin.push(negativosTxt(rechazadas));
+  if (pg) fin.push(pg);
+  if (rg) fin.push(rg);
+  if (top.length > 1) fin.push(variantesTxt(best, top.slice(1, 3)));
+  const final = fin.join('\n\n');
+  return { texto: `${intro}\n\n**Formulario de la PREA**\n\n${tablaFormulario(f)}\n\n${final}`, intro, final, formulario: f };
 }
 
 /* ---------- Con modelo ---------- */
@@ -234,17 +266,20 @@ async function conModelo({ k, mensaje, cand, subido, historial, user }) {
 
 async function responder({ user, mensaje, subidos = [], historial = [] }) {
   const k = conocimiento(user.agency.id);
-  const doc = subidos.find(s => s.d && s.d.tipo === 'prea');
+  const doc = subidos.find(x => x.d && x.d.tipo === 'prea');
   const cand = doc ? Object.assign({}, doc.d, { _doc: true, _texto: mensaje }) : Object.assign(P.parseTexto(mensaje || ''), { _texto: mensaje });
   const subido = !!doc;
-  let texto = null, origen = 'local';
+  const loc = localResponder({ k, mensaje, cand, subido });
+  let origen = 'local';
   if (process.env.ANTHROPIC_API_KEY && (k.preas.length || k.pagos.length || k.negs.length)) {
-    try { texto = await conModelo({ k, mensaje, cand, subido, historial, user }); origen = 'modelo'; } catch (e) { console.error('Agente de pruebas: falló el modelo, uso el motor local:', e.message); }
+    try {
+      const t = await conModelo({ k, mensaje, cand, subido, historial, user });
+      if (t) { origen = 'modelo'; if (loc.formulario) { loc.final = t; loc.texto = `${loc.intro}\n\n**Formulario de la PREA**\n\n${tablaFormulario(loc.formulario)}\n\n${t}`; } else loc.texto = t; }
+    } catch (e) { console.error('Agente de pruebas: falló el modelo, uso el motor local:', e.message); }
   }
-  if (!texto) texto = localResponder({ k, mensaje, cand, subido });
-  const fallidos = subidos.filter(s => !s.d || s.d.tipo !== 'prea');
-  if (fallidos.length) texto += `\n\nNo pude leer como PREA: ${fallidos.map(s => s.name + (s.error ? ' (' + s.error + ')' : '')).join(', ')}.`;
-  return { texto, origen };
+  const fallidos = subidos.filter(x => !x.d || x.d.tipo !== 'prea');
+  if (fallidos.length) { const extra = `\n\nNo pude leer como PREA: ${fallidos.map(x => x.name + (x.error ? ' (' + x.error + ')' : '')).join(', ')}.`; loc.texto += extra; if (loc.final != null) loc.final += extra; }
+  return { texto: loc.texto, intro: loc.intro || null, final: loc.final != null ? loc.final : null, formulario: loc.formulario || null, origen };
 }
 
 module.exports = { responder, conocimiento, puntuar, localResponder };

@@ -178,7 +178,7 @@ router.post('/entrenamiento/chat', async (req, res) => {
   try { r = await responder({ user: req.user, mensaje: msg || 'Valida esta PREA', subidos, historial: hist }); } catch (e) { console.error(e); r = { texto: 'No pude consultar lo aprendido en este momento. Intenta de nuevo.', origen: 'error' }; }
   db.prepare('INSERT INTO chat_messages (thread_id, role, content, created_at) VALUES (?,?,?,?)').run(hilo, 'assistant', r.texto, Date.now());
   db.prepare('UPDATE chat_threads SET updated_at = ? WHERE id = ?').run(Date.now(), hilo);
-  res.json({ hilo, respuesta: r.texto, origen: r.origen, lecturas: subidos.map(s => ({ id: s.id, nombre: s.name, estado: s.status, error: s.error, resumen: s.d && s.d.resumen })) });
+  res.json({ hilo, respuesta: r.texto, intro: r.intro, final: r.final, formulario: r.formulario, origen: r.origen, lecturas: subidos.map(s => ({ id: s.id, nombre: s.name, estado: s.status, error: s.error, resumen: s.d && s.d.resumen })) });
 });
 router.get('/entrenamiento/chat/hilos', (req, res) => res.json(db.prepare("SELECT id, title, updated_at FROM chat_threads WHERE advisor_id = ? AND kind = 'prueba' ORDER BY updated_at DESC LIMIT 30").all(req.user.id)));
 router.get('/entrenamiento/chat/hilos/:id', (req, res) => {
