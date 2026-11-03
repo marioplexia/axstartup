@@ -492,7 +492,8 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 #hmDlg p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
 #hmDlg label{display:flex;flex-direction:column;gap:5px;font-size:12.5px}
 #hmDlg input{font:inherit;font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--card-line);border-radius:10px;padding:9px 11px;outline:none}
-#hmDlg input:focus{border-color:var(--fg)}
+#hmDlg textarea{font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--card-line);border-radius:10px;padding:9px 11px;outline:none;resize:vertical}
+#hmDlg input:focus,#hmDlg textarea:focus{border-color:var(--fg)}
 #hmDlg .row{display:flex;gap:8px;justify-content:flex-end}
 #hmDlg .err{color:#b4372b;font-size:13px;min-height:18px}
 @media(max-width:700px){.hm-hero{height:150px}.hm-big{font-size:44px}.hm-card{padding:18px 16px 0}.hm-foot{margin:8px -16px 0;padding:12px 16px}}
@@ -610,6 +611,15 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .axl-seg button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 1px var(--fg);font-weight:600}
 .mr-h{margin:22px 0 10px;font-size:15px}
 .ms-off{display:none!important}
+.ls-st{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;padding:14px 16px}
+.ls-s{border:1px solid var(--card-line);border-radius:12px;padding:12px 14px;position:relative}
+.ls-s b{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-bottom:2px}.ls-s strong{font-size:22px}.ls-s small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.ls-s:not(:last-child)::after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;background:var(--card);z-index:1}
+.ls-h{padding:12px 16px 6px;font-size:12px;color:var(--muted);border-top:1px solid var(--card-line)}
+.ls-r{display:grid;grid-template-columns:minmax(0,1.4fr) 90px 90px 150px;gap:10px;align-items:center;padding:8px 16px;font-size:13px}
+.ls-r label{display:flex;align-items:center;gap:7px;cursor:pointer;justify-content:flex-end}
+.ls-f{display:grid;grid-template-columns:70px 78px minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 16px;border-top:1px solid var(--card-line);font-size:13px}
+.ls-f small{color:var(--muted)}
 .tr-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:34px 20px;margin-bottom:14px;border:1.5px dashed var(--card-line);border-radius:14px;background:var(--card);text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
 .tr-drop:hover,.tr-drop.drag{border-color:#2a6df4;background:rgba(42,109,244,.06)}
 .tr-drop b{font-size:15px}.tr-drop small{color:var(--muted);font-size:12.5px}
@@ -957,6 +967,14 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
           <div data-ms="agencias">
           <div class="mr-grid" id="mrAg"></div>
           <div class="mr-adv" id="mrAdv" hidden></div>
+          </div>
+          <div class="ad-card" id="lsBox" data-ms="cerebro" style="margin-bottom:14px">
+            <div class="ad-ch"><h3>Bucle de autoaprendizaje</h3><small id="lsLive">Aprende en tiempo real</small><span style="flex:1"></span><button class="bt" type="button" id="lsRun">Procesar pendientes</button></div>
+            <div class="ls-st" id="lsSt"></div>
+            <div class="ls-h">Lo que aprende cada agencia y si lo comparte con las demás</div>
+            <div id="lsAg"></div>
+            <div class="ls-h">Últimas lecciones aprendidas</div>
+            <div id="lsFeed"></div>
           </div>
           <div class="ad-grid flat">
             <div class="ad-card" data-ms="cerebro"><div class="ad-ch"><h3>Resultados por sistema (toda la marca)</h3></div><div id="mrSys"></div></div>
@@ -1767,7 +1785,7 @@ RS.toCase=function(r){
 };
 RS.note=function(hit){};  /* las consultas se cuentan desde la tabla expedientes */
 RS.mk=function(rec){
-  var mx=RS.d.rules.reduce(function(a,r){return Math.max(a,parseInt(String(r.id).slice(2),10)||0)},0);RS.d.seq=Math.max(RS.d.seq||0,mx)+1;var id='R-'+('000'+RS.d.seq).slice(-4),pm={};
+  var mx=RS.d.rules.reduce(function(a,r){return Math.max(a,parseInt(String(r.id).slice(2),10)||0)},0);RS.d.seq=Math.max(RS.d.seq||0,mx)+1;var id=(SB.share===false&&SB.user&&SB.user.agency_id?'R'+SB.user.agency_id+'-':'R-')+('000'+RS.d.seq).slice(-4),pm={};
   rec.parts.forEach(function(p){pm[p.no]={d:p.d,q:p.q,pr:p.pr,n:0}});
   var kw=(rec.kw||[]).concat(words(rec.kwText||rec.q[1])).filter(function(w,i,a){return a.indexOf(w)===i}).slice(0,10);
   return {id:id,sys:rec.sys||'Por clasificar',q:rec.q,c:rec.c,r:rec.r,op:rec.op,opd:rec.opd,h:rec.h,hSum:0,parts:pm,kw:kw,n:0,rej:0,status:'aprendizaje',created:Date.now(),updated:Date.now(),src:{base:0,historico:0,asesor:0},dist:{},_new:true};
@@ -1982,11 +2000,11 @@ SB.saveExp=function(c){
   var row={id:c.expId,conversation_id:S.convId||null,cliente:c.cliente||null,folio:c.folio,brand:c.brand,sys:c.sys,rule_id:c.ruleId,queja:c.rawText||c.queja,vin:c.vinReal||null,wo:c.wo||null,vehicle:c.vehicle,km:c.km,op:c.op,opd:c.opd,hours:c.h,parts:c.parts,parts_total:c.partsTot,labor:c.labor,codes:c.codes||GMCODES[c.sys]||GMCODES['Diagnóstico general']};
   c.expP=SB.c.from('expedientes').insert(row).then(function(r){if(r.error)SB.fail(r.error);return r});
 };
-SB.setExpStatus=async function(id,st){
+SB.setExpStatus=async function(id,st,extra){
   if(!SB.c||!SB.entered||!id)return;
   try{
     var c=ctxOf(id);if(c&&c.expP)await c.expP;
-    var r=await SB.c.from('expedientes').update({status:st,updated_at:new Date().toISOString()}).eq('id',id);
+    var r=await SB.c.from('expedientes').update(Object.assign({status:st,updated_at:new Date().toISOString()},extra||{})).eq('id',id);
     if(r.error)throw r.error;
   }catch(e){SB.fail(e)}
 };
@@ -2530,7 +2548,7 @@ HM.dlg=function(o){
   return new Promise(function(res){
     var d=$('#hmDlg');
     d.innerHTML='<form method="dialog" novalidate><h3>'+esc(o.title)+'</h3>'+(o.intro?'<p>'+esc(o.intro)+'</p>':'')+
-      o.fields.map(function(f){return '<label>'+esc(f.label)+'<input name="'+f.k+'" type="'+(f.type||'text')+'" value="'+ea(f.value||'')+'" placeholder="'+ea(f.ph||'')+'"'+(f.min!=null?' min="'+f.min+'"':'')+' autocomplete="off"></label>'}).join('')+
+      o.fields.map(function(f){return f.type==='textarea'?'<label>'+esc(f.label)+'<textarea name="'+f.k+'" rows="3" placeholder="'+ea(f.ph||'')+'">'+esc(f.value||'')+'</textarea></label>':'<label>'+esc(f.label)+'<input name="'+f.k+'" type="'+(f.type||'text')+'" value="'+ea(f.value||'')+'" placeholder="'+ea(f.ph||'')+'"'+(f.min!=null?' min="'+f.min+'"':'')+(f.step?' step="'+f.step+'"':'')+' autocomplete="off"></label>'}).join('')+
       '<div class="err" role="status"></div><div class="row"><button class="bt" type="button" data-no>Cancelar</button><button class="bt pri" type="submit">'+esc(o.ok||'Guardar')+'</button></div></form>';
     var done=false,fin=function(v){if(done)return;done=true;d.close();res(v)},f=$('form',d);
     f.onsubmit=function(ev){ev.preventDefault();var v={},bad='';
@@ -3402,11 +3420,18 @@ EX.render=function(){
 };
 EX.resolve=async function(id,ok){
   var x=EX.rows.filter(function(r){return r.id===id})[0];if(!x||x.status!=='borrador')return;
+  var dv=await HM.dlg({title:ok?'Registrar aceptación':'Registrar rechazo',intro:'Lo que escribas aquí lo aprende el cerebro en el momento y se lo enseña a las demás agencias (sin datos del cliente).',fields:[
+    {k:'c',label:ok?'Comentario del fabricante (opcional)':'¿Por qué la rechazó el fabricante?',type:'textarea',ph:ok?'Ej. Aceptada tras agregar el kilometraje':'Ej. Falta evidencia de medición de discos'},
+    {k:'m',label:'¿Qué ajustaste en la PREA antes de que respondiera? (opcional)',type:'textarea',ph:'Ej. Cambié la causa y quité una pieza'},
+    {k:'h',label:'Horas finales que aprobó el fabricante (opcional)',type:'number',min:0,step:'0.1',ph:String(x.hours||'')}],ok:ok?'Marcar aceptada':'Marcar rechazada'});
+  if(!dv)return;
   var rec={ruleId:x.rule_id||null,sys:x.rule_id?x.sys:'Por clasificar',q:x.codes?x.codes.q:['NUEVA',String(x.queja||'').toUpperCase().slice(0,60)],c:x.codes?x.codes.c:['S/C','SIN CAUSA'],r:x.codes?x.codes.r:['S/C','SIN CORRECCIÓN'],op:x.op,opd:x.opd,h:Number(x.hours),parts:x.parts,kwText:x.queja||'',src:'asesor',advisor:(x.profiles&&x.profiles.name)||(SB.user&&SB.user.name)||'asesor'};
   x.status=ok?'aceptada':'rechazada';EX.render();
   if(ok){var o=RS.learn(rec);toast(o.kind==='creada'?'Aceptada: el agente creó la regla '+o.rule.id:'Aceptada: se reforzó la regla '+o.rule.id)}
   else{if(x.rule_id)RS.reject(x.rule_id);toast('Rechazo registrado')}
-  SB.setExpStatus(id,x.status);
+  var hf=parseFloat(String(dv.h||'').replace(',','.')),ext={};
+  if(dv.c)ext.comentario_fabricante=dv.c;if(dv.m)ext.modificaciones=dv.m;if(hf>0)ext.final={horas:hf};
+  SB.setExpStatus(id,x.status,ext).then(function(){LS.learnNow()});
 };
 document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('#exBar [data-f]');if(f){EX.f=f.dataset.f;EX.render();return}
@@ -3500,7 +3525,7 @@ SB.submit=async function(ev){
   btn.disabled=false;
 };
 SB.loadAdvisors=async function(){
-  var r=await SB.c.from('profiles').select('id,name,role,brand,created_at,agency_id,agencies(name)').order('created_at');
+  var r=await SB.c.from('profiles').select('id,name,role,brand,created_at,agency_id,agencies(name,comparte)').order('created_at');
   if(r.error)throw r.error;
   ADVISORS.length=0;
   r.data.forEach(function(p){ADVISORS.push({id:p.id,name:p.name,role:p.role==='marca'?'admin':p.role,tag:p.id===ME?'tú':''})});
@@ -3513,7 +3538,7 @@ SB.loadAdvisors=async function(){
     return SB.loadAdvisors();
   }
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
-  if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.user=me;SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
+  if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
     MR.nav(!!me.marca);
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
@@ -3534,6 +3559,8 @@ SB.enter=async function(user){
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
       if(p.table==='expedientes'){AD.loadExp();if(S.view==='inicio')HM.load();return}
       if(p.table==='activity')return;
+      if(p.table==='reglas_lecciones'){LS.onNew(p);return}
+      if(p.table==='aprendizaje_eventos'){LS.refresh();return}
       if(p.table==='profiles'){SB.loadAdvisors().then(function(){return SB.pull()}).catch(SB.fail);return}
       if(SB.pushing||SB.dirty||Date.now()<SB.quiet)return;
       clearTimeout(SB.pt);SB.pt=setTimeout(function(){SB.pull()},500);
@@ -3596,6 +3623,7 @@ MR.show=function(id){
     $('#mrH').innerHTML=cut?esc(wd.slice(0,cut).join(' '))+' <em>'+esc(wd.slice(cut).join(' '))+'</em>':esc(T[0]);$('#mrP').textContent=sub;
     if(tab!=='tprea')$('#adImp').hidden=true;
     if(tab==='tprea'||tab==='tpago')TR.show(tab==='tpago'?'pago':'prea');
+    if(tab==='cerebro'&&(!LS.d||Date.now()-LS.t>8000))LS.load();
     $('#mrHero').dataset.tab=tab;MR.pixStart();
   }else{
     var h=$('#viewAdmin .ad-head h2'),pp=$('#viewAdmin .ad-head p');
@@ -3801,14 +3829,14 @@ TR.save=async function(k,id){
       msg='Pago aprendido: planta pagó '+(rl!=null?rl+'% de la mano de obra':money(ph.labor_pagada)+' de mano de obra')+' y '+(rp!=null?rp+'% de las piezas':money(ph.piezas_pagadas)+' de piezas')+'. El Agente de Cobros ya lo usa.';
       row={kind:'pago',folio:d.folio||null,wo:d.orden||null,file_name:it.name,vehiculo:TR.veh(d)||null,sys:d.sistema||null,op:d.operacion||null,resultado:'pagada',resumen:(d.sistema||'Pago')+' '+(d.operacion||'')+': reclamado '+money(ph.labor_reclamada+ph.piezas_reclamadas)+', pagado '+money(ph.labor_pagada+ph.piezas_pagadas)+(d.ajustes?'. Ajustes: '+d.ajustes:''),lecciones:d.lecciones||null,datos:d,busqueda:TR.search(k,d)};
     }else{
-      var est=d.estado||'desconocido',rule=TR.ruleFor(d),dup=d.folio?TR.lib.prea.filter(function(x){return x.folio===d.folio})[0]:null;
+      var lr=null,est=d.estado||'desconocido',rule=TR.ruleFor(d),dup=d.folio?TR.lib.prea.filter(function(x){return x.folio===d.folio})[0]:null;
       if(dup){if(!confirm('Ya enseñaste la PREA '+d.folio+'. ¿Actualizar lo aprendido de ese documento? (no vuelve a contar como una PREA nueva en las reglas)')){if(btn)btn.disabled=false;return}}
       if(!dup){
         if(est==='aceptada'){
           var ps=(d.piezas||[]).map(function(p){return [p.no,p.d,p.q,p.pr].map(function(x){return String(x==null?'':x).replace(/[:;|]/g,' ')}).join(':')}).join(';');
           var o={sistema:d.sistema,queja_codigo:d.queja&&d.queja.code,queja:d.queja&&d.queja.desc,causa_codigo:d.causa&&d.causa.code,causa:d.causa&&d.causa.desc,correccion_codigo:d.correccion&&d.correccion.code,correccion:d.correccion&&d.correccion.desc,operacion:d.operacion&&d.operacion.code,operacion_desc:d.operacion&&d.operacion.desc,horas:d.horas,piezas:ps,asesor:'entrenamiento'};
               var rec=recFromRow(o);
-          if(rec){var v=d.vehiculo||{};rec.kw=[norm(v.modelo||''),norm(v.marca||'')].filter(function(x){return x.length>=3});rec.src='historico';var lr=RS.learn(rec);msg=lr.kind==='creada'?'Aprendió una <b>regla nueva '+esc(lr.rule.id)+'</b> ('+esc(lr.rule.q[1].toLowerCase())+' → '+esc(lr.rule.op)+').':'<b>Reforzó la regla '+esc(lr.rule.id)+'</b>: ya suma '+lr.rule.n+' PREAs aceptadas.'}
+          if(rec){var v=d.vehiculo||{};rec.kw=[norm(v.modelo||''),norm(v.marca||'')].filter(function(x){return x.length>=3});rec.src='historico';lr=RS.learn(rec);msg=lr.kind==='creada'?'Aprendió una <b>regla nueva '+esc(lr.rule.id)+'</b> ('+esc(lr.rule.q[1].toLowerCase())+' → '+esc(lr.rule.op)+').':'<b>Reforzó la regla '+esc(lr.rule.id)+'</b>: ya suma '+lr.rule.n+' PREAs aceptadas.'}
           else msg='Se guardó como ejemplo, pero faltaban queja, operación u horas para formar una regla.';
         }else if(est==='rechazada'){
           if(rule){RS.reject(rule.id);msg='Registró un <b>rechazo en '+esc(rule.id)+'</b> (confianza '+RS.conf(rule)+'%) y guardó lo que falló como lección.'}
@@ -3816,6 +3844,16 @@ TR.save=async function(k,id){
         }else msg='Se guardó como ejemplo, sin modificar reglas.';
       }else msg='Actualizó el ejemplo de la PREA '+esc(d.folio)+'.';
       var v2=TR.veh(d);
+      if(!dup){
+        var rid=(lr&&lr.rule&&lr.rule.id)||(rule&&rule.id)||null,lec=[],cl=function(t){return String(t||'').replace(/\b[A-HJ-NPR-Z0-9]{17}\b/g,'[VIN]').replace(/\b(PREA-[A-Z0-9-]+|GA\d{3,8})\b/gi,'[ref]').slice(0,400)};
+        if(d.errores_y_correcciones)lec.push({tipo:'error',texto:cl(d.errores_y_correcciones)});
+        if(d.como_se_lleno)lec.push({tipo:est==='rechazada'?'error':'acierto',texto:cl(d.como_se_lleno)});
+        if(d.lecciones)lec.push({tipo:est==='rechazada'?'error':'acierto',texto:cl(d.lecciones)});
+        (Array.isArray(d.comentarios)?d.comentarios:[]).slice(0,4).forEach(function(c){if(c&&c.texto)lec.push({tipo:'comentario',texto:cl((c.autor?c.autor+': ':'')+c.texto)})});
+        if(est==='aceptada'&&d.horas>0&&d.operacion&&d.operacion.code)lec.push({tipo:'tiempo',texto:'La operación '+d.operacion.code+' se aceptó con '+d.horas+' h de mano de obra'+(v2?' en '+v2:'')+'.'});
+        (Array.isArray(d.piezas)?d.piezas:[]).slice(0,4).forEach(function(p){if(est==='aceptada'&&p&&p.d)lec.push({tipo:'pieza',texto:'Piezas aceptadas con '+(d.operacion&&d.operacion.code||'esta operación')+': '+p.d+' ×'+p.q})});
+        if(lec.length){var li=await SB.c.from('reglas_lecciones').insert(lec.map(function(l){return {rule_id:rid,tipo:l.tipo,texto:l.texto,vehiculo:v2||null,origen:'pdf'}}));if(li.error)SB.fail(li.error);else msg+=' Guardó '+lec.length+(lec.length===1?' lección':' lecciones')+' en la memoria compartida.'}
+      }
       row={kind:'prea',folio:d.folio||null,wo:d.orden||null,file_name:it.name,vehiculo:v2||null,sys:d.sistema||null,op:(d.operacion&&d.operacion.code)||null,resultado:est,resumen:[v2,d.queja&&d.queja.desc,d.operacion&&d.operacion.desc,est,d.motivo_resolucion].filter(Boolean).join(' · ').slice(0,700),lecciones:[d.como_se_lleno,d.errores_y_correcciones,d.lecciones].filter(Boolean).join(' | ')||null,datos:d,busqueda:TR.search(k,d)};
       if(dup){var u=await SB.c.from('entrenamiento_docs').update(row).eq('id',dup.id);if(u.error)throw u.error;it.state='guardado';it.msg=msg;TR.renderQ(k);TR.loadLib(k);return}
     }
@@ -3866,6 +3904,65 @@ async function runPrueba(text,files){
   if(pasos.length){var n=document.createElement('small');n.className='muted';n.style.cssText='display:block;margin-top:8px';n.textContent='Revisó su memoria: '+pasos.slice(0,6).join(' · ');col.insertBefore(n,$('.ai-actions',w))}
   $('.ai-actions',w).hidden=false;finish(my);
 }
+/* ===== Bucle de autoaprendizaje: observar → aprender → aplicar → verificar, compartido entre agencias ===== */
+var LS={d:null,t:0,last:0};
+LS.TIPO={acierto:'Acierto',error:'Error',tiempo:'Tiempo',pieza:'Pieza',codigo:'Códigos',comentario:'Comentario',riesgo:'Riesgo'};
+LS.learnNow=async function(){
+  if(!SB.c||!SB.entered)return;
+  try{
+    var r=await SB.c.functions.invoke('aprender',{body:{limite:4}});
+    if(r.error)throw r.error;
+    var d=r.data||{},n=(d.resultados||[]).reduce(function(a,x){return a+(x.lecciones||0)},0);
+    if(d.procesados)toast(n?'El cerebro aprendió '+n+(n===1?' lección':' lecciones')+' de esta respuesta':'El cerebro registró esta respuesta');
+    LS.refresh();
+  }catch(e){console.warn('[aprendizaje]',e&&e.message||e)}
+};
+LS.apply=async function(ctx){
+  if(!SB.c||!SB.entered||!ctx.ruleId)return;
+  var r=await Promise.all([SB.c.from('reglas_lecciones').select('tipo,texto,vehiculo').eq('rule_id',ctx.ruleId).order('created_at',{ascending:false}).limit(5),SB.c.from('agency_rules').select('conocimiento').eq('id',ctx.ruleId).single()]);
+  var L=(r[0].data||[]),k=(r[1].data&&r[1].data.conocimiento)||{},parts=[];
+  if(k.riesgo&&k.riesgo.nivel&&k.riesgo.nivel!=='bajo')parts.push('riesgo de rechazo '+k.riesgo.nivel+(k.riesgo.motivo?' ('+k.riesgo.motivo+')':''));
+  if(k.horas_sugeridas&&Math.abs(k.horas_sugeridas-ctx.h)>=0.1)parts.push('el fabricante ha dejado alrededor de '+k.horas_sugeridas+' h, no '+ctx.h.toFixed(1)+' h');
+  if(k.piezas_quitar&&k.piezas_quitar.length)parts.push('revisa si de verdad llevan estas piezas: '+k.piezas_quitar.join(', '));
+  if(k.piezas_agregar&&k.piezas_agregar.length)parts.push('suelen faltar: '+k.piezas_agregar.map(function(p){return p.d}).join(', '));
+  if(k.nota_codigos)parts.push(k.nota_codigos);
+  L.slice(0,3).forEach(function(l){parts.push(l.texto)});
+  if(parts.length){ctx.lessonNote='\n\n> **Lo que el cerebro aprendió de casos anteriores** (regla '+ctx.ruleId+'): '+parts.join(' · ');ctx.lessons=L.length}
+};
+LS.onNew=function(p){
+  var n=p.new||{};
+  if(p.eventType==='INSERT'&&n.created_by!==ME&&Date.now()-LS.last>8000){LS.last=Date.now();toast('El cerebro aprendió algo nuevo'+(n.rule_id?' en la regla '+n.rule_id:'')+(n.alcance==='compartida'?' (de otra agencia)':''))}
+  LS.refresh();
+};
+LS.refresh=function(){if(MR.is()&&S.view==='m_cer'){clearTimeout(LS.rt);LS.rt=setTimeout(LS.load,400)}};
+LS.load=async function(){
+  if(!SB.c||!SB.entered||!MR.is())return;
+  var r=await SB.c.rpc('marca_aprendizaje');if(r.error){SB.fail(r.error);return}
+  LS.d=r.data;LS.t=Date.now();LS.render();
+};
+LS.render=function(){
+  var d=LS.d;if(!d||!$('#lsSt'))return;
+  var ev=d.eventos||{},pe=(ev.pendiente||0)+(ev.procesando||0),pr=ev.procesado||0,er=ev.error||0,acc=0,rej=0;
+  (MR.d||[]).forEach(function(a){acc+=a.aceptadas;rej+=a.rechazadas});
+  var ST=function(t,v,s){return '<div class="ls-s"><b>'+t+'</b><strong>'+v+'</strong><small>'+s+'</small></div>'};
+  $('#lsSt').innerHTML=ST('1 · Observa',pr+pe,'respuestas del fabricante vistas'+(pe?' · '+pe+' por procesar':''))+ST('2 · Aprende',d.lecciones||0,'lecciones guardadas'+(d.protegidas?' · '+d.protegidas+' protegidas':''))+ST('3 · Aplica',RS.d.rules.length,'reglas que usan lo aprendido al armar cada PREA')+ST('4 · Verifica',acc+rej?Math.round(100*acc/(acc+rej))+'%':'—','aceptación del fabricante'+(er?' · '+er+' con error':''));
+  $('#lsAg').innerHTML=(d.por_agencia||[]).map(function(a){return '<div class="ls-r"><span><b>'+esc(a.agencia)+'</b></span><span>'+a.reglas+' reglas</span><span>'+a.lecciones+' lecciones</span><label title="Si está activado, lo que aprende esta agencia lo reciben las demás en tiempo real; si no, solo esta agencia y la marca lo ven"><input type="checkbox" data-ls-sh="'+a.agency_id+'"'+(a.comparte?' checked':'')+'> '+(a.comparte?'Comparte':'Protegida')+'</label></div>'}).join('')||'<p class="axl-hint" style="padding:6px 16px 12px">Sin agencias.</p>';
+  $('#lsFeed').innerHTML=(d.ultimas||[]).map(function(x){return '<div class="ls-f"><small>'+esc(SB.dayLbl(x.created_at))+'</small><span class="tr-badge">'+esc(LS.TIPO[x.tipo]||x.tipo)+'</span><span>'+esc(x.texto)+'<br><small>'+esc([x.rule_id,x.agencia,x.vehiculo,x.origen==='ia'?'IA':x.origen==='pdf'?'PDF':x.origen==='asesor'?'asesor':''].filter(Boolean).join(' · '))+'</small></span>'+(x.alcance==='protegida'?'<button class="bt" type="button" data-ls-pub="'+ea(x.id)+'">Compartir</button>':'<small>compartida</small>')+'</div>'}).join('')||'<p class="axl-hint" style="padding:6px 16px 14px">Todavía no hay lecciones. Aparecerán cuando el fabricante acepte o rechace PREAs, o cuando enseñes PDFs.</p>';
+};
+(function(){
+  var box=$('#lsBox');
+  box.addEventListener('change',async function(e){
+    var c=e.target.closest('[data-ls-sh]');if(!c)return;
+    var r=await SB.c.from('agencies').update({comparte:c.checked}).eq('id',Number(c.dataset.lsSh));
+    if(r.error){SB.fail(r.error);toast('No se pudo cambiar');c.checked=!c.checked;return}
+    toast(c.checked?'Esa agencia ahora comparte lo que aprende':'Lo que aprenda esa agencia queda protegido');LS.load();
+  });
+  box.addEventListener('click',async function(e){
+    var b=e.target.closest('[data-ls-pub]');
+    if(b){var r=await SB.c.from('reglas_lecciones').update({alcance:'compartida'}).eq('id',b.dataset.lsPub);if(r.error){SB.fail(r.error);toast('No se pudo compartir');return}toast('Lección compartida con todas las agencias');LS.load();return}
+    if(e.target.id==='lsRun'){e.target.disabled=true;e.target.textContent='Procesando…';await LS.learnNow();e.target.disabled=false;e.target.textContent='Procesar pendientes';LS.load()}
+  });
+})();
 var AD={filter:'todas',q:'',open:{},raf:0,exp:[]};
 AD.loadExp=async function(){
   if(!SB.c||!SB.entered)return;
@@ -4026,8 +4123,9 @@ async function run(text,files){
   if(!my.aborted){var s5=tk.step('Armando el formulario');await nap(550,my);s5.done(ctx.op+' · '+ctx.h.toFixed(1)+' h · '+ctx.parts.length+(ctx.parts.length===1?' pieza':' piezas'))}
   tk.end(my.aborted);
   RS.note(ctx.matched);
+  try{await LS.apply(ctx)}catch(_){}
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
-  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
+  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
   if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;GP.nPrea++;GP.caseText=text;GP.remember(text,w._text);GP.suggest(w,[{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'¿Cuánto pagará planta?',q:'¿Cuánto crees que pagará planta por esto?'}])}
   finish(my);
 }
