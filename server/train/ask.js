@@ -58,7 +58,7 @@ function leccionesClave(p) {
   const propias = new Set((p.d.lecciones || []).map(l => l.problema));
   const ls = db.prepare('SELECT * FROM train_lessons WHERE sys = ? AND q_code = ? AND (doc_id IS NULL OR doc_id != ?) ORDER BY id DESC LIMIT 8').all(r.sys, r.q_code, p.id).filter(l => !propias.has(l.problema)).slice(0, 5);
   if (!ls.length) return '';
-  return '**Otros errores que se han visto con esta misma queja**\n\n' + ls.map(l => `- ${l.origen === 'rechazada' ? 'En una PREA rechazada' : 'En el historial de otra PREA'}: «${l.problema}»${l.correccion ? ' → ' + l.correccion : ''}`).join('\n');
+  return '**Otros errores que se han visto con esta misma queja**\n\n' + ls.map(l => `- ${/^En una PREA rechazada/.test(l.problema) ? '' : (l.origen === 'rechazada' ? 'En una PREA rechazada: ' : 'En el historial de otra PREA: ')}«${l.problema}»${l.correccion ? ' → ' + l.correccion : ''}`).join('\n');
 }
 function rechazadasDe(k, cand) {
   return k.negs.map(p => ({ p, s: puntuar(cand, p) })).filter(x => x.s >= 4).sort((a, b) => b.s - a.s).slice(0, 2);

@@ -113,11 +113,15 @@ Solo se puede cobrar una PREA aprobada, un servicio pagado o una campaña realiz
 
 Tres apartados:
 
-1. **PREAs aceptadas**: PDFs o imágenes de PREAs que la planta ya aceptó. El agente lee el formulario y el **historial de comentarios**, aprende cómo se llenó cada campo, por qué se rechazó antes y cómo se corrigió, y crea o refuerza una regla del catálogo (queja + sistema). Valida cada PREA contra la regla que ya existe (operación, causa, corrección, tiempo y piezas) y avisa de las diferencias.
+1. **PREAs aceptadas** (y, si quieres, rechazadas): PDFs o imágenes de PREAs que la planta ya resolvió. El agente lee el formulario y el **historial de comentarios**, aprende cómo se llenó cada campo, por qué se rechazó antes y cómo se corrigió, y crea o refuerza una regla del catálogo (queja + sistema). Valida cada PREA contra la regla que ya existe (operación, causa, corrección, tiempo y piezas) y avisa de las diferencias.
 2. **Transacciones pagadas de planta**: PDFs o imágenes de pagos. Se ligan a su PREA (orden de trabajo, autorización, folio o VIN) y corrigen las horas y los precios de pieza de la regla con lo que la planta realmente pagó.
 3. **Probar al agente**: el mismo chat de siempre. Preguntas libres («cambio de polea de un Aveo 2024 de 40 mil km», «¿por qué rechazaron esa PREA?», «¿cuánto paga la planta?») o sube una PREA para validarla: responde con la PREA aceptada más parecida como ejemplo, los errores que tuvo y cómo se corrigieron, lo que pagó la planta y qué corregir en la PREA subida.
 
-Una regla se reparte a los asesores (y la usa el Agente de Garantías) al llegar al umbral de PREAs aceptadas del Tablero (3 por defecto); el chat de pruebas usa todo lo aprendido desde la primera PREA. Al eliminar un documento se deshace lo que aportó a la regla.
+**Con una sola PREA aceptada basta**: la regla se crea, se activa y se reparte a los asesores al instante (el umbral del Tablero ahora es de 1 PREA por defecto y se puede subir). Además:
+
+- **Variantes de contexto**: cada PREA aceptada queda guardada como variante de su regla (modelo, año, operación, causa, corrección, tiempo y piezas). Un caso parecido pero de otro modelo no se pierde ni se mezcla: el Agente de Garantías usa la variante del modelo que menciona la PREA.
+- **Errores**: del historial de comentarios (rechazos y solicitudes de la planta, con su corrección) y de las **PREAs rechazadas** que subas (se comparan contra lo aceptado del mismo modelo). Se ligan a la queja de la regla y el Agente de Garantías los avisa al preparar una PREA igual; si una PREA rechazada tiene los mismos códigos que la regla, baja su confianza.
+- Al eliminar un documento se deshace lo que aportó: contadores, variantes y errores.
 
 **Cómo lee los archivos**
 - Con `ANTHROPIC_API_KEY`: un modelo con visión lee cualquier formato, también PDFs escaneados y fotos (`TRAIN_MODEL` opcional; el chat de pruebas también redacta con el modelo).

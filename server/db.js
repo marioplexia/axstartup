@@ -165,6 +165,13 @@ const saveState = db.transaction((st, { reset = false, advisorId = null } = {}) 
 });
 
 // Una sola PREA aceptada ya basta para activar una regla (antes eran 3): se ajusta una vez, sin pisar cambios posteriores del Tablero
-if (!getSet('th1_migrated', '')) { putSet('th', '1'); putSet('th1_migrated', '1'); putSet('rev', getRev() + 1); }
+if (!getSet('th1_migrated', '')) {
+  putSet('th', '1'); putSet('th1_migrated', '1');
+  if (getSet('auto', 'true') === 'true') {     // las reglas que esperaban llegar al umbral ya lo cumplen: se activan y se reparten
+    const now = Date.now(), pend = db.prepare("SELECT id FROM rules WHERE status = 'aprendizaje' AND n >= 1").all(), advs = db.prepare('SELECT id FROM advisors WHERE active = 1').all();
+    pend.forEach(r => { db.prepare("UPDATE rules SET status = 'activa', updated_at = ? WHERE id = ?").run(now, r.id); advs.forEach(a => db.prepare('INSERT OR IGNORE INTO rule_distribution (rule_id, advisor_id, delivered_at) VALUES (?,?,?)').run(r.id, a.id, now)); logEvent('activada', r.id, `Regla ${r.id} se activó: ahora una sola PREA aceptada basta`); });
+  }
+  putSet('rev', getRev() + 1);
+}
 
 module.exports = { db, DB_PATH, confidence, getRule, listRules, logEvent, loadState, saveState, getRev };
