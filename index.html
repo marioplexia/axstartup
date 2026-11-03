@@ -2209,6 +2209,7 @@ CAR.act=async function(id,a){
   var r=await SB.c.from('cartera').update(patch).eq('expediente_id',id);
   if(r.error){Object.assign(x,old);CAR.render();SB.fail(r.error);toast('No se pudo guardar el cambio');return}
   toast(a==='fact'?'Factura registrada':'Pago registrado');
+  if(a!=='fact')LS.learnNow();
 };
 document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('#caBar [data-f]');if(f){CAR.f=f.dataset.f;CAR.render();return}
@@ -2548,11 +2549,11 @@ HM.dlg=function(o){
   return new Promise(function(res){
     var d=$('#hmDlg');
     d.innerHTML='<form method="dialog" novalidate><h3>'+esc(o.title)+'</h3>'+(o.intro?'<p>'+esc(o.intro)+'</p>':'')+
-      o.fields.map(function(f){return f.type==='textarea'?'<label>'+esc(f.label)+'<textarea name="'+f.k+'" rows="3" placeholder="'+ea(f.ph||'')+'">'+esc(f.value||'')+'</textarea></label>':'<label>'+esc(f.label)+'<input name="'+f.k+'" type="'+(f.type||'text')+'" value="'+ea(f.value||'')+'" placeholder="'+ea(f.ph||'')+'"'+(f.min!=null?' min="'+f.min+'"':'')+(f.step?' step="'+f.step+'"':'')+' autocomplete="off"></label>'}).join('')+
+      o.fields.map(function(f){return f.type==='file'?'<label>'+esc(f.label)+'<input name="'+f.k+'" type="file" accept="image/*,application/pdf"></label>':f.type==='textarea'?'<label>'+esc(f.label)+'<textarea name="'+f.k+'" rows="3" placeholder="'+ea(f.ph||'')+'">'+esc(f.value||'')+'</textarea></label>':'<label>'+esc(f.label)+'<input name="'+f.k+'" type="'+(f.type||'text')+'" value="'+ea(f.value||'')+'" placeholder="'+ea(f.ph||'')+'"'+(f.min!=null?' min="'+f.min+'"':'')+(f.step?' step="'+f.step+'"':'')+' autocomplete="off"></label>'}).join('')+
       '<div class="err" role="status"></div><div class="row"><button class="bt" type="button" data-no>Cancelar</button><button class="bt pri" type="submit">'+esc(o.ok||'Guardar')+'</button></div></form>';
     var done=false,fin=function(v){if(done)return;done=true;d.close();res(v)},f=$('form',d);
     f.onsubmit=function(ev){ev.preventDefault();var v={},bad='';
-      o.fields.forEach(function(x){var val=f.elements[x.k].value.trim();v[x.k]=val;if(x.req&&!val&&!bad)bad='Falta: '+x.label.toLowerCase()+'.'});
+      o.fields.forEach(function(x){var el=f.elements[x.k],val=x.type==='file'?((el.files&&el.files[0])||null):el.value.trim();v[x.k]=val;if(x.req&&!val&&!bad)bad='Falta: '+x.label.toLowerCase()+'.'});
       if(bad){$('.err',d).textContent=bad;return}fin(v)};
     $('[data-no]',d).onclick=function(){fin(null)};d.oncancel=function(){fin(null)};
     d.showModal();var first=f.elements[o.fields[0].k];if(first)first.focus();
@@ -3423,8 +3424,24 @@ EX.resolve=async function(id,ok){
   var dv=await HM.dlg({title:ok?'Registrar aceptación':'Registrar rechazo',intro:'Lo que escribas aquí lo aprende el cerebro en el momento y se lo enseña a las demás agencias (sin datos del cliente).',fields:[
     {k:'c',label:ok?'Comentario del fabricante (opcional)':'¿Por qué la rechazó el fabricante?',type:'textarea',ph:ok?'Ej. Aceptada tras agregar el kilometraje':'Ej. Falta evidencia de medición de discos'},
     {k:'m',label:'¿Qué ajustaste en la PREA antes de que respondiera? (opcional)',type:'textarea',ph:'Ej. Cambié la causa y quité una pieza'},
-    {k:'h',label:'Horas finales que aprobó el fabricante (opcional)',type:'number',min:0,step:'0.1',ph:String(x.hours||'')}],ok:ok?'Marcar aceptada':'Marcar rechazada'});
+    {k:'h',label:'Horas finales que aprobó el fabricante (opcional)',type:'number',min:0,step:'0.1',ph:String(x.hours||'')},
+    {k:'f',label:'Captura o PDF de la PREA con los comentarios de planta (opcional: el cerebro los lee solo)',type:'file'}],ok:ok?'Marcar aceptada':'Marcar rechazada'});
   if(!dv)return;
+  if(dv.f){
+    toast('Leyendo la respuesta de planta…');
+    try{
+      var pf=await TR.prep(dv.f),rr=await SB.c.functions.invoke('aprender',{body:{modo:'leer_respuesta',file:pf}});
+      if(rr.error)throw rr.error;
+      var R=rr.data&&rr.data.respuesta;
+      if(R){
+        var cm=(R.comentarios||[]).map(function(c){return (c.autor?c.autor+': ':'')+c.texto}).join(' | ');
+        dv.c=[dv.c,cm,R.motivo].filter(function(z,i,a){return z&&a.indexOf(z)===i}).join(' | ');
+        if(R.cambios)dv.m=[dv.m,R.cambios].filter(Boolean).join(' | ');
+        if(R.horas_finales>0&&!dv.h)dv.h=String(R.horas_finales);
+        if((R.estado==='aceptada'||R.estado==='rechazada')&&(R.estado==='aceptada')!==ok)toast('Ojo: el documento dice "'+R.estado+'"');
+      }
+    }catch(e){toast('No pude leer el archivo; se guardó solo lo que escribiste')}
+  }
   var rec={ruleId:x.rule_id||null,sys:x.rule_id?x.sys:'Por clasificar',q:x.codes?x.codes.q:['NUEVA',String(x.queja||'').toUpperCase().slice(0,60)],c:x.codes?x.codes.c:['S/C','SIN CAUSA'],r:x.codes?x.codes.r:['S/C','SIN CORRECCIÓN'],op:x.op,opd:x.opd,h:Number(x.hours),parts:x.parts,kwText:x.queja||'',src:'asesor',advisor:(x.profiles&&x.profiles.name)||(SB.user&&SB.user.name)||'asesor'};
   x.status=ok?'aceptada':'rechazada';EX.render();
   if(ok){var o=RS.learn(rec);toast(o.kind==='creada'?'Aceptada: el agente creó la regla '+o.rule.id:'Aceptada: se reforzó la regla '+o.rule.id)}
@@ -3917,17 +3934,60 @@ LS.learnNow=async function(){
     LS.refresh();
   }catch(e){console.warn('[aprendizaje]',e&&e.message||e)}
 };
+LS.MODELOS=['aveo','spark','beat','onix','tracker','trax','captiva','equinox','silverado','cheyenne','tahoe','suburban','colorado','s10','groove','montana','cavalier','sonic','malibu','camaro','blazer','traverse','optra','sail','orlando','cruze','bolt','chevy','corsa','tornado','cobalt','astra','vectra','express','express van','n300','tornado'];
+LS.veh=function(t){
+  var x=norm(t||''),m=null;
+  LS.MODELOS.forEach(function(k){if(!m&&new RegExp('(^|[^a-z0-9])'+k.replace(' ','\\s')+'([^a-z0-9]|$)').test(x))m=k});
+  var y=x.match(/(?:^|[^0-9])((?:19[89]|20[0-3])\d)(?:[^0-9]|$)/);
+  return {modelo:m,anio:y?parseInt(y[1],10):null};
+};
+/* devuelve null si la lección no aplica a este caso; si aplica, cuántos datos concretos coinciden */
+LS.match=function(c,v){
+  if(!c||typeof c!=='object')return {n:0,esp:false};
+  var n=0,esp=false;
+  if(c.modelo){if(!v.modelo||v.modelo!==norm(c.modelo))return null;n++;esp=true}
+  if(c.anio_desde||c.anio_hasta){if(!v.anio)return null;if(c.anio_desde&&v.anio<c.anio_desde)return null;if(c.anio_hasta&&v.anio>c.anio_hasta)return null;n++}
+  if(c.km_min||c.km_max){if(!v.km)return null;if(c.km_min&&v.km<c.km_min)return null;if(c.km_max&&v.km>c.km_max)return null;n++}
+  if(c.sistema&&norm(c.sistema)!==norm(v.sys||''))return null;
+  if(c.operacion&&String(c.operacion)!==String(v.op||''))return null;
+  if(c.pieza){if(norm(v.txt||'').indexOf(norm(c.pieza))<0)return null;n++;esp=true}
+  return {n:n,esp:esp};
+};
 LS.apply=async function(ctx){
-  if(!SB.c||!SB.entered||!ctx.ruleId)return;
-  var r=await Promise.all([SB.c.from('reglas_lecciones').select('tipo,texto,vehiculo').eq('rule_id',ctx.ruleId).order('created_at',{ascending:false}).limit(5),SB.c.from('agency_rules').select('conocimiento').eq('id',ctx.ruleId).single()]);
-  var L=(r[0].data||[]),k=(r[1].data&&r[1].data.conocimiento)||{},parts=[];
-  if(k.riesgo&&k.riesgo.nivel&&k.riesgo.nivel!=='bajo')parts.push('riesgo de rechazo '+k.riesgo.nivel+(k.riesgo.motivo?' ('+k.riesgo.motivo+')':''));
-  if(k.horas_sugeridas&&Math.abs(k.horas_sugeridas-ctx.h)>=0.1)parts.push('el fabricante ha dejado alrededor de '+k.horas_sugeridas+' h, no '+ctx.h.toFixed(1)+' h');
-  if(k.piezas_quitar&&k.piezas_quitar.length)parts.push('revisa si de verdad llevan estas piezas: '+k.piezas_quitar.join(', '));
-  if(k.piezas_agregar&&k.piezas_agregar.length)parts.push('suelen faltar: '+k.piezas_agregar.map(function(p){return p.d}).join(', '));
-  if(k.nota_codigos)parts.push(k.nota_codigos);
-  L.slice(0,3).forEach(function(l){parts.push(l.texto)});
-  if(parts.length){ctx.lessonNote='\n\n> **Lo que el cerebro aprendió de casos anteriores** (regla '+ctx.ruleId+'): '+parts.join(' · ');ctx.lessons=L.length}
+  if(!SB.c||!SB.entered)return;
+  var raw=ctx.rawText||ctx.queja||'',vv=LS.veh(raw);
+  if(vv.modelo)ctx.vehicle=vv.modelo.charAt(0).toUpperCase()+vv.modelo.slice(1)+(vv.anio?' '+vv.anio:'');
+  var qs=[SB.c.from('reglas_lecciones').select('tipo,texto,vehiculo,contexto,efecto,rule_id,created_at').or(ctx.ruleId?'rule_id.eq.'+ctx.ruleId+',rule_id.is.null':'rule_id.is.null').order('created_at',{ascending:false}).limit(120)];
+  if(ctx.ruleId)qs.push(SB.c.from('agency_rules').select('conocimiento').eq('id',ctx.ruleId).single());
+  var r=await Promise.all(qs),k=(r[1]&&r[1].data&&r[1].data.conocimiento)||{},notes=[],cambios=[];
+  var V={modelo:vv.modelo,anio:vv.anio,km:Number(ctx.km)||null,sys:ctx.sys,op:ctx.op,txt:raw+' '+(ctx.parts||[]).map(function(p){return p.d}).join(' ')};
+  var M=(r[0].data||[]).map(function(l){var m=LS.match(l.contexto,V);return m?{l:l,m:m}:null}).filter(Boolean);
+  M.sort(function(a,b){return (b.m.n-a.m.n)||String(b.l.created_at).localeCompare(String(a.l.created_at))});
+  var h0=ctx.h,setH=function(h,why){if(h>0&&Math.abs(h-ctx.h)>=0.1){var f=h/(ctx.h||h);ctx.labor=ctx.labor*f;ctx.h=h;ctx.hBad=+(h+0.3).toFixed(1);cambios.push('horas de '+h0.toFixed(1)+' a '+h.toFixed(1)+' h ('+why+')')}};
+  var quitar=function(t,why){var x=norm(t),before=ctx.parts.length;ctx.parts=ctx.parts.filter(function(p){return norm(p.no+' '+p.d).indexOf(x)<0});if(ctx.parts.length<before)cambios.push('quité '+t+' ('+why+')')};
+  var agregar=function(p,why){var x=norm(p.d);if(!ctx.parts.some(function(q){return norm(q.d)===x||(p.no&&q.no===p.no)}))ctx.parts.push({no:p.no||'—',d:p.d,q:p.q||1,pr:0}),cambios.push('agregué '+p.d+' ('+why+')')};
+  var donde=function(l){return l.vehiculo?'en '+l.vehiculo:'en un caso real'};
+  /* 1) lo que vale para cualquier vehículo de la regla (conocimiento) */
+  if(k.horas_sugeridas)setH(k.horas_sugeridas,'lo que ha dejado el fabricante');
+  (k.piezas_quitar||[]).forEach(function(t){quitar(t,'planta las ha rechazado')});
+  (k.piezas_agregar||[]).forEach(function(p){agregar(p,'suelen faltar')});
+  if(k.riesgo&&k.riesgo.nivel&&k.riesgo.nivel!=='bajo')notes.push('riesgo de rechazo '+k.riesgo.nivel+(k.riesgo.motivo?' ('+k.riesgo.motivo+')':''));
+  if(k.nota_codigos)notes.push(k.nota_codigos);
+  /* 2) lo aprendido de casos concretos: se aplica en cuanto existe UN caso, pero solo donde coincide el contexto */
+  var seen={},hDone=false;
+  M.forEach(function(x){
+    var l=x.l,e=l.efecto||{},t=l.texto;if(seen[t])return;seen[t]=1;
+    if(e.horas&&x.m.esp&&!hDone){hDone=true;setH(e.horas,donde(l)+' planta dejó '+e.horas+' h')}
+    if(x.m.esp){(e.piezas_quitar||[]).forEach(function(q){quitar(q,donde(l))});(e.piezas_agregar||[]).forEach(function(p){agregar(p,donde(l))})}
+    if(e.riesgo&&e.riesgo!=='bajo')notes.push('riesgo de rechazo '+e.riesgo+' '+donde(l));
+    if(e.nota_codigos&&notes.indexOf(e.nota_codigos)<0)notes.push(e.nota_codigos+' ('+donde(l)+')');
+    else if(!e.nota_codigos&&!e.horas&&notes.length<6)notes.push(t);
+  });
+  ctx.partsTot=ctx.parts.reduce(function(a,p){return a+p.q*p.pr},0);
+  var out=[];
+  if(cambios.length)out.push('**Ajusté la PREA con lo aprendido**: '+cambios.join('; ')+'.');
+  if(notes.length)out.push('**Ten en cuenta**: '+notes.slice(0,5).join(' · '));
+  if(out.length){ctx.lessonNote='\n\n> **Lo que el cerebro aprendió de casos anteriores**'+(ctx.ruleId?' (regla '+ctx.ruleId+')':'')+'. '+out.join(' ');ctx.lessons=M.length;ctx.adjusted=cambios.length}
 };
 LS.onNew=function(p){
   var n=p.new||{};
