@@ -1466,7 +1466,27 @@ SB.pull=async function(first){
 };
 /* las reglas activas llegan a todos los asesores reales (también a los que se registran después) */
 RS.heal=function(){var ch=false;RS.d.rules.forEach(function(r){if(r.status==='activa')ADVISORS.forEach(function(a){if(!r.dist[a.id]){r.dist[a.id]=Date.now();ch=true}})});return ch};
-SB.user=null;SB.chan=null;SB.mode='in';SB.hist={garantias:[],cobros:[]};
+SB.user=null;SB.chan=null;SB.mode='in';SB.aiOff=false;
+/* ---- IA: Edge Function "ai" (la llave de Anthropic vive solo en el servidor) ---- */
+SB.ai=async function(body){
+  if(!SB.c||!SB.entered)throw new Error('sin sesión');
+  var r=await SB.c.functions.invoke('ai',{body:body});
+  if(r.error){var m=r.error.message;try{var j=await r.error.context.json();m=j.error||m}catch(_){}throw new Error(m)}
+  return r.data;
+};
+SB.aiFail=function(e){var m=(e&&e.message)||'';
+  if(/ai_not_configured/.test(m)){if(!SB.aiOff){SB.aiOff=true;toast('IA aún no configurada: usando el modo básico')}}
+  else console.warn('[IA]',m)};
+SB.aiPrea=async function(text){try{var r=await SB.ai({mode:'garantia',text:text,brand:S.brand});return r&&r.form}catch(e){SB.aiFail(e);return null}};
+SB.applyForm=function(c,f){
+  var rule=f.rule_id?RS.byId(f.rule_id):null,up=function(x){return String(x||'').toUpperCase()};
+  c.sys=f.sys;c.op=f.operacion.code;c.opd=f.operacion.desc;c.h=f.horas;c.hBad=+(f.horas+0.3).toFixed(1);
+  c.parts=f.piezas.map(function(p){return {no:p.no,d:p.d,q:p.q,pr:p.pr}});
+  c.partsTot=c.parts.reduce(function(a,p){return a+p.q*p.pr},0);c.labor=f.horas*RATE;
+  c.codes={q:[f.queja.code,up(f.queja.desc)],c:[f.causa.code,up(f.causa.desc)],r:[f.correccion.code,up(f.correccion.desc)]};
+  c.ruleId=rule?rule.id:null;c.ruleN=rule?rule.n:0;c.ruleConf=rule?RS.conf(rule):0;c.matched=!!rule;
+  c.ai=true;c.aiNote=f.resumen||'';
+};SB.hist={garantias:[],cobros:[]};
 /* ---- Conversaciones y expedientes (por usuario, con RLS) ---- */
 SB.dayLbl=function(iso){var d=new Date(iso),n=new Date(),a=new Date(n.getFullYear(),n.getMonth(),n.getDate()),b=new Date(d.getFullYear(),d.getMonth(),d.getDate()),k=Math.round((a-b)/864e5);
   if(k<=0)return 'Hoy';if(k===1)return 'Ayer';return d.toLocaleDateString('es-MX',{day:'numeric',month:'short'}).replace('.','')};
@@ -1588,11 +1608,22 @@ RC.answer=async function(q){
   if(rule)out+=(out?'<br>':'')+'Regla relacionada: <b>'+rule.id+'</b> · '+esc(rule.sys)+' → '+esc(rule.op)+' ('+rule.n+' PREAs, confianza '+RS.conf(rule)+'%).';
   return out||'No encontré eso en tus registros. Prueba con un folio (PREA-…), un VIN, una regla (R-0001), un sistema como "frenos" o preguntas como "¿cuántas PREAs fueron aceptadas?".';
 };
+RC.hist=[];
+RC.linkFolios=function(html){return html.replace(/PREA-[A-Z0-9]+(?:-[A-Z0-9]+)*/g,function(f){return '<button class="rc-f" type="button" data-folio="'+f+'">'+f+'</button>'})};
 RC.ask=async function(q){
   q=q.trim();if(!q||RC.busy)return;
   if(!SB.c||!SB.entered){RC.add('a','Inicia sesión para consultar tus registros.');return}
   RC.busy=true;RC.add('u',esc(q));var th=RC.add('a','<small>Consultando…</small>');
-  try{th.innerHTML=await RC.answer(q)}catch(e){SB.fail(e);th.textContent='No pude consultar los registros ahora. Intenta de nuevo.'}
+  try{
+    var done=false;
+    if(!SB.aiOff){
+      try{
+        var r=await SB.ai({mode:'chat',messages:RC.hist.concat([{role:'user',content:q}])});
+        if(r&&r.text){th.innerHTML=RC.linkFolios(md(r.text,false));RC.hist.push({role:'user',content:q},{role:'assistant',content:r.text});RC.hist=RC.hist.slice(-10);done=true}
+      }catch(e){SB.aiFail(e)}
+    }
+    if(!done)th.innerHTML=await RC.answer(q)+(SB.aiOff?'<br><small>Modo básico: la IA aún no está configurada.</small>':'');
+  }catch(e){SB.fail(e);th.textContent='No pude consultar los registros ahora. Intenta de nuevo.'}
   RC.busy=false;$('#rcThread').scrollTop=$('#rcThread').scrollHeight;
 };
 $('#rcForm').addEventListener('submit',function(e){e.preventDefault();var i=$('#rcIn'),q=i.value;i.value='';RC.ask(q)});
@@ -1849,9 +1880,14 @@ async function agentTurn(w,ctx,intro,steps,sim,fin,my,build){
 }
 async function run(text,files){
   var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
-  var ctx=ctxFrom(text,files,S.brand);RS.note(ctx.matched);
+  var ctx=ctxFrom(text,files,S.brand),w=addAssistant();
+  if(text&&!SB.aiOff&&SB.entered){
+    $('.ai-body',w).innerHTML=THINK;
+    var form=await SB.aiPrea(text);if(form&&!my.aborted)SB.applyForm(ctx,form);
+  }
+  RS.note(ctx.matched);
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
-  var okp=await agentTurn(addAssistant(),ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx),my,buildPreaCard);
+  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:''),my,buildPreaCard);
   if(okp)SB.saveExp(ctx);
   finish(my);
 }
