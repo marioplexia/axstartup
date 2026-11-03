@@ -11,6 +11,8 @@ const chat = require('./routes/chat');
 const cartera = require('./routes/cartera');
 const expedientes = require('./routes/expedientes');
 const entrenamiento = require('./routes/entrenamiento');
+const cerebro = require('./routes/cerebro');
+const ciclos = require('./brain/cycles');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -31,6 +33,7 @@ app.use('/api/garantias', chat);
 app.use('/api/garantias', cartera);
 app.use('/api/garantias', expedientes);
 app.use('/api/garantias', entrenamiento);
+app.use('/api/garantias', cerebro);
 
 // Pantallas de acceso y la app
 app.get('/login', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
@@ -49,4 +52,4 @@ app.use((err, _req, res, _next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Ax AI Garantías en http://localhost:${PORT}  (login: /login)`));
+app.listen(PORT, () => { console.log(`Ax AI Garantías en http://localhost:${PORT}  (login: /login)`); ciclos.iniciar(); });

@@ -3,6 +3,7 @@
 const crypto = require('crypto');
 const { db, logEvent } = require('../db');
 const P = require('./parse');
+const B = require('../brain/brain');
 
 const getSet = (k, d) => { const r = db.prepare('SELECT value FROM settings WHERE key = ?').get(k); return r ? r.value : d; };
 const putSet = (k, v) => db.prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value').run(k, String(v));
@@ -22,7 +23,7 @@ function claveRegla(d) {
   return { sys, qCode: (d.queja.codigo || '') || 'SC-' + hash6(P.norm(d.queja.texto || d.operacion.descripcion || '')) };
 }
 const CAMPOS_FIJOS = [['unidad', 'Unidad de negocio'], ['tipo_transaccion', 'Tipo de transacción'], ['bac', 'BAC'], ['reparador', 'Reparador'], ['marcador', 'Marcador de transacción'], ['contacto', 'Nombre de contacto'], ['telefono', 'Teléfono'], ['email', 'Correo del contacto']];
-const leerDefaults = () => { try { return JSON.parse(getSet('form_defaults', '{}')); } catch (_) { return {}; } };
+const leerDefaults = agencyId => { const m = {}; db.prepare('SELECT campo, valor FROM agency_defaults WHERE agency_id = ? AND n > 0').all(agencyId || 0).forEach(x => { (m[x.campo] = m[x.campo] || {})[x.valor] = 1; }); return m; };
 function guardarVariante(doc, ruleId, d, h) {
   const ex = d.campos_extra || {};
   db.prepare(`INSERT INTO rule_variants (rule_id, doc_id, marca, modelo, anio, km, op, op_desc, c_code, c_text, r_code, r_text, hours, parts, tarifa, total_piezas, total_bruto, marcador, extra, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
@@ -30,29 +31,46 @@ function guardarVariante(doc, ruleId, d, h) {
       h, JSON.stringify((d.piezas || []).map(p => [p.numero || 'S/N', p.descripcion || '', p.cantidad || 1, p.precio || 0])), d.tarifa_mo || null, d.total_piezas != null ? d.total_piezas : null, d.total_bruto != null ? d.total_bruto : null,
       ex.marcador || '', JSON.stringify({ tipo_transaccion: ex.tipo_transaccion, deducible: ex.deducible, tiempo_adicional: ex.tiempo_adicional, olh: ex.olh, elementos_adicionales: ex.elementos_adicionales }), Date.now());
 }
-// Datos fijos de la agencia (BAC, reparador, contacto, unidad de negocio...): se aprende el valor más frecuente de las PREAs aceptadas
-function sumarDefaults(d, signo) {
-  const m = leerDefaults(), ex = d.campos_extra || {}, usados = [];
-  CAMPOS_FIJOS.forEach(([k]) => { const v = ex[k]; if (!v) return; m[k] = m[k] || {}; m[k][v] = Math.max(0, (m[k][v] || 0) + signo); if (!m[k][v]) delete m[k][v]; usados.push([k, v]); });
-  putSet('form_defaults', JSON.stringify(m));
+// Datos fijos de CADA agencia (BAC, reparador, contacto...): se aprende el valor más frecuente de sus PREAs aceptadas
+function sumarDefaults(agencyId, d, signo) {
+  const ex = d.campos_extra || {}, usados = [];
+  CAMPOS_FIJOS.forEach(([k]) => {
+    const v = ex[k]; if (!v) return;
+    db.prepare('INSERT INTO agency_defaults (agency_id, campo, valor, n) VALUES (?,?,?,?) ON CONFLICT(agency_id, campo, valor) DO UPDATE SET n = MAX(0, n + ?)').run(agencyId || 0, k, String(v), Math.max(0, signo), signo);
+    usados.push([k, v]);
+  });
   return usados;
 }
 const igual = (a, b) => String(a == null ? '' : a).trim().toUpperCase() === String(b == null ? '' : b).trim().toUpperCase();
 const cod = c => c && (c.codigo || c.texto) ? [c.codigo, c.texto].filter(Boolean).join(' · ') : '';
 function guardarLecciones(doc, k, lecs, origen) {
-  let n = 0;
+  const out = { nuevas: [], confirmadas: [] }, ag = doc.agency_id, now = Date.now();
   (lecs || []).forEach(l => {
     if (!l || !l.problema) return;
-    if (db.prepare('SELECT 1 FROM train_lessons WHERE sys = ? AND q_code = ? AND problema = ?').get(k.sys, k.qCode, l.problema)) return;
-    db.prepare('INSERT INTO train_lessons (doc_id, sys, q_code, problema, correccion, temas, tipo, origen, fecha, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)')
-      .run(doc.id, k.sys, k.qCode, l.problema, l.correccion || '', JSON.stringify(l.temas || []), l.tipo || 'rechazo', origen, l.fecha || null, Date.now()); n++;
+    const problema = B.anonimizar(l.problema), correccion = B.anonimizar(l.correccion || '');
+    const ex = db.prepare('SELECT * FROM train_lessons WHERE sys = ? AND q_code = ? AND problema = ?').get(k.sys, k.qCode, problema);
+    if (ex) {            // otra agencia (o el mismo error otra vez): se confirma y sube su peso
+      const ags = JSON.parse(ex.agencias || '[]'), nueva = ag != null && !ags.includes(ag); if (nueva) ags.push(ag);
+      db.prepare('UPDATE train_lessons SET veces = veces + 1, agencias = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(ags), now, ex.id);
+      out.confirmadas.push({ problema, agencias: ags.length, veces: ex.veces + 1, nuevaAgencia: nueva });
+      return;
+    }
+    db.prepare('INSERT INTO train_lessons (doc_id, sys, q_code, problema, correccion, temas, tipo, origen, fecha, created_at, agency_id, veces, agencias, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+      .run(doc.id, k.sys, k.qCode, problema, correccion, JSON.stringify(l.temas || []), l.tipo || 'rechazo', origen, l.fecha || null, now, ag != null ? ag : null, 1, JSON.stringify(ag != null ? [ag] : []), now);
+    out.nuevas.push({ problema, correccion, temas: l.temas || [] });
   });
-  return n;
+  return out;
+}
+// Difunde a toda la red lo que se acaba de aprender
+function avisarRed(doc, k, regla, res, tipo, titulo, sufijo) {
+  if (!res.nuevas.length) return;
+  const n = res.nuevas[0], mas = res.nuevas.length > 1 ? ` (y ${res.nuevas.length - 1} más)` : '';
+  B.alerta({ tipo, severidad: tipo === 'leccion' ? 'aviso' : 'alta', titulo, texto: `${n.problema}${n.correccion ? ' → ' + n.correccion : ''}${mas}${sufijo || ''}`, rule_id: regla ? regla.id : null, sys: k.sys, q_code: k.qCode, agency_id: doc.agency_id });
 }
 
 function aprenderPrea(doc, d) {
   const now = Date.now(), K = claveRegla(d), sys = K.sys, qCode = K.qCode;
-  let rule = db.prepare('SELECT * FROM rules WHERE sys = ? AND q_code = ?').get(sys, qCode), kind, val = [];
+  let rule = db.prepare('SELECT * FROM rules WHERE sys = ? AND q_code = ?').get(sys, qCode), kind, val = [], contextoNuevo = false;
   const hRaw = Number(d.horas) || 0, pz = d.piezas || [];
   const h = hRaw || (rule ? rule.hours_sum / Math.max(rule.n, 1) : 0);
   const insPart = db.prepare('INSERT INTO rule_parts (rule_id, part_no, descr, qty, price, n) VALUES (?,?,?,?,?,1) ON CONFLICT(rule_id, part_no) DO UPDATE SET n = n + 1, qty = excluded.qty, price = excluded.price, descr = excluded.descr');
@@ -78,6 +96,7 @@ function aprenderPrea(doc, d) {
     const nuevas = pz.filter(p => p.numero && !parts.includes(p.numero)).map(p => p.numero);
     if (nuevas.length) dif.push(`incluye piezas nuevas (${nuevas.join(', ')})`);
     const modeloNuevo = d.modelo && !previas.some(v => P.norm(v.modelo || '') === P.norm(d.modelo));
+    contextoNuevo = !!modeloNuevo;
     if (modeloNuevo) val.push({ nivel: 'ok', campo: 'contexto', texto: `Contexto nuevo para la regla ${rule.id}: ${veh}.` });
     if (dif.length) val.push({ nivel: 'aviso', campo: 'variante', texto: `Variante aprendida${veh ? ' para ' + veh : ''}: ${dif.join('; ')}.` });
     if (!val.length) val.push({ nivel: 'ok', campo: 'regla', texto: `Coincide con la regla ${rule.id}.` });
@@ -89,7 +108,7 @@ function aprenderPrea(doc, d) {
     logEvent('reforzada', rule.id, `Regla ${rule.id} reforzada con la PREA «${doc.name}» · ${rule.n} en total`);
   }
   // Reglas por campo: qué valor aprendió de cada campo del formulario y si ya lo conocía
-  const prev = db.prepare('SELECT * FROM rule_variants WHERE rule_id = ?').all(rule.id), ex = d.campos_extra || {}, reglas = [], defs = leerDefaults();
+  const prev = db.prepare('SELECT * FROM rule_variants WHERE rule_id = ?').all(rule.id), ex = d.campos_extra || {}, reglas = [], defs = leerDefaults(doc.agency_id);
   const base = kind === 'creada' ? null : rule;
   const campo = (nombre, valor, conocido) => { if (valor == null || valor === '') return; reglas.push({ campo: nombre, valor: String(valor), estado: kind === 'creada' ? 'nuevo' : (conocido ? 'igual' : 'distinto') }); };
   campo('Queja', cod(d.queja), base && igual(base.q_code, d.queja.codigo));
@@ -111,9 +130,14 @@ function aprenderPrea(doc, d) {
   if (faltan.length) val.push({ nivel: 'aviso', campo: 'campos', texto: `Faltaron estos campos en el documento (se aprendió todo lo demás): ${faltan.join(', ')}.` });
   d._reglas = reglas;
   guardarVariante(doc, rule.id, d, hRaw);
-  d._defs = sumarDefaults(d, +1);
+  d._defs = sumarDefaults(doc.agency_id, d, +1);
   const nl = guardarLecciones(doc, K, d.lecciones, 'aceptada');
-  if (nl) val.push({ nivel: 'ok', campo: 'errores', texto: `Aprendí ${nl} ${nl === 1 ? 'error del historial' : 'errores del historial'} de esta queja.` });
+  if (nl.nuevas.length) val.push({ nivel: 'ok', campo: 'errores', texto: `Aprendí ${nl.nuevas.length} ${nl.nuevas.length === 1 ? 'error del historial' : 'errores del historial'} de esta queja.` });
+  if (nl.confirmadas.length) val.push({ nivel: 'ok', campo: 'red', texto: `${nl.confirmadas.length} ${nl.confirmadas.length === 1 ? 'error ya lo conocía el cerebro' : 'errores ya los conocía el cerebro'}: se confirmaron con esta agencia.` });
+  const vehTxt = vehiculo(d), hTxt = hRaw ? ` · ${hRaw} h` : '';
+  if (kind === 'creada') B.alerta({ tipo: 'regla', titulo: 'La red aprendió una regla nueva', texto: `${d.queja.texto || qCode} → ${d.operacion.codigo || d.operacion.descripcion || 'operación'} (${sys}${vehTxt ? ' · ' + vehTxt : ''}${hTxt}).`, rule_id: rule.id, sys, q_code: qCode, agency_id: doc.agency_id });
+  else if (contextoNuevo) B.alerta({ tipo: 'regla', titulo: 'Un caso conocido, en otro contexto', texto: `«${rule.q_text}» también se aprobó en ${vehTxt}${hTxt}.`, rule_id: rule.id, sys, q_code: qCode, agency_id: doc.agency_id });
+  avisarRed(doc, K, rule, nl, 'leccion', 'Error aprendido en la red: ' + (d.queja.texto || qCode).toLowerCase());
   const th = Math.max(1, Number(getSet('th', 1)));
   if (rule.status === 'aprendizaje' && rule.n >= th) {
     if (getSet('auto', 'true') === 'true') {
@@ -148,9 +172,10 @@ function aprenderError(doc, d) {
     }
     val.push({ nivel: 'aviso', campo: 'regla', texto: `Se aprendió del error de la regla ${rule.id}${rej ? ' y bajó su confianza' : ''}.` });
   } else val.push({ nivel: 'aviso', campo: 'regla', texto: 'Aún no hay regla para esta queja; el error se guardó y se avisará cuando se prepare una PREA igual.' });
-  const nl = guardarLecciones(doc, K, lecs, 'rechazada');
-  val.push({ nivel: 'ok', campo: 'errores', texto: nl ? `Aprendí ${nl} ${nl === 1 ? 'error' : 'errores'} de esta PREA rechazada.` : 'Esos errores ya los conocía.' });
-  logEvent('info', rule ? rule.id : '', `El agente aprendió de una PREA rechazada («${doc.name}»): ${nl} ${nl === 1 ? 'error nuevo' : 'errores nuevos'}`);
+  const nl = guardarLecciones(doc, K, lecs, 'rechazada'), nn = nl.nuevas.length;
+  val.push({ nivel: 'ok', campo: 'errores', texto: nn ? `Aprendí ${nn} ${nn === 1 ? 'error' : 'errores'} de esta PREA rechazada y lo avisé a toda la red.` : 'Esos errores ya los conocía el cerebro (se confirmaron).' });
+  logEvent('info', rule ? rule.id : '', `El agente aprendió de una PREA rechazada («${doc.name}»): ${nn} ${nn === 1 ? 'error nuevo' : 'errores nuevos'}`);
+  avisarRed(doc, K, rule, nl, 'rechazo', 'PREA rechazada en la red: ' + (d.queja.texto || K.qCode).toLowerCase(), ' Evítalo en tu PREA.');
   bumpRev();
   return { rule: rule || null, kind: 'error', validacion: val, rej };
 }
@@ -195,6 +220,15 @@ function aprenderPago(doc, d) {
     logEvent('info', rule.id, `Pago de planta aprendido para la regla ${rule.id}: ${d.horas_pagadas != null ? d.horas_pagadas + ' h, ' : ''}$${(d.total_pagado || 0).toLocaleString('en-US')} pagados`);
     bumpRev();
   }
+  // Mal cobro de planta: la planta pagó menos de lo solicitado -> lección que se comparte con toda la red
+  if (rule && rel) {
+    const K = { sys: rule.sys, qCode: rule.q_code }, lecs = [], p = rel.p, op = d.operacion.codigo || rule.op || 'esta operación';
+    if (ajuste.horas < 0) lecs.push({ problema: `La planta pagó ${d.horas_pagadas} h en ${op} aunque se solicitaron ${p.horas} h.`, correccion: `Captura ${d.horas_pagadas} h para evitar el ajuste de cobro.`, temas: ['tiempo de mano de obra'], tipo: 'cobro' });
+    ajuste.precios.forEach(x => { if (x.despues < x.antes) lecs.push({ problema: `La planta pagó $${x.despues} por la pieza ${x.numero} y se solicitaron $${x.antes}.`, correccion: `Cotiza ${x.numero} a $${x.despues}.`, temas: ['piezas'], tipo: 'cobro' }); });
+    const dm = p.total_bruto != null && d.total_pagado != null ? r1(d.total_pagado - p.total_bruto) : 0;
+    if (dm < 0 && !lecs.length) lecs.push({ problema: `La planta pagó $${Math.abs(dm).toLocaleString('en-US')} menos de lo solicitado en ${op}.`, correccion: 'Revisa tiempo y precios de pieza contra lo que paga la planta.', temas: [], tipo: 'cobro' });
+    if (lecs.length) { const r = guardarLecciones(doc, K, lecs, 'cobro'); avisarRed(doc, K, rule, r, 'mal_cobro', 'Mal cobro de planta detectado', ' Revisa tu cobro y reclama si aplica.'); }
+  }
   return { rule, prea: rel ? rel.x : null, ajuste, validacion: val };
 }
 
@@ -202,7 +236,7 @@ function aprenderPago(doc, d) {
 function olvidar(doc) {
   const d = JSON.parse(doc.data || '{}'), ad = d._ajuste || {}, now = Date.now();
   const vh = db.prepare('SELECT hours FROM rule_variants WHERE doc_id = ?').get(doc.id);
-  if (Array.isArray(d._defs)) { const m = leerDefaults(); d._defs.forEach(([k, v]) => { if (m[k] && m[k][v]) { m[k][v] -= 1; if (m[k][v] <= 0) delete m[k][v]; } }); putSet('form_defaults', JSON.stringify(m)); }
+  if (Array.isArray(d._defs)) d._defs.forEach(([k, v]) => db.prepare('UPDATE agency_defaults SET n = MAX(0, n - 1) WHERE agency_id = ? AND campo = ? AND valor = ?').run(doc.agency_id || 0, k, String(v)));
   db.prepare('DELETE FROM rule_variants WHERE doc_id = ?').run(doc.id);
   db.prepare('DELETE FROM train_lessons WHERE doc_id = ?').run(doc.id);
   if (d._modo === 'error') {
@@ -229,4 +263,4 @@ function olvidar(doc) {
   bumpRev();
 }
 
-module.exports = { aprenderPrea, aprenderError, aprenderPago, olvidar, preaDelPago };
+module.exports = { aprenderPrea, aprenderError, aprenderPago, olvidar, preaDelPago, guardarLecciones, avisarRed, claveRegla };

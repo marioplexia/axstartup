@@ -21,7 +21,7 @@ router.get('/bitacora', (req, res) => {
 // Estado completo para la app (formato RS.d). ?since=<rev> evita reenviar si no hubo cambios.
 router.get('/estado', (req, res) => {
   if (req.query.since !== undefined && Number(req.query.since) === getRev()) return res.json({ unchanged: true, rev: getRev() });
-  res.json(loadState());
+  res.json(loadState(req.user.agency && req.user.agency.id));
 });
 
 // Guarda el estado del cliente mezclándolo con el del servidor y devuelve el resultado.
@@ -31,7 +31,7 @@ router.put('/estado', (req, res) => {
   const reset = !!req.body.reset;
   if (reset && req.user.role !== 'admin') return res.status(403).json({ error: 'Solo un administrador puede restablecer.' });
   saveState(st, { reset, advisorId: req.user.id });
-  res.json(loadState());
+  res.json(loadState(req.user.agency && req.user.agency.id));
 });
 
 module.exports = router;

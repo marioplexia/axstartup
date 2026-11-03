@@ -96,6 +96,19 @@ router.get('/ordenes/:id', (req, res) => {
   o ? res.json(o) : res.status(404).json({ error: 'Orden no encontrada.' });
 });
 
+// Una PREA rechazada enseña a toda la red: el motivo se vuelve lección y se avisa en tiempo real
+function aprenderRechazo(o, b, user) {
+  try {
+    const motivo = String(b.motivo || '').trim().slice(0, 400), r = o.rule_id && db.prepare('SELECT * FROM rules WHERE id = ?').get(o.rule_id);
+    if (r && b.origen !== 'formulario') db.prepare('UPDATE rules SET rej = rej + 1, updated_at = ? WHERE id = ?').run(Date.now(), r.id);   // el formulario ya lo cuenta en el cliente
+    db.prepare('UPDATE orders SET motivo = ? WHERE id = ?').run(motivo || null, o.id);
+    if (!r || !motivo) return;
+    const L = require('../train/learn'), K = { sys: r.sys, qCode: r.q_code }, ag = user.agency && user.agency.id;
+    const res = L.guardarLecciones({ id: null, agency_id: ag }, K, [{ problema: 'Rechazada por la planta: ' + motivo, correccion: '', temas: [], tipo: 'rechazo' }], 'rechazada');
+    L.avisarRed({ agency_id: ag }, K, r, res, 'rechazo', 'PREA rechazada en la red: ' + r.q_text.toLowerCase(), ' Evítalo en tu PREA.');
+  } catch (e) { console.error('cerebro/rechazo:', e.message); }
+}
+
 router.patch('/ordenes/:id', (req, res) => {
   const sc = scope(req.user);
   const o = db.prepare(sel + ' WHERE o.id = ?' + sc.sql).get(req.params.id, ...sc.args);
@@ -124,6 +137,7 @@ router.patch('/ordenes/:id', (req, res) => {
   const closed = status === 'cerrada' ? (o.closed_at || now) : (o.status === 'cerrada' ? null : o.closed_at);   // cerrada = cobrada
   db.prepare('UPDATE orders SET status=?, resolved_at=?, ev_have=?, part_status=?, part_ordered_at=?, due_at=?, closed_at=?, updated_at=? WHERE id=?').run(status, resolved, ev, pst, pord, due, closed, now, o.id);
   const nuevo = db.prepare(sel + ' WHERE o.id = ?').get(o.id);
+  if (o.kind === 'prea' && status === 'rechazada' && o.status !== 'rechazada') aprenderRechazo(o, b, req.user);
   try { require('./cartera').sync(nuevo); } catch (e) { console.error('cartera:', e.message); }
   res.json(nuevo);
 });

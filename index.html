@@ -824,6 +824,43 @@ textarea,input{font:inherit;color:inherit}
 
 /* ---------- Entrenamiento del agente (Tablero de agencia) ---------- */
 .ad-tabs{display:flex;gap:8px;margin:0 0 20px;border-bottom:1px solid var(--line);padding-bottom:0}
+#bell[data-n]:not([data-n="0"]){position:relative}
+#bell[data-n]:not([data-n="0"])::after{content:attr(data-n);position:absolute;top:-4px;right:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#d93025;color:#fff;font:600 10px/16px var(--f-ui,inherit);text-align:center}
+.cb-pop{position:fixed;left:16px;bottom:64px;width:min(380px,calc(100vw - 32px));max-height:min(520px,70vh);display:flex;flex-direction:column;background:var(--card);border:1px solid var(--card-line);border-radius:14px;box-shadow:0 24px 60px -20px rgba(0,0,0,.45);z-index:80;overflow:hidden}
+.cb-pop[hidden]{display:none}
+.cb-ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.cb-ph b{font-size:14px}.cb-ph small{display:block;font-size:11.5px;color:var(--faint);font-weight:400}
+.cb-lst{overflow:auto;flex:1}
+.cb-it{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);cursor:default}
+.cb-it:last-child{border-bottom:0}
+.cb-it.un{background:var(--surface)}
+.cb-dot{flex:none;width:9px;height:9px;border-radius:50%;margin-top:5px;background:#9a9894}
+.cb-dot.alta{background:#d93025}.cb-dot.aviso{background:#c58a1a}.cb-dot.info{background:#0a9b63}
+.cb-tx b{display:block;font-size:13px;font-weight:600;line-height:1.35}
+.cb-tx p{margin:3px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45}
+.cb-tx small{display:block;margin-top:4px;font-size:11px;color:var(--faint)}
+.cb-em{padding:28px 16px;text-align:center;color:var(--faint);font-size:13px}
+.cb-lk{font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;background:none;border:0;padding:0}
+.cb-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.cb-top p{margin:0;color:var(--muted);font-size:13.5px;flex:1;min-width:240px}
+.cb-live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.cb-live i{width:8px;height:8px;border-radius:50%;background:#9a9894}.cb-live.on i{background:#0a9b63;box-shadow:0 0 0 3px rgba(10,155,99,.18)}
+.cb-gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.cb-k{border:1px solid var(--card-line);border-radius:12px;padding:12px 14px;background:var(--card)}
+.cb-k b{display:block;font-size:22px;font-weight:600;font-family:var(--f-ui,inherit)}.cb-k span{font-size:12px;color:var(--muted)}
+.cb-lp{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-bottom:20px}
+.cb-l{border:1px solid var(--card-line);border-radius:12px;padding:12px 14px;background:var(--card);font-size:13px}
+.cb-l b{display:flex;align-items:center;gap:8px;font-size:13.5px}.cb-l b i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:11px;color:var(--muted)}
+.cb-l p{margin:6px 0 0;color:var(--muted);line-height:1.45}
+.cb-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:900px){.cb-2{grid-template-columns:1fr}}
+.cb-sec{border:1px solid var(--card-line);border-radius:14px;background:var(--card);overflow:hidden;margin-bottom:16px}
+.cb-sec h4{margin:0;padding:12px 14px;font-size:13.5px;border-bottom:1px solid var(--line)}
+.cb-row{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px}.cb-row:last-child{border-bottom:0}
+.cb-row em{font-style:normal;color:var(--faint);font-size:12px;white-space:nowrap}
+.cb-bar{height:6px;border-radius:3px;background:var(--b-track,#ecebe7);overflow:hidden;margin-top:5px;min-width:90px}.cb-bar i{display:block;height:100%;background:#d93025}
+.cb-ac{display:flex;gap:8px;flex-wrap:wrap}
+.gfi{flex:1;min-width:200px;height:28px;border:1px solid #b9cfee;border-radius:6px;padding:0 9px;font:12px var(--f-ui);background:#fff;color:#161616}
+.car-mo{width:120px;height:32px;border:1px solid var(--line);border-radius:8px;padding:0 9px;background:var(--bg);color:var(--fg);font:13px var(--f-ui,inherit)}
 .ad-tab{height:38px;padding:0 4px;margin-right:18px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;align-items:center;gap:8px}
 .ad-tab:hover{color:var(--fg)}.ad-tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg);font-weight:500}
 .tr-intro{margin:0 0 18px;color:var(--muted);font-size:14px;max-width:760px;line-height:1.6}
@@ -972,7 +1009,7 @@ textarea,input{font:inherit;color:inherit}
           <div><h2>Tablero de agencia</h2><p>FAME Morelia · reglas que aprende el Agente de Garantías y cómo se distribuyen</p></div>
           <div class="ad-live" id="adLive"><i></i><span>En vivo</span></div>
         </div>
-        <div class="ad-tabs" role="tablist"><button class="ad-tab" role="tab" data-adtab="cat" aria-selected="true">Catálogo de reglas</button><button class="ad-tab" role="tab" data-adtab="train" aria-selected="false">Entrenamiento<span class="nbadge" id="trBadge" hidden></span></button></div>
+        <div class="ad-tabs" role="tablist"><button class="ad-tab" role="tab" data-adtab="cat" aria-selected="true">Catálogo de reglas</button><button class="ad-tab" role="tab" data-adtab="train" aria-selected="false">Entrenamiento<span class="nbadge" id="trBadge" hidden></span></button><button class="ad-tab" role="tab" data-adtab="cerebro" aria-selected="false">Cerebro de la red</button></div>
         <div id="adCat">
         <div class="ad-kpi" id="adKpi"></div>
         <div class="ad-bar">
@@ -1008,6 +1045,7 @@ textarea,input{font:inherit;color:inherit}
         </div>
         </div>
         <div id="adTrain" hidden></div>
+        <div id="adCer" hidden></div>
       </div>
     </section>
   </main>
@@ -1089,7 +1127,60 @@ $('#sbClose').addEventListener('click',function(){setSb(false)});
 $('#sbOpen').addEventListener('click',function(){setSb(true)});
 $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
-$('#bell').addEventListener('click',function(){toast('Sin notificaciones nuevas')});
+
+/* ---------- Cerebro de la red: alertas en tiempo real (SSE) ---------- */
+var CB={al:[],unread:0,live:false,run:false,est:null,err:''};
+var CBT={leccion:'Error aprendido',regla:'Regla nueva',rechazo:'PREA rechazada',mal_cobro:'Mal cobro de planta',patron:'Patrón en la red',riesgo:'Regla en riesgo',desvio:'Desvío de pago',ciclo:'Ciclo'};
+var cbAgo=function(t){var s=Math.max(1,Math.round((Date.now()-t)/1000));return s<60?'hace '+s+' s':s<3600?'hace '+Math.round(s/60)+' min':s<86400?'hace '+Math.round(s/3600)+' h':'hace '+Math.round(s/86400)+' d'};
+var cbPop=document.createElement('div');cbPop.className='cb-pop';cbPop.hidden=true;cbPop.setAttribute('role','dialog');cbPop.setAttribute('aria-label','Notificaciones del cerebro');document.body.appendChild(cbPop);
+CB.badge=function(){var b=$('#bell');if(b)b.dataset.n=CB.unread>99?'99+':String(CB.unread)};
+CB.item=function(a){return '<div class="cb-it'+(a.leida||a.propia?'':' un')+'" data-cbid="'+a.id+'"><span class="cb-dot '+a.severidad+'"></span><div class="cb-tx"><b>'+escA(a.titulo)+'</b><p>'+escA(a.texto)+'</p><small>'+(CBT[a.tipo]||a.tipo)+' · '+(a.propia?'tu agencia':'otra agencia de la red')+' · '+cbAgo(a.created_at)+'</small></div></div>'};
+CB.render=function(){
+  if(!cbPop.hidden)cbPop.innerHTML='<div class="cb-ph"><div><b>Cerebro de la red</b><small>'+(CB.live?'En vivo · aprende de todas las agencias':'Sin conexión en vivo, reintentando…')+'</small></div>'+(CB.unread?'<button class="cb-lk" data-cball>Marcar todo como leído</button>':'')+'</div><div class="cb-lst">'+(CB.al.length?CB.al.slice(0,40).map(CB.item).join(''):'<div class="cb-em">Aún no hay avisos. Cuando cualquier agencia aprenda un error, una regla o detecte un mal cobro, te aparecerá aquí al instante.</div>')+'</div>';
+  if(S.view==='admin'&&TR.tab==='cerebro')cbDraw();
+};
+CB.load=async function(){try{var r=await bitApi('GET','/cerebro/alertas');CB.al=r.alertas;CB.unread=r.sin_leer;CB.badge();CB.render()}catch(_){}};
+CB.onAlert=function(a){
+  if(CB.al.some(function(x){return x.id===a.id}))return;
+  CB.al.unshift(a);if(CB.al.length>60)CB.al.length=60;
+  if(!a.propia){CB.unread++;toast('Cerebro · '+a.titulo)}
+  if(a.tipo!=='patron'&&a.tipo!=='riesgo'&&a.tipo!=='desvio')RS.pull();      /* la regla o la lección nueva llega a este asesor en el momento */
+  CB.badge();CB.render();
+  if(S.view==='admin'&&TR.tab==='cerebro')cbLoad();
+};
+CB.parse=function(blk){
+  var ev='',data='';blk.split('\n').forEach(function(l){if(l.indexOf('event: ')===0)ev=l.slice(7);else if(l.indexOf('data: ')===0)data+=l.slice(6)});
+  if(!ev||!data)return;var j;try{j=JSON.parse(data)}catch(_){return}
+  if(ev==='alerta')CB.onAlert(j);else if(ev==='ciclo'){if(S.view==='admin'&&TR.tab==='cerebro')cbLoad()}
+};
+CB.connect=async function(){
+  var stop=false;
+  try{
+    var r=await fetch('/api/garantias/cerebro/stream',{headers:{Authorization:'Bearer '+AX.token}});
+    if(r.status===401){return}
+    if(!r.ok||!r.body)throw 0;
+    CB.live=true;CB.render();
+    var rd=r.body.getReader(),dec=new TextDecoder(),buf='';
+    for(;;){var x=await rd.read();if(x.done)break;buf+=dec.decode(x.value,{stream:true});var parts=buf.split('\n\n');buf=parts.pop();parts.forEach(CB.parse)}
+  }catch(_){}
+  CB.live=false;CB.render();
+  if(!stop)setTimeout(CB.connect,3000+Math.random()*3000);
+};
+CB.start=function(){if(!AX.on||CB.run)return;CB.run=true;CB.load();CB.connect();setInterval(function(){if(!document.hidden)CB.load()},60000)};
+$('#bell').addEventListener('click',function(e){
+  e.stopPropagation();
+  if(!AX.on){toast('Sin notificaciones nuevas');return}
+  cbPop.hidden=!cbPop.hidden;if(!cbPop.hidden){CB.render();CB.load()}
+});
+cbPop.addEventListener('click',function(e){
+  e.stopPropagation();
+  if(e.target.closest('[data-cball]')){bitApi('POST','/cerebro/alertas/leidas',{}).then(function(){CB.al.forEach(function(a){a.leida=true});CB.unread=0;CB.badge();CB.render()}).catch(function(){});return}
+  var it=e.target.closest('[data-cbid]');
+  if(it){var a=CB.al.filter(function(x){return String(x.id)===it.dataset.cbid})[0];if(a&&!a.leida&&!a.propia){a.leida=true;CB.unread=Math.max(0,CB.unread-1);CB.badge();CB.render();bitApi('POST','/cerebro/alertas/leidas',{ids:[a.id]}).catch(function(){})}}
+});
+document.addEventListener('click',function(e){if(!cbPop.hidden&&!cbPop.contains(e.target))cbPop.hidden=true});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!cbPop.hidden)cbPop.hidden=true});
+
 $('#settings').addEventListener('click',function(){toast('Configuración no está disponible en esta réplica')});
 $('#userBtn').addEventListener('click',function(){
   if(AX.on){if(confirm('Sesión: '+AX.user.email+' · '+AX.user.agency.name+'\n\n¿Cerrar sesión?'))AX.logout()}
@@ -1364,7 +1455,7 @@ function ctxFrom(text,files,brand){
     km:km,kmTxt:km.toLocaleString('es-MX'),date:fmt(now),deliv:fmt(dl),vehicle:'Pickup '+dl.getFullYear()+' (ejemplo)',vin:'3GCDEMO5JG0000001',
     queja:t?(t.length>140?t.slice(0,137)+'…':t):'Falla reportada por el cliente',files:files,
     folio:'PREA-DEMO-'+String(Math.floor(100000+Math.random()*900000)),
-    ruleId:rl?rl.id:null,ruleN:rl?rl.n:0,ruleConf:rl?RS.conf(rl):0,matched:!!rl,codes:rl?(c.codes||{q:rl.q,c:rl.c,r:rl.r}):null,variantTxt:rl&&c.variant?[c.variant.mo,c.variant.an].filter(Boolean).join(' '):'',rate:c.rate||0,marcador:c.marcador||'',extra:c.extra||null,form:RS.d.form||{},lessons:rl?(rl.les||[]):[],
+    ruleId:rl?rl.id:null,ruleN:rl?rl.n:0,ruleConf:rl?RS.conf(rl):0,matched:!!rl,codes:rl?(c.codes||{q:rl.q,c:rl.c,r:rl.r}):null,variantTxt:rl&&c.variant?[c.variant.mo,c.variant.an].filter(Boolean).join(' '):'',rate:c.rate||0,marcador:c.marcador||'',extra:c.extra||null,form:RS.d.form||{},lessons:rl?(rl.les||[]):[],guide:rl&&rl.gu?rl.gu:'',
     rawText:t,vinReal:(t.match(/\b[A-HJ-NPR-Z0-9]{17}\b/i)||[''])[0].toUpperCase(),wo:(t.match(/\bG-[A-Z0-9]{6,10}\b/i)||[''])[0].toUpperCase()};
 }
 function introText(ctx){
@@ -1372,7 +1463,7 @@ function introText(ctx){
 }
 function finalText(ctx){
   var g=gmData(ctx);
-  return 'Listo. Este es el formulario completo de la PREA, con lo que debes capturar en cada campo.\n\n1. **Queja**: '+g.q.code+'\n2. **Causa**: '+g.c.code+'\n3. **Corrección**: '+g.r.code+'\n4. **Operación**: '+ctx.op+', '+ctx.h.toFixed(1)+' h\n5. **Piezas**: '+ctx.parts.length+(ctx.parts.length===1?' partida':' partidas')+', '+g.fm(ctx.partsTot)+'\n6. **Total bruto**: '+g.fm(g.gross)+'\n\nCopia cada campo con su botón **Copiar**, o todo junto con **Copiar todo**. Los códigos, tiempos y precios son de ejemplo y no se envió nada a ningún portal real.'+(ctx.matched?'\n\nUsé la regla **'+ctx.ruleId+'**, aprendida de '+ctx.ruleN+(ctx.ruleN===1?' PREA aceptada':' PREAs aceptadas')+(ctx.variantTxt?', con la variante de **'+ctx.variantTxt+'**':'')+'.'+(ctx.lessons.length?'\n\n**Evita estos errores que ya tuvo esta queja:**\n'+ctx.lessons.slice(0,4).map(function(l){return '- '+l.p+(l.c?' → '+l.c:'')}).join('\n'):''):'\n\nNo tenía una regla para este caso y usé criterio general. Cuando el fabricante responda, indícalo al final del formulario y el agente aprende.');
+  return 'Listo. Este es el formulario completo de la PREA, con lo que debes capturar en cada campo.\n\n1. **Queja**: '+g.q.code+'\n2. **Causa**: '+g.c.code+'\n3. **Corrección**: '+g.r.code+'\n4. **Operación**: '+ctx.op+', '+ctx.h.toFixed(1)+' h\n5. **Piezas**: '+ctx.parts.length+(ctx.parts.length===1?' partida':' partidas')+', '+g.fm(ctx.partsTot)+'\n6. **Total bruto**: '+g.fm(g.gross)+'\n\nCopia cada campo con su botón **Copiar**, o todo junto con **Copiar todo**. Los códigos, tiempos y precios son de ejemplo y no se envió nada a ningún portal real.'+(ctx.matched?'\n\nUsé la regla **'+ctx.ruleId+'**, aprendida de '+ctx.ruleN+(ctx.ruleN===1?' PREA aceptada':' PREAs aceptadas')+(ctx.variantTxt?', con la variante de **'+ctx.variantTxt+'**':'')+'.'+(ctx.lessons.length?'\n\n**Evita estos errores que ya tuvo esta queja:**\n'+ctx.lessons.slice(0,4).map(function(l){return '- '+l.p+(l.c?' → '+l.c:'')}).join('\n'):'')+(ctx.guide?'\n\n**Checklist del cerebro (aprendido de toda la red):**\n'+ctx.guide:''):'\n\nNo tenía una regla para este caso y usé criterio general. Cuando el fabricante responda, indícalo al final del formulario y el agente aprende.');
 }
 
 var HDR='<div class="ph"><b class="logo">PF</b><span>Portal del fabricante</span><em>Garantías</em></div>';
@@ -1599,9 +1690,12 @@ document.addEventListener('click',function(e){
   var f=b.closest('.gmf'),F=f&&f._F;if(!F)return;
   if(b.classList.contains('gfa')){
     var bar=b.parentNode,cx=f._ctx;if(!cx)return;
-    $$('.gfa',bar).forEach(function(x){x.disabled=true});
+    if(b.dataset.r!=='no')$$('.gfa',bar).forEach(function(x){x.disabled=true});else b.disabled=true;
     if(b.dataset.r==='ok'){bitResolve(cx,'aprobada');var o=RS.learn(ctxToRec(cx));bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia.</span>'}
-    else{bitResolve(cx,'rechazada');if(cx.ruleId)RS.reject(cx.ruleId);bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+'</span>'}
+    else if(b.dataset.r==='no'){
+      bar.className='gfb';bar.innerHTML='<span>¿Por qué la rechazó la planta? Tu respuesta se comparte (sin datos personales) para que ninguna otra agencia cometa el mismo error.</span><input class="gfi" type="text" maxlength="300" placeholder="Ej.: faltó el kilometraje en la evidencia" aria-label="Motivo del rechazo"><button class="gfa" type="button" data-r="nom">Enviar rechazo</button><button class="gfa" type="button" data-r="nos">Omitir motivo</button>';
+    }
+    else{var mot=b.dataset.r==='nom'?(bar.querySelector('.gfi').value||'').trim():'';bitResolve(cx,'rechazada',mot);if(cx.ruleId)RS.reject(cx.ruleId);bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+(mot?' El cerebro avisó a las demás agencias.':'')+'</span>'}
     return;
   }
   if(b.classList.contains('gall')){
@@ -1868,7 +1962,7 @@ function parseRecs(text,name){
 RS.template='sistema,queja_codigo,queja,causa_codigo,causa,correccion_codigo,correccion,operacion,operacion_desc,horas,piezas,asesor\nSuspensión,SU-110,Ruido en suspensión delantera al pasar baches,SU-320,Amortiguador delantero con fuga,SU-420,Reemplazar amortiguadores delanteros,OP-SU-018,Reemplazar amortiguadores delanteros,2.4,PZ-SU-7101:Amortiguador delantero:2:1480;PZ-SU-7102:Kit de cubrepolvo:1:320,Lucía Ortega\n';
 
 RS.load();
-if(AX.on){RS.pull();setInterval(RS.pull,5000);document.addEventListener('visibilitychange',function(){if(!document.hidden)RS.pull()})}
+if(AX.on){CB.start();RS.pull();setInterval(RS.pull,5000);document.addEventListener('visibilitychange',function(){if(!document.hidden)RS.pull()})}
 try{RS.bc=new BroadcastChannel('axai-reglas');RS.bc.onmessage=function(){RS.load();RS.emit()}}catch(_){}
 try{window.addEventListener('storage',function(e){if(e.key===RS.K){RS.load();RS.emit()}})}catch(_){}
 RS.d.rules.forEach(function(r){if(r.status==='distribuyendo'&&RS.q.indexOf(r.id)<0)RS.q.push(r.id)});
@@ -2444,6 +2538,7 @@ bitEl.addEventListener('click',async function(e){
   if(t.dataset.ev||t.dataset.set||t.dataset.part){
     var o=(BT.data.items.filter(function(x){return x.id===q('id')})[0]);if(!o)return;
     var body=t.dataset.part?{part_status:q('part')}:t.dataset.set?{status:q('set')}:{ev_have:o.ev_have+(+q('ev'))};
+    if(body.status==='rechazada'&&o.kind==='prea'&&o.status!=='rechazada'){var mot=window.prompt('¿Por qué la rechazó la planta? Tu respuesta se comparte (sin datos personales) para que ninguna otra agencia cometa el mismo error. Puedes dejarlo vacío.','');if(mot===null)return;body.motivo=mot.trim()}
     try{var r=await bitApi('PATCH','/ordenes/'+o.id,body);Object.assign(o,r);if(t.dataset.set)toast(r.kind==='prea'?'PREA '+r.id+': '+BST[r.status].toLowerCase():BST[r.status]+' · '+r.id);bitLoad()}catch(er){toast(er.message||'No se pudo actualizar')}
   }
 });
@@ -2472,9 +2567,9 @@ setInterval(function(){if(S.view==='bitacora'&&AX.on&&!document.hidden&&!BT.pop&
 function bitRegister(ctx,g){
   if(ctx.prueba||!AX.on||ctx.orderId||ctx.orderPending)return;ctx.orderPending=true;
   bitApi('POST','/ordenes',{tipo:'prea',titulo:'PREA',pieza:(ctx.parts&&ctx.parts[0]?ctx.parts[0].d:''),vin:g.vin,km:ctx.km,monto:g.gross,rule_id:ctx.ruleId||'',ev_need:5,
-    detalle:(ctx.brand||'')+' en garantía, VIN '+g.vin+', '+ctx.kmTxt+' km. '+(ctx.rawText||'')}).then(function(o){ctx.orderId=o.id;toast('PREA '+o.id+' registrada en la bitácora');if(ctx.wantStatus)bitResolve(ctx,ctx.wantStatus);var fl=(ctx.files||[]).map(function(x){return x.file}).filter(Boolean);if(fl.length)exUpload(o.id,'evidencias',fl,'Adjunto desde el Agente de Garantías',true).then(function(n){if(n)toast(n+(n===1?' archivo guardado':' archivos guardados')+' en el expediente')});if(S.view==='bitacora')bitLoad()}).catch(function(){ctx.orderPending=false});
+    detalle:(ctx.brand||'')+' en garantía, VIN '+g.vin+', '+ctx.kmTxt+' km. '+(ctx.rawText||'')}).then(function(o){ctx.orderId=o.id;toast('PREA '+o.id+' registrada en la bitácora');if(ctx.wantStatus)bitResolve(ctx,ctx.wantStatus,ctx.wantMotivo);var fl=(ctx.files||[]).map(function(x){return x.file}).filter(Boolean);if(fl.length)exUpload(o.id,'evidencias',fl,'Adjunto desde el Agente de Garantías',true).then(function(n){if(n)toast(n+(n===1?' archivo guardado':' archivos guardados')+' en el expediente')});if(S.view==='bitacora')bitLoad()}).catch(function(){ctx.orderPending=false});
 }
-function bitResolve(ctx,status){if(!AX.on)return;ctx.wantStatus=status;if(!ctx.orderId)return;bitApi('PATCH','/ordenes/'+ctx.orderId,{status:status}).catch(function(){})}
+function bitResolve(ctx,status,motivo){if(!AX.on)return;ctx.wantStatus=status;if(motivo)ctx.wantMotivo=motivo;if(!ctx.orderId)return;bitApi('PATCH','/ordenes/'+ctx.orderId,{status:status,motivo:ctx.wantMotivo||'',origen:'formulario'}).catch(function(){})}
 
 
 /* ---------- Inicio: tablero conectado al backend ---------- */
@@ -2755,7 +2850,7 @@ function carDrawer(){
   return '<div class="car-sc" data-cx="1"></div><aside class="car-dr" role="dialog" aria-label="Cobro '+escA(c.folio)+'"><div class="car-dh"><div><h3>'+escA(c.folio)+'</h3><p>'+escA(c.concepto)+'</p></div><button class="x" data-cx="1" aria-label="Cerrar">'+svg('x')+'</button></div>'+
    '<div class="car-db"><div><span class="car-pill '+c.estado+'">'+CPL[c.estado]+'</span></div><div class="car-df"><div><span>Instalación</span><b>'+carD(c.instalacion)+'</b></div><div><span>Cobro</span><b>'+carD(c.cobro)+'</b></div><div><span>Piezas</span><b>'+carM(c.piezas)+'</b></div><div><span>Total</span><b>'+carM(c.total)+'</b></div><div><span>Días abierto</span><b>'+(c.dias==null?'—':c.dias)+'</b></div><div><span>Pagado el</span><b>'+carD(c.pagado_el)+'</b></div></div>'+
    '<div><span class="lbl" style="display:block;margin-bottom:10px">Comentarios</span><div class="car-cl" id="carCl">'+(r.comentarios.length?r.comentarios.map(function(k){return '<div class="car-c">'+escA(k.texto)+'<small>'+escA(k.autor)+' · '+new Date(k.ts).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})+'</small></div>'}).join(''):'<div class="car-empty" style="padding:14px">Aún no hay comentarios.</div>')+'</div></div></div>'+
-   '<div class="car-dm"><textarea id="carNew" maxlength="500" placeholder="Escribe un comentario…" aria-label="Nuevo comentario"></textarea><div class="row2"><button class="car-b" data-pay="'+c.id+'" data-r="'+(c.estado==='pagado'?'0':'1')+'">'+(c.estado==='pagado'?'Reabrir cobro':'Registrar pago')+'</button><button class="car-b dk" data-send="'+c.id+'">Comentar</button></div></div></aside>';
+   '<div class="car-dm"><textarea id="carNew" maxlength="500" placeholder="Escribe un comentario…" aria-label="Nuevo comentario"></textarea><div class="row2">'+(c.estado==='pagado'?'':'<input class="car-mo" id="carMonto" type="number" min="0" step="0.01" value="'+c.total+'" aria-label="Monto pagado por la planta" title="Monto que pagó la planta">')+'<button class="car-b" data-pay="'+c.id+'" data-r="'+(c.estado==='pagado'?'0':'1')+'">'+(c.estado==='pagado'?'Reabrir cobro':'Registrar pago')+'</button><button class="car-b dk" data-send="'+c.id+'">Comentar</button></div></div></aside>';
 }
 function carRender(){
   if(S.view!=='cartera')return;
@@ -2782,7 +2877,7 @@ carEl.addEventListener('click',async function(e){
   if(q.pdf){carPdf();return}
   if(q.pay){
     var pagar=q.r!=='0';
-    try{await bitApi('POST','/cartera/'+q.pay+'/pago',{pagado:pagar});toast(pagar?'Pago registrado':'Cobro reabierto');
+    var mo=$('#carMonto');try{await bitApi('POST','/cartera/'+q.pay+'/pago',pagar&&mo&&mo.value!==''?{pagado:pagar,monto_pagado:+mo.value}:{pagado:pagar});toast(pagar?'Pago registrado':'Cobro reabierto');
       if(CAR.dr)await carOpen(CAR.dr.cobro.id);carLoad()}catch(er){toast(er.message||'No se pudo actualizar')}return}
   if(q.send){
     var tx=$('#carNew'),v=tx.value.trim();if(!v){tx.focus();return}
@@ -3186,9 +3281,35 @@ async function trUpload(tipo,files){
 }
 function adTab(t){
   TR.tab=t;$$('.ad-tab').forEach(function(b){b.setAttribute('aria-selected',b.dataset.adtab===t)});
-  $('#adCat').hidden=t!=='cat';$('#adTrain').hidden=t!=='train';
+  $('#adCat').hidden=t!=='cat';$('#adTrain').hidden=t!=='train';$('#adCer').hidden=t!=='cerebro';
   if(t==='train'){trRender();trLoad()}else clearTimeout(TR.timer);
+  if(t==='cerebro')cbLoad();
 }
+var LOOPS=[['Absorber','Lee cada PREA aceptada, rechazada y pago de planta, y guarda campos, variantes y errores.'],['Difundir','Lo que aprende una agencia llega a las demás en el instante, sin datos personales.'],['Consolidar','Detecta reglas con muchos rechazos y las marca en riesgo.'],['Buscar patrones','Cuando el mismo error aparece en varias agencias, lo eleva como patrón de la red.'],['Vigilar pagos','Compara lo cobrado con lo que paga la planta y avisa los desvíos.'],['Reflexionar','Convierte los errores en un checklist por regla que verás al armar tu PREA.']];
+async function cbLoad(){
+  if(!AX.on){cbDraw();return}
+  try{CB.est=await bitApi('GET','/cerebro/estado');CB.err=''}catch(e){if(e.message!=='sesión')CB.err='No se pudo conectar con el servidor.'}
+  cbDraw();
+}
+function cbDraw(){
+  var el=$('#adCer');if(!el||el.hidden)return;
+  if(!AX.on){el.innerHTML='<p class="cb-em">El cerebro de la red necesita el servidor conectado.</p>';return}
+  var e=CB.est;if(!e){el.innerHTML='<p class="cb-em">'+(CB.err||'Cargando el cerebro…')+'</p>';return}
+  var m=e.metricas||{},u=e.ultimo||(e.ciclos&&e.ciclos[0]&&{ts:e.ciclos[0].ts,ms:e.ciclos[0].ms}),prec=m.precision;
+  var K=function(n,l){return '<div class="cb-k"><b>'+n+'</b><span>'+l+'</span></div>'};
+  el.innerHTML='<div class="cb-top"><p>Un solo cerebro para toda la marca: cada PREA aceptada o rechazada y cada pago de planta enseñan a <b>todas</b> las agencias, en tiempo real, y los bucles de abajo lo mejoran solos.</p><span class="cb-live'+(CB.live?' on':'')+'"><i></i>'+(CB.live?'En vivo · '+(m.conectados||1)+(m.conectados===1?' asesor conectado':' asesores conectados'):'Reconectando…')+'</span><div class="cb-ac"><button class="bt pri" data-cbciclo'+(CB.busy?' disabled':'')+'>'+(CB.busy?'Aprendiendo…':'Ejecutar ciclo ahora')+'</button>'+(e.modo_prueba?'<button class="bt" data-cbsim="rechazo">Simular rechazo de otra agencia</button><button class="bt" data-cbsim="mal_cobro">Simular mal cobro</button>':'')+'</div></div>'+
+   '<div class="cb-gr">'+K(m.reglas||0,'reglas aprendidas')+K(m.variantes||0,'variantes y contextos')+K(m.lecciones||0,'errores aprendidos')+K(m.lecciones_confirmadas||0,'confirmados por varias agencias')+K(m.agencias_aportando||0,'agencias que enseñan')+K(m.guias||0,'checklists generados')+K(prec==null?'—':prec+' %','precisión en autoevaluación')+K(u?cbAgo(u.ts).replace('hace ',''):'—','desde el último ciclo')+'</div>'+
+   '<div class="cb-lp">'+LOOPS.map(function(l,i){return '<div class="cb-l"><b><i>'+(i+1)+'</i>'+l[0]+'</b><p>'+l[1]+'</p></div>'}).join('')+'</div>'+
+   '<div class="cb-2"><div><div class="cb-sec"><h4>Avisos en vivo de la red</h4>'+(CB.al.length?CB.al.slice(0,8).map(CB.item).join(''):'<div class="cb-em">Sin avisos todavía.</div>')+'</div></div>'+
+   '<div><div class="cb-sec"><h4>Errores que más se repiten</h4>'+((e.top_errores||[]).length?e.top_errores.map(function(l){return '<div class="cb-row"><span>'+escA(l.problema)+(l.correccion?' <span style="color:var(--muted)">→ '+escA(l.correccion)+'</span>':'')+'</span><em>'+l.veces+'×'+(l.agencias>1?' · '+l.agencias+' agencias':'')+'</em></div>'}).join(''):'<div class="cb-em">Sin errores guardados.</div>')+'</div>'+
+   '<div class="cb-sec"><h4>Reglas con más rechazos</h4>'+((e.riesgo||[]).length?e.riesgo.map(function(r){return '<div class="cb-row"><span>'+escA(r.q_text)+'<div class="cb-bar"><i style="width:'+r.tasa+'%"></i></div></span><em>'+r.rej+' de '+(r.n+r.rej)+' · '+r.tasa+' %</em></div>'}).join(''):'<div class="cb-em">Ninguna regla tiene rechazos.</div>')+'</div>'+
+   '<div class="cb-sec"><h4>Ciclos recientes</h4>'+((e.ciclos||[]).length?e.ciclos.slice(0,6).map(function(c){return '<div class="cb-row"><span>'+escA(c.motivo||'')+(c.acciones.length?' · '+escA(c.acciones.join(', ')):' · sin cambios')+'</span><em>'+cbAgo(c.ts)+' · '+c.ms+' ms</em></div>'}).join(''):'<div class="cb-em">Aún no corre ningún ciclo.</div>')+'</div></div></div>';
+}
+$('#adCer').addEventListener('click',async function(ev){
+  var t=ev.target.closest('button');if(!t)return;
+  if(t.dataset.cbciclo!==undefined){CB.busy=true;cbDraw();try{await bitApi('POST','/cerebro/ciclo',{});toast('Ciclo de aprendizaje completado')}catch(_){toast('No se pudo ejecutar el ciclo')}CB.busy=false;cbLoad();return}
+  if(t.dataset.cbsim){try{await bitApi('POST','/cerebro/simular',{tipo:t.dataset.cbsim})}catch(er){toast(er.message||'No disponible')}}
+});
 $$('.ad-tab').forEach(function(b){b.addEventListener('click',function(){adTab(b.dataset.adtab)})});
 var trFile=document.createElement('input');trFile.type='file';trFile.multiple=true;trFile.accept='application/pdf,image/png,image/jpeg,image/webp,image/gif,.pdf,.png,.jpg,.jpeg,.webp,.gif';trFile.hidden=true;document.body.appendChild(trFile);
 var trPick='prea';

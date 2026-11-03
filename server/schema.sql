@@ -244,3 +244,47 @@ CREATE TABLE IF NOT EXISTS train_lessons (
   created_at INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_tl_key ON train_lessons(sys, q_code);
+
+-- Cerebro de la red: alertas en tiempo real, ciclos de autoaprendizaje, guías por regla y valores fijos por agencia
+CREATE TABLE IF NOT EXISTS brain_alerts (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  tipo        TEXT NOT NULL,            -- leccion | regla | mal_cobro | rechazo | patron | riesgo | desvio | ciclo
+  severidad   TEXT NOT NULL DEFAULT 'info',   -- info | aviso | alta
+  titulo      TEXT NOT NULL,
+  texto       TEXT NOT NULL,
+  rule_id     TEXT,
+  sys         TEXT,
+  q_code      TEXT,
+  agency_id   INTEGER,                  -- agencia de origen (se muestra como «otra agencia de la red»)
+  data        TEXT,
+  created_at  INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_ba_ts ON brain_alerts(created_at DESC);
+CREATE TABLE IF NOT EXISTS brain_reads (
+  alert_id    INTEGER NOT NULL REFERENCES brain_alerts(id) ON DELETE CASCADE,
+  advisor_id  TEXT NOT NULL,
+  PRIMARY KEY (alert_id, advisor_id)
+);
+CREATE TABLE IF NOT EXISTS brain_cycles (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts          INTEGER NOT NULL,
+  ms          INTEGER NOT NULL,
+  motivo      TEXT,
+  metricas    TEXT,
+  acciones    TEXT
+);
+CREATE TABLE IF NOT EXISTS rule_guides (
+  rule_id     TEXT PRIMARY KEY REFERENCES rules(id) ON DELETE CASCADE,
+  guia        TEXT NOT NULL,
+  temas       TEXT,
+  motor       TEXT,
+  n_lecciones INTEGER NOT NULL DEFAULT 0,
+  updated_at  INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS agency_defaults (
+  agency_id   INTEGER NOT NULL,
+  campo       TEXT NOT NULL,
+  valor       TEXT NOT NULL,
+  n           INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (agency_id, campo, valor)
+);

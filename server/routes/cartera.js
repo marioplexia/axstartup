@@ -40,13 +40,30 @@ router.get('/cartera', (req, res) => {
   res.json({ ...resumen(all), items: items.map(out), total: all.length });
 });
 
+// La planta pagó menos de lo cobrado: la red aprende el desvío y las demás agencias revisan el suyo
+function malCobro(c, ord, monto, user) {
+  try {
+    const r = db.prepare('SELECT * FROM rules WHERE id = ?').get(ord.rule_id); if (!r) return;
+    const L = require('../train/learn'), K = { sys: r.sys, qCode: r.q_code }, ag = user.agency && user.agency.id;
+    const dif = Math.round(c.total - monto), pct = Math.round(dif / Math.max(1, c.total) * 100);
+    const res = L.guardarLecciones({ id: null, agency_id: ag }, K, [{ problema: `La planta pagó ${pct} % menos de lo cobrado en «${r.q_text.toLowerCase()}» ($${dif.toLocaleString('en-US')} de diferencia).`, correccion: 'Antes de cobrar, valida tiempo y precio de pieza contra lo que paga la planta.', temas: [], tipo: 'cobro' }], 'cobro');
+    L.avisarRed({ agency_id: ag }, K, r, res, 'mal_cobro', 'Mal cobro de planta detectado', ' Revisa tu cobro y reclama si aplica.');
+  } catch (e) { console.error('cerebro/mal cobro:', e.message); }
+}
+
 router.post('/cartera/:id/pago', (req, res) => {
   const sc = scope(req.user), c = db.prepare(sel + ' AND c.id = ?' + sc.sql).get(req.params.id, ...sc.args);
   if (!c) return res.status(404).json({ error: 'Cobro no encontrado.' });
   const pagado = !!(req.body && req.body.pagado);
+  const monto = req.body && req.body.monto_pagado != null && req.body.monto_pagado !== '' ? Number(req.body.monto_pagado) : null;
+  if (monto != null && (!Number.isFinite(monto) || monto < 0)) return res.status(400).json({ error: 'Monto pagado no válido.' });
   const ord = c.order_id && db.prepare('SELECT * FROM orders WHERE id = ?').get(c.order_id);
   if (ord) require('../closing').setCobrado(ord, pagado, req.user.id);
   else db.prepare('UPDATE cobros SET paid_at = ? WHERE id = ?').run(pagado ? Date.now() : null, c.id);
+  if (pagado && monto != null) {
+    db.prepare('UPDATE cobros SET paid_amount = ? WHERE id = ?').run(monto, c.id);
+    if (ord && ord.rule_id && monto < c.total - 0.5) malCobro(c, ord, monto, req.user);
+  } else if (!pagado) db.prepare('UPDATE cobros SET paid_amount = NULL WHERE id = ?').run(c.id);
   db.prepare('INSERT INTO cobro_comments (cobro_id, advisor_id, text, created_at) VALUES (?,?,?,?)').run(c.id, req.user.id, pagado ? 'Pago registrado.' : 'Cobro reabierto.', Date.now());
   res.json(out(db.prepare(sel + ' AND c.id = ?').get(c.id)));
 });

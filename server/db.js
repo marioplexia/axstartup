@@ -23,6 +23,9 @@ db.exec(fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8'));
   add('rules', [['paid_n', 'INTEGER NOT NULL DEFAULT 0'], ['paid_hours_sum', 'REAL NOT NULL DEFAULT 0'], ['paid_amount_sum', 'REAL NOT NULL DEFAULT 0']]);
   add('chat_threads', [['kind', "TEXT NOT NULL DEFAULT 'mi'"]]);
   add('rule_variants', [['tarifa', 'REAL'], ['total_piezas', 'REAL'], ['total_bruto', 'REAL'], ['marcador', 'TEXT'], ['extra', 'TEXT']]);
+  add('train_lessons', [['agency_id', 'INTEGER'], ['veces', 'INTEGER NOT NULL DEFAULT 1'], ['agencias', "TEXT NOT NULL DEFAULT '[]'"], ['updated_at', 'INTEGER']]);
+  add('orders', [['motivo', 'TEXT'], ['brain_at', 'INTEGER']]);
+  add('cobros', [['paid_amount', 'REAL']]);
 }
 
 // Confianza de una regla: misma fórmula que RS.conf en index.html
@@ -66,7 +69,7 @@ function group(rows, key) {
   return m;
 }
 
-function loadState() {
+function loadState(agencyId) {
   const parts = group(db.prepare('SELECT * FROM rule_parts').all(), 'rule_id');
   const kws = group(db.prepare('SELECT * FROM rule_keywords').all(), 'rule_id');
   const dist = group(db.prepare('SELECT * FROM rule_distribution').all(), 'rule_id');
@@ -82,16 +85,18 @@ function loadState() {
     };
   });
   const vars = group(db.prepare('SELECT * FROM rule_variants ORDER BY id DESC').all(), 'rule_id');
+  const guides = {}; db.prepare('SELECT rule_id, guia FROM rule_guides').all().forEach(g => { guides[g.rule_id] = g.guia; });
   const les = {}; db.prepare('SELECT * FROM train_lessons ORDER BY id DESC').all().forEach(l => { const k = l.sys + '|' + l.q_code; (les[k] = les[k] || []); if (les[k].length < 8 && !les[k].some(x => x.p === l.problema)) les[k].push({ p: l.problema, c: l.correccion || '', t: JSON.parse(l.temas || '[]') }); });
   rules.forEach(r => {
     r.ctx = (vars[r.id] || []).slice(0, 12).map(v => ({ mo: v.modelo || '', an: v.anio || null, km: v.km || null, op: v.op, opd: v.op_desc, h: v.hours, c: [v.c_code, v.c_text], r: [v.r_code, v.r_text], parts: JSON.parse(v.parts || '[]'), t: v.tarifa || null, tp: v.total_piezas, tb: v.total_bruto, mk: v.marcador || '', ex: JSON.parse(v.extra || '{}') }));
     r.les = les[r.sys + '|' + r.q[0]] || [];
+    r.gu = guides[r.id] || '';
   });
   const log = db.prepare('SELECT ts, type, rule_id, msg FROM rule_log ORDER BY ts DESC, id DESC LIMIT 120')
     .all().map(l => ({ t: l.ts, type: l.type, rule: l.rule_id || '', msg: l.msg }));
   const advisors = db.prepare('SELECT id, name FROM advisors WHERE active = 1 ORDER BY created_at, id').all();
-  let form = {};
-  try { const m = JSON.parse(getSet('form_defaults', '{}')); Object.keys(m).forEach(k => { const e = Object.entries(m[k]).sort((a, b) => b[1] - a[1])[0]; if (e) form[k] = e[0]; }); } catch (_) {}
+  const form = {};
+  if (agencyId) db.prepare('SELECT campo, valor FROM agency_defaults WHERE agency_id = ? AND n > 0 ORDER BY n ASC').all(agencyId).forEach(x => { form[x.campo] = x.valor; });
   return {
     rev: getRev(), advisors,
     state: {
@@ -175,6 +180,14 @@ if (!getSet('th1_migrated', '')) {
     pend.forEach(r => { db.prepare("UPDATE rules SET status = 'activa', updated_at = ? WHERE id = ?").run(now, r.id); advs.forEach(a => db.prepare('INSERT OR IGNORE INTO rule_distribution (rule_id, advisor_id, delivered_at) VALUES (?,?,?)').run(r.id, a.id, now)); logEvent('activada', r.id, `Regla ${r.id} se activó: ahora una sola PREA aceptada basta`); });
   }
   putSet('rev', getRev() + 1);
+}
+
+if (!getSet('defaults_por_agencia', '')) {
+  const ins = db.prepare('INSERT INTO agency_defaults (agency_id, campo, valor, n) VALUES (?,?,?,1) ON CONFLICT(agency_id, campo, valor) DO UPDATE SET n = n + 1');
+  db.prepare("SELECT agency_id, data FROM train_docs WHERE kind = 'prea' AND status = 'aprendida'").all().forEach(x => {
+    try { const j = JSON.parse(x.data || '{}'); if (j._modo === 'error') return; (j._defs || []).forEach(([k, v]) => ins.run(x.agency_id, k, v)); } catch (_) {}
+  });
+  putSet('defaults_por_agencia', '1');
 }
 
 module.exports = { db, DB_PATH, confidence, getRule, listRules, logEvent, loadState, saveState, getRev };

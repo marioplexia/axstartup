@@ -138,3 +138,23 @@ Documentos de ejemplo (datos ficticios) en `samples/`, también descargables des
 | `GET docs/:id` · `GET docs/:id/archivo` · `POST docs/:id/reintentar` · `DELETE docs/:id` | Datos leídos, original, reintentar y eliminar (deshace lo aprendido) |
 | `GET resumen` · `GET ejemplos` | Contadores y documentos de ejemplo |
 | `POST prueba/archivos?nombre=` · `POST chat` `{mensaje, hilo?, archivos?}` · `GET chat/hilos` | Chat de pruebas con archivos adjuntos (lo subido no se aprende) |
+
+## Cerebro de la red y bucles de autoaprendizaje (Tablero de agencia → Cerebro de la red)
+
+Hay **un solo cerebro para toda la marca**: lo que aprende una agencia lo usan todas, y se difunde en el instante.
+
+**Qué absorbe**: PREAs aceptadas (campos, variantes, contextos), PREAs rechazadas (sus errores), pagos de planta (mal cobro), el motivo cuando un asesor marca «Fue rechazada» (formulario o Bitácora) y el monto que pagó la planta al «Registrar pago» en Cartera.
+
+**Tiempo real** (`GET /api/garantias/cerebro/stream`, Server-Sent Events con `Authorization: Bearer`): cada aprendizaje genera una alerta (`regla`, `leccion`, `rechazo`, `mal_cobro`, `patron`, `riesgo`, `desvio`) que llega a todos los asesores conectados; la campana muestra el contador y el panel, y la regla/lección nueva se sincroniza sin recargar. Quien no estaba en línea la ve después (`GET /cerebro/alertas`, `POST /cerebro/alertas/leidas`).
+
+**Privacidad**: lo compartido se anonimiza (VIN, correos, teléfonos, folios PREA/AUT/PAG y órdenes se reemplazan) y nunca se expone el id de la agencia de origen; solo se indica «tu agencia» u «otra agencia de la red». El agente de pruebas usa el conocimiento de toda la red, pero nunca muestra folios ni autorizaciones de otra agencia. Los datos fijos (BAC, reparador, contacto) son **por agencia** (`agency_defaults`).
+
+**Bucles autónomos** (`server/brain/cycles.js`, cada 60 s, tras cada aprendizaje y a demanda con `POST /cerebro/ciclo`):
+1. **Consolidar**: reglas con ≥30 % de rechazos → alerta `riesgo`.
+2. **Patrones**: el mismo error confirmado por ≥2 agencias → alerta `patron` (cada confirmación suma `veces` y `agencias`).
+3. **Pagos**: cobros pagados por debajo de lo cobrado, agrupados por regla → alerta `desvio`.
+4. **Autoevaluación** (leave-one-out): deja una variante fuera y mide si la regla habría predicho operación y tiempo → «precisión».
+5. **Reflexión**: convierte los errores de cada regla en un checklist (`rule_guides`); con `ANTHROPIC_API_KEY` lo redacta el modelo, sin clave lo arma un motor local. El checklist aparece al final del formulario en el Agente de Garantías.
+6. Cada ciclo queda en `brain_cycles` (métricas y acciones).
+
+En modo de pruebas (`AX_MODO_PRUEBA=1`) el tab del cerebro trae botones para **simular** que otra agencia aprendió un rechazo o un mal cobro y ver la difusión en vivo.
