@@ -300,6 +300,17 @@ textarea,input{font:inherit;color:inherit}
 .pl{padding:6px;max-height:300px;overflow-y:auto}
 .pl .mi[data-sel="true"]{background:var(--hover)}
 .empty{padding:18px;color:var(--muted);font-size:13px;text-align:center}
+.ex-row{display:grid;grid-template-columns:132px minmax(0,1fr) 110px 100px 96px;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px}
+.ex-row:last-child{border-bottom:0}
+.ex-row small{display:block;color:var(--muted);font-size:12px}
+.ex-row .q{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ex-st{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;background:var(--chip)}
+.ex-st.aceptada{background:#e3f4e8;color:#1f6b3a}.ex-st.rechazada{background:#fbe5e2;color:#a3321f}
+.ex-act{display:flex;gap:6px;grid-column:2/-1}
+.ex-empty{padding:32px 14px;text-align:center;color:var(--muted)}
+.ex-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ex-bar .bt[aria-pressed=true]{background:var(--fg);color:var(--bg)}
+@media(max-width:700px){.ex-row{grid-template-columns:1fr auto}.ex-row .ex-h,.ex-row .ex-c{display:none}.ex-act{grid-column:1/-1}}
 .lg{position:fixed;inset:0;z-index:100;background:var(--bg);color:var(--fg);display:grid;place-items:center;padding:16px;overflow:auto}
 .lg[hidden]{display:none}
 .lg-card{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
@@ -484,7 +495,7 @@ textarea,input{font:inherit;color:inherit}
       </div>
       <div class="sb-foot">
         <button class="nav" id="settings" data-i="settings">Configuración</button>
-        <button class="nav" id="userBtn" style="margin-top:2px"><span class="avatar">M</span>mariogarantias</button>
+        <button class="nav" id="userBtn" style="margin-top:2px"><span class="avatar">·</span>Cuenta</button>
       </div>
     </aside>
   </div>
@@ -538,6 +549,16 @@ textarea,input{font:inherit;color:inherit}
       <p>Esta sección no forma parte de la réplica. Vuelve a Agente de Garantías para seguir con tu PREA.</p>
     </section>
 
+    <section class="admin" id="viewExp" hidden>
+      <div class="ad-in">
+        <div class="ad-head">
+          <div><h2>Expedientes</h2><p id="exSub">Tus PREAs generadas por el agente y lo que respondió el fabricante</p></div>
+          <input type="search" id="exQ" placeholder="Buscar folio, queja o VIN" aria-label="Buscar expedientes">
+        </div>
+        <div class="ex-bar" id="exBar"></div>
+        <div class="ad-card" id="exList"></div>
+      </div>
+    </section>
     <section class="admin" id="viewAdmin" hidden>
       <div class="ad-in">
         <div class="ad-head">
@@ -664,9 +685,10 @@ function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':(v==='agent'||v==='inicio')):v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin';stage.hidden=!main;$('#viewPh').hidden=main||adm;$('#viewAdmin').hidden=!adm;
+  var adm=id==='admin';stage.hidden=!main;$('#viewPh').hidden=main||adm||id==='exp';$('#viewAdmin').hidden=!adm;$('#viewExp').hidden=id!=='exp';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm)adRender();
+  else if(id==='exp'){crumb.textContent=VIEWS.exp;crumbSep.hidden=true;crumb2.hidden=true;EX.load()}
   else{crumb.textContent=AG[S.agent].crumb;syncCrumb()}
   if(mq.matches)setSb(false);
 }
@@ -759,7 +781,7 @@ function setAgent(a){
   ta.placeholder=c.ph;typeTok++;ta.value='';S.files=[];renderFiles();
   titleEl.textContent=c.title;replayIntro();autosize();updateSend();
 }
-function histBuild(m){head(m,'Conversaciones recientes');AG[S.agent].hist.forEach(function(h){item(m,{icon:'chat',t:h.t,s:h.s,fn:function(){loadHistory(h)}})})}
+function histBuild(m){head(m,'Conversaciones recientes');var L=SB.hist[S.agent];if(!L.length){var e=document.createElement('div');e.className='mh';e.textContent='Aún no hay conversaciones';m.appendChild(e)}L.forEach(function(h){item(m,{icon:'chat',t:h.t,s:h.s,fn:function(){loadHistory(h)}})})}
 menu('#histChip',histBuild);
 menu('#histTop',histBuild,{right:true});
 
@@ -817,7 +839,7 @@ function enterChat(title){
   syncCrumb();
 }
 function resetChat(){
-  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;
+  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
     flip(function(){stage.dataset.state='home';thread.hidden=true;ta.placeholder=AG[S.agent].ph;autosize()});
@@ -1132,8 +1154,8 @@ document.addEventListener('click',function(e){
   if(b.classList.contains('gfa')){
     var bar=b.parentNode,cx=f._ctx;if(!cx)return;
     $$('.gfa',bar).forEach(function(x){x.disabled=true});
-    if(b.dataset.r==='ok'){var o=RS.learn(ctxToRec(cx));bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia.</span>'}
-    else{if(cx.ruleId)RS.reject(cx.ruleId);bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+'</span>'}
+    if(b.dataset.r==='ok'){SB.setExpStatus(cx.expId,'aceptada');var o=RS.learn(ctxToRec(cx));bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia.</span>'}
+    else{SB.setExpStatus(cx.expId,'rechazada');if(cx.ruleId)RS.reject(cx.ruleId);bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+'</span>'}
     return;
   }
   if(b.classList.contains('gall')){
@@ -1409,7 +1431,76 @@ SB.pull=async function(first){
 };
 /* las reglas activas llegan a todos los asesores reales (también a los que se registran después) */
 RS.heal=function(){var ch=false;RS.d.rules.forEach(function(r){if(r.status==='activa')ADVISORS.forEach(function(a){if(!r.dist[a.id]){r.dist[a.id]=Date.now();ch=true}})});return ch};
-SB.user=null;SB.chan=null;SB.mode='in';
+SB.user=null;SB.chan=null;SB.mode='in';SB.hist={garantias:[],cobros:[]};
+/* ---- Conversaciones y expedientes (por usuario, con RLS) ---- */
+SB.dayLbl=function(iso){var d=new Date(iso),n=new Date(),a=new Date(n.getFullYear(),n.getMonth(),n.getDate()),b=new Date(d.getFullYear(),d.getMonth(),d.getDate()),k=Math.round((a-b)/864e5);
+  if(k<=0)return 'Hoy';if(k===1)return 'Ayer';return d.toLocaleDateString('es-MX',{day:'numeric',month:'short'}).replace('.','')};
+SB.loadHist=async function(){
+  if(!SB.c||!SB.entered)return;
+  var r=await SB.c.from('conversations').select('id,agent,title,text,created_at').order('created_at',{ascending:false}).limit(40);
+  if(r.error){SB.fail(r.error);return}
+  SB.hist={garantias:[],cobros:[]};
+  r.data.forEach(function(c){var L=SB.hist[c.agent];if(L&&L.length<12)L.push({id:c.id,t:c.title,s:SB.dayLbl(c.created_at),q:c.text})});
+};
+SB.saveConv=function(text){
+  if(!SB.c||!SB.entered||S.convId)return;
+  var id=crypto.randomUUID(),t=text.trim(),agent=S.agent==='cobros'?'cobros':'garantias';
+  S.convId=id;var title=t.length>48?t.slice(0,45).replace(/\s+\S*$/,'')+'…':t;
+  SB.c.from('conversations').insert({id:id,agent:agent,title:title||'Conversación',text:t||title}).then(function(r){if(r.error)SB.fail(r.error);else SB.loadHist()});
+};
+SB.saveExp=function(c){
+  if(!SB.c||!SB.entered)return;
+  var row={id:c.expId,conversation_id:S.convId||null,folio:c.folio,brand:c.brand,sys:c.sys,rule_id:c.ruleId,queja:c.rawText||c.queja,vin:c.vinReal||null,wo:c.wo||null,vehicle:c.vehicle,km:c.km,op:c.op,opd:c.opd,hours:c.h,parts:c.parts,parts_total:c.partsTot,labor:c.labor,codes:c.codes||null};
+  c.expP=SB.c.from('expedientes').insert(row).then(function(r){if(r.error)SB.fail(r.error);return r});
+};
+SB.setExpStatus=async function(id,st){
+  if(!SB.c||!SB.entered||!id)return;
+  try{
+    var c=ctxOf(id);if(c&&c.expP)await c.expP;
+    var r=await SB.c.from('expedientes').update({status:st,updated_at:new Date().toISOString()}).eq('id',id);
+    if(r.error)throw r.error;
+  }catch(e){SB.fail(e)}
+};
+var ctxReg={};function ctxOf(id){return ctxReg[id]}
+var EX={rows:[],f:'todos',q:'',loading:false};
+EX.load=async function(){
+  if(!SB.c||!SB.entered){return}
+  $('#exSub').textContent=SB.user&&SB.user.role==='admin'?'Todas las PREAs de la agencia y lo que respondió el fabricante':'Tus PREAs generadas por el agente y lo que respondió el fabricante';
+  EX.loading=true;EX.render();
+  var r=await SB.c.from('expedientes').select('*,profiles(name)').order('created_at',{ascending:false}).limit(200);
+  EX.loading=false;
+  if(r.error){SB.fail(r.error);EX.rows=[]}else EX.rows=r.data;
+  EX.render();
+};
+EX.money=function(n){return '$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})};
+EX.render=function(){
+  var cnt={todos:EX.rows.length,borrador:0,aceptada:0,rechazada:0};EX.rows.forEach(function(x){cnt[x.status]++});
+  var lbl={todos:'Todos',borrador:'Pendientes',aceptada:'Aceptadas',rechazada:'Rechazadas'};
+  $('#exBar').innerHTML=Object.keys(lbl).map(function(k){return '<button class="bt" type="button" data-f="'+k+'" aria-pressed="'+(EX.f===k)+'">'+lbl[k]+' · '+cnt[k]+'</button>'}).join('');
+  var q=norm(EX.q),list=EX.rows.filter(function(x){return (EX.f==='todos'||x.status===EX.f)&&(!q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0)});
+  var admin=SB.user&&SB.user.role==='admin',stl={borrador:'Pendiente',aceptada:'Aceptada',rechazada:'Rechazada'};
+  $('#exList').innerHTML=EX.loading?'<div class="ex-empty">Cargando…</div>':!list.length?'<div class="ex-empty">'+(EX.rows.length?'Sin resultados para este filtro.':'Aún no hay expedientes. Cada PREA que arme el agente aparecerá aquí.')+'</div>':
+    list.map(function(x){
+      return '<div class="ex-row" data-id="'+x.id+'"><div><b>'+esc(x.folio)+'</b><small>'+SB.dayLbl(x.created_at)+'</small></div>'+
+        '<div class="q"><span title="'+esc(x.queja||'').replace(/"/g,'&quot;')+'">'+esc(x.queja||'')+'</span><small>'+esc(x.sys||'')+' · '+esc(x.op||'')+(x.rule_id?' · regla '+esc(x.rule_id):'')+(admin&&x.profiles?' · '+esc(x.profiles.name):'')+'</small></div>'+
+        '<div class="ex-h">'+esc(String(x.hours||0))+' h<small>mano de obra</small></div><div class="ex-c">'+EX.money(Number(x.parts_total)+Number(x.labor))+'<small>total</small></div>'+
+        '<div><span class="ex-st '+x.status+'">'+stl[x.status]+'</span></div>'+
+        (x.status==='borrador'?'<div class="ex-act"><button class="bt" type="button" data-r="ok">Fue aceptada</button><button class="bt" type="button" data-r="no">Fue rechazada</button></div>':'')+'</div>';
+    }).join('');
+};
+EX.resolve=async function(id,ok){
+  var x=EX.rows.filter(function(r){return r.id===id})[0];if(!x||x.status!=='borrador')return;
+  var rec={ruleId:x.rule_id||null,sys:x.rule_id?x.sys:'Por clasificar',q:x.codes?x.codes.q:['NUEVA',String(x.queja||'').toUpperCase().slice(0,60)],c:x.codes?x.codes.c:['S/C','SIN CAUSA'],r:x.codes?x.codes.r:['S/C','SIN CORRECCIÓN'],op:x.op,opd:x.opd,h:Number(x.hours),parts:x.parts,kwText:x.queja||'',src:'asesor',advisor:(x.profiles&&x.profiles.name)||(SB.user&&SB.user.name)||'asesor'};
+  x.status=ok?'aceptada':'rechazada';EX.render();
+  if(ok){var o=RS.learn(rec);toast(o.kind==='creada'?'Aceptada: el agente creó la regla '+o.rule.id:'Aceptada: se reforzó la regla '+o.rule.id)}
+  else{if(x.rule_id)RS.reject(x.rule_id);toast('Rechazo registrado')}
+  SB.setExpStatus(id,x.status);
+};
+document.addEventListener('click',function(e){
+  var f=e.target.closest&&e.target.closest('#exBar [data-f]');if(f){EX.f=f.dataset.f;EX.render();return}
+  var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('.ex-row');EX.resolve(row.dataset.id,b.dataset.r==='ok')}
+});
+$('#exQ').addEventListener('input',function(){EX.q=this.value;EX.render()});
 SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='lg-msg'+(err?' err':'')};
 SB.lgMode=function(m){
   SB.mode=m;var up=m==='up';
@@ -1456,6 +1547,7 @@ SB.enter=async function(user){
     await SB.loadAdvisors();
     $('#lg').hidden=true;
     await SB.pull(true);
+    SB.loadHist();
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
       if(p.table==='profiles'){SB.loadAdvisors().then(function(){return SB.pull()}).catch(SB.fail);return}
       if(SB.pushing||SB.dirty||Date.now()<SB.quiet)return;
@@ -1488,7 +1580,7 @@ SB.init();
 function basis(c){return c.matched?'Regla <b>'+c.ruleId+'</b>, aprendida de '+c.ruleN+' PREAs aceptadas · confianza '+c.ruleConf+'%.':'Sin regla para este caso: apliqué criterio general (confianza baja). Si el fabricante la acepta, indícalo abajo y el agente aprenderá.'}
 function ctxToRec(c){
   var k=c.codes||GMCODES[c.sys]||GMCODES['Diagnóstico general'],t=(c.rawText||c.queja||'SIN QUEJA');
-  return {ruleId:c.ruleId||null,sys:c.matched?c.sys:'Por clasificar',q:c.matched?k.q:['NUEVA',(t.length>60?t.slice(0,57).replace(/\s+\S*$/,'')+'…':t).toUpperCase()],c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,parts:c.parts,kwText:t,src:'asesor',advisor:'mariogarantias'};
+  return {ruleId:c.ruleId||null,sys:c.matched?c.sys:'Por clasificar',q:c.matched?k.q:['NUEVA',(t.length>60?t.slice(0,57).replace(/\s+\S*$/,'')+'…':t).toUpperCase()],c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,parts:c.parts,kwText:t,src:'asesor',advisor:SB.user?SB.user.name:'asesor'};
 }
 
 /* ---------- Tablero de agencia ---------- */
@@ -1619,7 +1711,9 @@ async function agentTurn(w,ctx,intro,steps,sim,fin,my,build){
 async function run(text,files){
   var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
   var ctx=ctxFrom(text,files,S.brand);RS.note(ctx.matched);
-  await agentTurn(addAssistant(),ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx),my,buildPreaCard);
+  ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
+  var okp=await agentTurn(addAssistant(),ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx),my,buildPreaCard);
+  if(okp)SB.saveExp(ctx);
   finish(my);
 }
 
@@ -1788,7 +1882,7 @@ async function runCobros(text,files){
   }
   finish(my);
 }
-function start(text,files){return S.agent==='cobros'?runCobros(text,files):run(text,files)}
+function start(text,files){SB.saveConv(text||(files[0]&&files[0].name)||'Conversación');return S.agent==='cobros'?runCobros(text,files):run(text,files)}
 
 function onSend(){
   if(S.streaming){if(S.ctrl)S.ctrl.aborted=true;return}
@@ -1801,7 +1895,7 @@ function onSend(){
   start(text,files);
 }
 async function loadHistory(h){
-  showView(curView());resetChat();
+  showView(curView());resetChat();S.convId=h.id;
   enterChat(h.t);addUser(h.q,[]);
   var txt;
   if(S.agent==='cobros'){var cc=cobrosCtx(h.q,[],'General Motors');txt=introC1(cc)+'\n\n'+finalC1(cc)}
