@@ -1,0 +1,12 @@
+{
+  "name": "axstartup",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ax AI Garantías: interfaz conectada a Supabase",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
