@@ -121,6 +121,32 @@ pdf('6-PREA-aceptada-Aveo-2024-polea-b.pdf', 'Ver autorización previa a la repa
 pdf('7-PREA-aceptada-Aveo-2023-polea-c.pdf', 'Ver autorización previa a la reparación', variante('G-AVEO4302', 'PREA-50455', '3G1TA5CF9PL888002', '41,250', '22/06/2026', 'AUT-79310', '2023'),
     ['22/06/2026 08:20 - Agencia (L. Ortega): Se solicita autorización para el reemplazo de polea tensora.', '22/06/2026 16:10 - Planta (Garantías GM): ACEPTADA. Código de autorización AUT-79310.'])
 
+# ---------- 8) Mismo caso en OTRO modelo: parecida pero no idéntica, también aceptada ----------
+prea_onix = [
+ ('ID de autorización de pre-reparación', 'PREA-52210'), ('Unidad de negocio', 'General Motors de México'), ('Reparador', 'FAME MORELIA'),
+ ('Orden de trabajo', 'G-ONIX5120'), ('Fecha de la Orden de trabajo', '05/08/2026'), ('Vehículo', 'Chevrolet Onix 2025'), ('VIN', '3G1JC5SH0RL445511'),
+ ('Cuentakilómetros', '27,600'), ('Queja', 'EM-215 - RUIDO O CHIRRIDO EN EL MOTOR AL ARRANCAR'),
+ ('', 'Cliente reporta chirrido de la banda al encender el motor 1.2 turbo en frío.'),
+ ('Causa', 'EM-483 - RODAMIENTO DE POLEA TENSORA CON JUEGO'), ('Corrección', 'EM-572 - REEMPLAZAR POLEA TENSORA AUTOMÁTICA'),
+ ('Operación de trabajo', 'OP-EM-045 - Reemplazar polea tensora automática (motor 1.2 turbo)'), ('Tiempo de trabajo', '1.5'), ('Total de piezas', '1,420.00'),
+ ('Números de pieza', 'PZ-EM-7810  Polea tensora automática 1.2T  1 x 920.00'), ('', 'PZ-EM-7811  Tornillo de polea  2 x 250.00'),
+ ('Tarifa Mano de Obra', '420.00'), ('Total bruto', '2,050.00'), ('Código de autorización', 'AUT-82001'), ('Estado', 'ACEPTADA')]
+pdf('8-PREA-aceptada-Onix-2025-polea.pdf', 'Ver autorización previa a la reparación', prea_onix, [
+ '05/08/2026 09:00 - Agencia (J. Salinas): Solicitud de autorización por chirrido de la banda. Se adjunta captura de GDS2 y fotografías de la polea.',
+ '05/08/2026 15:20 - Planta (Garantías GM): ACEPTADA. Código de autorización AUT-82001.'])
+
+# ---------- 9) Una PREA RECHAZADA: de los errores también se aprende ----------
+prea_rech = [
+ ('ID de autorización de pre-reparación', 'PREA-47002'), ('Unidad de negocio', 'General Motors de México'), ('Reparador', 'FAME MORELIA'),
+ ('Orden de trabajo', 'G-AVEO3990'), ('Fecha de la Orden de trabajo', '20/02/2026'), ('Vehículo', 'Chevrolet Aveo 2024'), ('VIN', '3G1TA5CF3RL999003'),
+ ('Cuentakilómetros', '39,800'), ('Queja', 'EM-215 - RUIDO O CHIRRIDO EN EL MOTOR AL ARRANCAR'), ('Causa', 'EM-300 - FALLA GENERAL DE MOTOR'),
+ ('Corrección', 'EM-571 - REEMPLAZAR POLEA TENSORA Y BANDA DE ACCESORIOS'), ('Operación de trabajo', 'OP-EM-044 - Reemplazar polea tensora de banda de accesorios'),
+ ('Tiempo de trabajo', '2.0'), ('Números de pieza', 'PZ-EM-7710  Polea tensora de banda  1 x 684.00'), ('Tarifa Mano de Obra', '420.00'),
+ ('Total bruto', '1,524.00'), ('Estado', 'RECHAZADA')]
+pdf('9-PREA-rechazada-Aveo-2024-polea.pdf', 'Ver autorización previa a la reparación', prea_rech, [
+ '19/02/2026 11:00 - Agencia (H. Castañeda): Se solicita autorización para reemplazo de polea tensora.',
+ '20/02/2026 10:30 - Planta (Garantías GM): RECHAZADA. La causa EM-300 es demasiado general y no corresponde a la queja. Además el tiempo de 2.0 h excede el estándar de la operación y no se adjuntó evidencia fotográfica.'])
+
 # ---------- 5) PREA que el asesor quiere validar (con los mismos errores del pasado) ----------
 pdf('5-PREA-por-validar-Aveo-2024-polea.pdf', 'Autorización previa a la reparación (borrador)', [
  ('Orden de trabajo', 'G-AVEO4388'), ('Fecha de la Orden de trabajo', '28/10/2026'), ('Vehículo', 'Chevrolet Aveo 2024'), ('VIN', '3G1TA5CF1RL654321'),

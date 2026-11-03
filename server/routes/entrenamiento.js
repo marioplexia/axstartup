@@ -32,7 +32,7 @@ const vista = d => {
   const x = d.data ? JSON.parse(d.data) : null;
   return { id: d.id, tipo: d.kind, nombre: d.name, estado: d.status, error: d.error, motor: d.engine, size: d.size, creado: d.created_at, aprendido: d.learned_at, regla: d.rule_id, reglaEstado: d.rule_id ? (() => { const x = db.prepare('SELECT id, n, status FROM rules WHERE id = ?').get(d.rule_id); return x ? { id: x.id, n: x.n, status: x.status, th: Math.max(1, Number((db.prepare("SELECT value FROM settings WHERE key = 'th'").get() || { value: 3 }).value)) } : null; })() : null, relacionada: d.link_id,
     resumen: x ? x.resumen : null, vehiculo: x && x.tipo === 'prea' ? [x.marca, x.modelo, x.anio].filter(Boolean).join(' ') : null, validacion: x ? (x._validacion || []) : [],
-    comentarios: x && x.comentarios ? x.comentarios.length : 0, lecciones: x && x.lecciones ? x.lecciones.length : 0, total: x ? (x.tipo === 'prea' ? x.total_bruto : x.total_pagado) : null };
+    modo: x && x._modo || null, comentarios: x && x.comentarios ? x.comentarios.length : 0, lecciones: x && x.lecciones ? x.lecciones.length : 0, total: x ? (x.tipo === 'prea' ? x.total_bruto : x.total_pagado) : null };
 };
 
 /* ---------- Procesamiento (uno a la vez) ---------- */
@@ -52,8 +52,12 @@ async function procesar(id, { forzar = false } = {}) {
       const ya = (data.orden || data.folio) && db.prepare("SELECT id, data FROM train_docs WHERE id != ? AND kind = 'prea' AND agency_id = ? AND status = 'aprendida'").all(id, doc.agency_id).find(o => { const x = JSON.parse(o.data); return (data.folio && x.folio === data.folio) || (data.orden && x.orden === data.orden && (!data.vin || x.vin === data.vin)); });
       if (ya && !forzar) { set(id, { ...base, status: 'duplicada', error: 'Esta PREA ya está aprendida (mismo folio u orden de trabajo).' }); return; }
     }
+    if (tipo === 'prea' && data.estado === 'rechazada') {            // el error también se aprende
+      if (!(data.queja && (data.queja.codigo || data.queja.texto))) { set(id, { ...base, status: 'revisar', error: 'No pude leer la queja de esta PREA rechazada.' }); return; }
+      db.transaction(() => { const r = L.aprenderError(doc, data); data._modo = 'error'; data._validacion = r.validacion; data._rej = r.rej; set(id, { data: JSON.stringify(data), texto: texto.slice(0, 20000), engine, status: 'aprendida', error: null, rule_id: r.rule ? r.rule.id : null, learned_at: Date.now() }); })();
+      return;
+    }
     if (falta.length) { set(id, { ...base, status: 'revisar', error: 'No pude leer: ' + falta.join(', ') + '. Revisa que el archivo sea legible o sube una versión más clara.' }); return; }
-    if (tipo === 'prea' && data.estado === 'rechazada' && !forzar) { set(id, { ...base, status: 'revisar', error: 'Esta PREA aparece como rechazada. Aquí solo se aprende de PREAs aceptadas.' }); return; }
     db.transaction(() => {
       if (tipo === 'prea') {
         const r = L.aprenderPrea(doc, data); data._validacion = r.validacion;
@@ -141,7 +145,7 @@ router.delete('/entrenamiento/docs/:id', (req, res) => {
 /* ---------- Documentos de ejemplo para probar ---------- */
 const EJEMPLOS = path.join(__dirname, '..', '..', 'samples');
 const LISTA_EJ = { '1-PREA-aceptada-Aveo-2024-polea.pdf': 'PREA aceptada · Aveo 2024 · polea tensora', '1b-PREA-aceptada-Aveo-2024-polea-captura.png': 'La misma PREA como captura de pantalla (imagen)', '2-Pago-planta-Aveo-2024-polea.pdf': 'Pago de planta · Aveo 2024 · polea',
-  '3-PREA-aceptada-Equinox-2023-sensor-oxigeno.pdf': 'PREA aceptada · Equinox 2023 · sensor de oxígeno', '6-PREA-aceptada-Aveo-2024-polea-b.pdf': 'Otra PREA aceptada · Aveo 2024 · polea (2 de 3)', '7-PREA-aceptada-Aveo-2023-polea-c.pdf': 'Otra PREA aceptada · Aveo 2023 · polea (3 de 3: activa la regla)', '4-Pago-planta-Equinox-2023-sensor-oxigeno.pdf': 'Pago de planta · Equinox 2023', '5-PREA-por-validar-Aveo-2024-polea.pdf': 'PREA por validar (con errores) · para el chat de pruebas' };
+  '3-PREA-aceptada-Equinox-2023-sensor-oxigeno.pdf': 'PREA aceptada · Equinox 2023 · sensor de oxígeno', '6-PREA-aceptada-Aveo-2024-polea-b.pdf': 'Otra PREA aceptada · Aveo 2024 · polea', '7-PREA-aceptada-Aveo-2023-polea-c.pdf': 'Otra PREA aceptada · Aveo 2023 · polea', '8-PREA-aceptada-Onix-2025-polea.pdf': 'PREA aceptada de OTRO modelo · Onix 2025 · polea (parecida, no idéntica)', '9-PREA-rechazada-Aveo-2024-polea.pdf': 'PREA RECHAZADA · Aveo 2024 · el agente aprende del error', '4-Pago-planta-Equinox-2023-sensor-oxigeno.pdf': 'Pago de planta · Equinox 2023', '5-PREA-por-validar-Aveo-2024-polea.pdf': 'PREA por validar (con errores) · para el chat de pruebas' };
 router.get('/entrenamiento/ejemplos', (req, res) => res.json(Object.keys(LISTA_EJ).filter(f => fs.existsSync(path.join(EJEMPLOS, f))).map(f => ({ archivo: f, descripcion: LISTA_EJ[f] }))));
 router.get('/entrenamiento/ejemplos/:file', (req, res) => {
   const f = req.params.file, p = path.join(EJEMPLOS, path.basename(f));

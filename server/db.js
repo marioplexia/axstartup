@@ -80,6 +80,12 @@ function loadState() {
       src: { base: r.src_base, historico: r.src_historico, asesor: r.src_asesor }, dist: dm
     };
   });
+  const vars = group(db.prepare('SELECT * FROM rule_variants ORDER BY id DESC').all(), 'rule_id');
+  const les = {}; db.prepare('SELECT * FROM train_lessons ORDER BY id DESC').all().forEach(l => { const k = l.sys + '|' + l.q_code; (les[k] = les[k] || []); if (les[k].length < 8 && !les[k].some(x => x.p === l.problema)) les[k].push({ p: l.problema, c: l.correccion || '', t: JSON.parse(l.temas || '[]') }); });
+  rules.forEach(r => {
+    r.ctx = (vars[r.id] || []).slice(0, 12).map(v => ({ mo: v.modelo || '', an: v.anio || null, km: v.km || null, op: v.op, opd: v.op_desc, h: v.hours, c: [v.c_code, v.c_text], r: [v.r_code, v.r_text], parts: JSON.parse(v.parts || '[]') }));
+    r.les = les[r.sys + '|' + r.q[0]] || [];
+  });
   const log = db.prepare('SELECT ts, type, rule_id, msg FROM rule_log ORDER BY ts DESC, id DESC LIMIT 120')
     .all().map(l => ({ t: l.ts, type: l.type, rule: l.rule_id || '', msg: l.msg }));
   const advisors = db.prepare('SELECT id, name FROM advisors WHERE active = 1 ORDER BY created_at, id').all();
@@ -87,7 +93,7 @@ function loadState() {
     rev: getRev(), advisors,
     state: {
       v: 1, rules, log,
-      cfg: { th: Number(getSet('th', 3)), auto: getSet('auto', 'true') === 'true' },
+      cfg: { th: Number(getSet('th', 1)), auto: getSet('auto', 'true') === 'true' },
       stats: { q: Number(getSet('stats_q', 0)), hit: Number(getSet('stats_hit', 0)) },
       seq: Math.max(Number(getSet('seq', 0)), rules.length)
     }
@@ -145,8 +151,8 @@ const saveState = db.transaction((st, { reset = false, advisorId = null } = {}) 
   }
 
   if (st.cfg) {
-    const th = String(Math.max(1, st.cfg.th | 0 || 3)), auto = String(!!st.cfg.auto);
-    if (th !== getSet('th', '3') || auto !== getSet('auto', 'true')) changed = true;
+    const th = String(Math.max(1, st.cfg.th | 0 || 1)), auto = String(!!st.cfg.auto);
+    if (th !== getSet('th', '1') || auto !== getSet('auto', 'true')) changed = true;
     putSet('th', th); putSet('auto', auto);
   }
   if (st.stats) {
@@ -157,5 +163,8 @@ const saveState = db.transaction((st, { reset = false, advisorId = null } = {}) 
   putSet('seq', seq);
   if (changed) putSet('rev', getRev() + 1);
 });
+
+// Una sola PREA aceptada ya basta para activar una regla (antes eran 3): se ajusta una vez, sin pisar cambios posteriores del Tablero
+if (!getSet('th1_migrated', '')) { putSet('th', '1'); putSet('th1_migrated', '1'); putSet('rev', getRev() + 1); }
 
 module.exports = { db, DB_PATH, confidence, getRule, listRules, logEvent, loadState, saveState, getRev };

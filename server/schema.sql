@@ -216,3 +216,31 @@ CREATE TABLE IF NOT EXISTS train_docs (
   learned_at  INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_td_kind ON train_docs(agency_id, kind, status);
+
+-- Contextos (variantes) de cada regla: una por PREA aceptada (modelo, año, operación, causa, piezas…)
+CREATE TABLE IF NOT EXISTS rule_variants (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  rule_id    TEXT NOT NULL REFERENCES rules(id) ON DELETE CASCADE,
+  doc_id     INTEGER,
+  marca      TEXT, modelo TEXT, anio INTEGER, km INTEGER,
+  op         TEXT, op_desc TEXT, c_code TEXT, c_text TEXT, r_code TEXT, r_text TEXT,
+  hours      REAL,
+  parts      TEXT,                                  -- JSON [[numero, descripción, cantidad, precio]]
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_rv_rule ON rule_variants(rule_id);
+-- Errores aprendidos (rechazos y solicitudes de la planta, y PREAs rechazadas), ligados a la queja de la regla
+CREATE TABLE IF NOT EXISTS train_lessons (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  doc_id     INTEGER,
+  sys        TEXT NOT NULL,
+  q_code     TEXT NOT NULL,
+  problema   TEXT NOT NULL,
+  correccion TEXT,
+  temas      TEXT,                                  -- JSON
+  tipo       TEXT,
+  origen     TEXT,                                  -- aceptada | rechazada | comparacion
+  fecha      TEXT,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_tl_key ON train_lessons(sys, q_code);

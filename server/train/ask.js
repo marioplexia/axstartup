@@ -12,10 +12,10 @@ const cod = c => c && (c.codigo || c.texto) ? [c.codigo, c.texto].filter(Boolean
 
 function conocimiento(agencyId) {
   const docs = db.prepare("SELECT * FROM train_docs WHERE agency_id = ? AND status = 'aprendida' AND kind IN ('prea','pago') ORDER BY id").all(agencyId).map(x => ({ ...x, d: JSON.parse(x.data || '{}') }));
-  const preas = docs.filter(x => x.kind === 'prea'), pagos = docs.filter(x => x.kind === 'pago');
+  const preas = docs.filter(x => x.kind === 'prea' && x.d._modo !== 'error'), negs = docs.filter(x => x.kind === 'prea' && x.d._modo === 'error'), pagos = docs.filter(x => x.kind === 'pago');
   preas.forEach(p => { p.pagos = pagos.filter(g => g.link_id === p.id); });
   const reglas = db.prepare('SELECT * FROM rules WHERE src_historico > 0 ORDER BY n DESC').all();
-  return { preas, pagos, reglas };
+  return { preas, negs, pagos, reglas };
 }
 
 function puntuar(c, p) {
@@ -51,6 +51,41 @@ function leccionesDe(p) {
   if (!l.length) return '';
   return '**Errores que tuvo en el pasado y cómo se corrigieron**\n\n' + l.map(x => `- ${x.fecha ? fmt(x.fecha) + ' · ' : ''}${x.tipo === 'rechazo' ? 'La planta la rechazó' : 'La planta pidió corregir'}: «${x.problema}»${x.correccion ? ' Se corrigió así: «' + x.correccion + '»' : ''}`).join('\n');
 }
+// Otros errores guardados para la misma queja (de otros documentos, incluidas PREAs rechazadas)
+function leccionesClave(p) {
+  const r = p.rule_id && db.prepare('SELECT sys, q_code FROM rules WHERE id = ?').get(p.rule_id);
+  if (!r) return '';
+  const propias = new Set((p.d.lecciones || []).map(l => l.problema));
+  const ls = db.prepare('SELECT * FROM train_lessons WHERE sys = ? AND q_code = ? AND (doc_id IS NULL OR doc_id != ?) ORDER BY id DESC LIMIT 8').all(r.sys, r.q_code, p.id).filter(l => !propias.has(l.problema)).slice(0, 5);
+  if (!ls.length) return '';
+  return '**Otros errores que se han visto con esta misma queja**\n\n' + ls.map(l => `- ${l.origen === 'rechazada' ? 'En una PREA rechazada' : 'En el historial de otra PREA'}: «${l.problema}»${l.correccion ? ' → ' + l.correccion : ''}`).join('\n');
+}
+function rechazadasDe(k, cand) {
+  return k.negs.map(p => ({ p, s: puntuar(cand, p) })).filter(x => x.s >= 4).sort((a, b) => b.s - a.s).slice(0, 2);
+}
+function negativosTxt(lista) {
+  if (!lista.length) return '';
+  return '**Lo que no funcionó (PREAs rechazadas parecidas)**\n\n' + lista.map(({ p }) => {
+    const d = p.d, veh = [d.marca, d.modelo, d.anio].filter(Boolean).join(' '), ls = (d.lecciones || []).map(l => `«${l.problema}»${l.correccion ? ' → ' + l.correccion : ''}`);
+    const com = ls.length ? ls : (d.comentarios || []).filter(c => c.origen === 'planta').map(c => `«${c.texto}»`);
+    return `- PREA ${d.folio || d.orden || ''} (${veh || 'sin vehículo'}${d.km ? ' · ' + d.km.toLocaleString('en-US') + ' km' : ''}) fue rechazada. ${com.slice(0, 3).join(' ')}`;
+  }).join('\n');
+}
+function variantesTxt(best, otros) {
+  if (!otros.length) return '';
+  const b = best.d, veh = d => [d.marca, d.modelo, d.anio].filter(Boolean).join(' ');
+  return '**El mismo caso en otros contextos** (parecido, no idéntico, y también fue aceptado)\n\n' + otros.map(({ p }) => {
+    const d = p.d, dif = [];
+    if (d.operacion.codigo && b.operacion.codigo && d.operacion.codigo !== b.operacion.codigo) dif.push(`operación ${d.operacion.codigo}`);
+    if (d.causa.codigo && b.causa.codigo && d.causa.codigo !== b.causa.codigo) dif.push(`causa ${d.causa.codigo}`);
+    if (d.correccion.codigo && b.correccion.codigo && d.correccion.codigo !== b.correccion.codigo) dif.push(`corrección ${d.correccion.codigo}`);
+    if (d.horas != null && b.horas != null && d.horas !== b.horas) dif.push(`${d.horas} h`);
+    const pz = (d.piezas || []).map(x => x.numero).filter(n => !(b.piezas || []).some(y => y.numero === n));
+    if (pz.length) dif.push(`piezas ${pz.join(', ')}`);
+    return `- PREA ${d.folio || d.orden} (${veh(d) || 'sin vehículo'}${d.km ? ' · ' + d.km.toLocaleString('en-US') + ' km' : ''}): ${dif.length ? 'cambia ' + dif.join(', ') : 'mismos códigos, tiempo y piezas'}.`;
+  }).join('\n');
+}
+
 function pagoDe(p) {
   if (!p.pagos || !p.pagos.length) return '';
   const d = p.d;
@@ -111,10 +146,11 @@ function recomendacion(c, p) {
 }
 
 function resumenGeneral(k) {
-  if (!k.preas.length && !k.pagos.length) return 'Todavía no he aprendido nada. Sube PREAs aceptadas y transacciones pagadas en **Tablero de agencia → Entrenamiento** y vuelve a preguntarme.';
+  if (!k.preas.length && !k.pagos.length && !k.negs.length) return 'Todavía no he aprendido nada. Sube PREAs aceptadas y transacciones pagadas en **Tablero de agencia → Entrenamiento** y vuelve a preguntarme.';
   const temas = {}; k.preas.forEach(p => (p.d.lecciones || []).forEach(l => (l.temas || []).forEach(t => { temas[t] = (temas[t] || 0) + 1; })));
   const top = Object.entries(temas).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([t, n]) => `${t} (${n})`).join(', ');
-  return `He aprendido **${k.preas.length} ${k.preas.length === 1 ? 'PREA aceptada' : 'PREAs aceptadas'}** y **${k.pagos.length} ${k.pagos.length === 1 ? 'transacción pagada' : 'transacciones pagadas'}**, que forman **${k.reglas.length} ${k.reglas.length === 1 ? 'regla' : 'reglas'}**.\n\n` +
+  const nl = db.prepare('SELECT COUNT(*) n FROM train_lessons').get().n;
+  return `He aprendido **${k.preas.length} ${k.preas.length === 1 ? 'PREA aceptada' : 'PREAs aceptadas'}** y **${k.pagos.length} ${k.pagos.length === 1 ? 'transacción pagada' : 'transacciones pagadas'}**, que forman **${k.reglas.length} ${k.reglas.length === 1 ? 'regla' : 'reglas'}**${k.negs.length ? `, y también ${k.negs.length} ${k.negs.length === 1 ? 'PREA rechazada' : 'PREAs rechazadas'} para no repetir sus errores` : ''}. Tengo guardados **${nl} ${nl === 1 ? 'error' : 'errores'}** de los historiales de comentarios.\n\n` +
     (k.reglas.length ? '| Regla | Sistema | Queja | Operación | PREAs | Pagos |\n| --- | --- | --- | --- | --- | --- |\n' + k.reglas.slice(0, 10).map(r => `| ${r.id} | ${r.sys} | ${r.q_text} | ${r.op} | ${r.n} | ${r.paid_n} |`).join('\n') : '') +
     (top ? `\n\nErrores más comunes en el historial de comentarios: ${top}.` : '') + '\n\nPregúntame por un caso concreto, por ejemplo «cambio de polea de un Aveo 2024 de 40 mil km», o sube una PREA para validarla.';
 }
@@ -135,7 +171,7 @@ function preguntaErrores(k, q, top) {
 
 function localResponder({ k, mensaje, cand, subido }) {
   const q = P.norm(mensaje || '');
-  if (!k.preas.length && !k.pagos.length) return resumenGeneral(k);
+  if (!k.preas.length && !k.pagos.length && !k.negs.length) return resumenGeneral(k);
   if (!subido && /^\s*(hola|buenas|buenos dias|buenas tardes|que tal|hey)\W*$/.test(q)) return '¡Hola! Soy el agente de pruebas. Pregúntame cualquier cosa de lo que aprendí o sube una PREA para ver cómo la corregiría con base en las PREAs aceptadas.';
   const puntajes = k.preas.map(p => ({ p, s: puntuar(cand, p) })).sort((a, b) => b.s - a.s), top = puntajes.filter(x => x.s >= 4);
   if (!subido) {
@@ -144,12 +180,17 @@ function localResponder({ k, mensaje, cand, subido }) {
     if (/\breglas?\b/.test(q) && !top.length) return resumenGeneral(k);
     if (/error|rechaz|lecci|por que|corrig/.test(q)) return preguntaErrores(k, mensaje, top);
   }
-  if (!top.length) return `No tengo una PREA aceptada parecida a ${subido ? 'la que subiste' : 'ese caso'}. ` + resumenGeneral(k);
+  const rechazadas = rechazadasDe(k, cand);
+  if (!top.length) return `No tengo una PREA aceptada parecida a ${subido ? 'la que subiste' : 'ese caso'}.` + (rechazadas.length ? '\n\n' + negativosTxt(rechazadas) : '\n\n' + resumenGeneral(k));
   const best = top[0].p, partes = [];
   partes.push(subido ? `Analicé tu PREA${cand.resumen ? ' (' + cand.resumen + ')' : ''} y la comparé con lo que aprendí. Encontré **${top.length} ${top.length === 1 ? 'PREA aceptada parecida' : 'PREAs aceptadas parecidas'}**; la más cercana es esta:` : `Encontré **${top.length} ${top.length === 1 ? 'PREA aceptada parecida' : 'PREAs aceptadas parecidas'}**. Esto fue lo que sí funcionó:`);
   partes.push(ejemplo(best));
-  const pg = pagoDe(best), ls = leccionesDe(best), rg = reglaDe(best);
+  const pg = pagoDe(best), ls = leccionesDe(best), rg = reglaDe(best), ot = leccionesClave(best);
+  const vb = [best.d.marca, best.d.modelo, best.d.anio].filter(Boolean).join(' '), vc = [cand.marca, cand.modelo, cand.anio].filter(Boolean).join(' ');
+  if (cand.modelo && best.d.modelo && P.norm(cand.modelo) !== P.norm(best.d.modelo)) partes.push(`⚠️ Es un caso parecido pero de **otro contexto**: el ejemplo es de un ${vb} y el tuyo de un ${vc}. La estructura aplica; confirma número de pieza, tiempo y precio para tu modelo.`);
   if (ls) partes.push(ls);
+  if (ot) partes.push(ot);
+  if (rechazadas.length) partes.push(negativosTxt(rechazadas));
   if (pg) partes.push(pg);
   if (rg) partes.push(rg);
   if (subido || cand.horas != null || (cand.piezas || []).length || (cand.causa && cand.causa.codigo)) {
@@ -163,7 +204,7 @@ function localResponder({ k, mensaje, cand, subido }) {
     const temas = [...new Set((best.d.lecciones || []).flatMap(l => l.temas || []))];
     if (temas.length) partes.push(`**Antes de enviarla revisa:** ${temas.join(', ')}.`);
   }
-  if (top.length > 1) partes.push('También encontré: ' + top.slice(1, 3).map(x => `PREA ${x.p.d.folio || x.p.d.orden} (${[x.p.d.modelo, x.p.d.anio].filter(Boolean).join(' ')} · ${x.p.d.queja && x.p.d.queja.texto ? x.p.d.queja.texto.toLowerCase() : ''})`).join('; ') + '.');
+  if (top.length > 1) partes.push(variantesTxt(best, top.slice(1, 3)));
   return partes.join('\n\n');
 }
 
@@ -175,11 +216,13 @@ async function conModelo({ k, mensaje, cand, subido, historial, user }) {
       queja: p.d.queja, causa: p.d.causa, correccion: p.d.correccion, operacion: p.d.operacion, horas: p.d.horas, tarifa_mo: p.d.tarifa_mo, piezas: p.d.piezas, total_bruto: p.d.total_bruto, codigo_autorizacion: p.d.codigo_autorizacion,
       comentarios: (p.d.comentarios || []).map(c => `${fmt(c.fecha)} ${c.origen}: ${c.texto}`), lecciones: p.d.lecciones, pagos_de_planta: (p.pagos || []).map(g => g.d) })),
     reglas_aprendidas: k.reglas.slice(0, 12).map(r => ({ id: r.id, sistema: r.sys, queja: r.q_text, operacion: r.op, horas_promedio: r.n ? +(r.hours_sum / r.n).toFixed(2) : null, preas: r.n, pagos: r.paid_n, estado: r.status })),
-    totales: { preas: k.preas.length, pagos: k.pagos.length },
+    prea_rechazadas_similares: k.negs.map(p => ({ p, s: puntuar(cand, p) })).sort((a, b) => b.s - a.s).slice(0, 3).map(({ p }) => ({ folio: p.d.folio, vehiculo: [p.d.marca, p.d.modelo, p.d.anio].filter(Boolean).join(' '), queja: p.d.queja, causa: p.d.causa, operacion: p.d.operacion, horas: p.d.horas, lecciones: p.d.lecciones, comentarios: (p.d.comentarios || []).map(c => `${fmt(c.fecha)} ${c.origen}: ${c.texto}`) })),
+    errores_guardados: db.prepare('SELECT sys, q_code, problema, correccion, origen FROM train_lessons ORDER BY id DESC LIMIT 25').all(),
+    totales: { preas: k.preas.length, pagos: k.pagos.length, rechazadas: k.negs.length },
     caso_del_usuario: subido ? cand : (cand._texto ? { descripcion: cand._texto } : null)
   };
   const system = `Eres el agente de garantías de ${user.agency.name}, en modo de pruebas. Respondes en español de México, claro y práctico, a ${user.name}.\n` +
-    'Respondes SOLO con el conocimiento que se te da (PREAs aceptadas, su historial de comentarios, los pagos de planta y las reglas aprendidas). No inventes códigos, piezas, tiempos ni precios. Si no hay una PREA parecida, dilo.\n' +
+    'Respondes SOLO con el conocimiento que se te da (PREAs aceptadas y rechazadas, su historial de comentarios, los errores guardados, los pagos de planta y las reglas aprendidas). Un caso parecido pero de otro modelo o contexto también aplica: explica en qué cambia. No inventes códigos, piezas, tiempos ni precios. Si no hay una PREA parecida, dilo.\n' +
     'Cuando el usuario sube una PREA o describe un caso: 1) muestra la PREA aceptada más parecida como ejemplo (folio, vehículo, km, fecha y los campos tal como se llenaron, en una tabla markdown); 2) explica los errores que tuvo esa PREA en el pasado (rechazos y solicitudes de la planta) y cómo se corrigieron; 3) di lo que pagó la planta; 4) compara la PREA del usuario campo por campo y señala qué debe corregir (causa, corrección, operación, tiempo, piezas, kilometraje, evidencias); 5) cierra con cómo debería quedar. Usa **negritas**, listas con guiones y tablas | a | b |.';
   const messages = historial.slice(-8).map(m => ({ role: m.role, content: m.content }));
   messages[messages.length - 1] = { role: 'user', content: `${messages[messages.length - 1].content}\n\n<conocimiento>\n${JSON.stringify(ctx).slice(0, 60000)}\n</conocimiento>` };
@@ -195,7 +238,7 @@ async function responder({ user, mensaje, subidos = [], historial = [] }) {
   const cand = doc ? Object.assign({}, doc.d, { _doc: true, _texto: mensaje }) : Object.assign(P.parseTexto(mensaje || ''), { _texto: mensaje });
   const subido = !!doc;
   let texto = null, origen = 'local';
-  if (process.env.ANTHROPIC_API_KEY && (k.preas.length || k.pagos.length)) {
+  if (process.env.ANTHROPIC_API_KEY && (k.preas.length || k.pagos.length || k.negs.length)) {
     try { texto = await conModelo({ k, mensaje, cand, subido, historial, user }); origen = 'modelo'; } catch (e) { console.error('Agente de pruebas: falló el modelo, uso el motor local:', e.message); }
   }
   if (!texto) texto = localResponder({ k, mensaje, cand, subido });
