@@ -617,6 +617,10 @@ textarea,input{font:inherit;color:inherit}
 .hm-bars .tr{display:grid;gap:3px}.hm-bars .r{display:flex;align-items:center;gap:7px;min-width:0}.hm-bars .r i{display:block;height:8px;border-radius:0 2px 2px 0;background:var(--hm-org);min-width:2px;transition:width .4s}.hm-bars .r.c i{background:var(--hm-cmp);height:5px}.hm-bars .r b{font-weight:500;color:var(--fg);font-size:10px}
 .hm-empty{padding:34px 12px;text-align:center;color:var(--hm-mut);font-size:13px}
 /* pantallas de detalle */
+.hm-pre{padding-bottom:0}.hm-post{padding-top:0}
+.hm-fxw{position:relative;height:150px;margin-top:20px;background:#000;overflow:hidden}
+.hm-fx{display:block;position:absolute;inset:0}
+.hm-post .hm-tools{margin-top:22px}
 .hm-top{display:flex;flex-wrap:wrap;align-items:center;gap:20px}
 .hm-back{height:36px;display:inline-flex;align-items:center;gap:10px;padding:0 16px;border:1px solid var(--hm-line);border-radius:8px;background:var(--hm-card);font-size:13px;font-weight:500}.hm-back .ic{width:15px;height:15px}
 .hm-top .hm-h1{font-size:clamp(28px,3.4vw,38px)}
@@ -643,7 +647,7 @@ textarea,input{font:inherit;color:inherit}
 .hm-tw .o{color:var(--hm-green);font-weight:600;font-size:13px;text-decoration:none}.hm-tw .o:hover{text-decoration:underline;text-underline-offset:3px}
 .hm-tw .m{font-variant-numeric:tabular-nums;white-space:nowrap}
 .pl{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}.pl.ok{background:var(--hm-pill);color:var(--hm-green)}
-@media (max-width:900px){.hm-grid{grid-template-columns:1fr}.hm-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.hm-sr{margin-left:0;width:100%}.hm-kpi{flex:1 1 150px}}
+@media (max-width:900px){.hm-fxw{height:110px}.hm-grid{grid-template-columns:1fr}.hm-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.hm-sr{margin-left:0;width:100%}.hm-kpi{flex:1 1 150px}}
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -728,7 +732,7 @@ textarea,input{font:inherit;color:inherit}
       <p>Esta sección no forma parte de la réplica. Vuelve a Agente de Garantías para seguir con tu PREA.</p>
     </section>
 
-    <section class="hm" id="viewHome" hidden><div class="hm-in"></div></section>
+    <section class="hm" id="viewHome" hidden><div id="hmRoot"></div></section>
 
     <section class="bit" id="viewBit" hidden><div class="bit-in"></div></section>
 
@@ -2234,8 +2238,7 @@ function hmCard(k){
 }
 function hmHome(){
   var a=HM.acc||{total:0,items:[]};
-  return '<h1 class="hm-h1">'+hmGreet()+', '+escA(AX.name)+'</h1>'+
-   '<div class="hm-tools"><label class="hm-tg"><input type="checkbox" id="hmCmp"'+(HM.cmp?' checked':'')+'><span class="sw"></span>Comparar</label>'+
+  return '<div class="hm-tools"><label class="hm-tg"><input type="checkbox" id="hmCmp"'+(HM.cmp?' checked':'')+'><span class="sw"></span>Comparar</label>'+
    '<button class="hm-b" data-an="1">Ver todas las analíticas</button><button class="hm-b dk" data-ask="1"><span class="axl">A</span>Preguntar a Ax Ai</button></div>'+
    '<div class="hm-ban" data-open="'+HM.ban+'"><button data-ban="1" aria-expanded="'+HM.ban+'"><span class="axb">A</span><span>'+(a.total?'Hay '+a.total+' acciones recomendadas para aumentar tu uso de Ax Ai':'No tienes acciones pendientes. Buen trabajo.')+'</span>'+(a.total?svg('chevd'):'')+'</button>'+
    (HM.ban&&a.total?'<div class="hm-acts">'+a.items.map(function(i){return '<button data-act="'+i.k+'"><b>'+i.n+'</b><span>'+escA(i.txt)+'</span>'+svg('chevr')+'</button>'}).join('')+'</div>':'')+'</div>'+
@@ -2276,12 +2279,60 @@ function hmDetail(){
   }
   return top+'<div class="hm-kpis">'+k+'</div>'+t;
 }
+/* Animación de puntos azules (matriz LED) bajo el saludo, a todo el ancho */
+var FX=(function(){
+  var cv=document.createElement('canvas'),cx=cv.getContext('2d'),W=0,H=0,dpr=1,t0=performance.now(),raf=0,ro=null,slot=null;
+  cv.className='hm-fx';cv.setAttribute('aria-hidden','true');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hs=function(a,b,c){var x=Math.sin(a*127.1+b*311.7+c*74.7)*43758.5453;return x-Math.floor(x)};
+  var sm=function(x){var i=Math.floor(x),f=x-i;f=f*f*(3-2*f);return hs(i,0,7)*(1-f)+hs(i+1,0,7)*f};
+  function size(){
+    if(!slot)return false;var w=slot.clientWidth,h=slot.clientHeight;if(!w||!h)return false;
+    var d=Math.min(2,window.devicePixelRatio||1);if(w===W&&h===H&&d===dpr)return true;
+    W=w;H=h;dpr=d;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);return true;
+  }
+  function frame(now){
+    raf=0;if(!cv.isConnected||document.hidden||S.view!=='inicio')return;
+    if(size())draw((now-t0)/1000);
+    if(!reduce)raf=requestAnimationFrame(frame);
+  }
+  function draw(t){
+    var P=W<700?9:11,cols=Math.ceil(W/P),rows=Math.floor((H-6)/P),r0=P*.29;
+    cx.setTransform(dpr,0,0,dpr,0,0);cx.fillStyle='#000';cx.fillRect(0,0,W,H);
+    var g=cx.createLinearGradient(0,H*.4,0,H);g.addColorStop(0,'rgba(10,40,150,0)');g.addColorStop(1,'rgba(22,76,214,.6)');cx.fillStyle=g;cx.fillRect(0,0,W,H);
+    var ramp=reduce?1:1-Math.pow(1-Math.min(1,t/1.6),3),breathe=reduce?0:.5+.5*Math.sin(t*1.1),I=ramp*(1-.3*breathe)+(1-ramp)*.35,fl=Math.floor(t*14);
+    for(var c=0;c<cols;c++){
+      var gap=hs(c,3,Math.floor(t*2.2))>.62?1:0,short=Math.min(rows-3,Math.floor(sm(c*.42+t*.55)*(2+gap*3)));
+      for(var k=0;k<rows-short;k++){
+        var rf=k/rows,thr=1-(1-I)*(.25+.75*rf);
+        if(hs(c,k,fl)>thr)continue;
+        var tw=.78+.22*Math.sin(t*2+hs(c,k,1)*6.283);
+        var rr=Math.round(63+(146-63)*(1-rf)),gg=Math.round(95+(166-95)*(1-rf)),bb=Math.round(208+(255-208)*(1-rf));
+        cx.fillStyle='rgba('+rr+','+gg+','+bb+','+(.92*tw).toFixed(2)+')';
+        cx.beginPath();cx.arc(c*P+P/2,H-3-k*P-P/2,r0*(.92+.14*(1-rf)),0,6.2832);cx.fill();
+      }
+    }
+    if(!reduce&&t>.5){var sx=((t*70)%(W+80))-40;cx.fillStyle='rgba(120,148,255,.95)';for(var j=0;j<3;j++){cx.beginPath();cx.arc(Math.round((sx+j*P)/P)*P+P/2,H-3-(rows)*P-P/2+P*2,r0,0,6.2832);cx.fill()}}
+  }
+  document.addEventListener('visibilitychange',function(){if(!document.hidden&&!raf&&S.view==='inicio')raf=requestAnimationFrame(frame)});
+  return {mount:function(el){
+    slot=el;if(cv.parentNode!==el)el.appendChild(cv);
+    if(ro){ro.disconnect();ro=null}
+    if('ResizeObserver' in window){ro=new ResizeObserver(function(){if(!raf)raf=requestAnimationFrame(frame)});ro.observe(el)}
+    if(!raf)raf=requestAnimationFrame(frame);
+  }};
+})();
 function homeRender(){
   if(S.view!=='inicio')return;
   var a=document.activeElement,id=a&&homeEl.contains(a)&&a.id,pos=a&&a.selectionStart;
-  var body=!AX.on?'<h1 class="hm-h1">'+hmGreet()+', '+escA(AX.name)+'</h1><div class="hm-empty">Conecta el backend: el tablero se alimenta del servidor. Abre la app desde el sitio del servidor e inicia sesión.</div>':
-    HM.err?'<div class="hm-empty">'+HM.err+'<br><button class="hm-b" data-retry="1" style="margin:12px auto 0">Reintentar</button></div>':(HM.view==='home'?hmHome():hmDetail());
-  homeEl.querySelector('.hm-in').innerHTML=body;
+  var wrap=function(x,c){return '<div class="hm-in'+(c?' '+c:'')+'">'+x+'</div>'},slot='<div class="hm-fxw" id="hmFxSlot"></div>';
+  var h1='<h1 class="hm-h1">'+hmGreet()+', '+escA(AX.name)+'</h1>',html;
+  if(!AX.on)html=wrap(h1,'hm-pre')+slot+wrap('<div class="hm-empty">Conecta el backend: el tablero se alimenta del servidor. Abre la app desde el sitio del servidor e inicia sesión.</div>','hm-post');
+  else if(HM.err)html=wrap('<div class="hm-empty">'+HM.err+'<br><button class="hm-b" data-retry="1" style="margin:12px auto 0">Reintentar</button></div>');
+  else if(HM.view==='home')html=wrap(h1,'hm-pre')+slot+wrap(hmHome(),'hm-post');
+  else html=wrap(hmDetail());
+  $('#hmRoot').innerHTML=html;
+  var sl=$('#hmFxSlot');if(sl)FX.mount(sl);
   if(id){var n=document.getElementById(id);if(n){n.focus();try{if(pos!=null&&n.type==='search')n.setSelectionRange(pos,pos)}catch(_){}}}
 }
 function homeShow(){homeRender();hmLoad()}
