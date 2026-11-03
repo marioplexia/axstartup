@@ -193,3 +193,26 @@ CREATE TABLE IF NOT EXISTS expediente_audit (
   created_at  INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_expa_order ON expediente_audit(order_id, id DESC);
+
+-- Entrenamiento del agente: PREAs aceptadas y transacciones pagadas de planta (PDF o imagen)
+CREATE TABLE IF NOT EXISTS train_docs (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  kind        TEXT NOT NULL CHECK (kind IN ('prea','pago','prueba')),
+  name        TEXT NOT NULL,
+  mime        TEXT,
+  size        INTEGER NOT NULL DEFAULT 0,
+  path        TEXT,
+  hash        TEXT,
+  status      TEXT NOT NULL DEFAULT 'pendiente',   -- pendiente | procesando | aprendida | revisar | duplicada | error
+  error       TEXT,
+  engine      TEXT,                                -- ia | pdf | ocr
+  data        TEXT,                                -- JSON con los campos leídos
+  texto       TEXT,
+  rule_id     TEXT,
+  link_id     INTEGER,                             -- pago -> PREA relacionada
+  agency_id   INTEGER REFERENCES agencies(id),
+  advisor_id  TEXT REFERENCES advisors(id),
+  created_at  INTEGER NOT NULL,
+  learned_at  INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_td_kind ON train_docs(agency_id, kind, status);

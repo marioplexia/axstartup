@@ -6,6 +6,7 @@ COPY server/package*.json server/
 RUN cd server && npm ci --omit=dev
 COPY index.html ./
 COPY server server
+COPY samples samples
 ENV NODE_ENV=production PORT=3000 DB_PATH=/data/ax.db
 EXPOSE 3000
 WORKDIR /app/server

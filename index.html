@@ -821,6 +821,58 @@ textarea,input{font:inherit;color:inherit}
 .ex-lb{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.82);display:grid;place-items:center;padding:24px;animation:fadein .15s both;cursor:zoom-out}.ex-lb img{max-width:100%;max-height:100%;border-radius:10px;background:#fff}
 @media (max-width:900px){.ex-kp{grid-template-columns:repeat(2,minmax(0,1fr))}.ex-au>div{grid-template-columns:1fr}.exp-grid{gap:22px}}
 @media (max-width:560px){.exp-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.ex-dhi,.ex-di{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.ex-card{padding:20px 18px}.ex-f{flex-wrap:wrap}}
+
+/* ---------- Entrenamiento del agente (Tablero de agencia) ---------- */
+.ad-tabs{display:flex;gap:8px;margin:0 0 20px;border-bottom:1px solid var(--line);padding-bottom:0}
+.ad-tab{height:38px;padding:0 4px;margin-right:18px;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;align-items:center;gap:8px}
+.ad-tab:hover{color:var(--fg)}.ad-tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg);font-weight:500}
+.tr-intro{margin:0 0 18px;color:var(--muted);font-size:14px;max-width:760px;line-height:1.6}
+.tr-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.tr-st{border:1px solid var(--card-line);border-radius:12px;background:var(--card);padding:14px 16px;min-width:0}
+.tr-st b{display:block;font-family:var(--f-display);font-weight:500;font-size:30px;letter-spacing:-.02em;line-height:1}.tr-st span{display:block;margin-top:8px;font-size:12px;color:var(--muted)}
+.tr-card{border:1px solid var(--card-line);border-radius:14px;background:var(--card);margin-top:16px;overflow:hidden}
+.tr-ch{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;padding:20px 22px 0}
+.tr-ch h3{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}.tr-ch h3 i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--send-on);color:var(--send-fg);display:grid;place-items:center;font-size:12px;font-weight:600}
+.tr-ch p{margin:8px 0 0;color:var(--muted);font-size:13.5px;max-width:700px;line-height:1.55}
+.tr-dz{margin:16px 22px;border:1.5px dashed var(--card-line);border-radius:12px;padding:22px 16px;text-align:center;color:var(--muted);font-size:13.5px;display:grid;gap:8px;justify-items:center;transition:background .15s,border-color .15s}
+.tr-dz.over{background:var(--b-green-bg);border-color:var(--b-green)}.tr-dz.busy{opacity:.6;pointer-events:none}.tr-dz small{font-size:12px;color:var(--faint)}
+.tr-dz .bt{margin-top:2px}
+.tr-ls{border-top:1px solid var(--line)}
+.tr-d{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;align-items:start;padding:16px 22px;border-bottom:1px solid var(--line)}.tr-d:last-child{border-bottom:0}
+.tr-di{width:40px;height:40px;border-radius:10px;background:var(--surface);display:grid;place-items:center;color:var(--muted)}.tr-di .ic{width:19px;height:19px}
+.tr-dm{min-width:0}.tr-dm b{display:block;font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr-dm .sm{display:block;margin-top:5px;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.tr-dm .er{display:block;margin-top:6px;font-size:12.5px;color:var(--b-amber)}.tr-dm .er.bad{color:var(--b-red)}
+.tr-vs{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.tr-v{font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--card-line);color:var(--muted);background:var(--surface)}
+.tr-v.ok{color:var(--b-green);border-color:var(--b-green);background:var(--b-green-bg)}.tr-v.difiere{color:var(--b-amber);border-color:var(--b-amber-line);background:var(--b-amber-bg)}
+.tr-da{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.trs{display:inline-flex;align-items:center;gap:7px;height:24px;padding:0 10px;border-radius:12px;font-size:11.5px;font-weight:600;letter-spacing:.02em;border:1px solid var(--card-line);color:var(--muted);white-space:nowrap}
+.trs.aprendida{color:var(--b-green);background:var(--b-green-bg);border-color:var(--b-green)}.trs.revisar{color:var(--b-amber);background:var(--b-amber-bg);border-color:var(--b-amber-line)}
+.trs.error{color:var(--b-red);background:var(--b-red-bg);border-color:var(--b-red)}
+.trs.procesando,.trs.pendiente{color:var(--fg)}.trs.procesando::before,.trs.pendiente::before{content:"";width:10px;height:10px;border-radius:50%;border:2px solid var(--card-line);border-top-color:var(--fg);animation:trspin .8s linear infinite}
+@keyframes trspin{to{transform:rotate(360deg)}}
+.tr-ac{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.tr-ac .bt{height:28px;font-size:12px;padding:0 10px}
+.tr-empty{padding:26px 22px;text-align:center;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line)}
+.tr-pr{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding:18px 22px 22px}
+.tr-pr p{margin:0;max-width:640px;color:var(--muted);font-size:13.5px;line-height:1.6}
+.tr-ex{display:flex;flex-wrap:wrap;gap:8px;padding:0 22px 20px}.tr-ex button{font-size:12px;padding:5px 11px;border:1px solid var(--card-line);border-radius:999px;background:var(--surface)}.tr-ex button:hover{border-color:var(--fg)}
+.tr-sc{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.4);animation:fadein .18s both}
+.tr-mo{position:fixed;top:0;right:0;bottom:0;z-index:71;width:min(640px,100%);background:var(--bg);border-left:1px solid var(--line);box-shadow:var(--shadow-focus);display:flex;flex-direction:column;animation:rise .25s both}
+.tr-mh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:20px 24px 14px;border-bottom:1px solid var(--line)}.tr-mh h3{margin:0;font-size:17px;font-weight:600;overflow-wrap:anywhere}.tr-mh p{margin:6px 0 0;font-size:12.5px;color:var(--muted)}
+.tr-mh .x{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex:none}.tr-mh .x:hover{background:var(--hover)}
+.tr-mb{flex:1;overflow:auto;padding:18px 24px 30px;display:grid;gap:20px;align-content:start}
+.tr-mb h4{margin:0 0 10px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tr-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px 18px}.tr-g div{min-width:0}.tr-g span{display:block;font-size:11px;color:var(--muted)}.tr-g b{display:block;font-weight:500;font-size:13.5px;margin-top:3px;overflow-wrap:anywhere}
+.tr-cf{display:grid;gap:8px}.tr-cf>div{border:1px solid var(--card-line);border-radius:10px;padding:10px 12px;background:var(--card);font-size:13px}.tr-cf>div span{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}.tr-cf small{display:block;color:var(--muted);margin-top:4px;font-size:12px}
+.tr-tb{width:100%;border-collapse:collapse;font-size:12.5px}.tr-tb th{text-align:left;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;padding:6px 8px 6px 0;border-bottom:1px solid var(--line)}.tr-tb td{padding:8px 8px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}.tr-tb .n{text-align:right;font-variant-numeric:tabular-nums}
+.tr-tl{display:grid;gap:10px}.tr-tl>div{border-left:2px solid var(--card-line);padding:2px 0 2px 12px;font-size:13px}.tr-tl>div.planta{border-left-color:var(--b-amber)}.tr-tl small{display:block;color:var(--muted);font-size:11.5px;margin-bottom:3px}
+.tr-tl .tp{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 7px;border-radius:5px;border:1px solid var(--card-line);margin-left:6px;color:var(--muted)}.tr-tl .tp.rechazo{color:var(--b-red);border-color:var(--b-red)}.tr-tl .tp.aceptacion{color:var(--b-green);border-color:var(--b-green)}.tr-tl .tp.solicitud{color:var(--b-amber);border-color:var(--b-amber-line)}
+.tr-lc{display:grid;gap:8px}.tr-lc>div{background:var(--b-amber-bg);border:1px solid var(--b-amber-line);border-radius:10px;padding:10px 12px;font-size:13px}.tr-lc small{display:block;margin-top:5px;color:var(--fg);font-size:12.5px}
+.tr-mb details{border:1px solid var(--card-line);border-radius:10px;padding:10px 12px;font-size:12px}.tr-mb pre{white-space:pre-wrap;margin:10px 0 0;font:11.5px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;max-height:260px;overflow:auto;color:var(--muted)}
+.app[data-agent="prueba"] #brandHost{display:none}
+.chip.only-prueba{display:none}.app[data-agent="prueba"] .chip.only-prueba{display:inline-flex}
+@media (max-width:760px){.tr-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.tr-d{grid-template-columns:40px minmax(0,1fr)}.tr-da{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap}}
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -893,6 +945,7 @@ textarea,input{font:inherit;color:inherit}
           </div>
         </div>
         <div class="chips rise d2" id="chips">
+          <button class="chip only-prueba" id="backTrain"><span data-i="chart" style="display:contents"></span>Volver al entrenamiento</button>
           <button class="chip" id="evBtn"><span data-i="clip2" style="display:contents"></span><span id="evLbl">Evidencia</span><span data-i="plus" style="display:contents"></span></button>
           <span class="menu-host" id="histChip"><button class="chip" aria-haspopup="menu" aria-expanded="false"><span data-i="history" style="display:contents"></span>Conversaciones</button></span>
           <span class="menu-host" id="refHost"><button class="chip" aria-haspopup="menu" aria-expanded="false"><span data-i="file" style="display:contents"></span><span id="refLbl">Casos de referencia</span><svg class="ic chev" viewBox="0 0 24 24" style="width:13px;height:13px;transition:transform .2s"><path d="m6 9 6 6 6-6"/></svg></button></span>
@@ -919,6 +972,8 @@ textarea,input{font:inherit;color:inherit}
           <div><h2>Tablero de agencia</h2><p>FAME Morelia · reglas que aprende el Agente de Garantías y cómo se distribuyen</p></div>
           <div class="ad-live" id="adLive"><i></i><span>En vivo</span></div>
         </div>
+        <div class="ad-tabs" role="tablist"><button class="ad-tab" role="tab" data-adtab="cat" aria-selected="true">Catálogo de reglas</button><button class="ad-tab" role="tab" data-adtab="train" aria-selected="false">Entrenamiento<span class="nbadge" id="trBadge" hidden></span></button></div>
+        <div id="adCat">
         <div class="ad-kpi" id="adKpi"></div>
         <div class="ad-bar">
           <label>Activar con <select id="adThr"><option value="2">2 PREAs</option><option value="3">3 PREAs</option><option value="5">5 PREAs</option></select></label>
@@ -951,6 +1006,8 @@ textarea,input{font:inherit;color:inherit}
             <div class="ad-card"><div class="ad-ch"><h3>Asesores de la agencia</h3></div><div id="adAdv"></div></div>
           </div>
         </div>
+        </div>
+        <div id="adTrain" hidden></div>
       </div>
     </section>
   </main>
@@ -1040,18 +1097,18 @@ $('#userBtn').addEventListener('click',function(){
 });
 
 var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',chat:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia'};
-function isMain(id){return id==='agent'||id==='cobros'||id==='chat'}
+function isMain(id){return id==='agent'||id==='cobros'||id==='chat'||id==='prueba'}
 function showView(id){
   S.view=id;var main=isMain(id);document.querySelector('.main').dataset.v=id;
-  if(main){var ag=id==='cobros'?'cobros':id==='chat'?'mi':'garantias';if(ag!==S.agent)setAgent(ag)}
-  $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':S.agent==='mi'?v==='chat':v==='agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
+  if(main){var ag=id==='cobros'?'cobros':id==='chat'?'mi':id==='prueba'?'prueba':'garantias';if(ag!==S.agent)setAgent(ag)}
+  $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':S.agent==='mi'?v==='chat':S.agent==='prueba'?v==='admin':v==='agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
   var adm=id==='admin',bit=id==='bitacora';stage.hidden=!main;var hom=id==='inicio',car=id==='cartera',exp=id==='exp';$('#viewPh').hidden=main||adm||bit||hom||car||exp;$('#viewExp').hidden=!exp;$('#viewCar').hidden=!car;$('#viewBit').hidden=!bit;$('#viewHome').hidden=!hom;$('#viewAdmin').hidden=!adm;
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(bit)bitShow();
   if(hom)homeShow();
   if(car)carShow();
   if(exp)exShow();
-  if(adm)adRender();
+  if(adm){adRender();adTab(TR.tab)}
   else if(!bit&&!hom&&!car&&!exp){crumb.textContent=AG[S.agent].crumb;syncCrumb()}
   if(mq.matches)setSb(false);
 }
@@ -1139,16 +1196,17 @@ var MI_REFS=[
   {t:'Servicios cobrados',s:'Este mes',q:'¿Cuánto he cobrado este mes?'},
   {t:'Estado de una PREA',s:'Por folio',q:'¿Cuál es el estado de la PREA GA3957?'}
 ];
-var MI_HIST=[];
+var MI_HIST=[],PR_REFS_=[],PR_HIST_=[];
 var AG={
+  prueba:{crumb:'Probar al agente',title:'Probemos lo que aprendió el agente',ph:'Pregunta lo que quieras o sube una PREA para validarla…',menu:['Preguntar al agente','Validar una PREA'],menuDefault:'Preguntar al agente',ev:'Subir PREA',ref:'Preguntas de ejemplo',refs:PR_REFS_,hist:PR_HIST_},
   mi:{crumb:'Mi Agente',title:'¿En qué te ayudo hoy?',ph:'Pregúntame sobre tus PREAs, servicios, campañas, piezas o expedientes…',menu:['Toda la agencia','Solo mis órdenes'],menuDefault:'Toda la agencia',ev:'Evidencia',ref:'Preguntas sugeridas',refs:MI_REFS,hist:MI_HIST},
   garantias:{crumb:'Agente de Garantías',title:'Trabajemos en tu próxima PREA',ph:'Describe tu caso de garantía…',menu:PREAS,menuDefault:'Nueva PREA',ev:'Evidencia',ref:'Casos de referencia',refs:REFS,hist:HIST},
   cobros:{crumb:'Agente de Cobros',title:'Cobremos tu próxima PREA',ph:'Indica qué PREA quieres facturar…',menu:['PREA a cobrar','Todas las aprobadas','Pendientes de pago'],menuDefault:'PREA a cobrar',ev:'Factura',ref:'PREA aprobadas',refs:COBROS_REFS,hist:COBROS_HIST}
 };
-function curView(){return S.agent==='cobros'?'cobros':S.agent==='mi'?'chat':'agent'}
+function curView(){return S.agent==='cobros'?'cobros':S.agent==='mi'?'chat':S.agent==='prueba'?'prueba':'agent'}
 function setAgent(a){
   resetChat();
-  S.agent=a;var c=AG[a];app.dataset.agent=a;if(a==='mi')miHist();
+  S.agent=a;var c=AG[a];app.dataset.agent=a;if(a==='mi')miHist();if(a==='prueba')prHist();
   S.prea=c.menuDefault;$('#preaLabel').textContent=c.menuDefault;
   $('#evLbl').textContent=c.ev;$('#refLbl').textContent=c.ref;
   ta.placeholder=c.ph;typeTok++;ta.value='';S.files=[];renderFiles();
@@ -2141,7 +2199,7 @@ async function loadMiThread(h){
     S.last=null;toBottom(true);
   }catch(_){toast('No se pudo abrir la conversación')}
 }
-function start(text,files){return S.agent==='cobros'?runCobros(text,files):S.agent==='mi'?runMi(text,files):run(text,files)}
+function start(text,files){return S.agent==='cobros'?runCobros(text,files):S.agent==='mi'?runMi(text,files):S.agent==='prueba'?runPrueba(text,files):run(text,files)}
 
 function onSend(){
   if(S.streaming){if(S.ctrl)S.ctrl.aborted=true;return}
@@ -2155,6 +2213,7 @@ function onSend(){
 }
 async function loadHistory(h){
   if(S.agent==='mi')return loadMiThread(h);
+  if(S.agent==='prueba')return loadPruebaThread(h);
   showView(curView());resetChat();
   enterChat(h.t);addUser(h.q,[]);
   var txt;
@@ -3010,6 +3069,178 @@ exEl.addEventListener('drop',function(e){
 });
 document.addEventListener('click',function(e){if(EX.menu&&S.view==='exp'&&!e.target.closest('.ex-pop,[data-mn]')){EX.menu=null;exRender()}});
 setInterval(function(){if(S.view==='exp'&&AX.on&&!document.hidden&&!EX.lb&&!EX.menu&&!EX.conf&&!Object.keys(EX.busy).some(function(k){return EX.busy[k]})){var a=document.activeElement;if(!(a&&exEl.contains(a)&&a.tagName==='INPUT'))exLoad()}},20000);
+
+
+/* ---------- Entrenamiento del agente: PREAs aceptadas, pagos de planta y chat de pruebas ---------- */
+var TR={tab:'cat',docs:{prea:null,pago:null},res:null,ejemplos:null,det:null,conf:null,busy:{},err:'',timer:0};
+var trEl=$('#adTrain');
+var TRS={aprendida:'Aprendida',procesando:'Leyendo…',pendiente:'En cola…',revisar:'Por revisar',duplicada:'Duplicada',error:'Error'};
+var TRM={ia:'IA',pdf:'PDF',ocr:'OCR'};
+var trSz=function(n){return n<1048576?Math.max(1,Math.round(n/1024))+' KB':(n/1048576).toFixed(1)+' MB'};
+async function trLoad(){
+  if(!AX.on)return trRender();
+  try{
+    var r=await Promise.all([bitApi('GET','/entrenamiento/docs?tipo=prea'),bitApi('GET','/entrenamiento/docs?tipo=pago'),bitApi('GET','/entrenamiento/resumen')].concat(TR.ejemplos?[]:[bitApi('GET','/entrenamiento/ejemplos')]));
+    TR.docs.prea=r[0];TR.docs.pago=r[1];TR.res=r[2];if(r[3])TR.ejemplos=r[3];TR.err='';
+  }catch(e){if(e.message!=='sesión')TR.err='No se pudo conectar con el servidor.'}
+  trRender();trPoll();
+}
+function trPoll(){
+  clearTimeout(TR.timer);
+  if(S.view!=='admin'||TR.tab!=='train')return;
+  var vivo=(TR.docs.prea&&TR.docs.prea.procesando)||(TR.docs.pago&&TR.docs.pago.procesando);
+  TR.timer=setTimeout(trLoad,vivo?1500:15000);
+}
+function trBadge(){var b=$('#trBadge');if(!b)return;var n=TR.res?TR.res.revisar+TR.res.pendientes:0;b.textContent=n||'';b.hidden=!n}
+function trDoc(d){
+  var img=/image/.test(d.nombre)||/\.(png|jpe?g|webp|gif)$/i.test(d.nombre);
+  var vs=(d.validacion||[]).map(function(v){return '<span class="tr-v '+v.nivel+'" title="'+escA(v.texto)+'">'+(v.nivel==='ok'?'✓ ':v.nivel==='difiere'?'≠ ':'! ')+escA(v.texto.length>70?v.texto.slice(0,68)+'…':v.texto)+'</span>'}).join('');
+  var meta=[d.motor?'Leído con '+TRM[d.motor]:'',trSz(d.size),bd(d.creado),d.reglaEstado?(d.tipo==='prea'?'Regla '+d.reglaEstado.id+(d.reglaEstado.status==='aprendizaje'?' · en aprendizaje '+d.reglaEstado.n+' de '+d.reglaEstado.th+' PREAs':d.reglaEstado.status==='activa'?' · activa y repartida a los asesores':' · '+d.reglaEstado.status):'Ajustó la regla '+d.reglaEstado.id):'',d.comentarios?d.comentarios+(d.comentarios===1?' comentario':' comentarios'):'',d.lecciones?d.lecciones+(d.lecciones===1?' lección':' lecciones'):''].filter(Boolean).join(' · ');
+  var puede=d.estado==='aprendida'||d.estado==='revisar'||d.estado==='duplicada';
+  return '<div class="tr-d"><div class="tr-di">'+svg(img?'file':'file')+'</div><div class="tr-dm"><b title="'+escA(d.nombre)+'">'+escA(d.nombre)+'</b>'+
+   (d.resumen?'<span class="sm">'+escA(d.resumen)+(d.total!=null?' · '+hmM(d.total):'')+'</span>':'')+'<span class="sm" style="color:var(--faint)">'+escA(meta)+'</span>'+
+   (d.error?'<span class="er'+(d.estado==='error'?' bad':'')+'">'+escA(d.error)+'</span>':'')+(vs?'<div class="tr-vs">'+vs+'</div>':'')+'</div>'+
+   '<div class="tr-da"><span class="trs '+d.estado+'">'+TRS[d.estado]+'</span><div class="tr-ac">'+
+   (puede?'<button class="bt" data-trver="'+d.id+'">Ver datos</button>':'')+
+   (d.estado==='error'?'<button class="bt" data-trre="'+d.id+'">Reintentar</button>':'')+
+   (d.estado==='revisar'?'<button class="bt" data-trre="'+d.id+'">Reintentar</button><button class="bt" data-trre="'+d.id+'" data-f="1">Aprender de todos modos</button>':'')+
+   (String(TR.conf)===String(d.id)?'<button class="bt dng" data-trdel="'+d.id+'">¿Eliminar?</button>':'<button class="bt" data-trask="'+d.id+'" aria-label="Eliminar '+escA(d.nombre)+'">Eliminar</button>')+'</div></div></div>';
+}
+function trCard(tipo,n,titulo,desc,vacio){
+  var d=TR.docs[tipo],busy=TR.busy[tipo];
+  return '<section class="tr-card"><div class="tr-ch"><div><h3><i>'+n+'</i>'+titulo+'</h3><p>'+desc+'</p></div><button class="bt pri" data-trup="'+tipo+'"'+(busy?' disabled':'')+'>'+(busy?'Subiendo…':'Subir PDF o imagen')+'</button></div>'+
+   '<div class="tr-dz'+(busy?' busy':'')+'" data-trdz="'+tipo+'"><span>Arrastra aquí tus archivos o usa «Subir PDF o imagen»</span><small>PDF, PNG, JPG o WEBP · hasta 20 MB cada uno · puedes subir varios a la vez</small></div>'+
+   (d&&d.items.length?'<div class="tr-ls">'+d.items.map(trDoc).join('')+'</div>':'<div class="tr-empty">'+(d?vacio:'Cargando…')+'</div>')+'</section>';
+}
+function trRender(){
+  trBadge();
+  if(TR.tab!=='train')return;
+  var a=document.activeElement;
+  var r=TR.res||{preas:0,pagos:0,reglas:0,revisar:0,pendientes:0};
+  var body=!AX.on?'<div class="tr-empty" style="border:0">Conecta el backend: el entrenamiento se guarda en el servidor. Abre la app desde el sitio del servidor e inicia sesión.</div>':TR.err?'<div class="tr-empty" style="border:0">'+TR.err+'<br><button class="bt" data-trretry="1" style="margin-top:10px">Reintentar</button></div>':
+   '<p class="tr-intro">Entrena al agente con documentos reales de tu agencia. Lee PDFs e imágenes, valida cada PREA contra las reglas que ya conoce y aprende todos los datos: cómo se llenó cada campo, qué rechazó la planta y cómo se corrigió, y cuánto pagó realmente.</p>'+
+   '<div class="tr-stats"><div class="tr-st"><b>'+r.preas+'</b><span>PREAs aceptadas aprendidas</span></div><div class="tr-st"><b>'+r.pagos+'</b><span>Transacciones pagadas aprendidas</span></div><div class="tr-st"><b>'+r.reglas+'</b><span>Reglas moldeadas por documentos</span></div><div class="tr-st"><b>'+(r.revisar+r.pendientes)+'</b><span>Por revisar o leyéndose</span></div></div>'+
+   trCard('prea',1,'PREAs aceptadas','Sube solo PREAs que la planta ya aceptó. El agente lee el formulario y el <b>historial de comentarios</b>: aprende cómo se llenó cada campo, por qué se rechazó antes y cómo se corrigió, y con eso crea o refuerza las reglas.','Todavía no has subido PREAs aceptadas.')+
+   trCard('pago',2,'Transacciones pagadas de planta','Sube solo transacciones que la planta ya pagó correctamente. El agente aprende el tiempo pagado, la tarifa, el precio de cada pieza y los ajustes, y los liga con su PREA para corregir horas y precios de las reglas.','Todavía no has subido transacciones pagadas.')+
+   '<section class="tr-card"><div class="tr-ch"><div><h3><i>3</i>Probar al agente</h3><p>Pregúntale lo que quieras o sube una PREA nueva. El agente responde con lo que aprendió: te muestra la PREA aceptada más parecida como ejemplo, los errores que tuvo y cómo se corrigieron, lo que pagó la planta y qué debes cambiar en la tuya.</p></div><button class="bt pri" data-trchat="1">Abrir chat de pruebas</button></div>'+
+   '<div class="tr-pr"><p>¿Quieres probar el flujo sin tus archivos? Descarga los documentos de ejemplo (un Aveo 2024 con cambio de polea y un Equinox 2023), súbelos en los apartados 1 y 2 y valida la PREA con errores en el chat.</p></div>'+
+   '<div class="tr-ex">'+(TR.ejemplos||[]).map(function(e){return '<button data-trej="'+escA(e.archivo)+'" title="'+escA(e.descripcion)+'">'+svg('dl','sm')+' '+escA(e.descripcion)+'</button>'}).join('')+'</div></section>';
+  var keep=a&&trEl.contains(a)&&a.id;
+  trEl.innerHTML=body+trModal();
+  if(keep){var n=document.getElementById(keep);if(n)n.focus()}
+}
+/* detalle de lo que leyó el agente */
+function trField(l,v){return '<div><span>'+l+'</span><b>'+(v==null||v===''?'—':escA(v))+'</b></div>'}
+function trCod(l,c){return '<div><span>'+l+'</span>'+(c&&(c.codigo||c.texto)?'<b>'+escA([c.codigo,c.texto].filter(Boolean).join(' · '))+'</b>'+(c.detalle?'<small>'+escA(c.detalle)+'</small>':''):'<b>—</b>')+'</div>'}
+function trModal(){
+  var m=TR.det;if(!m)return '';
+  var x=m.datos||{},esP=m.tipo==='prea',body='';
+  if(!x||!x.tipo)body='<div class="tr-empty" style="border:0">Todavía no hay datos leídos de este archivo.</div>';
+  else if(esP){
+    body='<div><h4>Datos generales</h4><div class="tr-g">'+trField('Folio',x.folio)+trField('Orden de trabajo',x.orden)+trField('Fecha',x.fecha&&hmF(Date.parse(x.fecha+'T12:00:00')))+trField('Vehículo',[x.marca,x.modelo,x.anio].filter(Boolean).join(' '))+trField('VIN',x.vin)+trField('Kilometraje',x.km&&x.km.toLocaleString('en-US')+' km')+trField('Sistema',x.sistema)+trField('Resultado',x.estado)+trField('Autorización',x.codigo_autorizacion)+trField('Tiempo',x.horas!=null?x.horas+' h':'')+trField('Tarifa',x.tarifa_mo!=null?carM(x.tarifa_mo):'')+trField('Total bruto',x.total_bruto!=null?carM(x.total_bruto):'')+'</div></div>'+
+     '<div><h4>Cómo se llenó</h4><div class="tr-cf">'+trCod('Queja',x.queja)+trCod('Causa',x.causa)+trCod('Corrección',x.correccion)+trCod('Operación de trabajo',{codigo:x.operacion&&x.operacion.codigo,texto:x.operacion&&x.operacion.descripcion})+'</div></div>'+
+     '<div><h4>Piezas</h4>'+((x.piezas||[]).length?'<table class="tr-tb"><thead><tr><th>Número</th><th>Descripción</th><th class="n">Cant.</th><th class="n">Precio</th></tr></thead><tbody>'+x.piezas.map(function(p){return '<tr><td>'+escA(p.numero)+'</td><td>'+escA(p.descripcion)+'</td><td class="n">'+(p.cantidad||1)+'</td><td class="n">'+(p.precio!=null?carM(p.precio):'—')+'</td></tr>'}).join('')+'</tbody></table>':'<div class="sm" style="color:var(--muted)">Sin piezas leídas.</div>')+'</div>'+
+     ((x.lecciones||[]).length?'<div><h4>Errores del pasado y cómo se corrigieron</h4><div class="tr-lc">'+x.lecciones.map(function(l){return '<div>'+escA(l.problema)+(l.correccion?'<small><b>Corrección:</b> '+escA(l.correccion)+'</small>':'')+((l.temas||[]).length?'<small style="color:var(--muted)">'+escA(l.temas.join(' · '))+'</small>':'')+'</div>'}).join('')+'</div></div>':'')+
+     ((x.comentarios||[]).length?'<div><h4>Historial de comentarios</h4><div class="tr-tl">'+x.comentarios.map(function(c){return '<div class="'+(c.origen||'')+'"><small>'+escA(c.fecha||'')+' '+escA(c.hora||'')+' · '+escA(c.autor||c.origen||'')+'<span class="tp '+c.tipo+'">'+escA(c.tipo||'')+'</span></small>'+escA(c.texto)+'</div>'}).join('')+'</div></div>':'');
+  }else{
+    body='<div><h4>Datos del pago</h4><div class="tr-g">'+trField('Referencia',x.referencia_pago)+trField('Fecha de pago',x.fecha_pago&&hmF(Date.parse(x.fecha_pago+'T12:00:00')))+trField('Orden de trabajo',x.orden)+trField('Autorización',x.codigo_autorizacion)+trField('VIN',x.vin)+trField('Operación',[x.operacion&&x.operacion.codigo,x.operacion&&x.operacion.descripcion].filter(Boolean).join(' · '))+trField('Tiempo pagado',x.horas_pagadas!=null?x.horas_pagadas+' h':'')+trField('Tarifa',x.tarifa_mo!=null?carM(x.tarifa_mo):'')+trField('Mano de obra pagada',x.mano_obra_pagada!=null?carM(x.mano_obra_pagada):'')+trField('Total de piezas',x.total_piezas_pagado!=null?carM(x.total_piezas_pagado):'')+trField('Total pagado',x.total_pagado!=null?carM(x.total_pagado):'')+trField('Estado',x.estado_pago)+'</div></div>'+
+     '<div><h4>Piezas pagadas</h4>'+((x.piezas||[]).length?'<table class="tr-tb"><thead><tr><th>Número</th><th>Descripción</th><th class="n">Cant.</th><th class="n">Pagado</th></tr></thead><tbody>'+x.piezas.map(function(p){return '<tr><td>'+escA(p.numero)+'</td><td>'+escA(p.descripcion)+'</td><td class="n">'+(p.cantidad||1)+'</td><td class="n">'+(p.monto_pagado!=null?carM(p.monto_pagado):'—')+'</td></tr>'}).join('')+'</tbody></table>':'<div class="sm" style="color:var(--muted)">Sin piezas leídas.</div>')+'</div>'+
+     ((x.ajustes||[]).length?'<div><h4>Ajustes</h4><div class="tr-cf">'+x.ajustes.map(function(a){return '<div>'+escA(a.concepto)+' · <b>'+carM(a.monto)+'</b></div>'}).join('')+'</div></div>':'');
+  }
+  var val=(m.validacion||[]);
+  body+=(val.length?'<div><h4>Validación contra las reglas</h4><div class="tr-vs">'+val.map(function(v){return '<span class="tr-v '+v.nivel+'">'+(v.nivel==='ok'?'✓ ':v.nivel==='difiere'?'≠ ':'! ')+escA(v.texto)+'</span>'}).join('')+'</div></div>':'')+
+   (m.reglaInfo?'<div><h4>Regla del catálogo</h4><div class="tr-cf"><div><b>'+escA(m.reglaInfo.id)+' · '+escA(m.reglaInfo.q_text)+'</b><small>'+escA(m.reglaInfo.sys)+' · '+escA(m.reglaInfo.op)+' · '+m.reglaInfo.n+' PREAs · '+m.reglaInfo.paid_n+' pagos · '+escA(m.reglaInfo.status)+'</small></div></div></div>':'')+
+   (m.texto?'<details><summary>Texto que leí del archivo</summary><pre>'+escA(m.texto)+'</pre></details>':'');
+  return '<div class="tr-sc" data-trx="1"></div><aside class="tr-mo" role="dialog" aria-label="Datos leídos"><div class="tr-mh"><div><h3>'+escA(m.nombre)+'</h3><p>'+(esP?'PREA aceptada':'Transacción pagada')+' · '+TRS[m.estado]+(m.motor?' · leído con '+TRM[m.motor]:'')+'</p></div><button class="x" data-trx="1" aria-label="Cerrar">'+svg('x')+'</button></div><div class="tr-mb">'+body+'</div></aside>';
+}
+async function trUpload(tipo,files){
+  var ok=0,bad=[];TR.busy[tipo]=true;trRender();
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    if(f.size>20*1048576){bad.push(f.name+' supera los 20 MB');continue}
+    try{
+      var r=await fetch('/api/garantias/entrenamiento/docs?tipo='+tipo+'&nombre='+encodeURIComponent(f.name),{method:'POST',headers:{Authorization:'Bearer '+AX.token,'Content-Type':'application/octet-stream'},body:f});
+      if(r.status===401){AX.logout();return}
+      if(!r.ok){var j=await r.json().catch(function(){return{}});bad.push(f.name+': '+(j.error||'no se pudo subir'));continue}
+      ok++;
+    }catch(e){bad.push(f.name+': sin conexión')}
+  }
+  TR.busy[tipo]=false;
+  toast(ok?(ok===1?'Archivo subido: el agente ya lo está leyendo':ok+' archivos subidos: el agente los está leyendo')+(bad.length?' · '+bad.length+' con error':''):bad[0]||'No se subió ningún archivo');
+  await trLoad();
+}
+function adTab(t){
+  TR.tab=t;$$('.ad-tab').forEach(function(b){b.setAttribute('aria-selected',b.dataset.adtab===t)});
+  $('#adCat').hidden=t!=='cat';$('#adTrain').hidden=t!=='train';
+  if(t==='train'){trRender();trLoad()}else clearTimeout(TR.timer);
+}
+$$('.ad-tab').forEach(function(b){b.addEventListener('click',function(){adTab(b.dataset.adtab)})});
+var trFile=document.createElement('input');trFile.type='file';trFile.multiple=true;trFile.accept='application/pdf,image/png,image/jpeg,image/webp,image/gif,.pdf,.png,.jpg,.jpeg,.webp,.gif';trFile.hidden=true;document.body.appendChild(trFile);
+var trPick='prea';
+trFile.addEventListener('change',function(){var l=Array.prototype.slice.call(trFile.files);trFile.value='';if(l.length)trUpload(trPick,l)});
+trEl.addEventListener('click',async function(e){
+  var t=e.target.closest('button,.tr-sc');if(!t||!trEl.contains(t))return;var q=t.dataset;
+  if(q.trx){TR.det=null;trRender();return}
+  if(q.trup){trPick=q.trup;trFile.click();return}
+  if(q.trretry){TR.err='';trLoad();return}
+  if(q.trchat){showView('prueba');return}
+  if(q.trver){try{TR.det=await bitApi('GET','/entrenamiento/docs/'+q.trver);trRender()}catch(er){toast('No se pudo abrir el documento')}return}
+  if(q.trre){try{await bitApi('POST','/entrenamiento/docs/'+q.trre+'/reintentar',{forzar:q.f==='1'});toast('Leyendo de nuevo…');await trLoad()}catch(er){toast(er.message||'No se pudo reintentar')}return}
+  if(q.trask){TR.conf=q.trask;trRender();return}
+  if(q.trdel){try{await bitApi('DELETE','/entrenamiento/docs/'+q.trdel);TR.conf=null;toast('Documento eliminado y regla actualizada');await trLoad()}catch(er){toast(er.message||'No se pudo eliminar')}return}
+  if(q.trej){try{var r=await fetch('/api/garantias/entrenamiento/ejemplos/'+encodeURIComponent(q.trej),{headers:{Authorization:'Bearer '+AX.token}});if(!r.ok)throw 0;var b=await r.blob();carSave(b,q.trej)}catch(er){toast('No se pudo descargar el ejemplo')}return}
+});
+trEl.addEventListener('dragover',function(e){var z=e.target.closest&&e.target.closest('[data-trdz]');if(z){e.preventDefault();z.classList.add('over')}});
+trEl.addEventListener('dragleave',function(e){var z=e.target.closest&&e.target.closest('[data-trdz]');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
+trEl.addEventListener('drop',function(e){var z=e.target.closest&&e.target.closest('[data-trdz]');if(!z)return;e.preventDefault();z.classList.remove('over');var l=Array.prototype.slice.call(e.dataTransfer.files||[]);if(l.length)trUpload(z.dataset.trdz,l)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.view==='admin'&&TR.det){TR.det=null;trRender()}});
+$('#backTrain').addEventListener('click',function(){TR.tab='train';showView('admin')});
+
+/* ---------- Chat de pruebas (mismo chat, con archivos) ---------- */
+var PR_HIST=PR_HIST_,PR_REFS=PR_REFS_;PR_REFS.push(
+  {t:'¿Qué has aprendido?',s:'Resumen de lo aprendido',q:'¿Qué has aprendido?'},
+  {t:'Cambio de polea, Aveo 2024',s:'Caso descrito con palabras',q:'Quiero hacer una PREA de un cambio de polea de un Aveo 2024 de 40 mil km. ¿Cómo la lleno?'},
+  {t:'¿Por qué rechazaron una PREA?',s:'Errores del historial',q:'¿Por qué rechazaron la PREA del Aveo y cómo se corrigió?'},
+  {t:'¿Cuánto paga la planta?',s:'Pagos aprendidos',q:'¿Cuánto paga la planta por una polea tensora?'},
+  {t:'Validar una PREA',s:'Sube el archivo con el clip',q:'Valida esta PREA antes de enviarla.'}
+);
+var PR_THINK='<span class="thinking">Leyendo y consultando lo aprendido<span class="dots"><i></i><i></i><i></i></span></span>';
+async function prHist(){
+  if(!AX.on)return;
+  try{var l=await bitApi('GET','/entrenamiento/chat/hilos');PR_HIST.length=0;l.forEach(function(h){PR_HIST.push({t:h.title,s:miRel(h.updated_at),id:h.id})})}catch(_){}
+}
+async function runPrueba(text,files){
+  var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:files};updateSend();
+  var w=addAssistant(),body=$('.ai-body',w),acts=$('.ai-actions',w),full='';
+  body.innerHTML=PR_THINK;toBottom();
+  try{
+    if(!AX.on)throw new Error('offline');
+    var ids=[];
+    for(var i=0;i<files.length&&!my.aborted;i++){
+      var f=files[i].file;if(!f)continue;
+      var r=await fetch('/api/garantias/entrenamiento/prueba/archivos?nombre='+encodeURIComponent(f.name),{method:'POST',headers:{Authorization:'Bearer '+AX.token,'Content-Type':'application/octet-stream'},body:f});
+      if(r.status===401){AX.logout();throw new Error('sesión')}
+      var j=await r.json().catch(function(){return{}});if(!r.ok)throw new Error(j.error||'No se pudo subir el archivo');ids.push(j.id);
+    }
+    if(!my.aborted){var c=await bitApi('POST','/entrenamiento/chat',{mensaje:text,hilo:S.hilo||undefined,archivos:ids});S.hilo=c.hilo;full=c.respuesta}
+  }catch(e){if(!my.aborted)full=e.message==='offline'?'Para probar al agente necesito el servidor. Abre la app desde el sitio del servidor e inicia sesión.':(e.message&&e.message!=='sesión'?e.message:'No pude consultar al agente en este momento. Inténtalo de nuevo.')}
+  if(full&&!my.aborted)full=await stream(body,full,my,.3);
+  else if(my.aborted)body.innerHTML=full?md(full,false):'<p class="muted">Respuesta detenida.</p>';
+  w._text=full.replace(/\*\*/g,'').replace(/^> /gm,'');
+  if(w.isConnected&&full)acts.hidden=false;
+  finish(my);prHist();
+}
+async function loadPruebaThread(h){
+  showView('prueba');resetChat();enterChat(h.t);
+  try{
+    var r=await bitApi('GET','/entrenamiento/chat/hilos/'+h.id);S.hilo=h.id;
+    r.mensajes.forEach(function(m){
+      if(m.role==='user'){addUser(m.content,[]);return}
+      var w=addAssistant();$('.ai-body',w).innerHTML=md(m.content,false);w._text=m.content.replace(/\*\*/g,'');$('.ai-actions',w).hidden=false;
+    });
+    S.last=null;toBottom(true);
+  }catch(_){toast('No se pudo abrir la conversación')}
+}
 
 })();
 </script>

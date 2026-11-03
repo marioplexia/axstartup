@@ -108,3 +108,27 @@ Solo se puede cobrar una PREA aprobada, un servicio pagado o una campaña realiz
 
 - `GET /api/garantias/ordenes?cierre=activa|cerrada|rechazada` (y `cierre` con los conteos en la respuesta)
 - `POST /api/garantias/expedientes/:orden/cobro` `{cobrado}`
+
+## Entrenamiento del agente (Tablero de agencia → Entrenamiento)
+
+Tres apartados:
+
+1. **PREAs aceptadas**: PDFs o imágenes de PREAs que la planta ya aceptó. El agente lee el formulario y el **historial de comentarios**, aprende cómo se llenó cada campo, por qué se rechazó antes y cómo se corrigió, y crea o refuerza una regla del catálogo (queja + sistema). Valida cada PREA contra la regla que ya existe (operación, causa, corrección, tiempo y piezas) y avisa de las diferencias.
+2. **Transacciones pagadas de planta**: PDFs o imágenes de pagos. Se ligan a su PREA (orden de trabajo, autorización, folio o VIN) y corrigen las horas y los precios de pieza de la regla con lo que la planta realmente pagó.
+3. **Probar al agente**: el mismo chat de siempre. Preguntas libres («cambio de polea de un Aveo 2024 de 40 mil km», «¿por qué rechazaron esa PREA?», «¿cuánto paga la planta?») o sube una PREA para validarla: responde con la PREA aceptada más parecida como ejemplo, los errores que tuvo y cómo se corrigieron, lo que pagó la planta y qué corregir en la PREA subida.
+
+Una regla se reparte a los asesores (y la usa el Agente de Garantías) al llegar al umbral de PREAs aceptadas del Tablero (3 por defecto); el chat de pruebas usa todo lo aprendido desde la primera PREA. Al eliminar un documento se deshace lo que aportó a la regla.
+
+**Cómo lee los archivos**
+- Con `ANTHROPIC_API_KEY`: un modelo con visión lee cualquier formato, también PDFs escaneados y fotos (`TRAIN_MODEL` opcional; el chat de pruebas también redacta con el modelo).
+- Sin clave: texto del PDF + lector local que entiende la autorización previa de GM; las imágenes pasan por OCR en español (tesseract, sin internet). Un PDF escaneado sin texto necesita IA o subirse como imagen.
+- Los archivos se guardan en `train/` junto a la base (en Render, el volumen `/data`; cambia la ruta con `TRAIN_DIR`). Máximo 20 MB; solo PDF, PNG, JPG, WEBP o GIF (se valida por los bytes del archivo).
+
+Documentos de ejemplo (datos ficticios) en `samples/`, también descargables desde la pantalla: un Aveo 2024 con cambio de polea y un Equinox 2023, sus pagos de planta, una PREA con errores para validar y dos PREAs más de la polea para activar la regla. Se regeneran con `python3 samples/generar.py`.
+
+| Endpoint (`/api/garantias/entrenamiento/…`) | Qué hace |
+|---|---|
+| `POST docs?tipo=prea\|pago&nombre=` (cuerpo binario) · `GET docs?tipo=` | Sube un documento (se lee en segundo plano) y lista el estado |
+| `GET docs/:id` · `GET docs/:id/archivo` · `POST docs/:id/reintentar` · `DELETE docs/:id` | Datos leídos, original, reintentar y eliminar (deshace lo aprendido) |
+| `GET resumen` · `GET ejemplos` | Contadores y documentos de ejemplo |
+| `POST prueba/archivos?nombre=` · `POST chat` `{mensaje, hilo?, archivos?}` · `GET chat/hilos` | Chat de pruebas con archivos adjuntos (lo subido no se aprende) |

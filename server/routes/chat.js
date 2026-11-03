@@ -213,8 +213,8 @@ router.post('/chat', async (req, res) => {
   if (!msg) return res.status(400).json({ error: 'Escribe tu pregunta.' });
   const alcance = req.body.alcance === 'mias' ? 'mias' : 'agencia', now = Date.now();
   let hilo = Number(req.body.hilo) || 0;
-  if (hilo && !db.prepare('SELECT 1 FROM chat_threads WHERE id = ? AND advisor_id = ?').get(hilo, req.user.id)) hilo = 0;
-  if (!hilo) hilo = db.prepare('INSERT INTO chat_threads (advisor_id, title, created_at, updated_at) VALUES (?,?,?,?)').run(req.user.id, msg.length > 60 ? msg.slice(0, 57) + '…' : msg, now, now).lastInsertRowid;
+  if (hilo && !db.prepare('SELECT 1 FROM chat_threads WHERE id = ? AND advisor_id = ? AND kind = \'mi\'').get(hilo, req.user.id)) hilo = 0;
+  if (!hilo) hilo = db.prepare('INSERT INTO chat_threads (advisor_id, title, created_at, updated_at, kind) VALUES (?,?,?,?,\'mi\')').run(req.user.id, msg.length > 60 ? msg.slice(0, 57) + '…' : msg, now, now).lastInsertRowid;
   db.prepare('INSERT INTO chat_messages (thread_id, role, content, created_at) VALUES (?,?,?,?)').run(hilo, 'user', msg, now);
   const hist = db.prepare('SELECT role, content FROM chat_messages WHERE thread_id = ? ORDER BY id DESC LIMIT 12').all(hilo).reverse();
   let texto, origen = 'local';
@@ -226,9 +226,9 @@ router.post('/chat', async (req, res) => {
   db.prepare('UPDATE chat_threads SET updated_at = ? WHERE id = ?').run(Date.now(), hilo);
   res.json({ hilo, respuesta: texto, origen });
 });
-router.get('/chat/hilos', (req, res) => res.json(db.prepare('SELECT id, title, updated_at FROM chat_threads WHERE advisor_id = ? ORDER BY updated_at DESC LIMIT 30').all(req.user.id)));
+router.get('/chat/hilos', (req, res) => res.json(db.prepare('SELECT id, title, updated_at FROM chat_threads WHERE advisor_id = ? AND kind = \'mi\' ORDER BY updated_at DESC LIMIT 30').all(req.user.id)));
 router.get('/chat/hilos/:id', (req, res) => {
-  const h = db.prepare('SELECT id, title FROM chat_threads WHERE id = ? AND advisor_id = ?').get(req.params.id, req.user.id);
+  const h = db.prepare('SELECT id, title FROM chat_threads WHERE id = ? AND advisor_id = ? AND kind = \'mi\'').get(req.params.id, req.user.id);
   if (!h) return res.status(404).json({ error: 'Conversación no encontrada.' });
   res.json({ ...h, mensajes: db.prepare('SELECT role, content FROM chat_messages WHERE thread_id = ? ORDER BY id').all(h.id) });
 });

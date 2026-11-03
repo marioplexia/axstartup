@@ -18,6 +18,11 @@ db.exec(fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8'));
    ['due_at', 'INTEGER'], ['unit', 'TEXT'], ['svc_type', 'TEXT'], ['closed_at', 'INTEGER']]
     .forEach(([n, t]) => { if (!have.includes(n)) db.exec(`ALTER TABLE orders ADD COLUMN ${n} ${t}`); });
 }
+{
+  const add = (tabla, cols) => { const have = db.prepare(`PRAGMA table_info(${tabla})`).all().map(c => c.name); cols.forEach(([n, t]) => { if (!have.includes(n)) db.exec(`ALTER TABLE ${tabla} ADD COLUMN ${n} ${t}`); }); };
+  add('rules', [['paid_n', 'INTEGER NOT NULL DEFAULT 0'], ['paid_hours_sum', 'REAL NOT NULL DEFAULT 0'], ['paid_amount_sum', 'REAL NOT NULL DEFAULT 0']]);
+  add('chat_threads', [['kind', "TEXT NOT NULL DEFAULT 'mi'"]]);
+}
 
 // Confianza de una regla: misma fórmula que RS.conf en index.html
 function confidence(r) {
