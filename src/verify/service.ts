@@ -2,7 +2,8 @@ import type pg from 'pg';
 import { z } from 'zod';
 import { withTenant, type Tenant } from '../db/pool.js';
 import type { LlmClient } from '../llm/client.js';
-import { redact, redactFields, toModelView, sealForModel } from '../redact/index.js';
+import { redact, redactFields } from '../redact/index.js';
+import { evidencePayload } from './payload.js';
 import { readEvidenceMetadata, classifyEvidence } from '../evidence/metadata.js';
 import { runChecklist, type Draft, type Finding, type PriorPrea, type RuleRow } from './checklist.js';
 
@@ -63,7 +64,7 @@ export async function analyzeDraft(c: pg.PoolClient, tenant: Tenant, inp: Verify
   if (opts.useAgent === true && (safe.evidence.length || requiredKinds.length)) {
     reading = null;
     try {
-      const r = await llm.run('evidence-reader', 'evidence-reader.v1.md', sealForModel({ fields: toModelView(safe.fields), evidence: safe.evidence.map(e => ({ ...e, text: e.text ? redact(e.text).text : undefined })), required_kinds: requiredKinds }), EvidenceReading);
+      const r = await llm.run('evidence-reader', 'evidence-reader.v1.md', evidencePayload(safe.fields, safe.evidence, requiredKinds), EvidenceReading);
       reading = r.output;
       await c.query(
         `insert into llm_calls(group_id,order_id,agent,model,prompt_hash,input_tokens,output_tokens,cost_usd) values ($1,$2,'evidence-reader',$3,$4,$5,$6,$7)`,

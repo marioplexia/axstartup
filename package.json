@@ -13,7 +13,8 @@
     "ingest": "tsx scripts/ingest.ts",
     "eval:retro": "tsx scripts/eval-retro.ts",
     "demo": "tsx scripts/demo.ts",
-    "redact:report": "tsx scripts/redact-report.ts"
+    "redact:report": "tsx scripts/redact-report.ts",
+    "live:compare": "tsx scripts/live-compare.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.4.0",

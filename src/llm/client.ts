@@ -14,7 +14,7 @@ export interface LlmClient {
 
 const PROMPTS = path.resolve(import.meta.dirname, '../../prompts');
 export const loadPrompt = (file: string) => fs.readFileSync(path.join(PROMPTS, file), 'utf8');
-export const cost = (i: number, o: number) => +(i * CONFIG.llm.priceInPerMTok / 1e6 + o * CONFIG.llm.priceOutPerMTok / 1e6).toFixed(6);
+export const cost = (i: number, o: number, p: { priceInPerMTok: number; priceOutPerMTok: number } = CONFIG.llm) => +(i * p.priceInPerMTok / 1e6 + o * p.priceOutPerMTok / 1e6).toFixed(6);
 
 export function extractJson(s: string): unknown {
   const a = s.indexOf('{'), b = s.lastIndexOf('}');
@@ -22,7 +22,7 @@ export function extractJson(s: string): unknown {
   return JSON.parse(s.slice(a, b + 1));
 }
 
-class MockClient implements LlmClient {
+export class MockClient implements LlmClient {
   async run<T>(agent: string, promptFile: string, input: unknown, schema: z.ZodType<T>) {
     const prompt = loadPrompt(promptFile) + '\n\n' + JSON.stringify(input);
     const raw = mockComplete(agent, input);
@@ -32,8 +32,9 @@ class MockClient implements LlmClient {
   }
 }
 
-class LiveClient implements LlmClient {
-  private sdk = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+/** Cliente real. `sdk` es inyectable para pruebas; sin él usa ANTHROPIC_API_KEY. Exige payloads sellados (ver redact/guard). */
+export class LiveClient implements LlmClient {
+  constructor(private sdk: Pick<Anthropic, 'messages'> = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }), private prices: { priceInPerMTok: number; priceOutPerMTok: number } = CONFIG.llm) {}
   async run<T>(agent: string, promptFile: string, input: unknown, schema: z.ZodType<T>) {
     // Bloqueo: al modelo real solo llega lo que pasó por sealForModel (redacción + verificación de residuos).
     if (!isSealed(input)) throw new RedactionRequiredError(`agente ${agent}: el payload no pasó por la redacción (usa sealForModel)`);
@@ -45,7 +46,7 @@ class LiveClient implements LlmClient {
       const text = msg.content.map(b => (b.type === 'text' ? b.text : '')).join('');
       try {
         const output = schema.parse(extractJson(text));
-        return { output, usage: { model: CONFIG.llm.model, promptHash: sha(prompt), inputTokens: inT, outputTokens: outT, costUsd: cost(inT, outT) } };
+        return { output, usage: { model: CONFIG.llm.model, promptHash: sha(prompt), inputTokens: inT, outputTokens: outT, costUsd: cost(inT, outT, this.prices) } };
       } catch (e) { lastErr = e; }
     }
     throw new Error('salida del agente inválida tras reintento: ' + (lastErr as Error).message);

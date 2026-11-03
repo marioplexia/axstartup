@@ -32,6 +32,7 @@ El rol de conexión debe poder hacer `SET ROLE axai_app` (superusuario, o la mig
 | `pnpm nightly --group <uuid> [--min-cases 3] [--min-payments 3] [--deviation-pct 5]` | Corte nocturno. Cron: `30 2 * * * cd /app && pnpm nightly --group <uuid>` |
 | `pnpm ingest --group <uuid> --file orden.json` | Importa una orden (formato en `src/ingest/schema.ts`) |
 | `pnpm redact:report <archivo> [--names "A,B"] [--out reports/x.md]` | Muestra qué se quitó de un archivo (ver `docs/redaccion.md`) |
+| `pnpm live:compare [--dry]` | Agente simulado vs API real en 5 casos ficticios, con diferencias y costo por PREA (ver `docs/live.md`) |
 | `pnpm eval:retro --group <uuid> [--build 30] [--blind 20] [--agent] [--flag-at warning\|blocker] [--detail] [--out reports]` | Prueba retroactiva (reporte `.json` + `.md` en `reports/`, ignorado por git) |
 
 ## API

@@ -1,4 +1,5 @@
 import { FORM_FIELDS } from '../db/seedData.js';
+import { evidenceCatalog } from '../evidence/metadata.js';
 // Agente simulado y determinista para pruebas y demo. Imita el contrato del prompt, no el criterio del modelo.
 const KEYWORDS: Array<[kind: string, re: RegExp]> = [
   ['foto', /foto|imagen/i], ['orden_reparacion', /orden de reparaci[oó]n/i],
@@ -12,6 +13,7 @@ export function mockComplete(agent: string, input: any): unknown {
     const ops = [...new Set(all.match(/\bOP-[A-Z]{2}-\d{3}\b/g) ?? [])].map(op_code => ({ op_code }));
     const parts = [...new Set(all.match(/\bPZ-[A-Z]{2}-\d{4}\b/g) ?? [])].map(part_no => ({ part_no, quantity: 1 }));
     const detected = new Set<string>(ev.map(e => e.kind).filter(Boolean) as string[]);
+    for (const e of ev) for (const s of evidenceCatalog().kinds[e.kind ?? '']?.satisfies ?? []) detected.add(s);
     for (const e of ev) for (const [k, re] of KEYWORDS) if (re.test(`${e.filename ?? ''} ${e.text ?? ''}`)) detected.add(k);
     const missing = (input.required_kinds ?? []).filter((k: string) => !detected.has(k)).map((kind: string) => ({ kind, reason: 'no se encontró en la evidencia' }));
     const declared = new Set<string>([...(input.fields?.work_op ? [String(input.fields.work_op)] : [])]);
