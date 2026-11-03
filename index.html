@@ -518,6 +518,10 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .gp-t.no{font-weight:500;color:var(--muted)}
 .gp-st{width:8px;height:8px;border-radius:50%;background:#e0a100;flex:none}
 .gp-st.aceptada{background:#2fa863}.gp-st.rechazada{background:#d9534f}.gp-st.none{background:var(--line)}
+.gp-x{margin-left:auto;font-size:11px;font-weight:600;color:var(--accent,#0a7cff);background:rgba(10,124,255,.1);border-radius:999px;padding:2px 8px;cursor:pointer}
+.gp-chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 2px}
+.gp-chip{font:inherit;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line,#d8dde6);background:transparent;color:inherit;cursor:pointer}
+.gp-chip:hover{border-color:#0a7cff;color:#0a7cff}
 .gp-q{margin-top:2px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:44px}
 .gp-a{position:absolute;right:6px;top:8px;display:none;gap:2px}
 .gp-i:hover .gp-a,.gp-i:focus-within .gp-a{display:flex}
@@ -829,7 +833,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         </div>
       </div>
     </section>
-    <aside class="gp" id="gp" aria-label="Conversaciones de garantías" hidden>
+    <aside class="gp" id="gp" aria-label="Conversaciones" hidden>
       <div class="gp-h"><div><b>Conversaciones</b><small id="gpCount"></small></div><button class="gp-new" id="gpNew" type="button">+ Nueva</button></div>
       <label class="gp-s"><span data-i="search" style="display:contents"></span><input id="gpQ" type="search" placeholder="Buscar orden o queja" aria-label="Buscar conversaciones" autocomplete="off"></label>
       <div class="gp-l" id="gpList" role="list"></div>
@@ -1044,7 +1048,7 @@ function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===(S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin';stage.hidden=!main;$('#gpRow').hidden=!main;$('#gp').hidden=!(main&&S.agent==='garantias');if(main&&S.agent==='garantias'&&SB.entered&&Date.now()-GP.t>15000)GP.load();$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
+  var adm=id==='admin';stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
@@ -1200,7 +1204,7 @@ function enterChat(title){
   syncCrumb();
 }
 function resetChat(){
-  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(GP){GP.cur=null;GP.msgs=[]}
+  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.caseText='';GP.lastExpP=null}if(typeof CB!=='undefined'&&CB)CB.last=null
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
     flip(function(){stage.dataset.state='home';thread.hidden=true;ta.placeholder=AG[S.agent].ph;autosize()});
@@ -1881,7 +1885,7 @@ SB.loadHist=async function(){
   r.data.forEach(function(c){var L=SB.hist[c.agent];if(L&&L.length<12)L.push({id:c.id,t:c.title,s:SB.dayLbl(c.created_at),q:c.text})});
 };
 SB.saveConv=function(text,files){
-  if(S.agent==='garantias'){GP.save(text,files);return}
+  if(S.agent==='garantias'||S.agent==='cobros'){GP.save(text,files);return}
   if(!SB.c||!SB.entered||S.convId)return;
   var id=crypto.randomUUID(),t=text.trim(),agent=S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'garantias';
   S.convId=id;var title=t.length>48?t.slice(0,45).replace(/\s+\S*$/,'')+'…':t;
@@ -2970,8 +2974,10 @@ document.addEventListener('click',function(e){
 });
 
 document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('.mi-wrap [data-folio]');if(f){EX.q=f.dataset.folio;$('#exQ').value=EX.q;EX.f='todos';showView('exp')}});
-/* ===== Agente de Garantías: panel de conversaciones, tituladas con el número de orden (GA4041) ===== */
-var GP={list:[],q:'',cur:null,msgs:[],t:0};
+/* ===== Agentes de Garantías y Cobros: panel de conversaciones (título = número de orden) y charla sobre la orden ===== */
+var GP={all:[],q:'',cur:null,msgs:[],t:0,nPrea:0,caseText:'',lastExpP:null};
+GP.COLS='id,folio,status,wo,cliente,vin,sys,rule_id,queja,op,opd,hours,parts,parts_total,labor,codes,created_at';
+GP.ag=function(){return S.agent==='cobros'?'cobros':'garantias'};
 GP.norm=function(v){
   v=String(v||'').toUpperCase().replace(/\s+/g,'');var m;
   if((m=v.match(/^([A-Z]{1,3})-?(\d{3,8})$/)))return m[1]+m[2];
@@ -2989,23 +2995,28 @@ GP.orderOnly=function(text){
   var m=String(text||'').trim().match(/^(?:(?:la |mi )?(?:orden|ot)(?: de trabajo)?(?: es| n[uú]mero)?|es|n[uú]mero)?[\s:#]*([A-Za-z]{1,3}-?\d{3,8}|G-[A-Za-z0-9]{6,10})[.!\s]*$/i);
   return m?GP.norm(m[1]):null;
 };
+GP.mine=function(){var a=GP.ag();return GP.all.filter(function(c){return c.agent===a})};
+GP.sib=function(c){return c&&c.orden?GP.all.filter(function(x){return x.agent!==c.agent&&x.orden===c.orden})[0]||null:null};
 GP.load=async function(){
   if(!SB.c||!SB.entered)return;
-  var r=await SB.c.from('conversations').select('id,title,orden,text,created_at,expedientes(status,folio)').eq('agent','garantias').order('created_at',{ascending:false}).limit(200);
+  var r=await SB.c.from('conversations').select('id,agent,title,orden,text,created_at,expedientes(status,folio)').in('agent',['garantias','cobros']).order('created_at',{ascending:false}).limit(300);
   if(r.error){SB.fail(r.error);return}
-  GP.list=r.data;GP.t=Date.now();GP.render();
+  GP.all=r.data;GP.t=Date.now();GP.render();
 };
 GP.render=function(){
   var box=$('#gpList');if(!box)return;
-  var q=norm(GP.q),L=GP.list.filter(function(c){return !q||norm((c.orden||'')+' '+(c.text||'')+' '+(c.title||'')).indexOf(q)>=0});
-  $('#gpCount').textContent=GP.list.length?GP.list.length+(GP.list.length===1?' conversación':' conversaciones'):'Se guardan solas';
-  if(!L.length){box.innerHTML='<div class="gp-none">'+(GP.list.length?'Sin resultados.':'Aún no hay conversaciones.<br>Escribe un caso con su número de orden, por ejemplo <b>GA4041</b>, y se guarda solo.')+'</div>';return}
+  var ag=GP.ag(),q=norm(GP.q),mine=GP.mine(),L=mine.filter(function(c){return !q||norm((c.orden||'')+' '+(c.text||'')+' '+(c.title||'')).indexOf(q)>=0});
+  $('#gp .gp-h b').textContent=ag==='cobros'?'Conversaciones de Cobros':'Conversaciones';
+  $('#gpCount').textContent=mine.length?mine.length+(mine.length===1?' conversación':' conversaciones'):'Se guardan solas';
+  if(!L.length){box.innerHTML='<div class="gp-none">'+(mine.length?'Sin resultados.':(ag==='cobros'?'Aún no hay conversaciones de cobro.<br>Escribe la orden o el folio de una PREA aceptada, por ejemplo <b>GA4041</b>, y se guarda sola.':'Aún no hay conversaciones.<br>Escribe un caso con su número de orden, por ejemplo <b>GA4041</b>, y se guarda solo.'))+'</div>';return}
   var html='',last='';
   L.forEach(function(c){
     var day=SB.dayLbl(c.created_at);if(day!==last){html+='<div class="gp-d">'+esc(day)+'</div>';last=day}
-    var ex=(c.expedientes&&c.expedientes[0])||null,st=ex?ex.status:'none',stl={borrador:'Esperando respuesta del fabricante',aceptada:'Aceptada por el fabricante',rechazada:'Rechazada por el fabricante',none:'Sin PREA generada'};
+    var sb=GP.sib(c),ex=(c.expedientes&&c.expedientes[0])||(sb&&sb.expedientes&&sb.expedientes[0])||null,st=ex?ex.status:'none',stl={borrador:'Esperando respuesta del fabricante',aceptada:'Aceptada por el fabricante',rechazada:'Rechazada por el fabricante',none:'Sin PREA generada'};
+    var label=c.orden||(c.title&&c.title!=='Sin orden'?c.title:'Sin orden');
     html+='<div class="gp-i" role="listitem" tabindex="0" data-id="'+ea(c.id)+'"'+(S.convId===c.id?' aria-current="true"':'')+'>'+
-      '<div class="gp-t'+(c.orden?'':' no')+'"><i class="gp-st '+st+'" title="'+ea(stl[st])+'"></i>'+esc(c.orden||'Sin orden')+'</div><div class="gp-q">'+esc(MI.cl(c.text||'',70))+'</div>'+
+      '<div class="gp-t'+(c.orden||label!=='Sin orden'?'':' no')+'"><i class="gp-st '+st+'" title="'+ea(stl[st])+'"></i><span>'+esc(label)+'</span>'+(sb?'<span class="gp-x" role="button" tabindex="0" data-gpopen="'+ea(sb.id)+'" title="Abrir su conversación de '+(sb.agent==='cobros'?'Cobros':'Garantías')+'">'+(sb.agent==='cobros'?'Cobros':'Garantías')+' ↗</span>':'')+'</div>'+
+      '<div class="gp-q">'+esc(MI.cl(c.text||'',70))+'</div>'+
       '<span class="gp-a"><button type="button" class="gp-b" data-gp="ren" aria-label="Cambiar número de orden" title="Cambiar número de orden">✎</button><button type="button" class="gp-b" data-gp="del" aria-label="Eliminar conversación" title="Eliminar">×</button></span></div>';
   });
   box.innerHTML=html;
@@ -3013,7 +3024,7 @@ GP.render=function(){
 /* guarda sola la conversación: la primera vez que se escribe, con el número de orden como título */
 GP.save=function(text,files){
   if(!SB.c||!SB.entered)return;
-  var ord=GP.orden(text,files);
+  var ag=GP.ag(),ord=GP.orden(text,files),fm=String(text||'').match(/PREA-[A-Z0-9]+(?:-[A-Z0-9]+)*/i);
   if(S.convId){
     if(ord&&!GP.cur){GP.cur=ord;var id0=S.convId;S.convP=Promise.resolve(S.convP).then(function(){return GP.setOrden(id0,ord)})}
     return;
@@ -3022,10 +3033,10 @@ GP.save=function(text,files){
   S.convId=id;GP.cur=ord;GP.msgs=[];
   S.convP=(async function(){
     if(ord){
-      var f=await SB.c.from('conversations').select('id,messages').eq('agent','garantias').eq('orden',ord).limit(1);
+      var f=await SB.c.from('conversations').select('id,messages').eq('agent',ag).eq('orden',ord).limit(1);
       if(!f.error&&f.data&&f.data[0]){S.convId=f.data[0].id;GP.msgs=Array.isArray(f.data[0].messages)?f.data[0].messages.slice():[];toast('Continuando la conversación '+ord);return}
     }
-    var ins=await SB.c.from('conversations').insert({id:id,agent:'garantias',title:ord||'Sin orden',text:t.slice(0,2000),orden:ord});
+    var ins=await SB.c.from('conversations').insert({id:id,agent:ag,title:ord||(ag==='cobros'&&fm?fm[0].toUpperCase():null)||'Sin orden',text:t.slice(0,2000),orden:ord});
     if(ins.error)SB.fail(ins.error);
   })().then(function(){SB.loadHist();return GP.load()});
 };
@@ -3033,23 +3044,23 @@ GP.setOrden=async function(id,ord){
   var r=await SB.c.from('conversations').update({orden:ord,title:ord}).eq('id',id);
   if(r.error){SB.fail(r.error);toast('No se pudo guardar el número de orden');return false}
   await SB.c.from('expedientes').update({wo:ord}).eq('conversation_id',id);
-  var c=GP.list.filter(function(x){return x.id===id})[0];if(c){c.orden=ord;c.title=ord}
+  var c=GP.all.filter(function(x){return x.id===id})[0];if(c){c.orden=ord;c.title=ord}
   if(S.convId===id){GP.cur=ord;crumb2.textContent=ord}
   SB.loadHist();GP.render();return true;
 };
 GP.rename=async function(id){
-  var c=GP.list.filter(function(x){return x.id===id})[0];if(!c)return;
+  var c=GP.all.filter(function(x){return x.id===id})[0];if(!c)return;
   var v=await HM.dlg({title:'Número de orden',intro:'Será el título de esta conversación y la orden de su PREA.',fields:[{k:'o',label:'Orden',value:c.orden||'',ph:'GA4041',req:true}],ok:'Guardar'});
   if(!v)return;var o=GP.norm(v.o);
   if(!o){toast('Escribe una orden válida, por ejemplo GA4041');return}
   if(await GP.setOrden(id,o))toast('Conversación titulada '+o);
 };
 GP.del=async function(id){
-  var c=GP.list.filter(function(x){return x.id===id})[0];if(!c)return;
-  if(!confirm('¿Eliminar la conversación '+(c.orden||'sin orden')+'? Su PREA se conserva en Expedientes.'))return;
+  var c=GP.all.filter(function(x){return x.id===id})[0];if(!c)return;
+  if(!confirm('¿Eliminar la conversación '+(c.orden||c.title||'sin orden')+'? Lo que generó (PREA, estimado) se conserva.'))return;
   var r=await SB.c.from('conversations').delete().eq('id',id);
   if(r.error){SB.fail(r.error);toast('No se pudo eliminar');return}
-  GP.list=GP.list.filter(function(x){return x.id!==id});SB.loadHist();
+  GP.all=GP.all.filter(function(x){return x.id!==id});SB.loadHist();
   if(S.convId===id)document.getElementById('newChat').click();else GP.render();
 };
 GP.remember=function(u,a){
@@ -3061,8 +3072,18 @@ GP.persist=async function(){
   try{if(S.convP)await S.convP;if(!S.convId)return;await SB.c.from('conversations').update({messages:GP.msgs}).eq('id',S.convId)}catch(e){console.warn('[Conversaciones]',e)}
 };
 GP.ack=function(o){
-  var w=addAssistant();hideRegen(w);$('.ai-body',w).innerHTML=md('Listo, esta conversación queda titulada **'+o+'**. Cuéntame el caso del cliente y armo la PREA.',false);
-  w._text='Listo, esta conversación queda titulada '+o+'. Cuéntame el caso del cliente y armo la PREA.';$('.ai-actions',w).hidden=false;toBottom(true);
+  var w=addAssistant();hideRegen(w);var t='Listo, esta conversación queda titulada '+o+'. Cuéntame el caso del cliente y armo la PREA.';
+  $('.ai-body',w).innerHTML=md(t.replace(o,'**'+o+'**'),false);w._text=t;$('.ai-actions',w).hidden=false;toBottom(true);
+};
+/* sugerencias para seguir platicando (un toque envía la pregunta) */
+GP.suggest=function(w,items){
+  if(!items||!items.length)return;
+  var box=document.createElement('div');box.className='gp-chips';
+  box.innerHTML=items.map(function(i){return '<button type="button" class="gp-chip" '+(i.open?'data-gpopen="'+ea(i.open)+'"':'data-gpq="'+ea(i.q)+'"'+(i.go?' data-gpgo="'+i.go+'"':''))+'>'+esc(i.t)+'</button>'}).join('');
+  $('.ai-col',w).insertBefore(box,$('.ai-actions',w));toBottom();
+};
+GP.sendIn=function(agent,q){
+  showView(agent==='cobros'?'cobros':'agent');enterChat(q);addUser(q,[]);start(q,[]);
 };
 GP.prea=function(e){
   var mo=function(n){return EX.money(Number(n||0))},cd=e.codes||{},cj=function(a){return a&&a.length?a.join(' - '):'—'};
@@ -3075,28 +3096,161 @@ GP.prea=function(e){
 };
 GP.open=async function(id){
   if(!SB.c||!SB.entered)return;
-  showView('agent');resetChat();S.convId=id;
-  var c=await SB.c.from('conversations').select('id,title,orden,text,messages').eq('id',id).single();
+  var c=await SB.c.from('conversations').select('id,agent,title,orden,text,messages').eq('id',id).single();
   if(c.error||!c.data){SB.fail(c.error||'sin datos');toast('No se pudo abrir la conversación');return}
-  var cv=c.data;GP.cur=cv.orden;GP.msgs=Array.isArray(cv.messages)?cv.messages.slice():[];
+  var cv=c.data,cob=cv.agent==='cobros';
+  showView(cob?'cobros':'agent');resetChat();S.convId=id;
+  GP.cur=cv.orden;GP.msgs=Array.isArray(cv.messages)?cv.messages.slice():[];GP.caseText=cv.text||'';
   enterChat(cv.orden||cv.title||'Conversación');
-  var ex=await SB.c.from('expedientes').select('id,folio,status,wo,cliente,op,opd,hours,parts,parts_total,labor,codes').eq('conversation_id',id).order('created_at',{ascending:true}).limit(10);
+  var ex=await SB.c.from('expedientes').select(GP.COLS).eq('conversation_id',id).order('created_at',{ascending:true}).limit(10);
+  var rows=(ex.data||[]);GP.nPrea=rows.length;
   if(GP.msgs.length)GP.msgs.forEach(function(m){
     if(m.role==='user')addUser(m.content,[]);
     else{var w=addAssistant();hideRegen(w);$('.ai-body',w).innerHTML=md(m.content,false);w._text=m.content;$('.ai-actions',w).hidden=false}
   });else addUser(cv.text||'',[]);
-  var rows=(ex.data||[]);
-  if(rows.length){
-    var w2=addAssistant();hideRegen(w2);$('.ai-body',w2).innerHTML=md(rows.length>1?'Estas son las PREAs de esta conversación.':'Esta es la PREA de esta conversación.',false);
-    var box=document.createElement('div');box.className='mi-wrap';box.innerHTML=rows.map(GP.prea).join('');$('.ai-col',w2).insertBefore(box,$('.ai-actions',w2));$('.ai-actions',w2).hidden=false;
+  var sb=GP.sib({agent:cv.agent,orden:cv.orden}),last=null;
+  if(!cob&&rows.length){
+    last=addAssistant();hideRegen(last);$('.ai-body',last).innerHTML=md(rows.length>1?'Estas son las PREAs de esta conversación.':'Esta es la PREA de esta conversación.',false);
+    var box=document.createElement('div');box.className='mi-wrap';box.innerHTML=rows.map(GP.prea).join('');$('.ai-col',last).insertBefore(box,$('.ai-actions',last));$('.ai-actions',last).hidden=false;
   }else if(!GP.msgs.length){
-    var w3=addAssistant();hideRegen(w3);$('.ai-body',w3).innerHTML=md('Esta conversación no llegó a generar una PREA. Puedes continuar escribiendo aquí.',false);$('.ai-actions',w3).hidden=false;
+    last=addAssistant();hideRegen(last);$('.ai-body',last).innerHTML=md(cob?'Esta conversación no llegó a estimar un pago. Puedes continuar escribiendo aquí.':'Esta conversación no llegó a generar una PREA. Puedes continuar escribiendo aquí.',false);$('.ai-actions',last).hidden=false;
   }
+  var chips=[];
+  if(cob){
+    try{var o=await CB.prepare(cv.text||'',[],{step:function(){return {done:function(){}}},end:function(){}},{aborted:false,fast:true});if(o.kind==='ok'){CB.last=o.ctx;chips.push({t:'¿Por qué ese porcentaje?',q:'¿Por qué ese porcentaje?'},{t:'¿Cuánto es con IVA?',q:'¿Cuánto es con IVA?'})}}catch(_){}
+    chips.push({t:'Ver en Cartera',q:'',go:'cartera'});
+  }else if(rows.length){
+    var rw=rows[rows.length-1];chips.push({t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'Estimar pago en Cobros',q:'Estima cuánto pagará planta por la PREA '+rw.folio,go:'cobros'});
+  }
+  if(sb)chips.push({t:'Ver su conversación de '+(sb.agent==='cobros'?'Cobros':'Garantías'),open:sb.id});
+  var tgt=last||[].slice.call(document.querySelectorAll('#threadIn .msg-ai')).pop();
+  if(tgt&&chips.length)GP.suggest(tgt,chips);
   S.last=null;toBottom(true);GP.render();
 };
+
+/* ---- conversar sobre la orden: el cerebro (reglas aprendidas, resultados y pagos de planta) ---- */
+GP.isChat=function(text){
+  var raw=String(text||'').trim(),t=norm(raw);
+  if(/\b(arma|armame|genera|generame|haz|hazme|crea|creame|actualiza|rehaz|rehaz|vuelve a hacer|volver a hacer)\b.*\b(prea|formulario)\b|\b(otra|nueva|segunda) prea\b|\botro caso\b/.test(t))return false;
+  if(GP.nPrea>0)return !(raw.length>120&&!/\?/.test(raw));
+  if(MI.smalltalk(raw))return true;
+  if(raw.length>90)return false;
+  return /^¿/.test(raw)||/\?\s*$/.test(raw)||/^(que|cual|cuales|cuantas|cuantos|como|por que|porque|donde|quien|puedes|sabes|dime|explicame|cuentame)\b/.test(t);
+};
+GP.cobrosChat=function(text,files){
+  var src=String(text||'')+' '+(files||[]).map(function(f){return f.name}).join(' ');
+  if(/PREA-[A-Z0-9]/i.test(src)||GP.orden(text,files))return false;
+  return !!(CB.last||MI.smalltalk(text));
+};
+GP.rowsCtx=async function(){
+  if(S.convP)await S.convP;if(GP.lastExpP)await GP.lastExpP;
+  var rows=[];
+  if(S.convId){var r=await SB.c.from('expedientes').select(GP.COLS).eq('conversation_id',S.convId).order('created_at',{ascending:true}).limit(10);if(!r.error)rows=r.data||[]}
+  if(!rows.length&&GP.cur){var r2=await SB.c.from('expedientes').select(GP.COLS).eq('wo',GP.cur).order('created_at',{ascending:true}).limit(10);if(!r2.error)rows=r2.data||[]}
+  return rows;
+};
+GP.answer=async function(text){
+  var t=norm(text),rows=await GP.rowsCtx(),e=rows[rows.length-1]||null,has=function(re){return re.test(t)},mo=function(n){return EX.money(Number(n||0))},pl=function(n,a,b){return n+' '+(n===1?a:b)};
+  if(!HM.loaded)await HM.load();
+  var rule=e&&e.rule_id?RS.byId(e.rule_id):null,ST=HM.d.exp,claim=e?Number(e.parts_total)+Number(e.labor):0;
+  var stat=function(sys){var a=ST.filter(function(x){return x.sys===sys});return {a:a.filter(function(x){return x.status==='aceptada'}).length,r:a.filter(function(x){return x.status==='rechazada'}).length,p:a.filter(function(x){return x.status==='borrador'}).length}};
+  var sysAll=[];RS.d.rules.forEach(function(r){if(sysAll.indexOf(r.sys)<0)sysAll.push(r.sys)});
+  /* lo que sabe el cerebro, aunque todavía no haya una PREA */
+  var foundSys=sysAll.filter(function(x){return t.indexOf(norm(x))>=0});
+  if(has(/\b(reglas?|que sabes|que has aprendido|que aprendiste|conoces|cerebro|aprendizaje)\b/)||(!e&&foundSys.length)){
+    var L=RS.d.rules.filter(function(r){return !foundSys.length||foundSys.indexOf(r.sys)>=0}).slice().sort(function(a,b){return b.n-a.n}).slice(0,4);
+    if(!L.length)return {md:'Todavía no he aprendido reglas'+(foundSys.length?' de '+foundSys.join(' ni de '):'')+'. Aprendo cada vez que el fabricante acepta una PREA.'};
+    return {md:(foundSys.length?'Sobre '+foundSys.join(' y ').toLowerCase():'De lo que he aprendido')+', esto es lo que sé: '+L.map(function(r){return r.id+' ('+r.sys.toLowerCase()+'): '+String(r.q[1]).toLowerCase()+' → '+r.op+', respaldada por '+pl(r.n,'PREA aceptada','PREAs aceptadas')+(r.rej?' y '+pl(r.rej,'rechazo','rechazos'):'')+', confianza '+RS.conf(r)+'%'}).join('; ')+'.'};
+  }
+  if(!e)return {md:'Todavía no hemos armado una PREA en esta conversación. Cuéntame el caso del cliente (con su número de orden, por ejemplo GA4041) y la armo; después platicamos de ella lo que quieras. También puedo contarte qué he aprendido de un sistema, por ejemplo "¿qué sabes de frenos?".'};
+  var ps=Array.isArray(e.parts)?e.parts:[],cd=e.codes||{};
+  if(has(/\b(pieza|piezas|refaccion|refacciones|que lleva|materiales|partes)\b/)){
+    if(!ps.length)return {md:'La PREA '+e.folio+' no lleva piezas registradas.'};
+    var src=rule?' Las tomé de la regla '+rule.id+': '+ps.map(function(p){var rp=rule.parts[p.no];return rp?p.d+' aparece en '+rp.n+' de '+rule.n+' PREAs aceptadas':null}).filter(Boolean).slice(0,3).join('; ')+'.':'';
+    return {md:'La PREA '+e.folio+' lleva '+pl(ps.length,'pieza','piezas')+': '+ps.map(function(p){return p.d+' ×'+p.q+(p.pr?' ('+mo(p.pr)+' c/u)':'')}).join(', ')+'. Son '+mo(e.parts_total)+' en piezas y '+mo(e.labor)+' de mano de obra, '+mo(claim)+' antes de IVA.'+src};
+  }
+  if(has(/\b(hora|horas|tiempo|mano de obra|operacion|cuanto tarda|cuanto dura)\b/))
+    return {md:'La operación es '+e.op+(e.opd?' ('+e.opd+')':'')+', con '+e.hours+' h de mano de obra, '+mo(e.labor)+'.'+(rule?' En la regla '+rule.id+' el promedio es '+RS.toCase(rule).h.toFixed(1)+' h en '+pl(rule.n,'PREA aceptada','PREAs aceptadas')+'.':' No había una regla que la respaldara, así que usé un tiempo estándar general.')};
+  if(has(/\b(codigo|codigos|queja|causa|correccion)\b/)&&(cd.q||cd.c||cd.r)){
+    var cj=function(a){return a&&a.length?a.join(' - '):'—'};
+    return {md:'Los códigos que armé son: queja '+cj(cd.q)+'; causa '+cj(cd.c)+'; corrección '+cj(cd.r)+'.'+(rule?' Vienen de la regla '+rule.id+'.':'')};
+  }
+  if(has(/\b(por que|en que te basaste|como llegaste|de donde sale|por que esa|justific|que regla)\b/)){
+    if(!rule)return {md:'Para este caso no había una regla aprendida que coincidiera, así que armé la PREA con criterio general (confianza baja). Si el fabricante la acepta, aprendo de ella y la próxima vez ya tendré una regla.'};
+    var ov=(rule.kw||[]).filter(function(k){return norm(GP.caseText||e.queja||'').indexOf(k)>=0});
+    return {md:'Usé la regla '+rule.id+', que aprendí de '+pl(rule.n,'PREA aceptada','PREAs aceptadas')+(rule.rej?' (con '+pl(rule.rej,'rechazo','rechazos')+')':' (sin rechazos)')+', confianza '+RS.conf(rule)+'%. Coincidieron'+(ov.length?' las palabras clave '+ov.join(', '):' los datos del caso')+' y por eso propone '+rule.op+' ('+rule.opd+').'};
+  }
+  if(has(/\b(acept|rechaz|seguido|probab|riesgo|se cae|aprueban|aprobar|fabricante|respondio|estado)\b/)){
+    var stl={borrador:'está esperando la respuesta del fabricante',aceptada:'ya fue aceptada por el fabricante',rechazada:'fue rechazada por el fabricante'},ss=stat(e.sys),tr=rule&&(rule.n+(rule.rej||0))?Math.round(100*rule.n/(rule.n+(rule.rej||0))):null;
+    return {md:'La PREA '+e.folio+' '+(stl[e.status||'borrador'])+'.'+(rule?' La regla '+rule.id+' tiene '+pl(rule.n,'aceptada','aceptadas')+' y '+pl(rule.rej||0,'rechazo','rechazos')+(tr!=null?' ('+tr+'% de aceptación)':'')+'.':'')+' En '+e.sys.toLowerCase()+' la agencia lleva '+ss.a+' aceptadas, '+ss.r+' rechazadas y '+ss.p+' esperando respuesta.'+((e.status||'borrador')==='borrador'?' Cuando el fabricante responda, márcala en Expedientes y aprendo de eso.':'')+(ss.r||(rule&&rule.rej)?' Todavía no registro el motivo de los rechazos; sí bajo la confianza de la regla cada vez que marcas una como rechazada.':'')};
+  }
+  if(has(/\b(pagar|pago|planta|cobr|estimad|facturar|cuanto me)\b/)){
+    try{await CB.get()}catch(_){}
+    var b=CB.pick({op:e.op,sys:e.sys});
+    if(!b)return {md:'Todavía no tengo pagos de planta registrados para estimar cuánto pagaría. Cuando registres pagos en Cartera (o cargues los históricos), aprendo y te lo calculo.',chips:[{t:'Abrir en Cobros',q:'Estima cuánto pagará planta por la PREA '+e.folio,go:'cobros'}]};
+    var rl=Math.min(1.2,b.rl!=null?b.rl:b.rp),rp=Math.min(1.2,b.rp!=null?b.rp:b.rl),est=Math.round((Number(e.labor)*rl+Number(e.parts_total)*rp)*100)/100;
+    return {md:'Con lo que ha pagado planta en casos parecidos ('+pl(b.n,'pago','pagos')+' de '+CB.baseTxt(b,{op:e.op,sys:e.sys})+'), calculo que pagaría unos '+mo(est)+' antes de IVA de los '+mo(claim)+' reclamados. Para el detalle y dejarlo guardado en Cartera, pídeselo al Agente de Cobros.',chips:[{t:'Abrir en Cobros',q:'Estima cuánto pagará planta por la PREA '+e.folio,go:'cobros'}]};
+  }
+  if(has(/\b(parecid|similar|otras prea|otros casos|casos anteriores)\b/)){
+    var sm=ST.filter(function(x){return x.sys===e.sys&&x.id!==e.id}).slice(0,5);
+    return {md:sm.length?'En '+e.sys.toLowerCase()+' hay '+pl(sm.length,'caso parecido','casos parecidos')+': '+sm.map(function(x){return x.folio+' ('+({aceptada:'aceptada',rechazada:'rechazada',borrador:'esperando respuesta'}[x.status]||x.status)+(x.cliente?', '+x.cliente:'')+')'}).join('; ')+'.':'Todavía no tengo otros casos de '+e.sys.toLowerCase()+' registrados.'};
+  }
+  if(has(/\b(cliente|orden|vin|folio)\b/))return {md:'La orden '+(e.wo||'(aún sin número)')+' es '+(e.cliente?'de '+e.cliente:'de un cliente que todavía no tengo registrado')+'. La PREA es la '+e.folio+(e.vin?' y el VIN '+e.vin:'')+'.'};
+  return null;
+};
+GP.answerCobros=async function(text){
+  var c=CB.last,t=norm(text),has=function(re){return re.test(t)},mo=function(n){return EX.money(Number(n||0))};
+  if(!c)return null;
+  if(!c.basis){
+    if(has(/\b(por que|base|porcentaje|calcul|estim|pagar|planta|iva|total|rango)\b/))return {md:'Para esta PREA todavía no tengo pagos de planta en qué basarme, así que no te doy un número inventado. Lo máximo que podría pagar es lo reclamado: '+mo(c.claim)+' antes de IVA. Registra pagos en Cartera o carga los históricos y empiezo a estimar.'};
+    return null;
+  }
+  var b=c.basis,pg=b.n+(b.n===1?' pago':' pagos');
+  if(has(/\b(por que|en que te basas|base|como calculas|de donde|porcentaje|como llegaste)\b/))
+    return {md:'Me baso en '+pg+' reales de planta de '+CB.baseTxt(b,c)+': en promedio paga el '+Math.round(c.rl*100)+'% de la mano de obra y el '+Math.round(c.rp*100)+'% de las piezas. Aplicado a lo reclamado ('+mo(c.lc)+' de mano de obra y '+mo(c.pc)+' de piezas) sale '+mo(c.est)+' antes de IVA. Mi confianza es de '+c.conf+'%'+(b.n<3?', porque aún son pocos pagos':'')+'.'};
+  if(has(/\b(iva|con iva|total)\b/))return {md:'Son '+mo(c.est)+' antes de IVA; el IVA (16%) es '+mo(c.iva)+', así que planta pagaría '+mo(c.total)+' en total.'};
+  if(has(/\b(menos|si paga|rango|riesgo|variacion|margen|seguro|peor)\b/))
+    return {md:'Lo más probable es '+mo(c.est)+', pero según lo que ha pagado planta antes, el rango va de '+mo(c.lo)+' a '+mo(c.hi)+'. Si paga menos de ese rango, registra el pago real en Cartera con su desglose y aprendo de la diferencia.'};
+  if(has(/\b(facturar|factura|cuando|como facturo)\b/))
+    return {md:'Te conviene facturar '+mo(c.est)+' antes de IVA ('+mo(c.total)+' con IVA) para evitar refacturar. Cuando la tengas, regístrala en Cartera y luego el pago real.'};
+  if(has(/\b(mano de obra|piezas|detalle|desglos|reclam)\b/))
+    return {md:'De mano de obra reclamaste '+mo(c.lc)+' y esperaría '+mo(c.estL)+' ('+Math.round(c.rl*100)+'%). De piezas reclamaste '+mo(c.pc)+' y esperaría '+mo(c.estP)+' ('+Math.round(c.rp*100)+'%).'};
+  return null;
+};
+GP.think=async function(text,my){
+  await nap(380,my);
+  var st=MI.smalltalk(text);if(st)return {md:st};
+  var ag=GP.ag();
+  if(!SB.aiOff&&SB.entered){
+    try{
+      if(S.convP)await S.convP;if(GP.lastExpP)await GP.lastExpP;
+      var r=await SB.ai({mode:'garantias_chat',agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:text}]),ahora:MI.nowInfo()});
+      if(r&&r.text)return {md:r.text};
+    }catch(e){SB.aiFail(e)}
+  }
+  var loc=ag==='cobros'?await GP.answerCobros(text):await GP.answer(text);
+  if(loc)return loc;
+  var D=await MI.dataAnswer(text,{step:function(){return {done:function(){}}},end:function(){}},my);
+  return D;
+};
+async function runConv(text){
+  var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:[]};updateSend();
+  var w=addAssistant();hideRegen(w);w._noThink=true;
+  var body=$('.ai-body',w),col=$('.ai-col',w);body.innerHTML='<span class="typing" aria-label="Escribiendo"><i></i><i></i><i></i></span>';
+  var out;
+  try{out=await GP.think(text,my)}catch(e){console.error(e);SB.fail(e);out={md:'Uy, algo falló al procesar eso. ¿Me lo dices otra vez?'}}
+  if(my.aborted){body.innerHTML='<p class="muted">Respuesta detenida.</p>';$('.ai-actions',w).hidden=false;finish(my);return}
+  var plain='';
+  if(out.md)plain=await stream(body,out.md,my);else body.innerHTML='';
+  if(out.html){var c=document.createElement('div');c.className='mi-wrap';c.innerHTML=out.html;col.insertBefore(c,$('.ai-actions',w));toBottom()}
+  w._text=(plain||MI.plain(out.html)).replace(/\*\*/g,'');$('.ai-actions',w).hidden=false;
+  if(out.chips)GP.suggest(w,out.chips);
+  GP.remember(text,plain||MI.plain(out.html));finish(my);
+}
 (function(){
   var list=$('#gpList');
   list.addEventListener('click',function(e){
+    var x=e.target.closest('[data-gpopen]');if(x){e.stopPropagation();GP.open(x.dataset.gpopen);return}
     var b=e.target.closest('[data-gp]'),it=e.target.closest('.gp-i');if(!it)return;
     if(b){e.stopPropagation();if(b.dataset.gp==='ren')GP.rename(it.dataset.id);else GP.del(it.dataset.id);return}
     GP.open(it.dataset.id);
@@ -3106,7 +3260,14 @@ GP.open=async function(id){
   $('#gpNew').addEventListener('click',function(){document.getElementById('newChat').click()});
   document.addEventListener('click',function(e){
     var c=e.target.closest&&e.target.closest('[data-gpcopy]');if(c){copyText(c.dataset.gpcopy).then(function(){toast('Copiado')});return}
-    var x=e.target.closest&&e.target.closest('[data-gpexp]');if(x){EX.q=x.dataset.gpexp;$('#exQ').value=EX.q;EX.f='todos';showView('exp')}
+    var x=e.target.closest&&e.target.closest('[data-gpexp]');if(x){EX.q=x.dataset.gpexp;$('#exQ').value=EX.q;EX.f='todos';showView('exp');return}
+    var o=e.target.closest&&e.target.closest('.gp-chip[data-gpopen]');if(o){GP.open(o.dataset.gpopen);return}
+    var q=e.target.closest&&e.target.closest('.gp-chip[data-gpq]');
+    if(q){
+      if(q.dataset.gpgo==='cartera'){showView('cartera');return}
+      if(q.dataset.gpgo==='cobros'){GP.sendIn('cobros',q.dataset.gpq);return}
+      q.closest('.gp-chips').remove();addUser(q.dataset.gpq,[]);start(q.dataset.gpq,[]);
+    }
   });
 })();
 /* ---- ejemplos y configuración del agente ---- */
@@ -3464,7 +3625,7 @@ async function run(text,files){
   RS.note(ctx.matched);
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
   var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
-  if(okp){SB.saveExp(ctx);GP.remember(text,w._text)}
+  if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;GP.nPrea++;GP.caseText=text;GP.remember(text,w._text);GP.suggest(w,[{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'¿Cuánto pagará planta?',q:'¿Cuánto crees que pagará planta por esto?'}])}
   finish(my);
 }
 
@@ -3640,19 +3801,26 @@ CB.loadRefs=async function(){
 };
 CB.prepare=async function(text,files,tk,my){
   if(!SB.c||!SB.entered)return {kind:'msg',text:'Inicia sesión para consultar tus PREAs.'};
-  var pace=function(ms){return nap(ms,my)};
+  var pace=function(ms){return my.fast?Promise.resolve():nap(ms,my)};
   var s1=tk.step('Leyendo tu mensaje y adjuntos');
-  var src=(text||'')+' '+(files||[]).map(function(f){return f.name}).join(' '),m=src.match(/PREA-[A-Z0-9]+(?:-[A-Z0-9]+)*/i),folio=m?m[0].toUpperCase():null;
-  await pace(500);s1.done(folio?'folio '+folio:'no encontré un folio');
+  var src=(text||'')+' '+(files||[]).map(function(f){return f.name}).join(' '),m=src.match(/PREA-[A-Z0-9]+(?:-[A-Z0-9]+)*/i),folio=m?m[0].toUpperCase():null,ord=GP.orden(text,files)||(!folio?GP.cur:null);
+  if(!folio&&ord){
+    var eo=await SB.c.from('expedientes').select('folio,status').eq('wo',ord).order('created_at',{ascending:false}).limit(5);
+    if(eo.error)throw eo.error;
+    var pk=eo.data.filter(function(x){return x.status==='aceptada'})[0]||eo.data[0];
+    if(pk)folio=pk.folio;
+    else if(GP.orden(text,files)){s1.done('orden '+ord+' sin PREA');return {kind:'msg',text:'No encuentro ninguna PREA con la orden **'+ord+'**. Primero arma la PREA en el Agente de Garantías con ese número de orden y, cuando planta la acepte, vuelve aquí.'}}
+  }
+  await pace(500);s1.done(folio?(ord?'orden '+ord+' · folio '+folio:'folio '+folio):'no encontré un folio ni una orden');
   if(my.aborted)return {kind:'aborted'};
   var pend=async function(){
     var r=await SB.c.from('cartera').select('monto,expedientes(folio,sys)').eq('estado','por_facturar').order('created_at').limit(6);
     if(r.error)throw r.error;
     return r.data.length?'\n\nTus PREAs aceptadas por facturar:\n\n'+r.data.map(function(x,i){var e=x.expedientes||{};return (i+1)+'. **'+e.folio+'** · '+e.sys+' · '+money(Number(x.monto))}).join('\n'):'\n\nNo tienes PREAs aceptadas por facturar. Cuando el fabricante acepte una, aparecerá aquí.';
   };
-  if(!folio)return {kind:'msg',text:'Dime el **folio de la PREA aceptada** (PREA-…) o adjunta su archivo con el folio en el nombre, y calculo cuánto va a pagar planta.'+await pend()};
+  if(!folio)return {kind:'msg',text:'Dime el **número de orden** (por ejemplo GA4041) o el **folio de la PREA aceptada** (PREA-…), o adjunta su archivo, y calculo cuánto va a pagar planta.'+await pend()};
   var s2=tk.step('Buscando la PREA en tus aceptadas');
-  var r=await SB.c.from('cartera').select('*,expedientes!inner(folio,sys,op,opd,queja,labor,parts_total)').eq('expedientes.folio',folio).limit(1);
+  var r=await SB.c.from('cartera').select('*,expedientes!inner(folio,sys,op,opd,queja,labor,parts_total,wo)').eq('expedientes.folio',folio).limit(1);
   if(r.error)throw r.error;
   var row=r.data[0];
   await pace(500);if(my.aborted)return {kind:'aborted'};
@@ -3669,7 +3837,7 @@ CB.prepare=async function(text,files,tk,my){
   await CB.get();var b=CB.pick(ex);
   await pace(650);if(my.aborted)return {kind:'aborted'};
   s3.done(b?b.n+(b.n===1?' pago':' pagos')+' · base: '+CB.baseTxt(b,ex):'sin pagos registrados todavía');
-  var c={prea:folio,id:row.expediente_id,sys:ex.sys,op:ex.op,opd:ex.opd,queja:ex.queja,claim:claim,lc:lc,pc:pc,basis:b,estado:row.estado,factura:row.factura};
+  var c={prea:folio,wo:ex.wo||ord||null,id:row.expediente_id,sys:ex.sys,op:ex.op,opd:ex.opd,queja:ex.queja,claim:claim,lc:lc,pc:pc,basis:b,estado:row.estado,factura:row.factura};
   var s4=tk.step('Calculando lo que pagará planta');
   if(b){
     var cl=function(x){return Math.min(1.2,Math.max(0,x))},rl=cl(b.rl!=null?b.rl:b.rp),rp=cl(b.rp!=null?b.rp:b.rl);
@@ -3707,13 +3875,20 @@ async function runCobros(text,files){
   tk.end(my.aborted||out.kind==='aborted');
   if(my.aborted||out.kind==='aborted'){$('.ai-body',w).innerHTML='<p class="muted">Respuesta detenida.</p>';$('.ai-actions',w).hidden=false;finish(my);return}
   if(out.kind==='msg'){var full=await stream($('.ai-body',w),out.text,my);w._text=full.replace(/\*\*/g,'');$('.ai-actions',w).hidden=false;finish(my);return}
-  var ctx=out.ctx;
+  var ctx=out.ctx;CB.last=ctx;
+  if(ctx.wo&&!GP.cur&&S.convId){var oc=ctx.wo,ci=S.convId;S.convP=Promise.resolve(S.convP).then(function(){return GP.setOrden(ci,oc)})}
   await agentTurn(w,ctx,introCB(ctx),[],function(){},finalCB(ctx),my,buildCobroCard);
+  GP.remember(text,w._text||finalCB(ctx).replace(/\*\*/g,''));
+  var cs=[{t:'¿Por qué ese porcentaje?',q:'¿Por qué ese porcentaje?'},{t:'¿Cuánto es con IVA?',q:'¿Cuánto es con IVA?'},{t:'Ver en Cartera',q:'',go:'cartera'}];
+  var sbl=GP.all.filter(function(x){return x.agent==='garantias'&&ctx.wo&&x.orden===ctx.wo})[0];if(sbl)cs.push({t:'Ver conversación de Garantías',open:sbl.id});
+  if(ctx.basis)GP.suggest(w,cs);
   finish(my);
 }
 function start(text,files){
   if(S.agent==='garantias'){var oo=GP.orderOnly(text);if(oo){GP.save(text,files);GP.ack(oo);return}}
   SB.saveConv(text||(files[0]&&files[0].name)||'Conversación',files);
+  if(S.agent==='garantias'&&!(files&&files.length)&&GP.isChat(text)){GP.caseText=GP.caseText||'';return runConv(text)}
+  if(S.agent==='cobros'&&!(files&&files.length)&&GP.cobrosChat(text,files))return runConv(text);
   return S.agent==='cobros'?runCobros(text,files):S.agent==='mi'?runMi(text,files):run(text,files)}
 
 function onSend(){
@@ -3727,7 +3902,7 @@ function onSend(){
   start(text,files);
 }
 async function loadHistory(h){
-  if(S.agent==='garantias')return GP.open(h.id);
+  if(S.agent==='garantias'||S.agent==='cobros')return GP.open(h.id);
   showView(curView());resetChat();S.convId=h.id;
   enterChat(h.t);
   if(S.agent==='mi'){await MI.replay(h);return}
