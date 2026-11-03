@@ -63,7 +63,7 @@ describe('POST /prea/verify', () => {
   it('devuelve hallazgos con severidad y regla de origen, y detecta evidencia faltante', async () => {
     const { g, app, tok } = await setup();
     const res = await app.inject({ method: 'POST', url: '/prea/verify', headers: { authorization: `Bearer ${await tok('advisor')}` },
-      payload: { agency_id: g.agencyId, draft: { fields: { vin: '', work_op: 'OP-MT-031', complaint_text: 'Cliente Pedro Gómez, 443 111 2222' }, evidence: [{ kind: 'orden_reparacion', text: 'Orden de reparación. OP-MT-031 PZ-MT-6120' }] } } });
+      payload: { agency_id: g.agencyId, draft: { fields: { vin: '', work_op: 'OP-MT-031', complaint_text: 'Cliente Pedro Gómez, 443 111 2222' }, evidence: [{ kind: 'orden_reparacion', text: 'Orden de reparación. OP-MT-031 PZ-MT-6120' }], }, read_text: true } });
     expect(res.statusCode).toBe(200);
     const body = res.json();
     expect(body.blocked).toBe(true);

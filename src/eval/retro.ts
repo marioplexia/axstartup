@@ -48,7 +48,7 @@ async function scoreSet(c: pg.PoolClient, tenant: Tenant, inputs: BlindInput[], 
   for (const i of inputs) {
     const t = truth.get(i.order_id)!;
     const a = await analyzeDraft(c, tenant, {
-      agency_id: i.agency_id, order_id: undefined, today: i.submitted_on, customer_names: [],
+      agency_id: i.agency_id, order_id: undefined, today: i.submitted_on, customer_names: [], read_text: false,
       draft: { fields: i.fields, evidence: i.evidence_kinds.map(kind => ({ kind })), repair_date: i.fields.repair_date, submit_date: i.submitted_on },
     }, llm, { useAgent: o.useAgent });
     const hits = a.findings.filter(f => rank[f.severity] >= rank[o.flagAt]);

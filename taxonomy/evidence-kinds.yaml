@@ -1,0 +1,17 @@
+# Catálogo de tipos de evidencia que el asesor etiqueta al subir cada archivo.
+# `accept`: extensiones válidas para ese tipo. `satisfies`: tipos "genéricos" que las reglas ya exigen (rejection-causes.yaml)
+# y que este tipo cubre. Editable: agrega tipos según lo que pida la planta.
+version: 1
+max_size_mb: 25
+kinds:
+  foto_tablero:        { label: Foto de tablero (kilometraje / testigos), accept: [jpg, jpeg, png, heic, webp], satisfies: [foto] }
+  foto_pieza:          { label: Foto de la pieza dañada,                  accept: [jpg, jpeg, png, heic, webp], satisfies: [foto] }
+  foto_vin:            { label: Foto del VIN,                              accept: [jpg, jpeg, png, heic, webp], satisfies: [foto] }
+  video_falla:         { label: Video de la falla,                         accept: [mp4, mov] }
+  diagnostico_escaner: { label: Diagnóstico de escáner (DTC),              accept: [pdf, jpg, jpeg, png], satisfies: [diagnostico] }
+  orden_firmada:       { label: Orden de reparación firmada,               accept: [pdf, jpg, jpeg, png], satisfies: [orden_reparacion] }
+  factura:             { label: Factura,                                   accept: [pdf, xml, jpg, jpeg, png] }
+  # tipos genéricos anteriores (siguen siendo válidos)
+  foto:                { label: Foto,                                      accept: [jpg, jpeg, png, heic, webp] }
+  diagnostico:         { label: Diagnóstico,                               accept: [pdf, jpg, jpeg, png] }
+  orden_reparacion:    { label: Orden de reparación,                       accept: [pdf, jpg, jpeg, png] }

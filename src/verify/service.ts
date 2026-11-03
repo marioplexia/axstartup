@@ -3,9 +3,11 @@ import { z } from 'zod';
 import { withTenant, type Tenant } from '../db/pool.js';
 import type { LlmClient } from '../llm/client.js';
 import { redact, redactFields, toModelView, sealForModel } from '../redact/index.js';
+import { readEvidenceMetadata, classifyEvidence } from '../evidence/metadata.js';
 import { runChecklist, type Draft, type Finding, type PriorPrea, type RuleRow } from './checklist.js';
 
 export const EvidenceReading = z.object({
+  source: z.enum(['metadata', 'model']).optional(),
   concepts: z.object({
     operations: z.array(z.object({ op_code: z.string(), hours: z.number().optional() })),
     parts: z.array(z.object({ part_no: z.string(), quantity: z.number().default(1) })),
@@ -18,10 +20,10 @@ export type EvidenceReading = z.infer<typeof EvidenceReading>;
 
 export const DraftSchema = z.object({
   fields: z.record(z.string(), z.union([z.string(), z.number(), z.null()])),
-  evidence: z.array(z.object({ kind: z.string(), filename: z.string().optional(), text: z.string().optional() })).default([]),
+  evidence: z.array(z.object({ kind: z.string(), filename: z.string().optional(), text: z.string().optional(), mime: z.string().optional(), size_bytes: z.number().int().nonnegative().optional(), sha256: z.string().optional() })).default([]),
   repair_date: z.string().optional(), submit_date: z.string().optional(),
 });
-export const VerifyInput = z.object({ agency_id: z.uuid(), order_id: z.uuid().optional(), draft: DraftSchema, customer_names: z.array(z.string()).default([]), today: z.string().optional() });
+export const VerifyInput = z.object({ agency_id: z.uuid(), order_id: z.uuid().optional(), draft: DraftSchema, customer_names: z.array(z.string()).default([]), /** transitorio: además lee el texto extraído con el agente (fase de lectura con modelo aparte) */ read_text: z.boolean().default(false), today: z.string().optional() });
 export type VerifyInput = z.infer<typeof VerifyInput>;
 
 export interface VerifyResult { id: string; findings: Finding[]; blocked: boolean; rule_versions: Array<{ rule_id: string; rule_key: string; version: number }>; reading: EvidenceReading | null }
@@ -55,9 +57,11 @@ export async function analyzeDraft(c: pg.PoolClient, tenant: Tenant, inp: Verify
       where o.brand_id=$1`, [brandId])).rows;
 
   // Agente lector de evidencia: extrae y detecta faltantes. Si falla, el checklist sigue funcionando.
-  let reading: EvidenceReading | null = null;
   const requiredKinds = [...new Set(rules.filter(r => r.condition.type === 'required_evidence').map(r => r.condition.evidence_kind as string))];
-  if (opts.useAgent !== false && (safe.evidence.length || requiredKinds.length)) {
+  // Por defecto: lector por metadatos (determinista, sin modelo). El agente que lee texto es opt-in.
+  let reading: EvidenceReading | null = safe.evidence.length || requiredKinds.length ? readEvidenceMetadata(safe.evidence, requiredKinds) : null;
+  if (opts.useAgent === true && (safe.evidence.length || requiredKinds.length)) {
+    reading = null;
     try {
       const r = await llm.run('evidence-reader', 'evidence-reader.v1.md', sealForModel({ fields: toModelView(safe.fields), evidence: safe.evidence.map(e => ({ ...e, text: e.text ? redact(e.text).text : undefined })), required_kinds: requiredKinds }), EvidenceReading);
       reading = r.output;
@@ -67,7 +71,9 @@ export async function analyzeDraft(c: pg.PoolClient, tenant: Tenant, inp: Verify
     } catch { reading = null; }
   }
 
-  const findings = runChecklist(rules, safe, { today, prior, detectedKinds: new Set(reading?.evidence_detected ?? []), currentOrderId: inp.order_id });
+  // la evidencia inválida (tipo/extensión que no corresponde, vacía…) no cuenta como presente en el checklist
+  const counted: Draft = { ...safe, evidence: classifyEvidence(safe.evidence).valid };
+  const findings = runChecklist(rules, counted, { today, prior, detectedKinds: new Set(reading?.evidence_detected ?? []), currentOrderId: inp.order_id });
   if (reading) {
     for (const m of reading.missing) {
       if (findings.some(f => f.field === m.kind)) continue;
@@ -81,7 +87,7 @@ export async function analyzeDraft(c: pg.PoolClient, tenant: Tenant, inp: Verify
 export async function verifyDraft(tenant: Tenant, raw: unknown, llm: LlmClient): Promise<VerifyResult> {
   const inp = VerifyInput.parse(raw);
   return withTenant(tenant, async c => {
-    const { findings, reading, safe } = await analyzeDraft(c, tenant, inp, llm);
+    const { findings, reading, safe } = await analyzeDraft(c, tenant, inp, llm, { useAgent: inp.read_text });
     const used = [...new Map(findings.filter(f => f.rule_id).map(f => [f.rule_id!, { rule_id: f.rule_id!, rule_key: f.rule_key!, version: f.rule_version! }])).values()];
     const ins = await c.query(
       `insert into verifications(group_id,agency_id,order_id,created_by,draft,findings,rule_versions) values ($1,$2,$3,$4,$5,$6,$7) returning id`,
