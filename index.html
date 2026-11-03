@@ -605,6 +605,19 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .axl label{display:block;margin:14px 0 6px;font-size:12px;font-weight:500}
 .axl input,.axl select{width:100%;height:39px;padding:0 12px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:14px}
 .axl input:focus,.axl select:focus{outline:none;border-color:var(--fg);box-shadow:0 0 0 1px var(--fg)}
+.axl-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.axl-seg button{height:38px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:13px;cursor:pointer}
+.axl-seg button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 1px var(--fg);font-weight:600}
+.mr-h{margin:22px 0 10px;font-size:15px}
+.mr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:14px}
+.mr-ag{border:1px solid var(--card-line);border-radius:12px;background:var(--card);padding:14px 16px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.mr-ag:hover,.mr-ag[aria-expanded="true"]{border-color:var(--fg)}
+.mr-ag b{display:block;font-size:14px}.mr-ag small{color:var(--muted)}
+.mr-st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.mr-st span{display:block;font-size:11px;color:var(--muted)}.mr-st strong{font-size:15px}
+.mr-adv{border:1px solid var(--card-line);border-radius:12px;background:var(--card);margin-bottom:14px;overflow:auto}
+.mr-adv table{width:100%;border-collapse:collapse;font-size:13px}.mr-adv th,.mr-adv td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--card-line)}.mr-adv th{font-size:11px;color:var(--muted);font-weight:500}
+.mr-code{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px}.mr-code code{font-size:18px;letter-spacing:.08em;font-weight:600}
 .axl-hint{margin:4px 0 0;font-size:12px;color:var(--muted)}
 .axl-go{text-align:center;width:100%;height:38px;margin-top:20px;border:0;border-radius:8px;background:var(--fg);color:var(--bg);font:inherit;font-weight:500;cursor:pointer}
 .axl-go:disabled{opacity:.6;cursor:wait}
@@ -892,8 +905,21 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
           <div><h2>Tablero de agencia</h2><p><span id="adAgency">Tu agencia</span> · reglas que aprende el Agente de Garantías y cómo se distribuyen</p></div>
           <div class="ad-live" id="adLive"><i></i><span>En vivo</span></div>
         </div>
+        <div id="mrBox" hidden>
+          <div class="ad-kpi" id="mrKpi"></div>
+          <h3 class="mr-h">Agencias de la marca</h3>
+          <div class="mr-grid" id="mrAg"></div>
+          <div class="mr-adv" id="mrAdv" hidden></div>
+          <div class="ad-grid">
+            <div class="ad-card"><div class="ad-ch"><h3>Resultados por sistema (toda la marca)</h3></div><div id="mrSys"></div></div>
+            <div class="ad-card"><div class="ad-ch"><h3>Código para nuevos administradores</h3></div>
+              <div class="mr-code"><code id="mrCode">··········</code><button class="bt" type="button" id="mrCopy">Copiar</button><button class="bt dng" type="button" id="mrNew">Generar uno nuevo</button></div>
+              <p class="axl-hint" style="padding:0 16px 14px">Quien se registre como <b>Administrador de marca</b> con este código tendrá acceso a todas las agencias. Si lo generas de nuevo, el anterior deja de servir.</p></div>
+          </div>
+          <h3 class="mr-h">Cerebro y centro de entrenamiento</h3>
+        </div>
         <div class="ad-kpi" id="adKpi"></div>
-        <div class="ad-bar">
+        <div class="ad-bar" id="adBarBox">
           <label>Activar con <select id="adThr"><option value="2">2 PREAs</option><option value="3">3 PREAs</option><option value="5">5 PREAs</option></select></label>
           <label>Distribución <select id="adDist"><option value="auto">Automática</option><option value="manual">Con mi aprobación</option></select></label>
           <span class="sp"></span>
@@ -912,7 +938,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
           <textarea id="adPaste" placeholder="O pega aquí las PREAs en CSV o JSON…" aria-label="Pegar PREAs aceptadas"></textarea>
           <div class="imp-row"><button class="bt pri" type="button" id="adPasteGo">Enseñar al agente</button><span class="imp-msg" id="adImpMsg" role="status"></span></div>
         </div>
-        <div class="ad-imp" id="adHist">
+        <div class="ad-imp" id="adHist" hidden>
           <p><b>Pagos históricos de planta</b> · el Agente de Cobros aprende de ellos desde el primer día. Sube lo que planta pagó en PREAs anteriores: mano de obra y piezas, reclamado contra pagado, antes de IVA (CSV, sin separador de miles). <span id="phCount"></span></p>
           <div class="imp-row">
             <input type="file" id="phFile" accept=".csv,.txt" hidden>
@@ -966,6 +992,17 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
       <label for="lgPass">Contraseña</label>
       <input id="lgPass" type="password" autocomplete="current-password" minlength="8" required>
       <p class="axl-hint" id="lgHint" hidden>Mínimo 8 caracteres.</p>
+      <div id="lgTypeW" hidden>
+        <label>Tipo de cuenta</label>
+        <div class="axl-seg" id="lgType"><button type="button" data-t="asesor" aria-pressed="true">Asesor de garantías</button><button type="button" data-t="marca" aria-pressed="false">Administrador de marca</button></div>
+      </div>
+      <div id="lgMarW" hidden>
+        <label for="lgBr">Marca</label>
+        <select id="lgBr"><option value="">Cargando marcas…</option></select>
+        <label for="lgCode">Código de administrador</label>
+        <input id="lgCode" autocomplete="off" placeholder="XXXX-XXXX-XXXX" spellcheck="false">
+        <p class="axl-hint">Te lo da el administrador actual de la marca (se ve en su Tablero de marca).</p>
+      </div>
       <div id="lgAgW" hidden>
         <label for="lgAg">Agencia</label>
         <select id="lgAg" required><option value="">Cargando agencias…</option></select>
@@ -1048,7 +1085,7 @@ function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===(S.agent==='cobros'?'cobros':S.agent==='mi'?'mi':'agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin';stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
+  var adm=id==='admin';stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show();$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
@@ -1852,7 +1889,7 @@ SB.pull=async function(first){
 };
 /* las reglas activas llegan a todos los asesores reales (también a los que se registran después) */
 RS.heal=function(){var ch=false;RS.d.rules.forEach(function(r){if(r.status==='activa')ADVISORS.forEach(function(a){if(!r.dist[a.id]){r.dist[a.id]=Date.now();ch=true}})});return ch};
-SB.user=null;SB.chan=null;SB.mode='in';SB.aiOff=false;
+SB.user=null;SB.chan=null;SB.mode='in';SB.acct='asesor';SB.aiOff=false;
 /* ---- IA: Edge Function "ai" (la llave de Anthropic vive solo en el servidor) ---- */
 SB.ai=async function(body){
   if(!SB.c||!SB.entered)throw new Error('sin sesión');
@@ -3328,11 +3365,18 @@ SB.lgMode=function(m){
   $('#lgTabUp').setAttribute('aria-selected',up);$('#lgTabIn').setAttribute('aria-selected',!up);
   $('#lgTitle').textContent=up?'Crea tu cuenta':'Inicia sesión';
   $('#lgSub').textContent=up?'Registra tu correo y elige tu agencia.':'Accede al agente de garantías de tu agencia.';
-  $('#lgHint').hidden=!up;$('#lgAgW').hidden=!up;$('#lgGo').textContent=up?'Crear cuenta':'Entrar';
+  $('#lgHint').hidden=!up;$('#lgTypeW').hidden=!up;$('#lgGo').textContent=up?'Crear cuenta':'Entrar';SB.lgAcct(up?SB.acct:'asesor',true);
   $('#lgPass').autocomplete=up?'new-password':'current-password';
   $('#lgAltP').innerHTML=up?'¿Ya tienes cuenta? <a id="lgAlt">Inicia sesión</a>':'¿No tienes cuenta? <a id="lgAlt">Crea una</a>';
   SB.lgMsg('');
 };
+SB.lgAcct=function(t,keep){
+  var up=SB.mode==='up';if(!keep)SB.acct=t;var mar=up&&t==='marca';
+  $$('#lgType button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.t===SB.acct))});
+  $('#lgAgW').hidden=!up||mar;$('#lgMarW').hidden=!mar;
+  if(up)$('#lgSub').textContent=mar?'Para quien administra las agencias de una marca: cerebro, reglas y entrenamiento.':'Registra tu correo y elige tu agencia.';
+};
+$('#lgType').addEventListener('click',function(e){var b=e.target.closest('button[data-t]');if(b)SB.lgAcct(b.dataset.t)});
 SB.conn=function(t,err){var c=$('#lgConn');c.textContent=t;c.style.color=err?'#d92d20':''};
 /* detalle técnico del error, para poder reportarlo tal cual */
 SB.detail=function(e){
@@ -3344,7 +3388,7 @@ SB.detail=function(e){
 SB.loadAgencies=async function(){
   var sel=$('#lgAg');
   try{
-    var r=await Promise.race([SB.c.from('agencies').select('id,name,region').order('region').order('id'),
+    var r=await Promise.race([SB.c.from('agencies').select('id,name,region,brand').order('region').order('id'),
       new Promise(function(_,no){setTimeout(function(){no(new Error('Supabase no respondió en 10 s (red o bloqueador)'))},10000)})]);
     if(r.error)throw r.error;
     sel.innerHTML='<option value="">Selecciona tu agencia</option>';var groups={};
@@ -3352,6 +3396,8 @@ SB.loadAgencies=async function(){
       if(!groups[a.region]){var g=document.createElement('optgroup');g.label=a.region;sel.appendChild(g);groups[a.region]=g}
       var o=document.createElement('option');o.value=a.id;o.textContent=a.name;groups[a.region].appendChild(o);
     });
+    var br=[];r.data.forEach(function(a){if(a.brand&&br.indexOf(a.brand)<0)br.push(a.brand)});
+    $('#lgBr').innerHTML=br.length?br.map(function(b){return '<option value="'+ea(b)+'">'+esc(b)+'</option>'}).join(''):'<option value="">Sin marcas</option>';
     SB.conn('✓ Conectado a Supabase · '+r.data.length+(r.data.length===1?' agencia':' agencias'));
   }catch(e){
     sel.innerHTML='<option value="">No se pudieron cargar las agencias</option>';
@@ -3378,11 +3424,21 @@ SB.submit=async function(ev){
   if(up){
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){SB.lgMsg('Escribe un correo válido.',true);return}
     if(pass.length<8){SB.lgMsg('La contraseña debe tener al menos 8 caracteres.',true);return}
-    if(!ag){SB.lgMsg('Selecciona tu agencia.',true);return}
+    if(SB.acct==='marca'){
+      if(!$('#lgBr').value){SB.lgMsg('Selecciona la marca.',true);return}
+      if(!$('#lgCode').value.trim()){SB.lgMsg('Escribe el código de administrador.',true);return}
+    }else if(!ag){SB.lgMsg('Selecciona tu agencia.',true);return}
   }
   var btn=$('#lgGo');btn.disabled=true;SB.lgMsg('');
   try{
-    var r=up?await SB.c.auth.signUp({email:email,password:pass,options:{data:{agency_id:Number(ag)}}}):await SB.c.auth.signInWithPassword({email:email,password:pass});
+    var meta={agency_id:Number(ag)};
+    if(up&&SB.acct==='marca'){
+      var ck=await SB.c.rpc('check_marca_code',{p_brand:$('#lgBr').value,p_code:$('#lgCode').value});
+      if(ck.error)throw ck.error;
+      if(!ck.data){SB.lgMsg('Ese código de administrador no es correcto para esa marca.',true);btn.disabled=false;return}
+      meta={role_req:'marca',brand:$('#lgBr').value,code:$('#lgCode').value.trim()};
+    }
+    var r=up?await SB.c.auth.signUp({email:email,password:pass,options:{data:meta}}):await SB.c.auth.signInWithPassword({email:email,password:pass});
     if(r.error)throw r.error;
     if(up&&r.data.user&&r.data.user.identities&&!r.data.user.identities.length){SB.lgMode('in');SB.lgMsg('Ese correo ya tiene cuenta: inicia sesión.',true)}
     else if(up&&!r.data.session)SB.lgMsg('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
@@ -3390,10 +3446,10 @@ SB.submit=async function(ev){
   btn.disabled=false;
 };
 SB.loadAdvisors=async function(){
-  var r=await SB.c.from('profiles').select('id,name,role,created_at,agency_id,agencies(name)').order('created_at');
+  var r=await SB.c.from('profiles').select('id,name,role,brand,created_at,agency_id,agencies(name)').order('created_at');
   if(r.error)throw r.error;
   ADVISORS.length=0;
-  r.data.forEach(function(p){ADVISORS.push({id:p.id,name:p.name,role:p.role,tag:p.id===ME?'tú':''})});
+  r.data.forEach(function(p){ADVISORS.push({id:p.id,name:p.name,role:p.role==='marca'?'admin':p.role,tag:p.id===ME?'tú':''})});
   var me=r.data.filter(function(p){return p.id===ME})[0];
   if(!me&&!SB.healed){
     /* la cuenta existe pero no tiene perfil de asesor: se crea ahora (red de seguridad del trigger de alta) */
@@ -3403,7 +3459,8 @@ SB.loadAdvisors=async function(){
     return SB.loadAdvisors();
   }
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
-  if(me){SB.user=me;SB.agency=(me.agencies&&me.agencies.name)||'Tu agencia';$('#adAgency').textContent=SB.agency;
+  if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.user=me;SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
+    var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
 };
@@ -3463,6 +3520,52 @@ function ctxToRec(c){
 }
 
 /* ---------- Tablero de agencia ---------- */
+/* ===== Tablero de marca: agencias, asesores y cerebro (solo administradores de marca) ===== */
+var MR={d:null,adv:null,open:null,t:0};
+MR.is=function(){return !!(SB.user&&SB.user.marca)};
+MR.show=function(){
+  var m=MR.is();
+  $('#mrBox').hidden=!m;$('#adBarBox').hidden=!m;$('#adHist').hidden=!m;if(!m)$('#adImp').hidden=true;
+  var ca=$('#adAdv');if(ca&&ca.parentNode)ca.parentNode.hidden=m;
+  var h=$('#viewAdmin .ad-head h2'),pp=$('#viewAdmin .ad-head p');
+  if(h)h.textContent=m?'Tablero de marca':'Tablero de agencia';
+  if(pp)pp.innerHTML=m?'<span id="adAgency">'+esc(SB.agency||'')+'</span> · agencias, asesores, cerebro y centro de entrenamiento':'<span id="adAgency">'+esc(SB.agency||'Tu agencia')+'</span> · reglas que aprende el Agente de Garantías (las administra la marca)';
+  if(m&&(!MR.d||Date.now()-MR.t>20000))MR.load();
+};
+MR.load=async function(){
+  if(!SB.c||!SB.entered||!MR.is())return;
+  var r=await Promise.all([SB.c.rpc('marca_resumen'),SB.c.rpc('marca_asesores'),SB.c.rpc('marca_sistemas'),SB.c.rpc('marca_codigo')]);
+  if(r[0].error){SB.fail(r[0].error);return}
+  MR.d=r[0].data||[];MR.adv=r[1].data||[];MR.sys=r[2].data||[];MR.code=r[3].data||'';MR.t=Date.now();MR.render();
+};
+MR.render=function(){
+  var D=MR.d||[],sum=function(k){return D.reduce(function(a,x){return a+Number(x[k]||0)},0)};
+  var acc=sum('aceptadas'),rej=sum('rechazadas'),rate=acc+rej?Math.round(100*acc/(acc+rej))+'%':'—';
+  var K=function(l,v,t){return '<div class="kp"><span>'+l+'</span><b>'+v+'</b><small>'+t+'</small></div>'};
+  $('#mrKpi').innerHTML=K('Agencias',D.length,esc(SB.agency||''))+K('Asesores',sum('asesores'),'registrados')+K('PREAs',sum('preas'),sum('pendientes')+' esperando respuesta')+K('Aceptación',rate,acc+' aceptadas · '+rej+' rechazadas')+K('Por cobrar',money(sum('por_facturar')+sum('facturada')),'facturado y por facturar')+K('Cobrado',money(sum('cobrado')),'pagos de planta');
+  $('#mrAg').innerHTML=D.map(function(a){
+    var ar=a.aceptadas+a.rechazadas?Math.round(100*a.aceptadas/(a.aceptadas+a.rechazadas))+'%':'—';
+    return '<button type="button" class="mr-ag" data-mr="'+a.agency_id+'" aria-expanded="'+(MR.open===a.agency_id)+'"><b>'+esc(a.name)+'</b><small>'+esc(a.city||'')+' · '+(a.ultima?'última PREA '+esc(SB.dayLbl(a.ultima)):'sin actividad')+'</small>'+
+      '<div class="mr-st"><div><span>Asesores</span><strong>'+a.asesores+'</strong></div><div><span>PREAs</span><strong>'+a.preas+'</strong></div><div><span>Aceptación</span><strong>'+ar+'</strong></div>'+
+      '<div><span>Pendientes</span><strong>'+a.pendientes+'</strong></div><div><span>Por cobrar</span><strong>'+money(Number(a.por_facturar)+Number(a.facturada))+'</strong></div><div><span>Cobrado</span><strong>'+money(Number(a.cobrado))+'</strong></div></div></button>';
+  }).join('')||'<p class="axl-hint">Aún no hay agencias para esta marca.</p>';
+  var box=$('#mrAdv');
+  if(MR.open==null)box.hidden=true;
+  else{
+    var L=(MR.adv||[]).filter(function(x){return x.agency_id===MR.open});
+    box.hidden=false;
+    box.innerHTML='<table><thead><tr><th>Asesor</th><th>Rol</th><th>PREAs</th><th>Aceptadas</th><th>Rechazadas</th><th>Última PREA</th></tr></thead><tbody>'+(L.length?L.map(function(x){return '<tr><td>'+esc(x.name)+'</td><td>'+(x.role==='admin'?'Administrador':'Asesor')+'</td><td>'+x.preas+'</td><td>'+x.aceptadas+'</td><td>'+x.rechazadas+'</td><td>'+(x.ultima?esc(SB.dayLbl(x.ultima)):'—')+'</td></tr>'}).join(''):'<tr><td colspan="6">Esta agencia aún no tiene asesores registrados.</td></tr>')+'</tbody></table>';
+  }
+  $('#mrSys').innerHTML='<table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th style="text-align:left;padding:8px 14px">Sistema</th><th>Aceptadas</th><th>Rechazadas</th><th>Pendientes</th></tr></thead><tbody>'+((MR.sys||[]).map(function(x){return '<tr><td style="padding:8px 14px">'+esc(x.sys)+'</td><td style="text-align:center">'+x.aceptadas+'</td><td style="text-align:center">'+x.rechazadas+'</td><td style="text-align:center">'+x.pendientes+'</td></tr>'}).join('')||'<tr><td colspan="4" style="padding:8px 14px">Sin PREAs todavía.</td></tr>')+'</tbody></table>';
+  $('#mrCode').textContent=MR.code||'—';
+};
+$('#mrAg').addEventListener('click',function(e){var b=e.target.closest('[data-mr]');if(!b)return;var id=Number(b.dataset.mr);MR.open=MR.open===id?null:id;MR.render()});
+$('#mrCopy').addEventListener('click',function(){if(MR.code)copyText(MR.code).then(function(){toast('Código copiado')})});
+$('#mrNew').addEventListener('click',async function(){
+  if(!confirm('El código anterior dejará de servir. ¿Generar uno nuevo?'))return;
+  var r=await SB.c.rpc('marca_regenerar_codigo');if(r.error){SB.fail(r.error);toast('No se pudo generar el código');return}
+  MR.code=r.data;MR.render();toast('Código nuevo generado');
+});
 var AD={filter:'todas',q:'',open:{},raf:0,exp:[]};
 AD.loadExp=async function(){
   if(!SB.c||!SB.entered)return;
