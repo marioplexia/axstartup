@@ -1,7 +1,7 @@
 import type pg from 'pg';
 import { withTenant, type Tenant } from '../db/pool.js';
 import { BundleSchema, type Bundle } from './schema.js';
-import { redact, redactFields, hashRef, sha } from './redact.js';
+import { redact, redactFields, hashRef, sha } from '../redact/index.js';
 
 type Fields = Record<string, string | number | null>;
 export interface IngestResult {

@@ -2,7 +2,7 @@ import type pg from 'pg';
 import { z } from 'zod';
 import { withTenant, type Tenant } from '../db/pool.js';
 import type { LlmClient } from '../llm/client.js';
-import { redact, redactFields } from '../ingest/redact.js';
+import { redact, redactFields, toModelView, sealForModel } from '../redact/index.js';
 import { runChecklist, type Draft, type Finding, type PriorPrea, type RuleRow } from './checklist.js';
 
 export const EvidenceReading = z.object({
@@ -59,7 +59,7 @@ export async function analyzeDraft(c: pg.PoolClient, tenant: Tenant, inp: Verify
   const requiredKinds = [...new Set(rules.filter(r => r.condition.type === 'required_evidence').map(r => r.condition.evidence_kind as string))];
   if (opts.useAgent !== false && (safe.evidence.length || requiredKinds.length)) {
     try {
-      const r = await llm.run('evidence-reader', 'evidence-reader.v1.md', { fields: safe.fields, evidence: safe.evidence, required_kinds: requiredKinds }, EvidenceReading);
+      const r = await llm.run('evidence-reader', 'evidence-reader.v1.md', sealForModel({ fields: toModelView(safe.fields), evidence: safe.evidence.map(e => ({ ...e, text: e.text ? redact(e.text).text : undefined })), required_kinds: requiredKinds }), EvidenceReading);
       reading = r.output;
       await c.query(
         `insert into llm_calls(group_id,order_id,agent,model,prompt_hash,input_tokens,output_tokens,cost_usd) values ($1,$2,'evidence-reader',$3,$4,$5,$6,$7)`,

@@ -1,3 +1,4 @@
+import { sealForModel } from '../redact/index.js';
 import { z } from 'zod';
 import { CONFIG } from '../../config/defaults.js';
 import { withTenant, type Tenant } from '../db/pool.js';
@@ -32,7 +33,7 @@ export async function runNightly(tenant: Tenant, llm: LlmClient, overrides: Part
     const codes = new Set(tax.causes.map(c => c.code));
     for (const cm of pending) {
       const r = await llm.run('rejection-classifier', 'rejection-classifier.v1.md',
-        { comment: cm.body_redacted, taxonomy: tax.causes.map(({ code, label, description, keywords }) => ({ code, label, description, keywords })) }, Classification);
+        sealForModel({ comment: cm.body_redacted, taxonomy: tax.causes.map(({ code, label, description, keywords }) => ({ code, label, description, keywords })) }), Classification);
       const cause = codes.has(r.output.cause_code) ? r.output.cause_code : 'otro';
       await withTenant(tenant, async c => {
         await c.query(`insert into rejection_classifications(group_id,order_id,comment_id,taxonomy_version,cause_code,field,confidence) values ($1,$2,$3,$4,$5,$6,$7) on conflict do nothing`,

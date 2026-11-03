@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { withTenant, type Tenant } from '../db/pool.js';
-import { hashRef, redact, sha } from '../ingest/redact.js';
+import { hashRef, redact, sha } from '../redact/index.js';
 
 const Money = z.number().min(0);
 export const OutcomeInput = z.object({

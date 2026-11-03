@@ -12,7 +12,8 @@
     "nightly": "tsx scripts/nightly.ts",
     "ingest": "tsx scripts/ingest.ts",
     "eval:retro": "tsx scripts/eval-retro.ts",
-    "demo": "tsx scripts/demo.ts"
+    "demo": "tsx scripts/demo.ts",
+    "redact:report": "tsx scripts/redact-report.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.4.0",

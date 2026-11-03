@@ -3,7 +3,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import Anthropic from '@anthropic-ai/sdk';
 import { CONFIG } from '../../config/defaults.js';
-import { sha } from '../ingest/redact.js';
+import { sha, isSealed, RedactionRequiredError } from '../redact/index.js';
 import { mockComplete } from './mock.js';
 
 export interface LlmUsage { model: string; promptHash: string; inputTokens: number; outputTokens: number; costUsd: number }
@@ -34,7 +34,9 @@ class MockClient implements LlmClient {
 
 class LiveClient implements LlmClient {
   private sdk = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  async run<T>(_agent: string, promptFile: string, input: unknown, schema: z.ZodType<T>) {
+  async run<T>(agent: string, promptFile: string, input: unknown, schema: z.ZodType<T>) {
+    // Bloqueo: al modelo real solo llega lo que pasó por sealForModel (redacción + verificación de residuos).
+    if (!isSealed(input)) throw new RedactionRequiredError(`agente ${agent}: el payload no pasó por la redacción (usa sealForModel)`);
     const prompt = loadPrompt(promptFile) + '\n\n' + JSON.stringify(input);
     let inT = 0, outT = 0, lastErr: unknown;
     for (let attempt = 0; attempt < 2; attempt++) {

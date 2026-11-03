@@ -1,3 +1,4 @@
+import { sealForModel } from '../redact/index.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import type pg from 'pg';
@@ -127,7 +128,7 @@ export async function runRetro(tenant: Tenant, llm: LlmClient, opts: Partial<Ret
       const cm = (await c.query(`select body_redacted from prea_comments where order_id = any($1) and author_role='plant'`, [missedIds])).rows;
       const Cl = z.object({ cause_code: z.string(), confidence: z.number(), field: z.string().nullable().optional() });
       for (const m of cm) {
-        const r = await llm.run('rejection-classifier', 'rejection-classifier.v1.md', { comment: m.body_redacted, taxonomy: tax.causes.map(({ code, label, description, keywords }) => ({ code, label, description, keywords })) }, Cl);
+        const r = await llm.run('rejection-classifier', 'rejection-classifier.v1.md', sealForModel({ comment: m.body_redacted, taxonomy: tax.causes.map(({ code, label, description, keywords }) => ({ code, label, description, keywords })) }), Cl);
         if (r.output.cause_code !== 'otro') missedCauses[r.output.cause_code] = (missedCauses[r.output.cause_code] ?? 0) + 1;
       }
     }
