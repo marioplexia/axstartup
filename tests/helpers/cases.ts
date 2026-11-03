@@ -17,7 +17,7 @@ const ymd = (day: number) => iso(day, 0).slice(0, 10);
 export async function makeCase(o: CaseOpts) {
   const op = o.op ?? 'OP-MT-031', hours = o.hours ?? 3.4, rate = o.rate ?? 450, part = o.partNo ?? 'PZ-MT-6120', price = o.partPrice ?? 2300;
   const rej = o.rejectedFor ?? [];
-  const f1 = { vin: `VIN${o.n}`, work_op: op, labor_hours: hours, complaint_text: 'Falla reportada', ...(o.fields ?? {}) };
+  const f1 = { vin: `VIN${o.n}`, work_op: op, labor_hours: hours, complaint_text: 'Falla reportada', part_numbers: `${part} x1`, ...(o.fields ?? {}) };
   const versions = [{ submitted_at: iso(o.day), fields: f1, text: '' }];
   if (rej.length) versions.push({ submitted_at: iso(o.day + 1), fields: { ...f1, complaint_text: 'Falla reportada (corregida)' }, text: '' });
   const T = { groupId: o.g.groupId, role: 'system' as const };
