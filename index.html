@@ -159,7 +159,23 @@ textarea,input{font:inherit;color:inherit}
 .msg-user .bubble{background:var(--surface);padding:10px 16px;border-radius:18px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px;line-height:1.55}
 .msg-user .files{padding:0;justify-content:flex-end}
 .msg-ai{display:flex;gap:14px;animation:rise .38s cubic-bezier(.2,.8,.2,1) both}
-.ai-mark{width:26px;height:26px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:10.5px;font-weight:600;letter-spacing:-.02em;display:grid;place-items:center;flex:none;margin-top:1px}
+.ai-mark{width:30px;height:30px;flex:none;margin-top:-1px}
+/* Esfera azul animada: aguas que suben y bajan como marea, siempre en movimiento */
+.orb{--sp:1;position:relative;display:block;width:100%;height:100%;border-radius:50%;overflow:hidden;isolation:isolate;transform:translateZ(0);container-type:size;
+  background:radial-gradient(circle at 50% 28%,#c4ecff 0%,#4db1ff 42%,#0b80ff 78%,#0a62f0 100%);
+  box-shadow:0 0 0 1px rgba(150,215,255,.28),0 0 16px rgba(45,150,255,.42)}
+.orb i{position:absolute;display:block;pointer-events:none}
+.orb .w{left:-50%;top:50%;width:200%;height:200%;will-change:transform}
+.orb .w1{border-radius:41% 47% 39% 45%;background:linear-gradient(180deg,rgba(255,255,255,.95) 0%,rgba(190,238,255,.78) 20%,rgba(80,175,255,.3) 52%,rgba(80,175,255,0) 78%);filter:blur(7cqw);animation:orbw1 calc(6.5s*var(--sp)) linear infinite}
+.orb .w2{top:58%;border-radius:45% 40% 46% 38%;background:linear-gradient(180deg,rgba(105,200,255,.9) 0%,rgba(14,125,255,.94) 32%,#0a58ee 100%);filter:blur(6cqw);animation:orbw2 calc(9.5s*var(--sp)) linear infinite}
+.orb .c{inset:-14%;background:radial-gradient(62% 48% at 36% 26%,rgba(255,255,255,.92),rgba(200,242,255,.55) 46%,rgba(200,242,255,0) 76%);filter:blur(9cqw);animation:orbc calc(8s*var(--sp)) ease-in-out infinite alternate}
+.orb .g{left:14%;top:8%;width:36%;height:20%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.55),rgba(255,255,255,0));filter:blur(4cqw);transform:rotate(-24deg);animation:orbg calc(5s*var(--sp)) ease-in-out infinite alternate}
+@keyframes orbw1{to{transform:rotate(360deg)}}
+@keyframes orbw2{to{transform:rotate(-360deg)}}
+@keyframes orbc{0%{transform:translate(-9%,-5%) scale(1)}50%{transform:translate(11%,7%) scale(1.18)}100%{transform:translate(-3%,12%) scale(.94)}}
+@keyframes orbg{from{opacity:.55;transform:rotate(-24deg) translateX(-6%)}to{opacity:1;transform:rotate(-14deg) translateX(10%)}}
+.msg-ai:has(.tk-t.live) .orb{--sp:.38}
+@media(prefers-reduced-motion:reduce){.orb i{animation-play-state:paused}}
 .ai-col{min-width:0;flex:1}
 .ai-body{font-size:15px;line-height:1.7;overflow-wrap:anywhere}
 .ai-body p{margin:0 0 14px}
@@ -396,7 +412,7 @@ textarea,input{font:inherit;color:inherit}
 .hm-btn svg{width:15px;height:15px}
 .hm-mk{font-family:var(--f-display);font-weight:700;font-size:15px;line-height:1}
 .hm-acts{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:14px 16px;border:0;border-radius:12px;background:var(--card);box-shadow:var(--shadow);margin:0 0 6px;font:13.5px var(--f-ui);color:var(--fg);cursor:pointer}
-.hm-acts .hm-ico{width:24px;height:24px;border-radius:6px;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:13px;flex:none}
+.hm-acts .hm-ico{width:26px;height:26px;border-radius:50%;display:block;flex:none}
 .hm-acts .hm-chev{margin-left:auto;color:var(--muted);transition:transform .2s}
 .hm-acts[aria-expanded="true"] .hm-chev{transform:rotate(180deg)}
 .hm-actlist{margin:0 0 16px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
@@ -1163,9 +1179,10 @@ function addUser(text,files){
   if(text){var b=document.createElement('div');b.className='bubble';b.textContent=text;w.appendChild(b)}
   threadIn.appendChild(w);S.stick=true;toBottom(true);
 }
+var ORB='<span class="orb"><i class="c"></i><i class="w w1"></i><i class="w w2"></i><i class="g"></i></span>';
 function addAssistant(){
   var w=document.createElement('div');w.className='msg-ai';
-  w.innerHTML='<div class="ai-mark">Ax</div><div class="ai-col"><div class="ai-body"></div><div class="ai-actions" hidden>'+
+  w.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div><div class="ai-actions" hidden>'+
     '<button class="fb" data-act="copy" aria-label="Copiar">'+svg('copy','sm')+'</button>'+
     '<button class="fb" data-act="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button>'+
     '<button class="fb" data-act="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button>'+
@@ -2257,7 +2274,7 @@ HM.rHome=function(){
   return '<div class="hm-bar"><label class="hm-sw"><input type="checkbox" id="hmCmp"'+(HM.cmp?' checked':'')+'><i></i>Comparar</label>'+
     '<button class="hm-btn" type="button" data-nav="'+(SB.user&&SB.user.role==='admin'?'admin':'exp')+'">Ver todas las analíticas</button>'+
     '<button class="hm-btn dark" type="button" data-nav="mi"><span class="hm-mk">A</span> Preguntar a Ax Ai</button></div>'+
-    '<button class="hm-acts" type="button" id="hmActs" aria-expanded="false"><span class="hm-ico">A</span><span>'+(tot?'Hay '+tot+(tot===1?' acción recomendada':' acciones recomendadas')+' para aumentar tu uso de Ax Ai':'Estás al día: no hay acciones pendientes')+'</span>'+(tot?'<span class="hm-chev">⌄</span>':'')+'</button>'+
+    '<button class="hm-acts" type="button" id="hmActs" aria-expanded="false"><span class="hm-ico">'+ORB+'</span><span>'+(tot?'Hay '+tot+(tot===1?' acción recomendada':' acciones recomendadas')+' para aumentar tu uso de Ax Ai':'Estás al día: no hay acciones pendientes')+'</span>'+(tot?'<span class="hm-chev">⌄</span>':'')+'</button>'+
     '<div class="hm-actlist" id="hmActList" hidden>'+A.map(function(x){return '<button type="button" data-nav="'+x.go+'"><b>'+x.n+'</b><span>'+esc(x.t)+'</span></button>'}).join('')+'</div><div class="hm-gap"></div>'+
     '<div class="hm-grid">'+HM.cardPre()+HM.cardPie()+HM.cardCam()+HM.cardSrv()+'</div>';
 };
