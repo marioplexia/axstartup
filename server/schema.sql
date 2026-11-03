@@ -142,3 +142,29 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   created_at INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_msgs_thread ON chat_messages(thread_id, id);
+
+-- Cartera: piezas instaladas y cobradas a la planta
+CREATE TABLE IF NOT EXISTS cobros (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id      TEXT REFERENCES orders(id) ON DELETE SET NULL,
+  folio         TEXT NOT NULL,
+  concept       TEXT NOT NULL,
+  agency_id     INTEGER REFERENCES agencies(id),
+  advisor_id    TEXT REFERENCES advisors(id),
+  installed_at  INTEGER,                         -- fecha de instalación de la pieza
+  billed_at     INTEGER NOT NULL,                -- fecha del cobro a la planta
+  parts_amount  REAL NOT NULL DEFAULT 0,         -- valor de refacciones
+  total         REAL NOT NULL DEFAULT 0,         -- piezas + mano de obra
+  paid_at       INTEGER,                         -- NULL = saldo abierto
+  created_at    INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_cobros_agency ON cobros(agency_id, billed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_cobros_order ON cobros(order_id);
+CREATE TABLE IF NOT EXISTS cobro_comments (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  cobro_id    INTEGER NOT NULL REFERENCES cobros(id) ON DELETE CASCADE,
+  advisor_id  TEXT REFERENCES advisors(id),
+  text        TEXT NOT NULL,
+  created_at  INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_cc_cobro ON cobro_comments(cobro_id, id);

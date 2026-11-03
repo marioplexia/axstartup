@@ -69,3 +69,16 @@ Pantalla **Mi Agente**: el mismo chat del Agente de Garantías, para preguntar s
 |---|---|
 | `POST /api/garantias/chat` `{mensaje, hilo?, alcance?}` | Responde y guarda el mensaje (`alcance`: `agencia` o `mias`) |
 | `GET /api/garantias/chat/hilos` · `GET …/hilos/:id` · `DELETE …/hilos/:id` | Historial de conversaciones del asesor |
+
+## Agente de Cartera
+
+Pantalla **Agente de Cartera**: piezas instaladas y cobradas a la planta, saldos por recuperar, antigüedad de saldos (0–15, 16–30, 31–60, +60 días) y detalle por PREA,
+con panel de comentarios, registro de pago y exportación a Excel (.xlsx) y PDF. La pestaña **Agente** resume la cartera y sugiere a quién dar seguimiento.
+Los cobros se crean solos cuando una campaña pasa a «realizada» o a una PREA aprobada le llega la pieza a planta, y se cierran al marcar la campaña como «cerrada».
+
+| Endpoint (`/api/garantias/…`) | Qué hace |
+|---|---|
+| `GET cartera?estado=abierto\|pagado\|vencido&q=` | KPIs, antigüedad de saldos y cobros |
+| `POST cartera/:id/pago` `{pagado}` | Registra el pago o reabre el cobro |
+| `GET/POST cartera/:id/comentarios` | Comentarios del cobro |
+| `GET cartera/agente` | Lectura del agente y acciones sugeridas |

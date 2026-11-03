@@ -75,4 +75,17 @@ function tpu(user, alcance) {
   return { limite_dias: 8, ciclo_promedio_dias: prom == null ? null : +prom.toFixed(1), pendientes_fuera_de_tpu: fuera.length, ordenes: fuera.map(row) };
 }
 
-module.exports = { buscar, resumen, detalle, reglas, tpu, money, fecha, KIND, ESTADO, PIEZA, DAY };
+function cartera(user, alcance, minDias) {
+  const sc = user.role === 'admin' ? '' : ' AND agency_id = ' + Number(user.agency.id);
+  const all = db.prepare('SELECT * FROM cobros WHERE 1=1' + sc).all(), now = Date.now();
+  const dias = c => Math.floor((now - c.billed_at) / DAY);
+  const abiertos = all.filter(c => !c.paid_at && dias(c) >= (minDias || 0)).sort((a, b) => a.billed_at - b.billed_at);
+  const tot = all.reduce((s, c) => s + c.total, 0), pag = all.filter(c => c.paid_at).reduce((s, c) => s + c.total, 0), ab = all.filter(c => !c.paid_at);
+  return {
+    cartera_total: Math.round(tot), recuperado: Math.round(pag), por_cobrar: Math.round(ab.reduce((s, c) => s + c.total, 0)), pct_recuperacion: tot ? +(100 * pag / tot).toFixed(1) : 0, cobros_abiertos: ab.length,
+    antiguedad: [['0-15', 0, 15], ['16-30', 16, 30], ['31-60', 31, 60], ['+60', 61, 1e9]].map(([k, a, b]) => { const g = ab.filter(c => dias(c) >= a && dias(c) <= b); return { rango_dias: k, cobros: g.length, monto: Math.round(g.reduce((s, c) => s + c.total, 0)) }; }),
+    abiertos: abiertos.slice(0, 25).map(c => ({ orden: c.folio, concepto: c.concept, dias: dias(c), total: Math.round(c.total), estado: dias(c) > 60 ? 'Vencido' : 'Por cobrar' })), total_abiertos_con_filtro: abiertos.length
+  };
+}
+
+module.exports = { cartera, buscar, resumen, detalle, reglas, tpu, money, fecha, KIND, ESTADO, PIEZA, DAY };

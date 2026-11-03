@@ -664,6 +664,79 @@ textarea,input{font:inherit;color:inherit}
 .hm-tw .m{font-variant-numeric:tabular-nums;white-space:nowrap}
 .pl{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;white-space:nowrap}.pl.ok{background:var(--hm-pill);color:var(--hm-green)}
 @media (max-width:900px){.hm-fxw{height:150px}.hm-grid{grid-template-columns:1fr}.hm-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.hm-sr{margin-left:0;width:100%}.hm-kpi{flex:1 1 150px}}
+
+/* ---------- Agente de Cartera ---------- */
+.main[data-v="cartera"] .topbar{position:absolute;top:0;left:0;right:auto;z-index:6;height:auto;padding:max(8px,env(safe-area-inset-top,0px)) 8px 8px;pointer-events:none}
+.main[data-v="cartera"] .crumbs,.main[data-v="cartera"] .tb-right{display:none}
+.main[data-v="cartera"] #sbOpen{pointer-events:auto;margin:0}
+.car{flex:1;min-height:0;overflow:auto;background:var(--hm-bg);font-family:var(--f-dm);animation:fadein .4s both}
+.car-in{max-width:1180px;margin:0 auto;padding:36px max(38px,env(safe-area-inset-right,0px)) 90px max(38px,env(safe-area-inset-left,0px))}
+.car-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px 24px;flex-wrap:wrap}
+.car-h1{font-weight:400;font-size:clamp(34px,4.4vw,52px);letter-spacing:-.028em;line-height:1.05;margin:0}
+.car-sub{margin:20px 0 0;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--hm-mut)}
+.car-exp{display:flex;gap:12px;flex-wrap:wrap}
+.car-b{height:34px;display:inline-flex;align-items:center;gap:10px;padding:0 16px;border:1px solid var(--hm-line);border-radius:8px;background:var(--hm-card);font-size:12.5px;font-weight:500;white-space:nowrap}
+.car-b:hover{border-color:var(--hm-sel)}.car-b .ic{width:14px;height:14px}.car-b.dk{background:var(--send-on);color:var(--send-fg);border-color:var(--send-on)}
+.car-b:disabled{opacity:.5;cursor:default}
+.car-tabs{display:flex;gap:8px;margin-top:26px}
+.car-tab{height:32px;padding:0 15px;border-radius:8px;border:1px solid var(--hm-line);background:var(--surface);font-size:12.5px;font-weight:500;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.car-tab[aria-selected="true"]{background:var(--send-on);color:var(--send-fg);border-color:var(--send-on);box-shadow:none}
+.car-note{font-size:11.5px;color:var(--hm-mut);margin:22px 0 0}
+.car-kpis,.car-ages{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:20px}
+.car-k{background:var(--hm-card);border:1px solid var(--hm-line);border-radius:12px;padding:18px 20px 22px;min-width:0}
+.car-k .l{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--hm-mut)}
+.car-k .l .ic{width:14px;height:14px}
+.car-k .v{font-size:clamp(20px,2.3vw,27px);white-space:nowrap;margin:20px 0 10px;font-variant-numeric:tabular-nums;letter-spacing:-.01em;overflow-wrap:anywhere}
+.car-k .c{font-size:11.5px;color:var(--hm-mut)}
+.car-sec{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin:46px 0 16px}
+.car-sec h2{margin:0;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:500}
+.car-a{background:var(--hm-card);border:1px solid var(--hm-line);border-radius:12px;padding:20px 22px 22px;min-width:0}
+.car-a .l{font-size:12px;color:var(--hm-mut)}.car-a .v{font-size:clamp(19px,2.1vw,25px);white-space:nowrap;margin:16px 0 10px;font-variant-numeric:tabular-nums}.car-a .c{font-size:11.5px;color:var(--hm-mut)}
+.car-a.hot .v{color:var(--b-red)}
+.car-fl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.car-fl .hm-chip{height:26px;padding:0 13px;font-size:11.5px}
+.car-sr{position:relative}.car-sr .ic{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--hm-mut)}
+.car-sr input{height:30px;width:180px;border:1px solid var(--hm-sel);border-radius:8px;background:var(--hm-card);padding:0 10px 0 28px;font:400 12px var(--f-dm);color:var(--fg)}
+.car-tb{background:var(--hm-card);border:1px solid var(--hm-line);border-radius:12px;overflow:auto}
+.car-tb table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+.car-tb th{text-align:left;font-size:10px;font-weight:400;letter-spacing:.09em;text-transform:uppercase;color:var(--hm-mut);padding:16px 12px;border-bottom:1px solid var(--hm-line);white-space:nowrap}
+.car-tb td{padding:16px 12px;border-bottom:1px solid var(--hm-line);vertical-align:middle;white-space:nowrap}
+.car-tb tbody tr{cursor:pointer}.car-tb tbody tr:hover{background:var(--hover)}.car-tb tr:last-child td{border-bottom:0}
+.car-tb td:first-child,.car-tb th:first-child{padding-left:14px}
+.car-tb td.n,.car-tb th.n{text-align:right;font-variant-numeric:tabular-nums}
+.car-tb td.cc{white-space:normal;min-width:190px}
+.car-pill{display:inline-block;font-size:10.5px;font-weight:500;letter-spacing:.06em;padding:5px 11px;border-radius:6px;border:1px solid;text-transform:uppercase}
+.car-pill.pagado{color:var(--hm-green);background:var(--b-green-bg);border-color:var(--hm-pill)}
+.car-pill.por_cobrar{color:var(--b-amber);background:var(--b-amber-bg);border-color:var(--b-amber-line)}
+.car-pill.vencido{color:var(--b-red);background:var(--b-red-bg);border-color:var(--b-red)}
+.car-cm{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 11px;border:1px solid var(--hm-line);border-radius:8px;background:var(--surface);box-shadow:0 1px 0 rgba(0,0,0,.06);font-size:12.5px}
+.car-cm .ic{width:15px;height:15px}
+.car-back{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;height:38px;margin-top:26px;border:1px solid var(--hm-line);border-radius:8px;background:var(--hm-card);font-size:13px;font-weight:500}.car-back:hover{border-color:var(--hm-sel)}.car-back .ic{width:15px;height:15px}
+.car-empty{padding:40px 16px;text-align:center;color:var(--hm-mut);font-size:13px}
+/* pestaña Agente */
+.car-ag{display:grid;gap:16px;margin-top:20px}
+.car-ai{background:var(--hm-card);border:1px solid var(--hm-line);border-radius:12px;padding:22px 24px;font-size:14.5px;line-height:1.65}
+.car-ai .mk{display:flex;align-items:center;gap:10px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--hm-mut);margin-bottom:12px}
+.car-ai .mk b{width:20px;height:20px;border-radius:4px;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-family:var(--f-display);font-size:13px;letter-spacing:0}
+.car-ai p{margin:0}
+.car-ac{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:14px 20px;border-bottom:1px solid var(--hm-line)}.car-ac:last-child{border-bottom:0}
+.car-ac .dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--hm-sel)}.car-ac .dot.alta{background:var(--b-red)}.car-ac .dot.media{background:var(--b-orange)}.car-ac .dot.baja{background:var(--hm-green)}
+.car-ac .t{flex:1 1 280px;font-size:13.5px;min-width:0}.car-ac .m{font-variant-numeric:tabular-nums;font-size:13px;color:var(--hm-mut)}
+.car-ac .car-b{height:28px;padding:0 12px;font-size:12px}
+/* panel de detalle */
+.car-sc{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);animation:fadein .2s both}
+.car-dr{position:fixed;top:0;right:0;bottom:0;z-index:61;width:min(420px,100%);background:var(--hm-card);border-left:1px solid var(--hm-line);box-shadow:var(--shadow-focus);display:flex;flex-direction:column;font-family:var(--f-dm);animation:rise .25s both}
+.car-dh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 22px 16px;border-bottom:1px solid var(--hm-line)}
+.car-dh h3{margin:0;font-size:20px;font-weight:500;letter-spacing:-.01em}.car-dh p{margin:6px 0 0;font-size:12px;color:var(--hm-mut)}
+.car-dh .x{width:30px;height:30px;border-radius:8px;display:grid;place-items:center}.car-dh .x:hover{background:var(--hover)}
+.car-db{flex:1;overflow:auto;padding:18px 22px;display:grid;gap:18px;align-content:start}
+.car-df{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}.car-df span{display:block;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--hm-mut)}.car-df b{display:block;font-weight:500;font-size:14px;margin-top:4px;font-variant-numeric:tabular-nums}
+.car-cl{display:grid;gap:12px}.car-c{background:var(--surface);border-radius:10px;padding:10px 12px;font-size:13px}.car-c small{display:block;color:var(--hm-mut);font-size:11px;margin-top:4px}
+.car-dm{padding:14px 22px 20px;border-top:1px solid var(--hm-line);display:grid;gap:10px}
+.car-dm textarea{width:100%;min-height:62px;border:1px solid var(--hm-sel);border-radius:10px;background:var(--hm-card);padding:10px 12px;font:400 13px var(--f-dm);color:var(--fg);resize:vertical}
+.car-dm .row2{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+@media (max-width:980px){.car-kpis,.car-ages{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.car-in{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.car-kpis,.car-ages{grid-template-columns:1fr}.car-sr input{width:140px}}
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -747,6 +820,8 @@ textarea,input{font:inherit;color:inherit}
       <h2 id="phTitle"></h2>
       <p>Esta sección no forma parte de la réplica. Vuelve a Agente de Garantías para seguir con tu PREA.</p>
     </section>
+
+    <section class="car" id="viewCar" hidden><div id="carRoot"></div></section>
 
     <section class="hm" id="viewHome" hidden><div id="hmRoot"></div></section>
 
@@ -884,12 +959,13 @@ function showView(id){
   S.view=id;var main=isMain(id);document.querySelector('.main').dataset.v=id;
   if(main){var ag=id==='cobros'?'cobros':id==='chat'?'mi':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':S.agent==='mi'?v==='chat':v==='agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin',bit=id==='bitacora';stage.hidden=!main;var hom=id==='inicio';$('#viewPh').hidden=main||adm||bit||hom;$('#viewBit').hidden=!bit;$('#viewHome').hidden=!hom;$('#viewAdmin').hidden=!adm;
+  var adm=id==='admin',bit=id==='bitacora';stage.hidden=!main;var hom=id==='inicio',car=id==='cartera';$('#viewPh').hidden=main||adm||bit||hom||car;$('#viewCar').hidden=!car;$('#viewBit').hidden=!bit;$('#viewHome').hidden=!hom;$('#viewAdmin').hidden=!adm;
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(bit)bitShow();
   if(hom)homeShow();
+  if(car)carShow();
   if(adm)adRender();
-  else if(!bit&&!hom){crumb.textContent=AG[S.agent].crumb;syncCrumb()}
+  else if(!bit&&!hom&&!car){crumb.textContent=AG[S.agent].crumb;syncCrumb()}
   if(mq.matches)setSb(false);
 }
 $$('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){showView(b.dataset.view)})});
@@ -2459,6 +2535,182 @@ var hmQT;
 homeEl.addEventListener('input',function(e){if(e.target.id==='hmQ'){HM.q=e.target.value.trim();clearTimeout(hmQT);hmQT=setTimeout(hmLoad,250)}});
 document.addEventListener('click',function(e){if(HM.pop&&S.view==='inicio'&&!e.target.closest('.hm-pop,[data-filt]')){HM.pop=false;homeRender()}});
 setInterval(function(){if(S.view==='inicio'&&AX.on&&!document.hidden&&!HM.pop){var a=document.activeElement;if(!(a&&homeEl.contains(a)&&/^(INPUT|SELECT)$/.test(a.tagName)))hmLoad()}},15000);
+
+
+/* ---------- Agente de Cartera (conectado al backend) ---------- */
+P.msg='<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>';
+var CAR={tab:'cartera',estado:'',q:'',d:null,ag:null,dr:null,err:''};
+var carEl=$('#viewCar');
+var carM=function(n){return '$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
+var carD=function(t){return t?bd(t):'—'};
+var CPL={pagado:'Pagado',por_cobrar:'Por cobrar',vencido:'Vencido'};
+async function carLoad(){
+  if(!AX.on)return carRender();
+  try{
+    if(CAR.tab==='agente')CAR.ag=await bitApi('GET','/cartera/agente');
+    else CAR.d=await bitApi('GET','/cartera'+hmQs({estado:CAR.estado,q:CAR.q}));
+    CAR.err='';
+  }catch(e){if(e.message!=='sesión')CAR.err='No se pudo conectar con el servidor.'}
+  carRender();
+}
+function carShow(){carRender();carLoad()}
+function carKpi(l,ic,v,c){return '<div class="car-k"><div class="l"><span>'+l+'</span>'+svg(ic)+'</div><div class="v">'+v+'</div><div class="c">'+c+'</div></div>'}
+function carHead(){
+  return '<div class="car-top"><div><h1 class="car-h1">Agente de Cartera</h1><p class="car-sub">Piezas instaladas y cobradas a planta · Saldos por recuperar</p></div>'+
+   '<div class="car-exp"><button class="car-b" data-xl="1"'+(CAR.d?'':' disabled')+'>'+svg('file')+'Exportar Excel</button><button class="car-b" data-pdf="1"'+(CAR.d?'':' disabled')+'>'+svg('file')+'Exportar PDF</button></div></div>'+
+   '<div class="car-tabs" role="tablist"><button class="car-tab" role="tab" data-ctab="cartera" aria-selected="'+(CAR.tab==='cartera')+'">Cartera</button><button class="car-tab" role="tab" data-ctab="agente" aria-selected="'+(CAR.tab==='agente')+'">Agente</button></div>'+
+   '<p class="car-note">Datos de tus registros · No conectados a GM Global</p>';
+}
+function carCartera(){
+  var d=CAR.d;if(!d)return '<div class="car-empty">Cargando…</div>';
+  var ages=['0 – 15 días','16 – 30 días','31 – 60 días','+60 días'];
+  var rows=d.items.map(function(c){return '<tr data-cobro="'+c.id+'" tabindex="0"><td>'+escA(c.folio)+'</td><td class="cc">'+escA(c.concepto)+'</td><td>'+carD(c.instalacion)+'</td><td>'+carD(c.cobro)+'</td><td class="n">'+carM(c.piezas)+'</td><td class="n">'+carM(c.total)+'</td><td class="n">'+(c.dias==null?'—':c.dias)+'</td><td><span class="car-pill '+c.estado+'">'+CPL[c.estado]+'</span></td>'+
+    '<td><button class="car-cm" data-cm="'+c.id+'" aria-label="Comentarios de '+escA(c.folio)+'">'+svg('msg')+c.comentarios+'</button></td></tr>'}).join('');
+  return '<div class="car-kpis">'+carKpi('Piezas instaladas','wallet',carM(d.piezas_instaladas),'valor de refacciones')+carKpi('Cartera total','wallet',carM(d.cartera_total),'piezas + mano de obra')+
+    carKpi('Por cobrar','clock',carM(d.por_cobrar),'saldo abierto con planta')+carKpi('Recuperado','checkc',carM(d.recuperado),d.pct_recuperacion+'% de recuperación')+'</div>'+
+   '<div class="car-sec"><h2>Antigüedad de saldos</h2></div><div class="car-ages" style="margin-top:0">'+d.antiguedad.map(function(a,i){return '<div class="car-a'+(i===3&&a.n?' hot':'')+'"><div class="l">'+ages[i]+'</div><div class="v">'+carM(a.monto)+'</div><div class="c">'+a.n+' cobro(s)</div></div>'}).join('')+'</div>'+
+   '<div class="car-sec"><h2>Detalle por PREA</h2><div class="car-fl"><div class="hm-chips" role="group">'+[['','Todos'],['abierto','Abiertos'],['pagado','Pagados']].map(function(o){return '<button class="hm-chip" data-cest="'+o[0]+'" aria-pressed="'+(CAR.estado===o[0])+'">'+o[1]+'</button>'}).join('')+'</div>'+
+   '<div class="car-sr">'+svg('search')+'<input id="carQ" type="search" placeholder="Buscar orden" aria-label="Buscar orden" value="'+escA(CAR.q)+'"></div></div></div>'+
+   '<div class="car-tb">'+(rows?'<table><thead><tr><th>Orden</th><th>Concepto</th><th>Instalación</th><th>Cobro</th><th class="n">Piezas</th><th class="n">Total</th><th class="n">Días</th><th>Estado</th><th>Comentarios</th></tr></thead><tbody>'+rows+'</tbody></table>':'<div class="car-empty">No hay cobros con ese filtro.</div>')+'</div>';
+}
+function carAgente(){
+  var a=CAR.ag;if(!a)return '<div class="car-empty">Cargando…</div>';
+  return '<div class="car-ag"><div class="car-ai"><div class="mk"><b>A</b>Lectura de tu cartera</div><p>'+md(a.resumen,false).replace(/^<p>|<\/p>$/g,'')+'</p></div>'+
+   '<div class="car-sec" style="margin:14px 0 0"><h2>Acciones sugeridas</h2><button class="car-b dk" data-ask="¿Qué cobros llevan más de 30 días abiertos?">'+svg('msg')+'Preguntar a Mi Agente</button></div>'+
+   '<div class="car-tb">'+(a.acciones.length?a.acciones.map(function(x){return '<div class="car-ac"><span class="dot '+x.prioridad+'" title="Prioridad '+x.prioridad+'"></span><span class="t">'+escA(x.texto)+'</span><span class="m">'+carM(x.total)+'</span><button class="car-b" data-cm="'+x.id+'">Comentar</button><button class="car-b" data-pay="'+x.id+'">Marcar pagado</button></div>'}).join(''):'<div class="car-empty"><b style="display:block;color:var(--fg);font-weight:500;margin-bottom:6px">Sin saldos abiertos</b>Todos los cobros están pagados.</div>')+'</div></div>';
+}
+function carDrawer(){
+  var r=CAR.dr;if(!r)return '';var c=r.cobro;
+  return '<div class="car-sc" data-cx="1"></div><aside class="car-dr" role="dialog" aria-label="Cobro '+escA(c.folio)+'"><div class="car-dh"><div><h3>'+escA(c.folio)+'</h3><p>'+escA(c.concepto)+'</p></div><button class="x" data-cx="1" aria-label="Cerrar">'+svg('x')+'</button></div>'+
+   '<div class="car-db"><div><span class="car-pill '+c.estado+'">'+CPL[c.estado]+'</span></div><div class="car-df"><div><span>Instalación</span><b>'+carD(c.instalacion)+'</b></div><div><span>Cobro</span><b>'+carD(c.cobro)+'</b></div><div><span>Piezas</span><b>'+carM(c.piezas)+'</b></div><div><span>Total</span><b>'+carM(c.total)+'</b></div><div><span>Días abierto</span><b>'+(c.dias==null?'—':c.dias)+'</b></div><div><span>Pagado el</span><b>'+carD(c.pagado_el)+'</b></div></div>'+
+   '<div><span class="lbl" style="display:block;margin-bottom:10px">Comentarios</span><div class="car-cl" id="carCl">'+(r.comentarios.length?r.comentarios.map(function(k){return '<div class="car-c">'+escA(k.texto)+'<small>'+escA(k.autor)+' · '+new Date(k.ts).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})+'</small></div>'}).join(''):'<div class="car-empty" style="padding:14px">Aún no hay comentarios.</div>')+'</div></div></div>'+
+   '<div class="car-dm"><textarea id="carNew" maxlength="500" placeholder="Escribe un comentario…" aria-label="Nuevo comentario"></textarea><div class="row2"><button class="car-b" data-pay="'+c.id+'" data-r="'+(c.estado==='pagado'?'0':'1')+'">'+(c.estado==='pagado'?'Reabrir cobro':'Registrar pago')+'</button><button class="car-b dk" data-send="'+c.id+'">Comentar</button></div></div></aside>';
+}
+function carRender(){
+  if(S.view!=='cartera')return;
+  var a=document.activeElement,id=a&&carEl.contains(a)&&a.id,pos=a&&a.selectionStart,val=id==='carNew'?a.value:null;
+  var body=!AX.on?'<div class="car-empty"><b style="display:block;color:var(--fg);font-weight:500;margin-bottom:6px">Conecta el backend</b>La cartera se alimenta del servidor. Abre la app desde el sitio del servidor e inicia sesión.</div>':
+    CAR.err?'<div class="car-empty">'+CAR.err+'<br><button class="car-b" data-retry="1" style="margin:12px auto 0">Reintentar</button></div>':CAR.tab==='agente'?carAgente():carCartera();
+  $('#carRoot').innerHTML='<div class="car-in">'+carHead()+body+'<button class="car-back" data-home="1">'+svg('back')+'Mi Inicio</button></div>'+carDrawer();
+  if(id){var n=document.getElementById(id);if(n){if(val!=null)n.value=val;n.focus();try{if(pos!=null&&/search|textarea/.test(n.type))n.setSelectionRange(pos,pos)}catch(_){}}}
+}
+async function carOpen(id,focus){
+  try{CAR.dr=await bitApi('GET','/cartera/'+id+'/comentarios');carRender();if(focus){var t=$('#carNew');if(t)t.focus()}}catch(e){toast('No se pudo abrir el cobro')}
+}
+carEl.addEventListener('click',async function(e){
+  var t=e.target.closest('button,tr[data-cobro],.car-sc');if(!t||!carEl.contains(t))return;var q=t.dataset;
+  if(q.cx){CAR.dr=null;carRender();return}
+  if(q.home){showView('inicio');return}
+  if(q.retry){CAR.err='';carLoad();return}
+  if(q.ctab){CAR.tab=q.ctab;CAR.dr=null;carRender();carLoad();return}
+  if(q.cest!==undefined){CAR.estado=q.cest;carLoad();return}
+  if(q.cm){e.stopPropagation();carOpen(q.cm,true);return}
+  if(q.cobro){carOpen(q.cobro);return}
+  if(q.ask){var qq=q.ask;showView('chat');setTimeout(function(){ta.value=qq;autosize();updateSend();onSend()},150);return}
+  if(q.xl){carXlsx();return}
+  if(q.pdf){carPdf();return}
+  if(q.pay){
+    var pagar=q.r!=='0';
+    try{await bitApi('POST','/cartera/'+q.pay+'/pago',{pagado:pagar});toast(pagar?'Pago registrado':'Cobro reabierto');
+      if(CAR.dr)await carOpen(CAR.dr.cobro.id);carLoad()}catch(er){toast(er.message||'No se pudo actualizar')}return}
+  if(q.send){
+    var tx=$('#carNew'),v=tx.value.trim();if(!v){tx.focus();return}
+    try{await bitApi('POST','/cartera/'+q.send+'/comentarios',{texto:v});await carOpen(+q.send);carLoad();var cl=$('#carCl');if(cl)cl.scrollTop=cl.scrollHeight;toast('Comentario agregado')}catch(er){toast(er.message||'No se pudo comentar')}
+  }
+});
+carEl.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&e.target.matches('tr[data-cobro]'))carOpen(e.target.dataset.cobro);
+  if(e.key==='Escape'&&CAR.dr){CAR.dr=null;carRender()}
+});
+var carQT;
+carEl.addEventListener('input',function(e){if(e.target.id==='carQ'){CAR.q=e.target.value.trim();clearTimeout(carQT);carQT=setTimeout(carLoad,250)}});
+setInterval(function(){if(S.view==='cartera'&&AX.on&&!document.hidden&&!CAR.dr){var a=document.activeElement;if(!(a&&carEl.contains(a)&&a.tagName==='INPUT'))carLoad()}},20000);
+
+/* Exportar a Excel (.xlsx real, sin librerías) */
+var CRCT=(function(){var t=[],c,n,k;for(n=0;n<256;n++){c=n;for(k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){var c=0xFFFFFFFF;for(var i=0;i<b.length;i++)c=CRCT[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function zipStore(files){
+  var enc=new TextEncoder(),parts=[],cd=[],off=0;
+  files.forEach(function(f){
+    var nm=enc.encode(f.name),data=enc.encode(f.text),crc=crc32(data),h=new DataView(new ArrayBuffer(30)),c=new DataView(new ArrayBuffer(46));
+    h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(10,0,true);h.setUint16(12,0x21,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,nm.length,true);
+    c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(14,0x21,true);c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+    parts.push(new Uint8Array(h.buffer),nm,data);cd.push(new Uint8Array(c.buffer),nm);off+=30+nm.length+data.length;
+  });
+  var cdl=cd.reduce(function(a,b){return a+b.length},0),e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cdl,true);e.setUint32(16,off,true);
+  return new Blob(parts.concat(cd,[new Uint8Array(e.buffer)]),{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+var xe=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+function xlsxBlob(rows,widths){
+  var col=function(i){return String.fromCharCode(65+i)};
+  var sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols>'+widths.map(function(w,i){return '<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>'}).join('')+'</cols><sheetData>'+
+    rows.map(function(r,ri){return '<row r="'+(ri+1)+'">'+r.map(function(c,ci){
+      if(c==null||c==='')return '';var v=c,st=0;if(c&&typeof c==='object'){v=c.v;st=c.s}
+      var ref=col(ci)+(ri+1);
+      return typeof v==='number'?'<c r="'+ref+'"'+(st?' s="'+st+'"':'')+'><v>'+v+'</v></c>':'<c r="'+ref+'" t="inlineStr"'+(st?' s="'+st+'"':'')+'><is><t xml:space="preserve">'+xe(v)+'</t></is></c>';
+    }).join('')+'</row>'}).join('')+'</sheetData></worksheet>';
+  var X='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  return zipStore([
+    {name:'[Content_Types].xml',text:X+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'},
+    {name:'_rels/.rels',text:X+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+    {name:'xl/workbook.xml',text:X+'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Cartera" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels',text:X+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+    {name:'xl/styles.xml',text:X+'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="4" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'},
+    {name:'xl/worksheets/sheet1.xml',text:sheet}
+  ]);
+}
+function carSave(blob,name){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},3000)}
+async function carFull(){return bitApi('GET','/cartera')}
+async function carXlsx(){
+  try{
+    var d=await carFull(),B=function(v){return {v:v,s:1}},N=function(v){return {v:v,s:2}};
+    var rows=[[B('Agente de Cartera')],['Generado el '+hmF(Date.now())],[],[B('Resumen')],['Piezas instaladas',N(d.piezas_instaladas)],['Cartera total',N(d.cartera_total)],['Por cobrar',N(d.por_cobrar)],['Recuperado',N(d.recuperado)],['% de recuperación',d.pct_recuperacion],[],[B('Antigüedad de saldos')]];
+    d.antiguedad.forEach(function(a){rows.push([a.k+' días',N(a.monto),a.n+' cobro(s)'])});
+    rows.push([],[B('Orden'),B('Concepto'),B('Instalación'),B('Cobro'),B('Piezas'),B('Total'),B('Días'),B('Estado'),B('Comentarios')]);
+    d.items.forEach(function(c){rows.push([c.folio,c.concepto,carD(c.instalacion),carD(c.cobro),N(c.piezas),N(c.total),c.dias==null?'':c.dias,CPL[c.estado],c.comentarios])});
+    carSave(xlsxBlob(rows,[14,34,13,13,14,14,8,12,12]),'cartera-'+bd(Date.now())+'.xlsx');toast('Excel descargado');
+  }catch(e){toast('No se pudo exportar a Excel')}
+}
+/* Exportar a PDF (generado en el navegador) */
+function pdfBlob(pages){
+  var objs=[],add=function(s){objs.push(s);return objs.length};
+  add('<< /Type /Catalog /Pages 2 0 R >>');add('');
+  add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');add('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+  var kids=[];
+  pages.forEach(function(items){
+    var c=items.map(function(i){
+      if(i.l)return '0.8 G 0.5 w '+i.x+' '+i.y+' m '+i.l+' '+i.y+' l S';
+      return 'BT /'+(i.b?'F2':'F1')+' '+(i.s||9)+' Tf '+i.x+' '+i.y+' Td ('+String(i.t).replace(/[—–]/g,'-').replace(/[^\x20-\xff]/g,'?').replace(/([()\\])/g,'\\$1')+') Tj ET';
+    }).join('\n');
+    var cid=add('<< /Length '+c.length+' >>\nstream\n'+c+'\nendstream');
+    kids.push(add('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Contents '+cid+' 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> >>')+' 0 R');
+  });
+  objs[1]='<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+kids.length+' >>';
+  var out='%PDF-1.4\n',offs=[];objs.forEach(function(o,i){offs.push(out.length);out+=(i+1)+' 0 obj\n'+o+'\nendobj\n'});
+  var x=out.length;out+='xref\n0 '+(objs.length+1)+'\n0000000000 65535 f \n'+offs.map(function(o){return ('0000000000'+o).slice(-10)+' 00000 n \n'}).join('')+'trailer\n<< /Size '+(objs.length+1)+' /Root 1 0 R >>\nstartxref\n'+x+'\n%%EOF';
+  var u=new Uint8Array(out.length);for(var i=0;i<out.length;i++)u[i]=out.charCodeAt(i)&255;
+  return new Blob([u],{type:'application/pdf'});
+}
+async function carPdf(){
+  try{
+    var d=await carFull(),pages=[],cur=[],y=548,X=[36,104,290,352,414,488,560,598,676],first=true;
+    var hdr=function(){cur.push({x:X[0],y:y,t:'ORDEN',s:7,b:1},{x:X[1],y:y,t:'CONCEPTO',s:7,b:1},{x:X[2],y:y,t:'INSTALACION',s:7,b:1},{x:X[3],y:y,t:'COBRO',s:7,b:1},{x:X[4],y:y,t:'PIEZAS',s:7,b:1},{x:X[5],y:y,t:'TOTAL',s:7,b:1},{x:X[6],y:y,t:'DIAS',s:7,b:1},{x:X[7],y:y,t:'ESTADO',s:7,b:1},{x:X[8],y:y,t:'COMENT.',s:7,b:1});cur.push({l:806,x:36,y:y-5});y-=18};
+    cur.push({x:36,y:y,t:'Agente de Cartera',s:20,b:1});y-=18;
+    cur.push({x:36,y:y,t:'Piezas instaladas y cobradas a planta - Saldos por recuperar - '+hmF(Date.now()),s:8});y-=26;
+    var k=[['PIEZAS INSTALADAS',d.piezas_instaladas],['CARTERA TOTAL',d.cartera_total],['POR COBRAR',d.por_cobrar],['RECUPERADO',d.recuperado]];
+    k.forEach(function(v,i){cur.push({x:36+i*200,y:y,t:v[0],s:7,b:1},{x:36+i*200,y:y-17,t:carM(v[1]),s:14})});y-=46;
+    cur.push({x:36,y:y,t:'ANTIGUEDAD DE SALDOS',s:7,b:1});y-=14;
+    d.antiguedad.forEach(function(a,i){cur.push({x:36+i*200,y:y,t:a.k+' dias: '+carM(a.monto)+' ('+a.n+' cobro(s))',s:9})});y-=30;
+    hdr();
+    d.items.forEach(function(c){
+      if(y<40){pages.push(cur);cur=[];y=548;hdr()}
+      var v=[c.folio,String(c.concepto).slice(0,38),carD(c.instalacion),carD(c.cobro),carM(c.piezas),carM(c.total),c.dias==null?'-':c.dias,CPL[c.estado],c.comentarios];
+      v.forEach(function(t,i){cur.push({x:X[i],y:y,t:t,s:8})});y-=15;
+    });
+    pages.push(cur);carSave(pdfBlob(pages),'cartera-'+bd(Date.now())+'.pdf');toast('PDF descargado');
+  }catch(e){console.error(e);toast('No se pudo exportar a PDF')}
+}
 
 })();
 </script>

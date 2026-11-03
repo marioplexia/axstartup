@@ -109,6 +109,15 @@ function local(user, alcance, msg) {
     return `${head}\n\n${table(b.ordenes, [COLS.orden, COLS.cliente, COLS.pieza, COLS.epieza, COLS.llegada])}${more(b)}`;
   }
 
+  // 4b) cartera: saldos por recuperar y antigüedad
+  if (/cartera|saldos?\b|antiguedad|por recuperar|recuperaci|recuperad|cobros? (abiert|pendient|vencid)|(mas de|mayor(es)? a)\s*\d+\s*dias|sin pagar/.test(q)) {
+    const m = q.match(/(?:mas de|mayor(?:es)? a)\s*(\d+)\s*dias/), min = m ? +m[1] : 0, c = D.cartera(user, alcance, min);
+    const head = `Tu cartera es de **${D.money(c.cartera_total)}**: recuperaste **${D.money(c.recuperado)}** (${c.pct_recuperacion}%) y quedan **${D.money(c.por_cobrar)}** por cobrar en **${c.cobros_abiertos}** cobros abiertos.`;
+    const ant = c.antiguedad.map(a => `- ${a.rango_dias} días: ${D.money(a.monto)} (${a.cobros})`).join('\n');
+    if (!c.total_abiertos_con_filtro) return `${head}\n\nNo hay cobros abiertos${min ? ' con más de ' + min + ' días' : ''}.`;
+    return `${head}\n\n**Antigüedad de saldos**\n${ant}\n\n**Cobros abiertos${min ? ' con más de ' + min + ' días' : ''}** (${c.total_abiertos_con_filtro}):\n\n${table(c.abiertos, [['Orden', r => r.orden], ['Días', r => r.dias], ['Total', r => D.money(r.total)], ['Estado', r => r.estado]])}`;
+  }
+
   // 5) cuánto se cobró / monto
   if (/cobr|factur|ingres|dinero|monto|importe|vend|gane|ganado|pago|pagos/.test(q) && !/pendient|por cobrar/.test(q)) {
     const p = per || periodo('este mes'), r = D.resumen(user, alcance, p.desde, p.hasta);
@@ -159,6 +168,7 @@ const TOOLS = [
   { name: 'resumen', description: 'Totales por tipo y estado, piezas, expedientes incompletos y monto aprobado/cobrado en un periodo.', input_schema: { type: 'object', properties: { desde: { type: 'string' }, hasta: { type: 'string' } } } },
   { name: 'detalle_orden', description: 'Todos los datos de una orden por su folio (G-…, GA… o S-…).', input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
   { name: 'reglas_aprendidas', description: 'Reglas de garantía que ha aprendido el agente.', input_schema: { type: 'object', properties: { texto: { type: 'string' } } } },
+  { name: 'cartera', description: 'Cartera de cobros a la planta: total, recuperado, por cobrar, antigüedad de saldos y cobros abiertos (con mínimo de días opcional).', input_schema: { type: 'object', properties: { min_dias: { type: 'integer' } } } },
   { name: 'tpu', description: 'Tiempo por unidad: límite de días, ciclo promedio y PREAs abiertas fuera de tiempo.', input_schema: { type: 'object', properties: {} } }
 ];
 const iso = s => { if (!s) return undefined; const t = new Date(String(s) + (String(s).length <= 10 ? 'T00:00:00' : '')).getTime(); return isNaN(t) ? undefined : t; };
@@ -169,6 +179,7 @@ function runTool(user, alcance, name, a) {
   if (name === 'detalle_orden') return D.detalle(user, alcance, a.id) || { error: 'No existe esa orden en tu agencia.' };
   if (name === 'reglas_aprendidas') return D.reglas(a.texto);
   if (name === 'tpu') return D.tpu(user, alcance);
+  if (name === 'cartera') return D.cartera(user, alcance, a.min_dias);
   return { error: 'Herramienta desconocida.' };
 }
 async function conModelo(user, alcance, historial) {

@@ -189,6 +189,31 @@ if (!db.prepare("SELECT 1 FROM settings WHERE key = 'home_seed'").get()) db.tran
   }));
   db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('home_seed', '1')").run();
 })();
+
+// Cobros de ejemplo para la cartera (una sola vez): la mayoría pagados y algunos abiertos con distintas antigüedades.
+if (!db.prepare("SELECT 1 FROM settings WHERE key = 'cartera_seed'").get()) db.transaction(() => {
+  const ag = db.prepare('SELECT id, name FROM agencies WHERE name = ?').get('Chevrolet FAME Morelia'), short = String(ag.name).replace(/^chevrolet\s+/i, '').toUpperCase();
+  const ins = db.prepare('INSERT INTO cobros (order_id, folio, concept, agency_id, advisor_id, installed_at, billed_at, parts_amount, total, paid_at, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)');
+  const cm = db.prepare('INSERT INTO cobro_comments (cobro_id, advisor_id, text, created_at) VALUES (?,?,?,?)');
+  let sd = 5; const rnd = () => (sd = (sd * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const cand = db.prepare("SELECT id, amount, advisor_id, created_at FROM orders WHERE kind='prea' AND status='aprobada' AND part_status IN ('en_planta','recibida') ORDER BY created_at ASC").all();
+  const abiertos = [6, 11, 19, 27, 38, 52, 71], NOTAS = ['Se envió la factura a la planta.', 'La planta pidió aclarar la mano de obra.', 'Seguimiento por correo con el área de garantías.', 'Pago programado por la planta.'];
+  const usados = new Set();
+  const crear = (o, billed, paid) => {
+    const total = +(o.amount || 3500).toFixed(2), parts = +(total * (0.3 + rnd() * 0.25)).toFixed(2), inst = billed - (5 + Math.floor(rnd() * 25)) * DAY;
+    const id = ins.run(o.id, o.id, `Cobro ${o.id} · ${short}`, ag.id, o.advisor_id, inst, billed, parts, total, paid, billed).lastInsertRowid;
+    if (rnd() > 0.45) cm.run(id, o.advisor_id, NOTAS[Math.floor(rnd() * NOTAS.length)], billed + DAY);
+    if (paid) cm.run(id, o.advisor_id, 'Pago registrado.', paid);
+    return id;
+  };
+  // abiertos: una orden cuya aprobación sea anterior a la fecha de cobro
+  abiertos.forEach((d, i) => { const b = now - d * DAY, o = cand.find(x => !usados.has(x.id) && x.created_at < b - 12 * DAY); if (o) { usados.add(o.id); crear(o, b, null); } });
+  // pagados: 22 más, cobrados entre 20 y 160 días atrás
+  cand.filter(x => !usados.has(x.id)).slice(0, 22).forEach((o, i) => { const b = Math.max(o.created_at + 6 * DAY, now - (20 + i * 6.2) * DAY); usados.add(o.id); crear(o, Math.min(b, now - 20 * DAY), Math.min(now - DAY, b + (8 + Math.floor(rnd() * 22)) * DAY)); });
+  // campañas realizadas pendientes de cobro
+  db.prepare("SELECT id, advisor_id, created_at FROM orders WHERE kind='campana' AND status='realizada'").all().forEach((o, i) => crear({ id: o.id, advisor_id: o.advisor_id, amount: 2400 + i * 900 }, now - (2 + i) * DAY, null));
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('cartera_seed', '1')").run();
+})();
 const c = t => db.prepare(`SELECT COUNT(*) n FROM ${t}`).get().n;
 console.log(`Base lista en ${DB_PATH}`);
 console.log(`  agencias: ${c('agencies')} · asesores: ${c('advisors')} · reglas: ${c('rules')} · piezas: ${c('rule_parts')} · palabras clave: ${c('rule_keywords')}`);

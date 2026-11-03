@@ -116,7 +116,9 @@ router.patch('/ordenes/:id', (req, res) => {
     else if (pst === 'por_pedir') { pord = null; due = null; }
   }
   db.prepare('UPDATE orders SET status=?, resolved_at=?, ev_have=?, part_status=?, part_ordered_at=?, due_at=?, updated_at=? WHERE id=?').run(status, resolved, ev, pst, pord, due, now, o.id);
-  res.json(db.prepare(sel + ' WHERE o.id = ?').get(o.id));
+  const nuevo = db.prepare(sel + ' WHERE o.id = ?').get(o.id);
+  try { require('./cartera').sync(nuevo); } catch (e) { console.error('cartera:', e.message); }
+  res.json(nuevo);
 });
 
 // Desempeño por periodo: dia | semana | mes
