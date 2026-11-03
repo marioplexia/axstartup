@@ -84,6 +84,9 @@ textarea,input{font:inherit;color:inherit}
 .ib:active{transform:scale(.94)}
 .ib.m{color:var(--muted)}
 #sbOpen{margin-right:2px}
+.main[data-v="inicio"] .topbar{position:absolute;top:0;left:0;right:auto;z-index:6;height:auto;padding:max(8px,env(safe-area-inset-top,0px)) 8px 8px;pointer-events:none}
+.main[data-v="inicio"] .crumbs,.main[data-v="inicio"] .tb-right{display:none}
+.main[data-v="inicio"] #sbOpen{pointer-events:auto;color:#fff;background:rgba(0,0,0,.5);margin:0}
 .app[data-sb="open"] #sbOpen{display:none}
 .crumbs-wrap{display:flex;align-items:center;gap:4px;min-width:0}
 
@@ -619,7 +622,7 @@ textarea,input{font:inherit;color:inherit}
 /* pantallas de detalle */
 /* El saludo vive dentro de la animación (siempre sobre negro, texto blanco) */
 .hm-post{padding-top:0}
-.hm-fxw{position:relative;height:190px;background:#000;overflow:hidden}
+.hm-fxw{position:relative;height:210px;background:#000;overflow:hidden}
 .hm-fxw::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.4) 45%,rgba(0,0,0,0) 78%)}
 .hm-fx{display:block;position:absolute;inset:0}
 .hm-fxt{position:relative;z-index:2;height:100%;display:flex;align-items:center;padding-top:0;padding-bottom:0}
@@ -661,6 +664,7 @@ textarea,input{font:inherit;color:inherit}
         <div class="brand">Ax Ai</div>
         <div class="sb-tools">
           <button class="sb-ib" data-i="bell" id="bell" aria-label="Notificaciones"></button>
+          <button class="sb-ib" data-i="moon" id="themeBtn" aria-label="Cambiar tema"></button>
           <button class="sb-ib" data-i="search" id="searchBtn" aria-label="Buscar"></button>
           <button class="sb-ib dark" data-i="panel" id="sbClose" aria-label="Ocultar barra lateral"></button>
         </div>
@@ -698,7 +702,6 @@ textarea,input{font:inherit;color:inherit}
         <button class="ib" id="newChat" data-i="plus" aria-label="Nueva PREA"></button>
         <span class="menu-host" id="histTop"><button class="ib" data-i="history" aria-label="Conversaciones" aria-haspopup="menu" aria-expanded="false"></button></span>
         <button class="ib" id="expBtn" data-i="folderchart" aria-label="Expedientes"></button>
-        <button class="ib" id="themeBtn" data-i="moon" aria-label="Cambiar tema"></button>
       </div>
     </header>
 
@@ -869,7 +872,7 @@ $('#userBtn').addEventListener('click',function(){
 var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',chat:'Chatea con tus Registros',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia'};
 function isMain(id){return id==='agent'||id==='cobros'}
 function showView(id){
-  S.view=id;var main=isMain(id);
+  S.view=id;var main=isMain(id);document.querySelector('.main').dataset.v=id;
   if(main){var ag=id==='cobros'?'cobros':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?(S.agent==='cobros'?v==='cobros':v==='agent'):v===id;b.setAttribute('aria-current',on?'true':'false')});
   var adm=id==='admin',bit=id==='bitacora';stage.hidden=!main;var hom=id==='inicio';$('#viewPh').hidden=main||adm||bit||hom;$('#viewBit').hidden=!bit;$('#viewHome').hidden=!hom;$('#viewAdmin').hidden=!adm;
