@@ -3800,17 +3800,17 @@ TR.codes=function(c){return c&&(c.code||c.desc)?esc((c.code?c.code+' · ':'')+(c
 TR.cardPrea=function(it){
   var d=it.d,rule=TR.ruleFor(d),est=d.estado||'desconocido',ps=Array.isArray(d.piezas)?d.piezas:[],cm=Array.isArray(d.comentarios)?d.comentarios:[];
   var G=function(l,v){return '<div><span>'+l+'</span>'+v+'</div>'};
-  var learn=est==='aceptada'?(rule?'Reforzará la regla <b>'+esc(rule.id)+'</b> ('+rule.n+' PREAs aceptadas hasta ahora).':'Creará una <b>regla nueva</b> con esta PREA.'):(est==='rechazada'?(rule?'Registrará un rechazo en la regla <b>'+esc(rule.id)+'</b> y guardará lo que falló como lección.':'Guardará lo que falló como lección (no hay una regla que penalizar).'):'Se guardará como ejemplo, sin modificar reglas.');
+  var learn=est==='aceptada'?(rule?'Reforzará la regla <b>'+esc(rule.id)+'</b> ('+rule.n+' PREAs aceptadas hasta ahora).':'Creará una <b>regla nueva</b> con esta PREA.'):(est==='rechazada'?(rule?'Registrará un rechazo en la regla <b>'+esc(rule.id)+'</b> y guardará lo que falló como lección.':'Guardará lo que falló como lección (no hay una regla que penalizar).'):(est==='pendiente'?'Aprenderá de los comentarios de planta <b>lo que le faltó o estuvo mal</b> (código de labor, tiempo, evidencia, redacción, piezas) para evitarlo la próxima vez. No crea ni refuerza reglas hasta que planta la acepte.':'Se guardará como ejemplo, sin modificar reglas.'));
   return '<div class="tr-card"><div class="tr-h"><b>'+esc(d.folio||it.name)+'</b><span class="tr-badge '+esc(est)+'">'+esc({aceptada:'Aceptada',rechazada:'Rechazada',pendiente:'Pendiente',desconocido:'Estado no visible'}[est]||est)+'</span><small>'+esc(it.name)+(d.confianza!=null?' · lectura '+Math.round(Number(d.confianza)*100)+'%':'')+'</small></div>'+
     '<div class="tr-grid">'+G('Vehículo',esc(TR.veh(d)||'—'))+G('Orden',esc(d.orden||'—'))+G('Sistema',esc(d.sistema||'—'))+G('Operación',TR.codes(d.operacion))+G('Horas',d.horas!=null?esc(String(d.horas)):'—')+G('Queja',TR.codes(d.queja))+G('Causa',TR.codes(d.causa))+G('Corrección',TR.codes(d.correccion))+G('Piezas',ps.length?ps.map(function(p){return esc(p.no+' · '+p.d+' ×'+p.q)}).join('<br>'):'—')+'</div>'+
-    (est!=='aceptada'?'<div class="tr-note warn"><b>Ojo:</b> este documento aparece como <b>'+esc(est==='desconocido'?'sin estado visible':est)+'</b>, no como aceptada. '+(est==='rechazada'?'Puedes guardarlo para que el agente aprenda qué evitar.':'Revisa que sea el documento correcto.')+'</div>':'')+
+    (est==='pendiente'?'<div class="tr-note warn"><b>Pendiente:</b> planta todavía no la resuelve'+((Array.isArray(d.comentarios)&&d.comentarios.length)?' y dejó comentarios (devuelta). El cerebro aprenderá de ellos lo que le faltó.':'.')+'</div>':est!=='aceptada'?'<div class="tr-note warn"><b>Ojo:</b> este documento aparece como <b>'+esc(est==='desconocido'?'sin estado visible':est)+'</b>, no como aceptada. '+(est==='rechazada'?'Puedes guardarlo para que el agente aprenda qué evitar.':'Revisa que sea el documento correcto.')+'</div>':'')+
     (d.motivo_resolucion?'<div class="tr-note"><b>Resolución del fabricante:</b> '+esc(d.motivo_resolucion)+'</div>':'')+
     (d.como_se_lleno?'<div class="tr-note"><b>Cómo se llenó:</b> '+esc(d.como_se_lleno)+'</div>':'')+
     (d.errores_y_correcciones?'<div class="tr-note bad"><b>Errores y correcciones:</b> '+esc(d.errores_y_correcciones)+'</div>':'')+
     (d.lecciones?'<div class="tr-note"><b>Lección:</b> '+esc(d.lecciones)+'</div>':'')+
     (cm.length?'<ul class="tr-cm">'+cm.slice(0,12).map(function(c){return '<li>'+esc(c.texto)+'<br><small>'+esc([c.autor,c.fecha].filter(Boolean).join(' · '))+'</small></li>'}).join('')+'</ul>':'')+
     '<div class="tr-note"><b>Al enseñar:</b> '+learn+'</div>'+
-    '<div class="tr-act"><button class="bt pri" type="button" data-tr="save" data-id="'+it.id+'">'+(est==='aceptada'?'Enseñar al agente':'Guardar como lección')+'</button><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Descartar</button></div></div>';
+    '<div class="tr-act"><button class="bt pri" type="button" data-tr="save" data-id="'+it.id+'">'+(est==='aceptada'?'Enseñar al agente':est==='pendiente'?'Enseñar lo que le faltó':'Guardar como lección')+'</button><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Descartar</button></div></div>';
 };
 TR.cardPago=function(it){
   var d=it.d,N=function(n){return d[n]!=null&&d[n]!==''?d[n]:''},I=function(n,l){return '<div><label>'+l+'</label><input inputmode="decimal" data-f="'+n+'" value="'+ea(N(n))+'" placeholder="0.00"></div>'};
@@ -3864,18 +3864,26 @@ TR.save=async function(k,id){
         }else if(est==='rechazada'){
           if(rule){RS.reject(rule.id);msg='Registró un <b>rechazo en '+esc(rule.id)+'</b> (confianza '+RS.conf(rule)+'%) y guardó lo que falló como lección.'}
           else msg='Guardó lo que falló como lección. No había una regla que penalizar.';
-        }else msg='Se guardó como ejemplo, sin modificar reglas.';
+        }else msg=est==='pendiente'?'Guardada como pendiente: las reglas no cambian hasta que planta responda.':'Se guardó como ejemplo, sin modificar reglas.';
       }else msg='Actualizó el ejemplo de la PREA '+esc(d.folio)+'.';
       var v2=TR.veh(d);
       if(!dup){
         var rid=(lr&&lr.rule&&lr.rule.id)||(rule&&rule.id)||null,lec=[],cl=function(t){return String(t||'').replace(/\b[A-HJ-NPR-Z0-9]{17}\b/g,'[VIN]').replace(/\b(PREA-[A-Z0-9-]+|GA\d{3,8})\b/gi,'[ref]').slice(0,400)};
-        if(d.errores_y_correcciones)lec.push({tipo:'error',texto:cl(d.errores_y_correcciones)});
-        if(d.como_se_lleno)lec.push({tipo:est==='rechazada'?'error':'acierto',texto:cl(d.como_se_lleno)});
-        if(d.lecciones)lec.push({tipo:est==='rechazada'?'error':'acierto',texto:cl(d.lecciones)});
-        (Array.isArray(d.comentarios)?d.comentarios:[]).slice(0,4).forEach(function(c){if(c&&c.texto)lec.push({tipo:'comentario',texto:cl((c.autor?c.autor+': ':'')+c.texto)})});
-        if(est==='aceptada'&&d.horas>0&&d.operacion&&d.operacion.code)lec.push({tipo:'tiempo',texto:'La operación '+d.operacion.code+' se aceptó con '+d.horas+' h de mano de obra'+(v2?' en '+v2:'')+'.'});
-        (Array.isArray(d.piezas)?d.piezas:[]).slice(0,4).forEach(function(p){if(est==='aceptada'&&p&&p.d)lec.push({tipo:'pieza',texto:'Piezas aceptadas con '+(d.operacion&&d.operacion.code||'esta operación')+': '+p.d+' ×'+p.q})});
-        if(lec.length){var li=await SB.c.from('reglas_lecciones').insert(lec.map(function(l){return {rule_id:rid,tipo:l.tipo,texto:l.texto,vehiculo:v2||null,origen:'pdf'}}));if(li.error)SB.fail(li.error);else msg+=' Guardó '+lec.length+(lec.length===1?' lección':' lecciones')+' en la memoria compartida.'}
+        var okIA=false;
+        try{
+          var ar=await SB.ai({modo:'aprender_documento',datos:d,rule_id:rid},'aprender');
+          if(ar&&ar.lecciones>0){okIA=true;msg+=' <br>El cerebro aprendió '+ar.lecciones+(ar.lecciones===1?' lección':' lecciones')+(est==='pendiente'?' de lo que le faltó':'')+':'+(ar.textos||[]).slice(0,4).map(function(t){return '<br>• '+esc(t)}).join('')}
+        }catch(e){console.warn('[aprender_documento]',e&&e.message||e)}
+        if(!okIA){
+          var mala=est!=='aceptada';
+          if(d.errores_y_correcciones)lec.push({tipo:'error',texto:cl(d.errores_y_correcciones)});
+          if(d.como_se_lleno)lec.push({tipo:mala?'error':'acierto',texto:cl(d.como_se_lleno)});
+          if(d.lecciones)lec.push({tipo:mala?'error':'acierto',texto:cl(d.lecciones)});
+          (Array.isArray(d.comentarios)?d.comentarios:[]).slice(0,4).forEach(function(c){if(c&&c.texto)lec.push({tipo:'comentario',texto:cl((c.autor?c.autor.split(' ')[0]+': ':'')+c.texto)})});
+          if(est==='aceptada'&&d.horas>0&&d.operacion&&d.operacion.code)lec.push({tipo:'tiempo',texto:'La operación '+d.operacion.code+' se aceptó con '+d.horas+' h de mano de obra'+(v2?' en '+v2:'')+'.'});
+          (Array.isArray(d.piezas)?d.piezas:[]).slice(0,4).forEach(function(p){if(est==='aceptada'&&p&&p.d)lec.push({tipo:'pieza',texto:'Piezas aceptadas con '+(d.operacion&&d.operacion.code||'esta operación')+': '+p.d+' ×'+p.q})});
+          if(lec.length){var li=await SB.c.from('reglas_lecciones').insert(lec.map(function(l){return {rule_id:rid,tipo:l.tipo,texto:l.texto,vehiculo:v2||null,origen:'pdf'}}));if(li.error)SB.fail(li.error);else msg+=' Guardó '+lec.length+(lec.length===1?' lección':' lecciones')+' (sin IA) en la memoria compartida.'}
+        }
       }
       row={kind:'prea',folio:d.folio||null,wo:d.orden||null,file_name:it.name,vehiculo:v2||null,sys:d.sistema||null,op:(d.operacion&&d.operacion.code)||null,resultado:est,resumen:[v2,d.queja&&d.queja.desc,d.operacion&&d.operacion.desc,est,d.motivo_resolucion].filter(Boolean).join(' · ').slice(0,700),lecciones:[d.como_se_lleno,d.errores_y_correcciones,d.lecciones].filter(Boolean).join(' | ')||null,datos:d,busqueda:TR.search(k,d)};
       if(dup){var u=await SB.c.from('entrenamiento_docs').update(row).eq('id',dup.id);if(u.error)throw u.error;it.state='guardado';it.msg=msg;TR.renderQ(k);TR.loadLib(k);return}
