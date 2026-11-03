@@ -1964,7 +1964,7 @@ SB.user=null;SB.chan=null;SB.mode='in';SB.acct='asesor';SB.aiOff=false;
 SB.ai=async function(body,fn){
   if(!SB.c||!SB.entered)throw new Error('sin sesión');
   var r=await SB.c.functions.invoke(fn||'ai',{body:body});
-  if(r.error){var m=r.error.message;try{var j=await r.error.context.json();m=j.error||m}catch(_){}throw new Error(m)}
+  if(r.error){var m=r.error.message;try{var j=await r.error.context.json();m=(j.error||m)+(j.detalle?' :: '+j.detalle:'')}catch(_){}throw new Error(m)}
   return r.data;
 };
 SB.aiFail=function(e){var m=(e&&e.message)||'';
@@ -3748,7 +3748,7 @@ TR.errTxt=function(e){
   if(/ai_not_configured/.test(m))return 'La IA aún no está configurada: agrega ANTHROPIC_API_KEY en Supabase (Edge Functions → Secrets).';
   if(/forbidden/.test(m))return 'Solo los administradores pueden entrenar al agente.';
   if(/archivo_invalido/.test(m))return 'El archivo no es válido o pesa demasiado.';
-  if(/upstream|bad_output/.test(m))return 'El modelo de IA no pudo leer el documento. Inténtalo de nuevo.';
+  if(/upstream|bad_output/.test(m)){var dd=m.split(' :: ')[1];return 'El modelo de IA no pudo leer el documento'+(dd?': '+dd:'. Inténtalo de nuevo.')}
   return m;
 };
 TR.show=function(k){
@@ -3784,7 +3784,7 @@ TR.pump=async function(k){
       it.started=true;
       try{
         var f=await TR.prep(it.file);
-        var r=await SB.ai({mode:'extraer',kind:k,file:f});
+        var r=await SB.ai({modo:'extraer',kind:k,file:f},'aprender');
         var d=r&&r.datos;if(!d)throw new Error('bad_output');
         if(k==='prea'&&d.es_prea===false){it.state='error';it.err='No parece una PREA'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
         else if(k==='pago'&&d.es_pago===false){it.state='error';it.err='No parece un pago de planta'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
