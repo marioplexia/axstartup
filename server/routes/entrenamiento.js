@@ -8,6 +8,7 @@ const { db, DB_PATH } = require('../db');
 const { requireAuth } = require('./auth');
 const { extraer, faltantes } = require('../train/extract');
 const L = require('../train/learn');
+const P = require('../train/parse');
 const { responder } = require('../train/ask');
 
 const router = express.Router();
@@ -57,7 +58,16 @@ async function procesar(id, { forzar = false } = {}) {
       db.transaction(() => { const r = L.aprenderError(doc, data); data._modo = 'error'; data._validacion = r.validacion; data._rej = r.rej; set(id, { data: JSON.stringify(data), texto: texto.slice(0, 20000), engine, status: 'aprendida', error: null, rule_id: r.rule ? r.rule.id : null, learned_at: Date.now() }); })();
       return;
     }
-    if (falta.length) { set(id, { ...base, status: 'revisar', error: 'No pude leer: ' + falta.join(', ') + '. Revisa que el archivo sea legible o sube una versión más clara.' }); return; }
+    // Se aprende de TODAS las PREAs: si falta algún campo se aprende lo demás; solo se detiene si no hay ningún dato legible
+    const sinDatos = tipo === 'prea'
+      ? !(data.queja && (data.queja.codigo || data.queja.texto)) && !(data.operacion && (data.operacion.codigo || data.operacion.descripcion)) && !(data.horas > 0) && !(data.piezas && data.piezas.length)
+      : falta.length > 0;
+    if (sinDatos) { set(id, { ...base, status: 'revisar', error: 'No pude leer datos de este archivo (' + falta.join(', ') + '). Revisa que sea legible o sube una versión más clara.' }); return; }
+    if (tipo === 'prea') {
+      if (!data.sistema || data.sistema === 'Por clasificar') data.sistema = P.inferirSistema(texto.slice(0, 3000));
+      if (!(data.queja.codigo || data.queja.texto)) data.queja.texto = data.operacion.descripcion || data.correccion.texto || 'SIN QUEJA CAPTURADA';
+      data.faltantes = falta;
+    }
     db.transaction(() => {
       if (tipo === 'prea') {
         const r = L.aprenderPrea(doc, data); data._validacion = r.validacion;

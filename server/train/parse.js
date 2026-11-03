@@ -24,7 +24,9 @@ const DIC_PREA = {
   'queja': 'queja', 'causa': 'causa', 'correccion': 'correccion', 'operacion de trabajo': 'operacion', 'operacion': 'operacion',
   'tiempo de trabajo': 'horas', 'horas': 'horas', 'total tiempo': 'total_tiempo', 'total de piezas': 'total_piezas', 'numeros de pieza': 'piezas', 'piezas': 'piezas',
   'tarifa mano de obra': 'tarifa', 'total bruto': 'total', 'deducible': 'deducible', 'codigo de autorizacion': 'auth', 'estado': 'estado', 'estatus': 'estado',
-  'unidad de negocio': 'unidad', 'tipo de transaccion': 'tipo', 'marca': 'marca', 'modelo': 'modelo', 'ano': 'anio', 'anio': 'anio', 'ano modelo': 'anio', 'ano del modelo': 'anio', 'ano del vehiculo': 'anio', 'descripcion del vehiculo': 'vehiculo'
+  'unidad de negocio': 'unidad', 'tipo de transaccion': 'tipo', 'marca': 'marca', 'modelo': 'modelo', 'ano': 'anio', 'anio': 'anio', 'ano modelo': 'anio', 'ano del modelo': 'anio', 'ano del vehiculo': 'anio', 'descripcion del vehiculo': 'vehiculo',
+  'nombre de contacto del reparador': 'contacto', 'numero de telefono': 'telefono', 'numero del fax': 'fax', 'direccion de correo electronico del contacto': 'email', 'numero de la transaccion': 'ntrans',
+  'tiempo adicionales': 't_adic', 'tiempo olh': 'olh', 'total de elementos adicionales': 'elem_adic', 'asignado a': 'asignado', 'hora de presentacion': 'hora', 'nombre de usuario': 'usuario'
 };
 const DIC_PAGO = {
   'referencia de pago': 'ref', 'fecha de pago': 'fecha', 'orden de trabajo': 'orden', 'codigo de autorizacion': 'auth', 'autorizacion': 'auth',
@@ -134,6 +136,13 @@ function lecciones(coms) {
   return out;
 }
 
+// Campos del formulario que no son queja/causa/corrección/operación/tiempo/piezas pero también se aprenden como reglas
+function extras(v, f) {
+  const e = { unidad: v('unidad'), tipo_transaccion: v('tipo'), bac: v('bac'), reparador: v('reparador'), marcador: v('marcador'), contacto: v('contacto'), telefono: v('telefono'), email: v('email'),
+    deducible: money(v('deducible')), tiempo_adicional: money(v('t_adic')), olh: money(v('olh')), elementos_adicionales: money(v('elem_adic')) };
+  Object.keys(e).forEach(k => { if (e[k] === '' || e[k] == null) delete e[k]; });
+  return e;
+}
 function parsePrea(texto) {
   const { f, com } = leer(texto, DIC_PREA), v = k => clean((f[k] || []).join(' '));
   const q = codigo(f.queja), c = codigo(f.causa), r = codigo(f.correccion), o = codigo(f.operacion);
@@ -151,7 +160,8 @@ function parsePrea(texto) {
   const d = {
     tipo: 'prea', folio: v('folio'), orden: v('orden'), fecha: toIso(v('fecha')), vin, marca: veh.marca, modelo: veh.modelo, anio: veh.anio, km, sistema,
     queja: q, causa: c, correccion: r, operacion: { codigo: o.codigo, descripcion: o.texto }, horas, tarifa_mo: money(v('tarifa')), piezas: pz,
-    total_piezas: money(v('total_piezas')), total_bruto: money(v('total')), codigo_autorizacion: v('auth'), estado,
+    total_piezas: money(v('total_piezas')), total_bruto: money(v('total')), total_tiempo: money(v('total_tiempo')), codigo_autorizacion: v('auth'), estado,
+    campos_extra: extras(v, f),
     fecha_aceptacion: aceptada ? aceptada.fecha : null, comentarios: coms, lecciones: lecciones(coms)
   };
   d.resumen = resumenPrea(d);

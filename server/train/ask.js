@@ -161,6 +161,7 @@ function armarFormulario(cand, best, cmp) {
     queja: d.queja, causa: d.causa, correccion: d.correccion, operacion: d.operacion, horas, tarifa, piezas, total_piezas: +tp.toFixed(2), total_bruto: +(horas * tarifa + tp).toFixed(2),
     descripcion: (cand._doc && cand.queja && cand.queja.detalle) || d.queja.detalle || cand._texto || '', regla: regla ? { id: regla.id, n: regla.n, confianza: conf } : null,
     base: { folio: d.folio || d.orden, orden: d.orden, vehiculo: [d.marca, d.modelo, d.anio].filter(Boolean).join(' '), km: d.km, aceptada: aceptadaEl(d), autorizacion: d.codigo_autorizacion },
+    extras: Object.assign({}, d.campos_extra || {}),
     cambios: (cmp || []).filter(x => x.n !== 'ok').length
   };
 }
@@ -168,7 +169,9 @@ function tablaFormulario(f) {
   const row = (k, v) => `| ${k} | ${v} |`;
   return ['| Campo | Valor |', '| --- | --- |', row('Vehículo', f.vehiculo || '—'), row('Kilometraje', f.km ? f.km.toLocaleString('en-US') + ' km' : '—'), row('Queja', cod(f.queja)), row('Causa', cod(f.causa)), row('Corrección', cod(f.correccion)),
     row('Operación de trabajo', [f.operacion.codigo, f.operacion.descripcion].filter(Boolean).join(' · ') || '—'), row('Tiempo de trabajo', f.horas != null ? f.horas + ' h' : '—'),
-    row('Números de pieza', f.piezas.map(x => `${x.numero} ${x.descripcion} ×${x.cantidad} (${m2(x.precio)})`).join('; ') || '—'), row('Total de piezas', m2(f.total_piezas)), row('Tarifa mano de obra', m2(f.tarifa)), row('Total bruto', m2(f.total_bruto))].join('\n');
+    row('Números de pieza', f.piezas.map(x => `${x.numero} ${x.descripcion} ×${x.cantidad} (${m2(x.precio)})`).join('; ') || '—'), row('Total de piezas', m2(f.total_piezas)), row('Tarifa mano de obra', m2(f.tarifa)), row('Total bruto', m2(f.total_bruto)),
+    ...(f.extras && f.extras.marcador ? [row('Marcador de transacción', f.extras.marcador)] : []), ...(f.extras && f.extras.tipo_transaccion ? [row('Tipo de transacción', f.extras.tipo_transaccion)] : []),
+    ...(f.extras && f.extras.deducible != null ? [row('Deducible', m2(f.extras.deducible))] : [])].join('\n');
 }
 
 function resumenGeneral(k) {

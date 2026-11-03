@@ -37,6 +37,8 @@ const SCHEMA = {
       queja: COD, causa: COD, correccion: COD, operacion: { type: 'object', properties: { codigo: { type: 'string' }, descripcion: { type: 'string' } } },
       horas: { type: 'number', description: 'Tiempo de trabajo en horas' }, tarifa_mo: { type: 'number' }, piezas: { type: 'array', items: PIEZA },
       total_piezas: { type: 'number' }, total_bruto: { type: 'number' }, codigo_autorizacion: { type: 'string' }, estado: { type: 'string', enum: ['aceptada', 'rechazada', 'pendiente'] },
+      campos_extra: { type: 'object', description: 'Otros campos del formulario', properties: { unidad: { type: 'string', description: 'Unidad de negocio' }, tipo_transaccion: { type: 'string' }, bac: { type: 'string' }, reparador: { type: 'string' }, marcador: { type: 'string', description: 'Marcador de transacción' },
+        contacto: { type: 'string' }, telefono: { type: 'string' }, email: { type: 'string' }, deducible: { type: 'number' }, tiempo_adicional: { type: 'number' }, olh: { type: 'number' }, elementos_adicionales: { type: 'number' } } },
       comentarios: { type: 'array', description: 'Historial de comentarios completo, en orden cronológico', items: { type: 'object', properties: {
         fecha: { type: 'string', description: 'yyyy-mm-dd' }, hora: { type: 'string' }, autor: { type: 'string' }, origen: { type: 'string', enum: ['agencia', 'planta', 'otro'] },
         tipo: { type: 'string', enum: ['rechazo', 'solicitud', 'correccion', 'aceptacion', 'info'] }, texto: { type: 'string' } } } },
@@ -78,7 +80,7 @@ function normalizar(tipo, d, texto) {
   if (tipo === 'prea') {
     ['queja', 'causa', 'correccion'].forEach(k => { d[k] = Object.assign({ codigo: '', texto: '', detalle: '' }, d[k] || {}); });
     d.operacion = Object.assign({ codigo: '', descripcion: '' }, d.operacion || {});
-    d.piezas = d.piezas || []; d.comentarios = (d.comentarios || []).map(c => Object.assign({ origen: 'otro', tipo: 'info' }, c));
+    d.campos_extra = d.campos_extra || {}; d.piezas = d.piezas || []; d.comentarios = (d.comentarios || []).map(c => Object.assign({ origen: 'otro', tipo: 'info' }, c));
     d.sistema = d.sistema && d.sistema !== 'Por clasificar' ? d.sistema : P.inferirSistema([d.queja.texto, d.causa.texto, d.correccion.texto, d.operacion.descripcion].join(' '));
     if (!d.lecciones || !d.lecciones.length) d.lecciones = P.lecciones(d.comentarios);
     d.lecciones = d.lecciones.map(l => Object.assign({ temas: [], correccion: '' }, l));

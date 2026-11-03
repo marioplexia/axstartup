@@ -1364,7 +1364,7 @@ function ctxFrom(text,files,brand){
     km:km,kmTxt:km.toLocaleString('es-MX'),date:fmt(now),deliv:fmt(dl),vehicle:'Pickup '+dl.getFullYear()+' (ejemplo)',vin:'3GCDEMO5JG0000001',
     queja:t?(t.length>140?t.slice(0,137)+'…':t):'Falla reportada por el cliente',files:files,
     folio:'PREA-DEMO-'+String(Math.floor(100000+Math.random()*900000)),
-    ruleId:rl?rl.id:null,ruleN:rl?rl.n:0,ruleConf:rl?RS.conf(rl):0,matched:!!rl,codes:rl?(c.codes||{q:rl.q,c:rl.c,r:rl.r}):null,variantTxt:rl&&c.variant?[c.variant.mo,c.variant.an].filter(Boolean).join(' '):'',lessons:rl?(rl.les||[]):[],
+    ruleId:rl?rl.id:null,ruleN:rl?rl.n:0,ruleConf:rl?RS.conf(rl):0,matched:!!rl,codes:rl?(c.codes||{q:rl.q,c:rl.c,r:rl.r}):null,variantTxt:rl&&c.variant?[c.variant.mo,c.variant.an].filter(Boolean).join(' '):'',rate:c.rate||0,marcador:c.marcador||'',extra:c.extra||null,form:RS.d.form||{},lessons:rl?(rl.les||[]):[],
     rawText:t,vinReal:(t.match(/\b[A-HJ-NPR-Z0-9]{17}\b/i)||[''])[0].toUpperCase(),wo:(t.match(/\bG-[A-Z0-9]{6,10}\b/i)||[''])[0].toUpperCase()};
 }
 function introText(ctx){
@@ -1529,7 +1529,7 @@ var GMCODES={
 };
 function gmData(c){
   var fm=function(n){return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})};
-  var k=c.codes||GMCODES[c.sys]||GMCODES['Diagnóstico general'],sys=c.sys.toLowerCase(),RT=420,now=new Date();
+  var k=c.codes||GMCODES[c.sys]||GMCODES['Diagnóstico general'],sys=c.sys.toLowerCase(),RT=c.rate||420,now=new Date();
   var wo=c.wo||('G-'+Math.random().toString(36).slice(2,9).toUpperCase());
   var lab=+(c.h*RT).toFixed(2),gross=+(lab+c.partsTot).toFixed(2);
   return {fm:fm,RT:RT,gross:gross,lab:lab,wo:wo,
@@ -1563,23 +1563,23 @@ function gmFields(ctx){
 function buildPreaCard(ctx,steps){
   var g=gmData(ctx),F=gmFields(ctx),w=document.createElement('div');w.className='cu-wrap';
   var li=(steps||STEPS).map(function(t){return '<li data-s="pending"><span class="mk"><svg class="k" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><svg class="w" viewBox="0 0 24 24"><path d="M12 6v7M12 18h.01"/></svg></span><span><span class="t">'+t+'</span><span class="det"></span></span></li>'}).join('');
-  var H=gr;
+  var H=gr,FD=ctx.form||{},EXT=ctx.extra||{};
   var form='<div class="gmf" hidden>'+
    '<div class="gtop"><div class="glogo">gm</div><span class="gclose">Cerrar ventana ×</span></div>'+
    '<h3>Ver autorización previa a la reparación</h3><p class="gsub">Esta pantalla permite al usuario ver la información de una autorización previa a la reparación existente.</p>'+
    '<div class="gtabs"><span class="gtab">Autorización previa a reparación</span></div>'+
    '<div class="gbar"><span><b>Formulario sugerido por Ax Ai.</b> Los campos resaltados son los que debes capturar.</span><button class="gall" type="button" disabled>Copiar todo</button></div>'+
    '<div class="gdis"><b>Aviso de exención de responsabilidad:</b><span>Todas las cantidades son en bruto</span><i>EDITAR</i></div>'+
-   H('ID de autorización de pre-reparación','—')+H('Unidad de negocio','General Motors de México')+H('Tipo de transacción','Transacción Normal de Vehículo')+
-   H('BAC','183147')+H('Reparador','FAME MORELIA')+H('Nombre de contacto del Reparador','HERIBERTO CASTAÑEDA')+H('Número de teléfono','2980 - 753')+H('Número del fax','')+
-   H('Dirección de correo electrónico del contacto','SERVICIOAPA@FAMECUPATITZIO.COM')+H('Número de la transacción','')+
+   H('ID de autorización de pre-reparación','—')+H('Unidad de negocio',esc(FD.unidad||'General Motors de México'))+H('Tipo de transacción',esc(FD.tipo_transaccion||'Transacción Normal de Vehículo'))+
+   H('BAC',esc(FD.bac||'183147'))+H('Reparador',esc(FD.reparador||'FAME MORELIA'))+H('Nombre de contacto del Reparador',esc(FD.contacto||'HERIBERTO CASTAÑEDA'))+H('Número de teléfono',esc(FD.telefono||'2980 - 753'))+H('Número del fax','')+
+   H('Dirección de correo electrónico del contacto',esc(FD.email||'SERVICIOAPA@FAMECUPATITZIO.COM'))+H('Número de la transacción','')+
    H('Orden de trabajo',g.wo)+H('Fecha de la Orden de trabajo',g.date)+H('Nombre de usuario',esc(ctx.rawText||'—'))+H('Hora de presentación',esc(g.hora))+H('Número de referencia',g.wo)+
-   gr('VIN',null,{f:0})+gr('Cuentakilómetros',null,{f:1})+H('Marcador de transacción','Defecto de Fábrica')+
+   gr('VIN',null,{f:0})+gr('Cuentakilómetros',null,{f:1})+H('Marcador de transacción',esc(ctx.marcador||FD.marcador||'Defecto de Fábrica'))+
    gr('Queja',null,{f:2})+gr('',null,{f:3,area:1})+gr('Causa',null,{f:4})+gr('',null,{f:5,area:1})+gr('Corrección',null,{f:6})+gr('',null,{f:7,area:1})+
    gr('Operación de trabajo',null,{f:8})+gr('Tiempo de trabajo',null,{f:9})+gr('Total de piezas',null,{f:10})+gr('Números de pieza',null,{f:11})+gr('Total tiempo',null,{f:12})+
-   H('Tarifa Mano de Obra',g.fm(g.RT))+H('Tiempo adicionales','0')+H('Tiempo OLH','0')+
+   H('Tarifa Mano de Obra',g.fm(g.RT))+H('Tiempo adicionales',String(EXT.tiempo_adicional||0))+H('Tiempo OLH',String(EXT.olh||0))+
    '<div class="ghd">No se encontraron líneas.</div><table class="gtb"><thead><tr><th>Tipo de adicionales/otros</th><th>Cantidad</th></tr></thead><tbody><tr><td colspan="2">&nbsp;</td></tr></tbody></table>'+
-   H('Total de elementos adicionales','0.00')+gr('Total bruto',null,{f:13})+H('Deducible','0.00')+H('Código de autorización','')+H('Asignado a','')+H('Estado','<span class="gst">POR CAPTURAR</span>')+
+   H('Total de elementos adicionales',g.fm(EXT.elementos_adicionales||0))+gr('Total bruto',null,{f:13})+H('Deducible',g.fm(EXT.deducible||0))+H('Código de autorización','')+H('Asignado a','')+H('Estado','<span class="gst">POR CAPTURAR</span>')+
    '<div class="gbk"><b>Respaldo del agente</b><ul><li>'+basis(ctx)+'</li>'+(ctx.variantTxt?'<li>Variante aprendida de <b>'+esc(ctx.variantTxt)+'</b>.</li>':'')+(ctx.lessons||[]).slice(0,3).map(function(l){return '<li>Ojo: '+esc(l.p)+(l.c?' → '+esc(l.c):'')+'</li>'}).join('')+'<li>Tiempo estándar de la operación: '+ctx.h.toFixed(1)+' h.</li>'+ctx.parts.map(function(p){return '<li>'+p.no+' · '+esc(p.d)+' · cant. '+p.q+' · '+g.fm(p.pr)+' c/u</li>'}).join('')+'</ul></div>'+
    (ctx.prueba?'':'<div class="gfb"><span>¿Qué respondió el fabricante en su portal? Tu respuesta enseña al agente.</span><button class="gfa" type="button" data-r="ok">Fue aceptada</button><button class="gfa" type="button" data-r="no">Fue rechazada</button></div>')+
    '</div>';
@@ -1745,8 +1745,9 @@ RS.toCase=function(r,text){
   var arr=Object.keys(r.parts).map(function(no){var p=r.parts[no];return {no:no,p:p}}).sort(function(a,b){return b.p.n-a.p.n});
   var keep=arr.filter(function(x){return x.p.n>=r.n*0.5});if(!keep.length)keep=arr.slice(0,1);
   var c={sys:r.sys,op:r.op,opd:r.opd,h:r1(r.hSum/Math.max(r.n,1)),parts:keep.map(function(x){return [x.no,x.p.d,x.p.q,x.p.pr]}),codes:null,variant:null};
-  var v=RS.variantFor(r,text);
-  if(v){c.op=v.op||r.op;c.opd=v.opd||r.opd;if(v.h)c.h=r1(v.h);if(v.parts&&v.parts.length)c.parts=v.parts.map(function(p){return [p[0],p[1],p[2],p[3]]});c.codes={q:r.q,c:(v.c&&v.c[0]?v.c:r.c),r:(v.r&&v.r[0]?v.r:r.r)};c.variant=v}
+  var v=RS.variantFor(r,text),n0=r.ctx&&r.ctx[0];
+  if(n0){c.rate=n0.t||null;c.marcador=n0.mk||'';c.extra=n0.ex||null}
+  if(v){c.rate=v.t||c.rate;c.marcador=v.mk||c.marcador;c.extra=v.ex||c.extra;c.op=v.op||r.op;c.opd=v.opd||r.opd;if(v.h)c.h=r1(v.h);if(v.parts&&v.parts.length)c.parts=v.parts.map(function(p){return [p[0],p[1],p[2],p[3]]});c.codes={q:r.q,c:(v.c&&v.c[0]?v.c:r.c),r:(v.r&&v.r[0]?v.r:r.r)};c.variant=v}
   return c;
 };
 RS.note=function(hit){RS.d.stats.q++;if(hit)RS.d.stats.hit++;RS.save();RS.emit()};
@@ -1922,7 +1923,7 @@ function adRender(){
       '<span class="bg s-'+r.status+'">'+ST_LBL[r.status]+'</span></button>'+
       '<div class="rl-b"><div class="rl-g"><div><span>Queja</span>'+esc(r.q.join(' - '))+'</div><div><span>Causa</span>'+esc(r.c.join(' - '))+'</div><div><span>Corrección</span>'+esc(r.r.join(' - '))+'</div><div><span>Operación</span>'+esc(r.op)+' · '+esc(r.opd)+'</div></div>'+
       '<div class="rl-s"><span>Aprendida de: '+r.src.base+' base · '+r.src.historico+' históricas · '+r.src.asesor+' de asesores · '+r.rej+' rechazos</span><span>Palabras clave: '+esc(r.kw.join(', ')||'—')+'</span></div>'+
-      (r.ctx&&r.ctx.length?'<div class="rl-s"><span>Contextos aprendidos: '+esc(r.ctx.map(function(v){return [v.mo,v.an].filter(Boolean).join(' ')+(v.km?' · '+v.km.toLocaleString('es-MX')+' km':'')+' → '+(v.op||'')+(v.h?' · '+v.h+' h':'')}).join('  |  '))+'</span></div>':'')+
+      (r.ctx&&r.ctx.length?'<div class="rl-s"><span>Contextos aprendidos: '+esc(r.ctx.map(function(v){return [v.mo,v.an].filter(Boolean).join(' ')+(v.km?' · '+v.km.toLocaleString('es-MX')+' km':'')+' → '+(v.op||'')+(v.h?' · '+v.h+' h':'')+(v.t?' · tarifa $'+v.t:'')+(v.tb!=null?' · total $'+v.tb.toLocaleString('es-MX'):'')}).join('  |  '))+'</span></div>':'')+
       (r.les&&r.les.length?'<ul class="rl-p">'+r.les.map(function(l){return '<li><b>Error aprendido:</b> '+esc(l.p)+(l.c?' <em>→ '+esc(l.c)+'</em>':'')+'</li>'}).join('')+'</ul>':'')+
       '<ul class="rl-p">'+parts+'</ul><div class="rl-a">'+acts+'</div></div></div>';
   }).join('');
@@ -3132,7 +3133,7 @@ function trRender(){
   var body=!AX.on?'<div class="tr-empty" style="border:0">Conecta el backend: el entrenamiento se guarda en el servidor. Abre la app desde el sitio del servidor e inicia sesión.</div>':TR.err?'<div class="tr-empty" style="border:0">'+TR.err+'<br><button class="bt" data-trretry="1" style="margin-top:10px">Reintentar</button></div>':
    '<p class="tr-intro">Entrena al agente con documentos reales de tu agencia. Lee PDFs e imágenes, valida cada PREA contra las reglas que ya conoce y aprende todos los datos: cómo se llenó cada campo, qué rechazó la planta y cómo se corrigió, y cuánto pagó realmente.</p>'+
    '<div class="tr-stats"><div class="tr-st"><b>'+r.preas+'</b><span>PREAs aceptadas aprendidas</span></div><div class="tr-st"><b>'+r.pagos+'</b><span>Transacciones pagadas aprendidas</span></div><div class="tr-st"><b>'+r.reglas+'</b><span>Reglas moldeadas por documentos</span></div><div class="tr-st"><b>'+(r.revisar+r.pendientes)+'</b><span>Por revisar o leyéndose</span></div></div>'+
-   trCard('prea',1,'PREAs aceptadas','Sube PREAs que la planta ya aceptó: <b>con una sola basta</b> para crear la regla y activarla. El agente lee el formulario y el <b>historial de comentarios</b> y aprende cómo se llenó cada campo, por qué se rechazó antes y cómo se corrigió. Si es parecida a otra pero de otro modelo o contexto, la guarda como variante. También puedes subir PREAs <b>rechazadas</b>: aprende del error y lo avisa la próxima vez.','Todavía no has subido PREAs aceptadas.')+
+   trCard('prea',1,'PREAs aceptadas','Sube PREAs que la planta ya aceptó: <b>con una sola basta</b> para crear la regla y activarla. El agente lee <b>todo el formulario</b> (queja, causa, corrección, operación, tiempo, números de pieza, totales, tarifa, marcador, tipo de transacción, BAC, reparador, deducible…) y el <b>historial de comentarios</b>, y cada campo se vuelve una regla; por qué se rechazó antes y cómo se corrigió. Si es parecida a otra pero de otro modelo o contexto, la guarda como variante. También puedes subir PREAs <b>rechazadas</b>: aprende del error y lo avisa la próxima vez.','Todavía no has subido PREAs aceptadas.')+
    trCard('pago',2,'Transacciones pagadas de planta','Sube solo transacciones que la planta ya pagó correctamente. El agente aprende el tiempo pagado, la tarifa, el precio de cada pieza y los ajustes, y los liga con su PREA para corregir horas y precios de las reglas.','Todavía no has subido transacciones pagadas.')+
    '<section class="tr-card"><div class="tr-ch"><div><h3><i>3</i>Probar al agente</h3><p>Describe la reparación que necesitas (modelo, año, kilometraje y falla) y el agente te entrega <b>el formulario de la PREA completo y llenado</b> con lo que aprendió de las PREAs aceptadas, ya corregidos los errores que tuvieron en el pasado. O sube tu PREA y te la corrige. También puedes preguntarle qué aprendió y por qué rechazaron una PREA.</p></div><button class="bt pri" data-trchat="1">Abrir chat de pruebas</button></div>'+
    '<div class="tr-pr"><p>¿Quieres probar el flujo sin tus archivos? Descarga los documentos de ejemplo (un Aveo 2024 con cambio de polea y un Equinox 2023), súbelos en los apartados 1 y 2 y valida la PREA con errores en el chat.</p></div>'+
@@ -3150,8 +3151,10 @@ function trModal(){
   if(!x||!x.tipo)body='<div class="tr-empty" style="border:0">Todavía no hay datos leídos de este archivo.</div>';
   else if(esP){
     body='<div><h4>Datos generales</h4><div class="tr-g">'+trField('Folio',x.folio)+trField('Orden de trabajo',x.orden)+trField('Fecha',x.fecha&&hmF(Date.parse(x.fecha+'T12:00:00')))+trField('Vehículo',[x.marca,x.modelo,x.anio].filter(Boolean).join(' '))+trField('VIN',x.vin)+trField('Kilometraje',x.km&&x.km.toLocaleString('en-US')+' km')+trField('Sistema',x.sistema)+trField('Resultado',x.estado)+trField('Autorización',x.codigo_autorizacion)+trField('Tiempo',x.horas!=null?x.horas+' h':'')+trField('Tarifa',x.tarifa_mo!=null?carM(x.tarifa_mo):'')+trField('Total bruto',x.total_bruto!=null?carM(x.total_bruto):'')+'</div></div>'+
+     (x.campos_extra&&Object.keys(x.campos_extra).length?'<div><h4>Otros campos del formulario</h4><div class="tr-g">'+[['unidad','Unidad de negocio'],['tipo_transaccion','Tipo de transacción'],['bac','BAC'],['reparador','Reparador'],['marcador','Marcador de transacción'],['contacto','Contacto'],['telefono','Teléfono'],['email','Correo'],['deducible','Deducible'],['tiempo_adicional','Tiempo adicional'],['olh','Tiempo OLH'],['elementos_adicionales','Elementos adicionales']].filter(function(p){return x.campos_extra[p[0]]!=null}).map(function(p){var v=x.campos_extra[p[0]];return trField(p[1],typeof v==='number'&&/deducible|elementos/.test(p[0])?carM(v):v)}).join('')+'</div></div>':'')+
      '<div><h4>Cómo se llenó</h4><div class="tr-cf">'+trCod('Queja',x.queja)+trCod('Causa',x.causa)+trCod('Corrección',x.correccion)+trCod('Operación de trabajo',{codigo:x.operacion&&x.operacion.codigo,texto:x.operacion&&x.operacion.descripcion})+'</div></div>'+
      '<div><h4>Piezas</h4>'+((x.piezas||[]).length?'<table class="tr-tb"><thead><tr><th>Número</th><th>Descripción</th><th class="n">Cant.</th><th class="n">Precio</th></tr></thead><tbody>'+x.piezas.map(function(p){return '<tr><td>'+escA(p.numero)+'</td><td>'+escA(p.descripcion)+'</td><td class="n">'+(p.cantidad||1)+'</td><td class="n">'+(p.precio!=null?carM(p.precio):'—')+'</td></tr>'}).join('')+'</tbody></table>':'<div class="sm" style="color:var(--muted)">Sin piezas leídas.</div>')+'</div>'+
+     ((x._reglas||[]).length?'<div><h4>Reglas que aprendió de esta PREA</h4><table class="tr-tb"><thead><tr><th>Campo</th><th>Valor aprendido</th><th>Regla</th></tr></thead><tbody>'+x._reglas.map(function(r){return '<tr><td>'+escA(r.campo)+'</td><td>'+escA(r.valor)+'</td><td><span class="tr-v '+(r.estado==='distinto'?'difiere':r.estado==='igual'?'ok':'')+'">'+({nuevo:'Nuevo',igual:'Ya la conocía',distinto:'Variante'}[r.estado]||r.estado)+'</span></td></tr>'}).join('')+'</tbody></table></div>':'')+
      ((x.lecciones||[]).length?'<div><h4>Errores del pasado y cómo se corrigieron</h4><div class="tr-lc">'+x.lecciones.map(function(l){return '<div>'+escA(l.problema)+(l.correccion?'<small><b>Corrección:</b> '+escA(l.correccion)+'</small>':'')+((l.temas||[]).length?'<small style="color:var(--muted)">'+escA(l.temas.join(' · '))+'</small>':'')+'</div>'}).join('')+'</div></div>':'')+
      ((x.comentarios||[]).length?'<div><h4>Historial de comentarios</h4><div class="tr-tl">'+x.comentarios.map(function(c){return '<div class="'+(c.origen||'')+'"><small>'+escA(c.fecha||'')+' '+escA(c.hora||'')+' · '+escA(c.autor||c.origen||'')+'<span class="tp '+c.tipo+'">'+escA(c.tipo||'')+'</span></small>'+escA(c.texto)+'</div>'}).join('')+'</div></div>':'');
   }else{
@@ -3231,6 +3234,7 @@ function ctxDeFormulario(f,text,files){
   c.codes={q:[f.queja.codigo,f.queja.texto],c:[f.causa.codigo,f.causa.texto],r:[f.correccion.codigo,f.correccion.texto]};
   c.vinReal=f.vin||'(captura el VIN)';if(f.orden)c.wo=f.orden;
   c.vehicle=f.vehiculo||c.vehicle;c.matched=true;c.ruleId=f.regla?f.regla.id:null;c.ruleN=f.regla?f.regla.n:1;c.ruleConf=f.regla?f.regla.confianza:0;
+  c.rate=f.tarifa||0;c.marcador=(f.extras&&f.extras.marcador)||'';c.extra=f.extras||null;c.form=Object.assign({},RS.d.form||{},f.extras||{});
   c.rawText=(f.descripcion||text||'').trim()||c.rawText;c.prueba=true;
   return c;
 }

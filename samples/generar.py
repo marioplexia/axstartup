@@ -55,7 +55,8 @@ def imagen(nombre, titulo, campos, comentarios):
 # ---------- 1) PREA aceptada: polea tensora, Aveo 2024, 40,120 km ----------
 prea_aveo = [
  ('ID de autorización de pre-reparación', 'PREA-48210'), ('Unidad de negocio', 'General Motors de México'), ('Tipo de transacción', 'Transacción Normal de Vehículo'),
- ('BAC', '183147'), ('Reparador', 'FAME MORELIA'), ('Orden de trabajo', 'G-AVEO4021'), ('Fecha de la Orden de trabajo', '14/03/2026'),
+ ('BAC', '183147'), ('Reparador', 'FAME MORELIA'), ('Nombre de contacto del Reparador', 'HERIBERTO CASTAÑEDA'), ('Número de teléfono', '2980 - 753'), ('Dirección de correo electrónico del contacto', 'SERVICIOAPA@FAMECUPATITZIO.COM'),
+ ('Orden de trabajo', 'G-AVEO4021'), ('Fecha de la Orden de trabajo', '14/03/2026'),
  ('Vehículo', 'Chevrolet Aveo 2024'), ('VIN', '3G1TA5CF8RL123456'), ('Cuentakilómetros', '40,120'), ('Marcador de transacción', 'Defecto de Fábrica'),
  ('Queja', 'EM-215 - RUIDO O CHIRRIDO EN EL MOTOR AL ARRANCAR'),
  ('', 'El cliente reporta chirrido proveniente de la banda de accesorios al encender el motor en frío.'),
@@ -65,7 +66,7 @@ prea_aveo = [
  ('Operación de trabajo', 'OP-EM-044 - Reemplazar polea tensora de banda de accesorios'), ('Tiempo de trabajo', '1.2'),
  ('Total de piezas', '1,184.00'),
  ('Números de pieza', 'PZ-EM-7710  Polea tensora de banda  1 x 684.00'), ('', 'PZ-EM-7711  Banda de accesorios serpentina  1 x 500.00'),
- ('Total tiempo', '1.2'), ('Tarifa Mano de Obra', '420.00'), ('Total bruto', '1,688.00'), ('Deducible', '0.00'),
+ ('Total tiempo', '1.2'), ('Tarifa Mano de Obra', '420.00'), ('Tiempo adicionales', '0'), ('Tiempo OLH', '0'), ('Total de elementos adicionales', '0.00'), ('Total bruto', '1,688.00'), ('Deducible', '0.00'),
  ('Código de autorización', 'AUT-77120'), ('Estado', 'ACEPTADA')]
 com_aveo = [
  '12/03/2026 09:14 - Agencia (H. Castañeda): Se solicita autorización para el reemplazo de la polea tensora. Se adjunta el ticket de diagnóstico.',

@@ -22,6 +22,7 @@ db.exec(fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8'));
   const add = (tabla, cols) => { const have = db.prepare(`PRAGMA table_info(${tabla})`).all().map(c => c.name); cols.forEach(([n, t]) => { if (!have.includes(n)) db.exec(`ALTER TABLE ${tabla} ADD COLUMN ${n} ${t}`); }); };
   add('rules', [['paid_n', 'INTEGER NOT NULL DEFAULT 0'], ['paid_hours_sum', 'REAL NOT NULL DEFAULT 0'], ['paid_amount_sum', 'REAL NOT NULL DEFAULT 0']]);
   add('chat_threads', [['kind', "TEXT NOT NULL DEFAULT 'mi'"]]);
+  add('rule_variants', [['tarifa', 'REAL'], ['total_piezas', 'REAL'], ['total_bruto', 'REAL'], ['marcador', 'TEXT'], ['extra', 'TEXT']]);
 }
 
 // Confianza de una regla: misma fórmula que RS.conf en index.html
@@ -83,16 +84,18 @@ function loadState() {
   const vars = group(db.prepare('SELECT * FROM rule_variants ORDER BY id DESC').all(), 'rule_id');
   const les = {}; db.prepare('SELECT * FROM train_lessons ORDER BY id DESC').all().forEach(l => { const k = l.sys + '|' + l.q_code; (les[k] = les[k] || []); if (les[k].length < 8 && !les[k].some(x => x.p === l.problema)) les[k].push({ p: l.problema, c: l.correccion || '', t: JSON.parse(l.temas || '[]') }); });
   rules.forEach(r => {
-    r.ctx = (vars[r.id] || []).slice(0, 12).map(v => ({ mo: v.modelo || '', an: v.anio || null, km: v.km || null, op: v.op, opd: v.op_desc, h: v.hours, c: [v.c_code, v.c_text], r: [v.r_code, v.r_text], parts: JSON.parse(v.parts || '[]') }));
+    r.ctx = (vars[r.id] || []).slice(0, 12).map(v => ({ mo: v.modelo || '', an: v.anio || null, km: v.km || null, op: v.op, opd: v.op_desc, h: v.hours, c: [v.c_code, v.c_text], r: [v.r_code, v.r_text], parts: JSON.parse(v.parts || '[]'), t: v.tarifa || null, tp: v.total_piezas, tb: v.total_bruto, mk: v.marcador || '', ex: JSON.parse(v.extra || '{}') }));
     r.les = les[r.sys + '|' + r.q[0]] || [];
   });
   const log = db.prepare('SELECT ts, type, rule_id, msg FROM rule_log ORDER BY ts DESC, id DESC LIMIT 120')
     .all().map(l => ({ t: l.ts, type: l.type, rule: l.rule_id || '', msg: l.msg }));
   const advisors = db.prepare('SELECT id, name FROM advisors WHERE active = 1 ORDER BY created_at, id').all();
+  let form = {};
+  try { const m = JSON.parse(getSet('form_defaults', '{}')); Object.keys(m).forEach(k => { const e = Object.entries(m[k]).sort((a, b) => b[1] - a[1])[0]; if (e) form[k] = e[0]; }); } catch (_) {}
   return {
     rev: getRev(), advisors,
     state: {
-      v: 1, rules, log,
+      v: 1, rules, log, form,
       cfg: { th: Number(getSet('th', 1)), auto: getSet('auto', 'true') === 'true' },
       stats: { q: Number(getSet('stats_q', 0)), hit: Number(getSet('stats_hit', 0)) },
       seq: Math.max(Number(getSet('seq', 0)), rules.length)

@@ -21,11 +21,24 @@ function claveRegla(d) {
   const sys = d.sistema || 'Por clasificar';
   return { sys, qCode: (d.queja.codigo || '') || 'SC-' + hash6(P.norm(d.queja.texto || d.operacion.descripcion || '')) };
 }
-function guardarVariante(doc, ruleId, d) {
-  db.prepare(`INSERT INTO rule_variants (rule_id, doc_id, marca, modelo, anio, km, op, op_desc, c_code, c_text, r_code, r_text, hours, parts, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+const CAMPOS_FIJOS = [['unidad', 'Unidad de negocio'], ['tipo_transaccion', 'Tipo de transacción'], ['bac', 'BAC'], ['reparador', 'Reparador'], ['marcador', 'Marcador de transacción'], ['contacto', 'Nombre de contacto'], ['telefono', 'Teléfono'], ['email', 'Correo del contacto']];
+const leerDefaults = () => { try { return JSON.parse(getSet('form_defaults', '{}')); } catch (_) { return {}; } };
+function guardarVariante(doc, ruleId, d, h) {
+  const ex = d.campos_extra || {};
+  db.prepare(`INSERT INTO rule_variants (rule_id, doc_id, marca, modelo, anio, km, op, op_desc, c_code, c_text, r_code, r_text, hours, parts, tarifa, total_piezas, total_bruto, marcador, extra, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
     .run(ruleId, doc.id, d.marca || '', d.modelo || '', d.anio || null, d.km || null, d.operacion.codigo || '', d.operacion.descripcion || '', d.causa.codigo || '', d.causa.texto || '', d.correccion.codigo || '', d.correccion.texto || '',
-      Number(d.horas) || 0, JSON.stringify((d.piezas || []).map(p => [p.numero || 'S/N', p.descripcion || '', p.cantidad || 1, p.precio || 0])), Date.now());
+      h, JSON.stringify((d.piezas || []).map(p => [p.numero || 'S/N', p.descripcion || '', p.cantidad || 1, p.precio || 0])), d.tarifa_mo || null, d.total_piezas != null ? d.total_piezas : null, d.total_bruto != null ? d.total_bruto : null,
+      ex.marcador || '', JSON.stringify({ tipo_transaccion: ex.tipo_transaccion, deducible: ex.deducible, tiempo_adicional: ex.tiempo_adicional, olh: ex.olh, elementos_adicionales: ex.elementos_adicionales }), Date.now());
 }
+// Datos fijos de la agencia (BAC, reparador, contacto, unidad de negocio...): se aprende el valor más frecuente de las PREAs aceptadas
+function sumarDefaults(d, signo) {
+  const m = leerDefaults(), ex = d.campos_extra || {}, usados = [];
+  CAMPOS_FIJOS.forEach(([k]) => { const v = ex[k]; if (!v) return; m[k] = m[k] || {}; m[k][v] = Math.max(0, (m[k][v] || 0) + signo); if (!m[k][v]) delete m[k][v]; usados.push([k, v]); });
+  putSet('form_defaults', JSON.stringify(m));
+  return usados;
+}
+const igual = (a, b) => String(a == null ? '' : a).trim().toUpperCase() === String(b == null ? '' : b).trim().toUpperCase();
+const cod = c => c && (c.codigo || c.texto) ? [c.codigo, c.texto].filter(Boolean).join(' · ') : '';
 function guardarLecciones(doc, k, lecs, origen) {
   let n = 0;
   (lecs || []).forEach(l => {
@@ -40,14 +53,15 @@ function guardarLecciones(doc, k, lecs, origen) {
 function aprenderPrea(doc, d) {
   const now = Date.now(), K = claveRegla(d), sys = K.sys, qCode = K.qCode;
   let rule = db.prepare('SELECT * FROM rules WHERE sys = ? AND q_code = ?').get(sys, qCode), kind, val = [];
-  const h = Number(d.horas) || 0, pz = d.piezas || [];
+  const hRaw = Number(d.horas) || 0, pz = d.piezas || [];
+  const h = hRaw || (rule ? rule.hours_sum / Math.max(rule.n, 1) : 0);
   const insPart = db.prepare('INSERT INTO rule_parts (rule_id, part_no, descr, qty, price, n) VALUES (?,?,?,?,?,1) ON CONFLICT(rule_id, part_no) DO UPDATE SET n = n + 1, qty = excluded.qty, price = excluded.price, descr = excluded.descr');
   const insKw = db.prepare('INSERT OR IGNORE INTO rule_keywords (rule_id, keyword) VALUES (?, ?)');
   if (!rule) {
     const id = nextRuleId();
     db.prepare(`INSERT INTO rules (id, sys, q_code, q_text, c_code, c_text, r_code, r_text, op, op_desc, hours, hours_sum, n, rej, status, src_base, src_historico, src_asesor, created_at, updated_at)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1,0,'aprendizaje',0,1,0,?,?)`)
-      .run(id, sys, qCode, d.queja.texto || '', d.causa.codigo || '', d.causa.texto || '', d.correccion.codigo || '', d.correccion.texto || '', d.operacion.codigo || '', d.operacion.descripcion || '', h, h, now, now);
+      .run(id, sys, qCode, d.queja.texto || '', d.causa.codigo || '', d.causa.texto || '', d.correccion.codigo || '', d.correccion.texto || '', d.operacion.codigo || '', d.operacion.descripcion || '', hRaw, hRaw, now, now);
     pz.forEach(p => insPart.run(id, p.numero || 'S/N', p.descripcion || '', p.cantidad || 1, p.precio || 0));
     keywords(d).forEach(w => insKw.run(id, w));
     logEvent('creada', id, `Regla nueva ${id}: ${(d.queja.texto || '').toLowerCase()} → ${d.operacion.codigo || d.operacion.descripcion} (${sys}) · aprendida de «${doc.name}»`);
@@ -60,7 +74,7 @@ function aprenderPrea(doc, d) {
     if (rule.op && d.operacion.codigo && rule.op !== d.operacion.codigo) dif.push(`opera con ${d.operacion.codigo} (la regla principal usa ${rule.op})`);
     if (rule.c_code && d.causa.codigo && rule.c_code !== d.causa.codigo) dif.push(`usa la causa ${d.causa.codigo} (la regla principal, ${rule.c_code})`);
     if (rule.r_code && d.correccion.codigo && rule.r_code !== d.correccion.codigo) dif.push(`usa la corrección ${d.correccion.codigo} (la regla principal, ${rule.r_code})`);
-    if (h && avg && Math.abs(h - avg) / avg > 0.2) dif.push(`toma ${h} h (promedio de la regla, ${r1(avg)} h)`);
+    if (hRaw && avg && Math.abs(hRaw - avg) / avg > 0.2) dif.push(`toma ${hRaw} h (promedio de la regla, ${r1(avg)} h)`);
     const nuevas = pz.filter(p => p.numero && !parts.includes(p.numero)).map(p => p.numero);
     if (nuevas.length) dif.push(`incluye piezas nuevas (${nuevas.join(', ')})`);
     const modeloNuevo = d.modelo && !previas.some(v => P.norm(v.modelo || '') === P.norm(d.modelo));
@@ -74,7 +88,30 @@ function aprenderPrea(doc, d) {
     rule = db.prepare('SELECT * FROM rules WHERE id = ?').get(rule.id); kind = 'reforzada';
     logEvent('reforzada', rule.id, `Regla ${rule.id} reforzada con la PREA «${doc.name}» · ${rule.n} en total`);
   }
-  guardarVariante(doc, rule.id, d);
+  // Reglas por campo: qué valor aprendió de cada campo del formulario y si ya lo conocía
+  const prev = db.prepare('SELECT * FROM rule_variants WHERE rule_id = ?').all(rule.id), ex = d.campos_extra || {}, reglas = [], defs = leerDefaults();
+  const base = kind === 'creada' ? null : rule;
+  const campo = (nombre, valor, conocido) => { if (valor == null || valor === '') return; reglas.push({ campo: nombre, valor: String(valor), estado: kind === 'creada' ? 'nuevo' : (conocido ? 'igual' : 'distinto') }); };
+  campo('Queja', cod(d.queja), base && igual(base.q_code, d.queja.codigo));
+  campo('Causa', cod(d.causa), base && prev.some(v => igual(v.c_code, d.causa.codigo)));
+  campo('Corrección', cod(d.correccion), base && prev.some(v => igual(v.r_code, d.correccion.codigo)));
+  campo('Operación de trabajo', [d.operacion.codigo, d.operacion.descripcion].filter(Boolean).join(' · '), base && prev.some(v => igual(v.op, d.operacion.codigo)));
+  campo('Tiempo de trabajo', hRaw ? hRaw + ' h' : '', base && prev.some(v => v.hours === hRaw));
+  campo('Números de pieza', pz.map(p => p.numero).join(', '), base && prev.some(v => JSON.parse(v.parts || '[]').map(x => x[0]).join(',') === pz.map(p => p.numero).join(',')));
+  campo('Total de piezas', d.total_piezas != null ? '$' + d.total_piezas.toLocaleString('en-US') : '', base && prev.some(v => v.total_piezas === d.total_piezas));
+  campo('Tarifa mano de obra', d.tarifa_mo ? '$' + d.tarifa_mo : '', base && prev.some(v => v.tarifa === d.tarifa_mo));
+  campo('Total bruto', d.total_bruto != null ? '$' + d.total_bruto.toLocaleString('en-US') : '', base && prev.some(v => v.total_bruto === d.total_bruto));
+  CAMPOS_FIJOS.forEach(([k, n]) => campo(n, ex[k], base && Object.keys(defs[k] || {}).some(x => igual(x, ex[k]))));
+  campo('Deducible', ex.deducible != null ? '$' + ex.deducible : '', base && prev.some(v => (JSON.parse(v.extra || '{}')).deducible === ex.deducible));
+  if (ex.tiempo_adicional) campo('Tiempo adicional', ex.tiempo_adicional + ' h', false);
+  // Totales: el total bruto debe ser tiempo x tarifa + piezas
+  const esperado = hRaw && d.tarifa_mo ? +(hRaw * d.tarifa_mo + (d.total_piezas != null ? d.total_piezas : pz.reduce((t, p) => t + (p.precio || 0) * (p.cantidad || 1), 0))).toFixed(2) : null;
+  if (esperado && d.total_bruto != null && Math.abs(esperado - d.total_bruto) / Math.max(d.total_bruto, 1) > 0.03) val.push({ nivel: 'aviso', campo: 'totales', texto: `El total bruto ($${d.total_bruto.toLocaleString('en-US')}) no coincide con tiempo × tarifa + piezas ($${esperado.toLocaleString('en-US')}); se guardó tal como vino.` });
+  const faltan = [!d.causa.codigo && !d.causa.texto && 'causa', !d.correccion.codigo && !d.correccion.texto && 'corrección', !(hRaw > 0) && 'tiempo', !pz.length && 'piezas', !d.tarifa_mo && 'tarifa', d.total_bruto == null && 'total bruto'].filter(Boolean);
+  if (faltan.length) val.push({ nivel: 'aviso', campo: 'campos', texto: `Faltaron estos campos en el documento (se aprendió todo lo demás): ${faltan.join(', ')}.` });
+  d._reglas = reglas;
+  guardarVariante(doc, rule.id, d, hRaw);
+  d._defs = sumarDefaults(d, +1);
   const nl = guardarLecciones(doc, K, d.lecciones, 'aceptada');
   if (nl) val.push({ nivel: 'ok', campo: 'errores', texto: `Aprendí ${nl} ${nl === 1 ? 'error del historial' : 'errores del historial'} de esta queja.` });
   const th = Math.max(1, Number(getSet('th', 1)));
@@ -164,6 +201,8 @@ function aprenderPago(doc, d) {
 // Deshace lo aprendido de un documento (al eliminarlo)
 function olvidar(doc) {
   const d = JSON.parse(doc.data || '{}'), ad = d._ajuste || {}, now = Date.now();
+  const vh = db.prepare('SELECT hours FROM rule_variants WHERE doc_id = ?').get(doc.id);
+  if (Array.isArray(d._defs)) { const m = leerDefaults(); d._defs.forEach(([k, v]) => { if (m[k] && m[k][v]) { m[k][v] -= 1; if (m[k][v] <= 0) delete m[k][v]; } }); putSet('form_defaults', JSON.stringify(m)); }
   db.prepare('DELETE FROM rule_variants WHERE doc_id = ?').run(doc.id);
   db.prepare('DELETE FROM train_lessons WHERE doc_id = ?').run(doc.id);
   if (d._modo === 'error') {
@@ -174,7 +213,7 @@ function olvidar(doc) {
   const r = db.prepare('SELECT * FROM rules WHERE id = ?').get(doc.rule_id);
   if (!r) return;
   if (doc.kind === 'prea') {
-    const h = Number(d.horas) || 0;
+    const h = Number(d.horas) > 0 ? Number(d.horas) : (vh ? Number(vh.hours) || 0 : 0);
     if (r.n <= 1 && !r.src_base && !r.src_asesor) { db.prepare('DELETE FROM rules WHERE id = ?').run(r.id); logEvent('info', '', `Se eliminó la regla ${r.id}: su única PREA se quitó del entrenamiento`); }
     else {
       db.prepare('UPDATE rules SET n = MAX(n - 1, 0), hours_sum = MAX(hours_sum - ?, 0), src_historico = MAX(src_historico - 1, 0), updated_at = ? WHERE id = ?').run(h, now, r.id);
