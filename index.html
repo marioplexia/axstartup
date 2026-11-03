@@ -368,19 +368,27 @@ textarea,input{font:inherit;color:inherit}
 @keyframes tkspin{to{transform:rotate(360deg)}}
 @keyframes tkshine{to{background-position:-220% 0}}
 @media(prefers-reduced-motion:reduce){.tk-t.live,.tk-sp,.tk-i{animation:none}}
-.lg{position:fixed;inset:0;z-index:100;background:var(--bg);color:var(--fg);display:grid;place-items:center;padding:16px;overflow:auto}
-.lg[hidden]{display:none}
-.lg-card{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
-.lg-card h1{font-family:var(--f-display);font-weight:500;font-size:30px;letter-spacing:-.025em;margin:0 0 4px}
-.lg-card p{margin:0 0 8px;color:var(--fg);opacity:.65}
-.lg-card label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;opacity:.9}
-.lg-card input{font:inherit;font-size:15px;color:var(--fg);background:var(--card);border:1px solid var(--card-line);border-radius:10px;padding:10px 12px;outline:none}
-.lg-card input:focus{border-color:var(--fg)}
-.lg-btn{font:inherit;font-weight:500;background:var(--fg);color:var(--bg);border:0;border-radius:10px;padding:11px 14px;cursor:pointer;margin-top:4px}
-.lg-btn:disabled{opacity:.5;cursor:default}
-.lg-alt{font:inherit;background:none;border:0;color:var(--fg);opacity:.7;text-decoration:underline;cursor:pointer;padding:4px}
-.lg-msg{min-height:20px;font-size:13px}
-.lg-msg.err{color:#c0392b}
+.axl{position:fixed;inset:0;z-index:100;background:var(--bg);color:var(--fg);display:grid;place-items:center;padding:16px;overflow:auto}
+.axl[hidden]{display:none}
+.axl-card{width:100%;max-width:384px;background:var(--card);border:1px solid var(--card-line);border-radius:16px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.axl-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px}
+.axl-logo{width:28px;height:28px;border-radius:6px;background:#000;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+.axl-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:24px 0;padding:4px;background:var(--surface);border-radius:10px}
+.axl-tabs button{text-align:center;border:0;background:none;padding:9px;border-radius:8px;font:inherit;color:var(--muted);cursor:pointer}
+.axl-tabs button[aria-selected=true]{background:var(--card);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.axl h1{margin:0 0 6px;font-size:22px;font-weight:700;letter-spacing:-.01em;font-family:inherit}
+.axl-sub{margin:0 0 22px;color:var(--muted)}
+.axl label{display:block;margin:14px 0 6px;font-size:12px;font-weight:500}
+.axl input,.axl select{width:100%;height:39px;padding:0 12px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:14px}
+.axl input:focus,.axl select:focus{outline:none;border-color:var(--fg);box-shadow:0 0 0 1px var(--fg)}
+.axl-hint{margin:4px 0 0;font-size:12px;color:var(--muted)}
+.axl-go{text-align:center;width:100%;height:38px;margin-top:20px;border:0;border-radius:8px;background:var(--fg);color:var(--bg);font:inherit;font-weight:500;cursor:pointer}
+.axl-go:disabled{opacity:.6;cursor:wait}
+.axl-msg{display:none;margin-top:14px;padding:9px 12px;border-radius:8px;font-size:13px;background:var(--surface)}
+.axl-msg.on{display:block}
+.axl-msg.err{background:color-mix(in srgb,#d92d20 14%,transparent);color:#d92d20}
+.axl-alt{margin:18px 0 0;text-align:center;font-size:12px;color:var(--muted)}
+.axl-alt a{color:inherit;text-decoration:underline;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13px;z-index:90;box-shadow:0 10px 30px -10px rgba(0,0,0,.4);animation:toast .3s cubic-bezier(.2,.9,.3,1) both;max-width:calc(100vw - 32px)}
 
 @keyframes wordin{from{opacity:0;transform:translateY(12px);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
@@ -646,7 +654,7 @@ textarea,input{font:inherit;color:inherit}
     <section class="admin" id="viewAdmin" hidden>
       <div class="ad-in">
         <div class="ad-head">
-          <div><h2>Tablero de agencia</h2><p>FAME Morelia · reglas que aprende el Agente de Garantías y cómo se distribuyen</p></div>
+          <div><h2>Tablero de agencia</h2><p><span id="adAgency">Tu agencia</span> · reglas que aprende el Agente de Garantías y cómo se distribuyen</p></div>
           <div class="ad-live" id="adLive"><i></i><span>En vivo</span></div>
         </div>
         <div class="ad-kpi" id="adKpi"></div>
@@ -707,17 +715,30 @@ textarea,input{font:inherit;color:inherit}
   <div class="err" id="pgE" role="status"></div>
   <div class="row"><button class="bt" type="button" id="pgNo">Cancelar</button><button class="bt pri" type="submit">Guardar pago</button></div>
 </form></dialog>
-<div class="lg" id="lg">
-  <form class="lg-card" id="lgForm" novalidate>
-    <h1 id="lgTitle">Iniciar sesión</h1>
-    <p id="lgSub">Entra con tu cuenta de asesor.</p>
-    <label id="lgNameW" hidden>Nombre<input id="lgName" autocomplete="name"></label>
-    <label>Correo<input id="lgEmail" type="email" autocomplete="email" required></label>
-    <label>Contraseña<input id="lgPass" type="password" autocomplete="current-password" minlength="6" required></label>
-    <div class="lg-msg" id="lgMsg" role="status"></div>
-    <button class="lg-btn" id="lgGo" type="submit">Entrar</button>
-    <button class="lg-alt" id="lgAlt" type="button">¿No tienes cuenta? Crear cuenta</button>
-  </form>
+<div class="axl" id="lg">
+  <main class="axl-card">
+    <div class="axl-brand"><span class="axl-logo">Ax</span>Ax AI Garantías</div>
+    <div class="axl-tabs" role="tablist">
+      <button type="button" role="tab" id="lgTabUp" aria-selected="false">Crear cuenta</button>
+      <button type="button" role="tab" id="lgTabIn" aria-selected="true">Iniciar sesión</button>
+    </div>
+    <form id="lgForm" novalidate>
+      <h1 id="lgTitle">Inicia sesión</h1>
+      <p class="axl-sub" id="lgSub">Accede al agente de garantías de tu agencia.</p>
+      <label for="lgEmail">Correo</label>
+      <input id="lgEmail" type="email" autocomplete="email" required>
+      <label for="lgPass">Contraseña</label>
+      <input id="lgPass" type="password" autocomplete="current-password" minlength="8" required>
+      <p class="axl-hint" id="lgHint" hidden>Mínimo 8 caracteres.</p>
+      <div id="lgAgW" hidden>
+        <label for="lgAg">Agencia</label>
+        <select id="lgAg" required><option value="">Cargando agencias…</option></select>
+      </div>
+      <button class="axl-go" id="lgGo" type="submit">Entrar</button>
+      <div class="axl-msg" id="lgMsg" role="alert"></div>
+      <p class="axl-alt" id="lgAltP">¿No tienes cuenta? <a id="lgAlt">Crea una</a></p>
+    </form>
+  </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
@@ -1905,14 +1926,28 @@ document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('.ex-row');EX.resolve(row.dataset.id,b.dataset.r==='ok')}
 });
 $('#exQ').addEventListener('input',function(){EX.q=this.value;EX.render()});
-SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='lg-msg'+(err?' err':'')};
+SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='axl-msg'+(t?' on':'')+(t&&err?' err':'')};
 SB.lgMode=function(m){
   SB.mode=m;var up=m==='up';
-  $('#lgTitle').textContent=up?'Crear cuenta':'Iniciar sesión';
-  $('#lgSub').textContent=up?'Regístrate como asesor de la agencia.':'Entra con tu cuenta de asesor.';
-  $('#lgNameW').hidden=!up;$('#lgGo').textContent=up?'Crear cuenta':'Entrar';
+  $('#lgTabUp').setAttribute('aria-selected',up);$('#lgTabIn').setAttribute('aria-selected',!up);
+  $('#lgTitle').textContent=up?'Crea tu cuenta':'Inicia sesión';
+  $('#lgSub').textContent=up?'Registra tu correo y elige tu agencia.':'Accede al agente de garantías de tu agencia.';
+  $('#lgHint').hidden=!up;$('#lgAgW').hidden=!up;$('#lgGo').textContent=up?'Crear cuenta':'Entrar';
   $('#lgPass').autocomplete=up?'new-password':'current-password';
-  $('#lgAlt').textContent=up?'¿Ya tienes cuenta? Iniciar sesión':'¿No tienes cuenta? Crear cuenta';SB.lgMsg('');
+  $('#lgAltP').innerHTML=up?'¿Ya tienes cuenta? <a id="lgAlt">Inicia sesión</a>':'¿No tienes cuenta? <a id="lgAlt">Crea una</a>';
+  SB.lgMsg('');
+};
+SB.loadAgencies=async function(){
+  var sel=$('#lgAg');
+  try{
+    var r=await SB.c.from('agencies').select('id,name,region').order('region').order('id');
+    if(r.error)throw r.error;
+    sel.innerHTML='<option value="">Selecciona tu agencia</option>';var groups={};
+    r.data.forEach(function(a){
+      if(!groups[a.region]){var g=document.createElement('optgroup');g.label=a.region;sel.appendChild(g);groups[a.region]=g}
+      var o=document.createElement('option');o.value=a.id;o.textContent=a.name;groups[a.region].appendChild(o);
+    });
+  }catch(e){sel.innerHTML='<option value="">No se pudieron cargar las agencias</option>';SB.fail(e)}
 };
 SB.errEs=function(e){var m=(e&&e.message)||'';
   if(/Invalid login/i.test(m))return 'Correo o contraseña incorrectos';
@@ -1928,12 +1963,16 @@ SB.errEs=function(e){var m=(e&&e.message)||'';
   return m?'No se pudo completar la acción: '+m:'No se pudo completar la acción'};
 SB.submit=async function(ev){
   ev.preventDefault();
-  var email=$('#lgEmail').value.trim(),pass=$('#lgPass').value,name=$('#lgName').value.trim(),up=SB.mode==='up';
-  if(!email||pass.length<6){SB.lgMsg('Escribe tu correo y una contraseña de 6 caracteres o más',true);return}
-  if(up&&!name){SB.lgMsg('Escribe tu nombre',true);return}
+  var email=$('#lgEmail').value.trim(),pass=$('#lgPass').value,ag=$('#lgAg').value,up=SB.mode==='up';
+  if(!email||!pass){SB.lgMsg('Escribe tu correo y contraseña.',true);return}
+  if(up){
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){SB.lgMsg('Escribe un correo válido.',true);return}
+    if(pass.length<8){SB.lgMsg('La contraseña debe tener al menos 8 caracteres.',true);return}
+    if(!ag){SB.lgMsg('Selecciona tu agencia.',true);return}
+  }
   var btn=$('#lgGo');btn.disabled=true;SB.lgMsg('');
   try{
-    var r=up?await SB.c.auth.signUp({email:email,password:pass,options:{data:{name:name}}}):await SB.c.auth.signInWithPassword({email:email,password:pass});
+    var r=up?await SB.c.auth.signUp({email:email,password:pass,options:{data:{agency_id:Number(ag)}}}):await SB.c.auth.signInWithPassword({email:email,password:pass});
     if(r.error)throw r.error;
     if(up&&r.data.user&&r.data.user.identities&&!r.data.user.identities.length){SB.lgMode('in');SB.lgMsg('Ese correo ya tiene cuenta: inicia sesión.',true)}
     else if(up&&!r.data.session)SB.lgMsg('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
@@ -1941,7 +1980,7 @@ SB.submit=async function(ev){
   btn.disabled=false;
 };
 SB.loadAdvisors=async function(){
-  var r=await SB.c.from('profiles').select('id,name,role,created_at').order('created_at');
+  var r=await SB.c.from('profiles').select('id,name,role,created_at,agency_id,agencies(name)').order('created_at');
   if(r.error)throw r.error;
   ADVISORS.length=0;
   r.data.forEach(function(p){ADVISORS.push({id:p.id,name:p.name,role:p.role,tag:p.id===ME?'tú':''})});
@@ -1954,7 +1993,7 @@ SB.loadAdvisors=async function(){
     return SB.loadAdvisors();
   }
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
-  if(me){SB.user=me;
+  if(me){SB.user=me;SB.agency=(me.agencies&&me.agencies.name)||'Tu agencia';$('#adAgency').textContent=SB.agency;
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
 };
@@ -1978,9 +2017,13 @@ SB.enter=async function(user){
 SB.signOut=async function(){try{await SB.c.auth.signOut()}catch(_){}try{localStorage.removeItem(RS.K)}catch(_){}location.reload()};
 SB.init=function(){
   $('#lgForm').addEventListener('submit',SB.submit);
-  $('#lgAlt').addEventListener('click',function(){SB.lgMode(SB.mode==='in'?'up':'in')});
+  $('#lgTabUp').addEventListener('click',function(){SB.lgMode('up')});
+  $('#lgTabIn').addEventListener('click',function(){SB.lgMode('in')});
+  $('#lgAltP').addEventListener('click',function(e){if(e.target.id==='lgAlt')SB.lgMode(SB.mode==='in'?'up':'in')});
+  if(location.hash==='#registro')SB.lgMode('up');
   if(!window.supabase||!window.supabase.createClient){SB.lgMsg('No se pudo cargar el servicio. Revisa tu conexión y recarga.',true);return}
   SB.c=window.supabase.createClient(SB.url,SB.key);
+  SB.loadAgencies();
   SB.c.auth.onAuthStateChange(function(ev,sess){
     /* sin await dentro del callback: supabase-js se bloquea si se llama a su API desde aquí */
     setTimeout(function(){
