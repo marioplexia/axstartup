@@ -46,4 +46,14 @@ subir y borrar solo a quien puede ver ese expediente.
   - `aprender`: una corrida por evento de aprendizaje (el cron `aprender-barrido` corre cada 2 min con usuario "sistema"
     `00000000-0000-0000-0000-000000000000`).
 - El código fuente de `manual` y `aprender` vive en Supabase (no está copiado en este repositorio todavía).
-- Pendiente (paso 2b): `ai` (la más grande) y sincronizar `documento`/`evidencia` a harness v2 (hoy tienen v1, compatible).
+
+# Harness de agentes · paso 2b (`ai`)
+
+- `ai` (v13) migrada al módulo común: sus llamadas a la IA se reintentan ante fallas transitorias y cada petición queda en
+  `agent_runs` como `ai:<modo>` (`garantia`, `chat`, `agente`, `garantias_chat`, `extraer`, `probar`). Usa `AsyncLocalStorage`
+  para que cada llamada sume sus intentos a la corrida de SU petición. Código en `supabase/functions/ai/`.
+- Prueba de arranque (llamada con la llave pública, sin sesión): `ai`, `manual`, `documento`, `evidencia` y `aprender`
+  responden `401 unauthorized` desde su propio código, es decir, cargan bien.
+- `documento` (v2) y `evidencia` (v4) siguen con `harness.ts` v1: el comportamiento es el mismo (solo les falta `detalle` en
+  errores, que no usan). Se igualan a v2 en su próximo despliegue.
+- Código fuente de `manual` (v5) y `aprender` (v7): viven solo en Supabase, no están copiados en este repositorio.
