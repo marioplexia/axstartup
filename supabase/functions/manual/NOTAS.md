@@ -35,3 +35,15 @@ subir y borrar solo a quien puede ver ese expediente.
 - Reintentos solo ante fallas transitorias (red, tiempo agotado, 429, 5xx) con espera creciente. Reanudar con el mismo
   `run_id` repite solo lo pendiente: la lectura de la IA, si ya salió bien, no se vuelve a pagar.
 - Pendiente (pasos siguientes): módulo común para `manual`/`ai`/`aprender`, panel de salud de agentes, habilidades propuestas.
+
+# Harness de agentes · paso 2 (módulo común en manual y aprender)
+
+- `supabase/functions/_shared/harness.ts` es la copia canónica (v2: `detalle` en errores, `anotar()`, `NIL_USER`).
+  Cada función lleva su copia idéntica al desplegar.
+- Migradas al módulo: `manual` (v5) y `aprender` (v7). Ahora todas sus llamadas a la IA se reintentan ante fallas
+  transitorias, y quedan en `agent_runs`:
+  - `manual:<garantias|cobros|prueba>`: una corrida por pregunta, con cada llamada a la IA y cada herramienta usada.
+  - `aprender`: una corrida por evento de aprendizaje (el cron `aprender-barrido` corre cada 2 min con usuario "sistema"
+    `00000000-0000-0000-0000-000000000000`).
+- El código fuente de `manual` y `aprender` vive en Supabase (no está copiado en este repositorio todavía).
+- Pendiente (paso 2b): `ai` (la más grande) y sincronizar `documento`/`evidencia` a harness v2 (hoy tienen v1, compatible).
