@@ -401,6 +401,33 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .hm-sw input:focus-visible+i{outline:2px solid var(--fg);outline-offset:2px}
 .hm-btn{height:36px;padding:0 14px;border-radius:9px;border:1px solid var(--card-line);background:var(--card);color:var(--fg);font:500 13px var(--f-ui);cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .hm-btn:hover{background:var(--hover)}
+
+/* ---------- Configuración ---------- */
+.cf-grid{display:grid;gap:14px;max-width:720px;padding-bottom:24px}
+.cf-card{background:var(--card);border:1px solid var(--card-line);border-radius:12px;padding:18px 20px}
+.cf-card h3{margin:0;font:600 15px var(--f-ui)}
+.cf-card .sub{margin:3px 0 14px;color:var(--muted);font-size:13px}
+.cf-who{display:flex;align-items:center;gap:14px}
+.cf-who b{display:block;font-family:var(--f-display);font-weight:500;font-size:24px;letter-spacing:-.02em;line-height:1.15}
+.cf-who small{color:var(--muted);font-size:13px}
+.avatar.big{width:52px;height:52px;font-size:20px;background:var(--fg);color:var(--bg)}
+.cf-form+.cf-form{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.cf-l{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}
+.cf-r{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cf-r+.cf-l{margin-top:12px}
+.cf-in{flex:1;min-width:200px;height:36px;font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--card-line);border-radius:9px;padding:0 12px;outline:none}
+.cf-in:focus{border-color:var(--fg)}
+.cf-msg{min-height:0;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.cf-msg:empty{display:none}
+.cf-msg.ok{color:#1f8a4c}.cf-msg.bad{color:#c0392b}
+.cf-kv{display:flex;gap:28px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.cf-kv span{display:block;font-size:11.5px;color:var(--muted)}
+.cf-kv b{font-weight:500;font-size:13.5px}
+.cf-seg{display:inline-flex;padding:3px;gap:2px;border:1px solid var(--card-line);border-radius:10px;background:var(--surface)}
+.cf-seg button{height:30px;padding:0 14px;border-radius:7px;font-size:13px;color:var(--muted)}
+.cf-seg button[aria-pressed="true"]{background:var(--card);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.hm-btn.danger{color:#c0392b}
+.hm-btn:disabled{opacity:.55;cursor:default}
 .hm-btn.dark{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .hm-btn.dark:hover{opacity:.9;background:var(--fg)}
 .hm-btn svg{width:15px;height:15px}
@@ -1296,6 +1323,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         <div class="ad-card" id="caList"></div>
       </div>
     </section>
+    <section class="admin" id="viewCfg" hidden><div class="ad-in"><div class="ad-head"><div><h2>Configuración</h2><p id="cfSub">Tu cuenta, tu nombre y cómo ves la plataforma</p></div></div><div class="cf-grid" id="cfBody"></div></div></section>
     <section class="admin" id="viewAdmin" hidden>
       <div class="mr-hero" id="mrHero" hidden><canvas id="mrCv" aria-hidden="true"></canvas><h1 id="mrH"></h1><p id="mrP"></p></div>
       <div class="ad-in">
@@ -1484,24 +1512,121 @@ $('#sbOpen').addEventListener('click',function(){setSb(true)});
 $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){if(!MI.due().length){toast('Sin avisos pendientes');return}showView('mi');MI.send('¿Qué tengo pendiente?')});
-$('#settings').addEventListener('click',function(){toast('Configuración no está disponible en esta réplica')});
-$('#userBtn').addEventListener('click',function(){if(window.SB&&SB.user&&confirm('¿Cerrar la sesión de '+SB.user.name+'?'))SB.signOut()});
 
-var VIEWS={agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas'};
+var VIEWS={cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'}
 function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewPh').hidden=main||adm||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count()}
+  else if(id==='cfg'){crumb.textContent=VIEWS.cfg;crumbSep.hidden=true;crumb2.hidden=true;CFG.open()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
   else{crumb.textContent=AG[S.agent].crumb;syncCrumb()}
   if(mq.matches)setSb(false);
 }
 $$('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){showView(b.dataset.view)})});
 $('#expBtn').addEventListener('click',function(){showView('exp')});
+
+/* ---------- Configuración (todos los roles) ----------
+   Cuenta, nombre, contraseña y apariencia. El nombre vive en profiles
+   (la política "profiles update own" ya deja a cada quien editar su fila;
+   el trigger profiles_guard impide tocar role y brand). */
+var CFG={};
+CFG.ROL={asesor:'Asesor de garantías',admin:'Administrador de agencia',marca:'Administrador de marca'};
+CFG.msg=function(id,t,bad){var m=$('#'+id);if(!m)return;m.textContent=t||'';m.className='cf-msg'+(t?(bad?' bad':' ok'):'')};
+CFG.theme=function(){try{return localStorage.getItem('ax_theme')||'auto'}catch(_){return 'auto'}};
+CFG.applyTheme=function(v){
+  if(v==='light'||v==='dark')document.documentElement.dataset.theme=v;else delete document.documentElement.dataset.theme;
+  syncTheme();
+};
+CFG.setTheme=function(v){try{localStorage.setItem('ax_theme',v)}catch(_){}CFG.applyTheme(v);CFG.paintSeg()};
+CFG.paintSeg=function(){var t=CFG.theme();$$('#cfSeg button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.t===t))})};
+CFG.open=function(){CFG.render()};
+CFG.render=function(){
+  var body=$('#cfBody'),u=window.SB&&SB.user,sess=window.SB&&SB.c;
+  if(!u||!sess){body.innerHTML='<div class="cf-card"><h3>Inicia sesión</h3><p class="sub">Para configurar tu cuenta necesitas entrar con tu correo.</p></div>';return}
+  var rol=u.marca?'marca':u.role,email=(SB.email||''),since=u.created_at?new Date(u.created_at).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}):'';
+  var org=u.marca?('Marca '+(u.brand||'')):(SB.agency||'');
+  body.innerHTML=
+    '<div class="cf-card"><div class="cf-who"><span class="avatar big" id="cfAv">'+esc((u.name||'?').charAt(0).toUpperCase())+'</span><div><b id="cfWho">'+esc(u.name||'')+'</b><small>'+esc(CFG.ROL[rol]||rol)+(org?' · '+esc(org):'')+'</small></div></div></div>'+
+    '<div class="cf-card"><h3>Perfil</h3><p class="sub">Así te ven tus compañeros y así firma el agente tus acciones.</p>'+
+      '<form id="cfName" class="cf-form" novalidate><label class="cf-l" for="cfNm">Nombre</label><div class="cf-r"><input class="cf-in" id="cfNm" maxlength="60" autocomplete="name" value="'+ea(u.name||'')+'"><button class="hm-btn dark" type="submit">Guardar nombre</button></div><div id="cfNmM" class="cf-msg"></div></form>'+
+      '<div class="cf-kv"><div><span>Rol</span><b>'+esc(CFG.ROL[rol]||rol)+'</b></div><div><span>'+(u.marca?'Marca':'Agencia')+'</span><b>'+esc(org.replace(/^Marca /,'')||'—')+'</b></div>'+(since?'<div><span>En la plataforma desde</span><b>'+esc(since)+'</b></div>':'')+'</div>'+
+    '</div>'+
+    '<div class="cf-card"><h3>Cuenta</h3><p class="sub">El correo con el que entras. Si lo cambias, te llega un enlace de confirmación.</p>'+
+      '<form id="cfMail" class="cf-form" novalidate><label class="cf-l" for="cfEm">Correo</label><div class="cf-r"><input class="cf-in" id="cfEm" type="email" autocomplete="email" value="'+ea(email)+'"><button class="hm-btn" type="submit">Cambiar correo</button></div><div id="cfEmM" class="cf-msg"></div></form>'+
+      '<form id="cfPass" class="cf-form" novalidate><label class="cf-l" for="cfP1">Nueva contraseña</label><div class="cf-r"><input class="cf-in" id="cfP1" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo 8 caracteres"></div>'+
+        '<label class="cf-l" for="cfP2">Repite la contraseña</label><div class="cf-r"><input class="cf-in" id="cfP2" type="password" autocomplete="new-password" minlength="8"><button class="hm-btn" type="submit">Actualizar contraseña</button></div><div id="cfPwM" class="cf-msg"></div></form>'+
+    '</div>'+
+    '<div class="cf-card"><h3>Apariencia</h3><p class="sub">Se recuerda en este navegador.</p><div class="cf-seg" id="cfSeg" role="group" aria-label="Tema"><button type="button" data-t="auto">Automático</button><button type="button" data-t="light">Claro</button><button type="button" data-t="dark">Oscuro</button></div></div>'+
+    '<div class="cf-card"><h3>Sesión</h3><p class="sub">Salir en este dispositivo, o cerrar la sesión en todos los demás.</p><div class="cf-r"><button class="hm-btn" id="cfOthers" type="button">Cerrar en otros dispositivos</button><button class="hm-btn danger" id="cfOut" type="button">Cerrar sesión</button></div><div id="cfSsM" class="cf-msg"></div></div>';
+  CFG.paintSeg();
+  $('#cfSeg').addEventListener('click',function(e){var b=e.target.closest('button[data-t]');if(b)CFG.setTheme(b.dataset.t)});
+  $('#cfName').addEventListener('submit',CFG.saveName);
+  $('#cfMail').addEventListener('submit',CFG.saveMail);
+  $('#cfPass').addEventListener('submit',CFG.savePass);
+  $('#cfOthers').addEventListener('click',CFG.others);
+  $('#cfOut').addEventListener('click',function(){SB.signOut()});
+};
+CFG.busy=function(form,on){$$('button',form).forEach(function(b){b.disabled=on})};
+CFG.saveName=async function(e){
+  e.preventDefault();var f=e.currentTarget,u=SB.user,name=$('#cfNm').value.replace(/\s+/g,' ').trim();
+  if(name.length<2){CFG.msg('cfNmM','Escribe tu nombre (al menos 2 letras).',true);return}
+  if(name.length>60){CFG.msg('cfNmM','Máximo 60 caracteres.',true);return}
+  if(name===u.name){CFG.msg('cfNmM','Ese ya es tu nombre.');return}
+  CFG.busy(f,true);CFG.msg('cfNmM','Guardando…');
+  try{
+    var r=await SB.c.from('profiles').update({name:name}).eq('id',ME).select('name');
+    if(r.error)throw r.error;
+    if(!r.data||!r.data.length)throw new Error('No se pudo guardar el nombre.');
+    try{await SB.c.auth.updateUser({data:{name:name}})}catch(_){}
+    u.name=r.data[0].name;
+    ADVISORS.forEach(function(a){if(a.id===ME)a.name=u.name});
+    $('#userBtn').innerHTML='<span class="avatar">'+esc(u.name.charAt(0).toUpperCase())+'</span>'+esc(u.name);
+    $('#cfWho').textContent=u.name;$('#cfAv').textContent=u.name.charAt(0).toUpperCase();$('#cfNm').value=u.name;
+    CFG.msg('cfNmM','Nombre actualizado.');toast('Nombre actualizado');
+  }catch(err){CFG.msg('cfNmM',SB.errEs?SB.errEs(err):(err.message||'No se pudo guardar.'),true)}
+  CFG.busy(f,false);
+};
+CFG.saveMail=async function(e){
+  e.preventDefault();var f=e.currentTarget,em=$('#cfEm').value.trim().toLowerCase();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){CFG.msg('cfEmM','Escribe un correo válido.',true);return}
+  if(em===String(SB.email||'').toLowerCase()){CFG.msg('cfEmM','Ese ya es tu correo.');return}
+  CFG.busy(f,true);CFG.msg('cfEmM','Enviando confirmación…');
+  try{
+    var r=await SB.c.auth.updateUser({email:em});
+    if(r.error)throw r.error;
+    CFG.msg('cfEmM','Te enviamos un enlace de confirmación. El cambio se aplica cuando lo abras (revisa también tu correo anterior).');
+  }catch(err){CFG.msg('cfEmM',SB.errEs?SB.errEs(err):(err.message||'No se pudo cambiar.'),true)}
+  CFG.busy(f,false);
+};
+CFG.savePass=async function(e){
+  e.preventDefault();var f=e.currentTarget,a=$('#cfP1').value,b=$('#cfP2').value;
+  if(a.length<8){CFG.msg('cfPwM','La contraseña debe tener al menos 8 caracteres.',true);return}
+  if(a!==b){CFG.msg('cfPwM','Las contraseñas no coinciden.',true);return}
+  CFG.busy(f,true);CFG.msg('cfPwM','Actualizando…');
+  try{
+    var r=await SB.c.auth.updateUser({password:a});
+    if(r.error)throw r.error;
+    $('#cfP1').value='';$('#cfP2').value='';
+    CFG.msg('cfPwM','Contraseña actualizada.');toast('Contraseña actualizada');
+  }catch(err){CFG.msg('cfPwM',SB.errEs?SB.errEs(err):(err.message||'No se pudo actualizar.'),true)}
+  CFG.busy(f,false);
+};
+CFG.others=async function(){
+  var b=$('#cfOthers');b.disabled=true;CFG.msg('cfSsM','Cerrando…');
+  try{var r=await SB.c.auth.signOut({scope:'others'});if(r&&r.error)throw r.error;CFG.msg('cfSsM','Listo: se cerró la sesión en tus otros dispositivos.')}
+  catch(err){CFG.msg('cfSsM',SB.errEs?SB.errEs(err):(err.message||'No se pudo cerrar.'),true)}
+  b.disabled=false;
+};
+/* el tema elegido se recuerda; el botón de la luna del encabezado también lo guarda */
+(function(){var t=CFG.theme();if(t==='light'||t==='dark')CFG.applyTheme(t)})();
+$('#themeBtn').addEventListener('click',function(){setTimeout(function(){try{localStorage.setItem('ax_theme',document.documentElement.dataset.theme||'auto')}catch(_){}if($('#cfSeg'))CFG.paintSeg()},0)});
+$('#settings').addEventListener('click',function(){showView('cfg')});
+$('#userBtn').addEventListener('click',function(){showView('cfg')});
 
 /* ---------- Theme ---------- */
 function isDark(){var t=document.documentElement.dataset.theme;return t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches}
@@ -4076,7 +4201,7 @@ SB.loadAdvisors=async function(){
     return SB.loadAdvisors();
   }
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
-  if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
+  if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;try{var au=await SB.c.auth.getUser();SB.email=au&&au.data&&au.data.user&&au.data.user.email||''}catch(_){}SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
     MR.nav(!!me.marca);
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
@@ -5160,10 +5285,10 @@ var SK=(function(){
   /* ── results ─────────────────────────────────────────────
      ADAPTED: the old Ctrl+K palette's list, now hanging from the
      field. Same sections, same filter, same icons. */
-  var ICON={agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'};
+  var ICON={cfg:'settings',agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'};
   function results(){
     var v=norm(field.value.trim());
-    list=Object.keys(VIEWS).filter(function(k){return (MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&norm(VIEWS[k]).indexOf(v)>-1});
+    list=Object.keys(VIEWS).filter(function(k){return k==='cfg'||(MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&norm(VIEWS[k]).indexOf(v)>-1});
     if(sel>=list.length)sel=0;
     res.innerHTML='';
     if(!open){res.hidden=true;return}
