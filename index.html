@@ -994,7 +994,10 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .gp-row[hidden]{display:none}
 .gp-row>.stage{flex:1;min-width:0}
 .gp{width:300px;flex:none;border-left:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;min-height:0}
-.gp[hidden]{display:none}
+.gp[hidden],.gp.off{display:none}
+.gp-hide{width:30px;height:30px;flex:none;border:0;border-radius:8px;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center;font-size:16px;line-height:1}
+.gp-hide:hover{background:var(--hover);color:var(--fg)}
+.gp-h .gp-bt{display:flex;align-items:center;gap:4px}
 .gp-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 16px 10px}
 .gp-h b{font-size:14px;font-weight:600}.gp-h small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
 .gp-new{height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--card-line);background:var(--card);color:var(--fg);font:500 12.5px var(--f-ui);cursor:pointer;white-space:nowrap}
@@ -1856,6 +1859,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div class="crumbs"><span id="crumb">Agente de Garantías</span><span class="sep" id="crumbSep" hidden>/</span><span class="cur" id="crumb2" hidden></span></div>
       </div>
       <div class="tb-right">
+        <button class="ib" id="gpShow" data-i="file" aria-label="Mostrar órdenes" title="Mostrar órdenes" hidden></button>
         <button class="ib" id="newChat" data-i="plus" aria-label="Nueva PREA"></button>
         <span class="menu-host" id="histTop"><button class="ib" data-i="history" aria-label="Conversaciones" aria-haspopup="menu" aria-expanded="false"></button></span>
         <button class="ib" id="expBtn" data-i="folderchart" aria-label="Expedientes"></button>
@@ -1913,8 +1917,8 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
       </div>
     </section>
     <aside class="gp" id="gp" aria-label="Conversaciones" hidden>
-      <div class="gp-h"><div><b>Conversaciones</b><small id="gpCount"></small></div><button class="gp-new" id="gpNew" type="button">+ Nueva</button></div>
-      <label class="gp-s"><span data-i="search" style="display:contents"></span><input id="gpQ" type="search" placeholder="Buscar orden o queja" aria-label="Buscar conversaciones" autocomplete="off"></label>
+      <div class="gp-h"><div><b>Órdenes</b><small id="gpCount"></small></div><span class="gp-bt"><button class="gp-new" id="gpNew" type="button">+ Nueva</button><button class="gp-hide" id="gpHide" type="button" aria-label="Ocultar órdenes" title="Ocultar órdenes">✕</button></span></div>
+      <label class="gp-s"><span data-i="search" style="display:contents"></span><input id="gpQ" type="search" placeholder="Buscar orden o queja" aria-label="Buscar órdenes" autocomplete="off"></label>
       <div class="gp-l" id="gpList" role="list"></div>
     </aside>
     </div>
@@ -2165,7 +2169,7 @@ function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count()}
   else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
@@ -4661,9 +4665,9 @@ GP.load=async function(){
 GP.render=function(){
   var box=$('#gpList');if(!box)return;
   var ag=GP.ag(),q=norm(GP.q),mine=GP.mine(),L=mine.filter(function(c){return !q||norm((c.orden||'')+' '+(c.text||'')+' '+(c.title||'')).indexOf(q)>=0});
-  $('#gp .gp-h b').textContent=ag==='cobros'?'Conversaciones de Cobros':'Conversaciones';
-  $('#gpCount').textContent=mine.length?mine.length+(mine.length===1?' conversación':' conversaciones'):'Se guardan solas';
-  if(!L.length){box.innerHTML='<div class="gp-none">'+(mine.length?'Sin resultados.':(ag==='cobros'?'Aún no hay conversaciones de cobro.<br>Escribe la orden o el folio de una PREA aceptada, por ejemplo <b>GA4041</b>, y se guarda sola.':'Aún no hay conversaciones.<br>Escribe un caso con su número de orden, por ejemplo <b>GA4041</b>, y se guarda solo.'))+'</div>';return}
+  $('#gp .gp-h b').textContent=ag==='cobros'?'Órdenes de Cobros':'Órdenes';
+  $('#gpCount').textContent=mine.length?mine.length+(mine.length===1?' orden':' órdenes'):'Se guardan solas';
+  if(!L.length){box.innerHTML='<div class="gp-none">'+(mine.length?'Sin resultados.':(ag==='cobros'?'Aún no hay órdenes de cobro.<br>Escribe la orden o el folio de una PREA aceptada, por ejemplo <b>GA4041</b>, y se guarda sola.':'Aún no hay órdenes.<br>Escribe un caso con su número de orden, por ejemplo <b>GA4041</b>, y se guarda solo.'))+'</div>';return}
   var html='',last='';
   L.forEach(function(c){
     var day=SB.dayLbl(c.created_at);if(day!==last){html+='<div class="gp-d">'+esc(day)+'</div>';last=day}
@@ -6529,6 +6533,18 @@ function start(text,files){
    Antes de escribir nada: se elige si es PREA, Campaña o Servicio (el botón
    Create) y después se escribe el número de orden (GA4043). Solo entonces
    aparece el composer. Cada chat nuevo vuelve a pedirlo. */
+/* ocultar / mostrar la lista de órdenes (se recuerda en este navegador) */
+var GPUI={off:false};
+try{GPUI.off=localStorage.getItem('ax_gp_off')==='1'}catch(_){}
+GPUI.sync=function(){
+  var g=$('#gp'),avail=!g.hidden;
+  g.classList.toggle('off',GPUI.off);
+  $('#gpShow').hidden=!(avail&&GPUI.off);
+};
+GPUI.set=function(off){GPUI.off=off;try{localStorage.setItem('ax_gp_off',off?'1':'0')}catch(_){}GPUI.sync()};
+$('#gpHide').addEventListener('click',function(){GPUI.set(true);$('#gpShow').focus()});
+$('#gpShow').addEventListener('click',function(){GPUI.set(false)});
+GPUI.sync();
 var gStill=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 var GATE={v:null,open:false,beat:0,ORD:/^(GA-?\d{3,8}|G-[A-Z0-9]{6,10}|[A-Z]{1,3}-?\d{3,8})$/};
 GATE.on=function(){return S.agent==='garantias'&&stage.dataset.state!=='chat'&&!GATE.v};
