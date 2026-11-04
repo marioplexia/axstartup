@@ -57,3 +57,12 @@ subir y borrar solo a quien puede ver ese expediente.
 - `documento` (v2) y `evidencia` (v4) siguen con `harness.ts` v1: el comportamiento es el mismo (solo les falta `detalle` en
   errores, que no usan). Se igualan a v2 en su próximo despliegue.
 - Código fuente de `manual` (v5) y `aprender` (v7): viven solo en Supabase, no están copiados en este repositorio.
+
+# Panel de salud de agentes
+
+- Tarjeta "Salud de agentes" en el Tablero de agencia (administradores) y en la pestaña Cerebro del tablero de marca.
+  Muestra corridas, % de éxito, reintentos, tiempo medio y p95, corridas sin cerrar (más de 10 min en curso) y las últimas
+  fallas, por agente. Periodos: 24 h, 7 días, 30 días. Se refresca solo cada 30 s con el tablero abierto.
+- Datos: función SQL `salud_agentes(p_horas)` (SECURITY INVOKER: respeta las políticas de `agent_runs`).
+  Políticas: cada quien ve lo suyo; el administrador de agencia ve a su gente (`can_admin`); la marca ve todo, incluido el
+  aprendizaje automático (usuario "sistema"), con la política `runs read marca`.

@@ -1631,6 +1631,25 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .eyt-body { fill: var(--fill-slab, #ffffff); transition: fill .2s; }
 
 .eyt-eye { fill: var(--fill-on, #0b0b0d); }
+/* ══ Salud de agentes (tablero) ══ */
+.sh-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sh-top select{height:30px;padding:0 8px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:12.5px var(--f-ui)}
+.sh-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font:500 12px var(--f-ui);background:var(--chip);color:var(--muted)}
+.sh-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.sh-chip.ok{color:#15803d;background:color-mix(in srgb,#15803d 12%,var(--card))}
+.sh-chip.warn{color:#b45309;background:color-mix(in srgb,#e0a100 16%,var(--card))}
+.sh-chip.err{color:#b42318;background:color-mix(in srgb,#e5484d 12%,var(--card))}
+#saludBox .ad-kpi{padding:14px 14px 4px;margin-bottom:0}
+.sh-h{padding:12px 14px 6px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint)}
+.sh-row{display:grid;grid-template-columns:minmax(150px,2fr) repeat(5,minmax(62px,1fr));gap:8px;align-items:center;padding:9px 14px;border-top:1px solid var(--line);font-size:13px}
+.sh-row.hd{border-top:0;font-size:11.5px;color:var(--faint);padding-top:4px;padding-bottom:4px}
+.sh-row b{font-weight:600}
+.sh-row .m{color:var(--muted);font-variant-numeric:tabular-nums}
+.sh-row .bad{color:#b42318;font-weight:600}
+.sh-err{padding:9px 14px;border-top:1px solid var(--line);font-size:13px;display:grid;gap:2px}
+.sh-err small{color:var(--muted);font-size:12px}
+.sh-empty{padding:22px 14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.55}
+@media(max-width:760px){.sh-row{grid-template-columns:1.6fr repeat(3,1fr)}.sh-row>:nth-child(n+5){display:none}}
 /* ══ Expediente a pantalla completa + Upload dropzone ═════
    (Bencho · MIT · bencho.dev/licence.) Adapted to vanilla JS and to REAL
    files: the box takes a drag from the computer or a click to browse.
@@ -1986,6 +2005,14 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
           <div class="ad-live" id="adLive"><i></i><span>En vivo</span></div>
         </div>
         <div class="ad-kpi" id="adKpi" data-ms="cerebro agencia"></div>
+        <div class="ad-card" id="saludBox" data-ms="agencia cerebro" style="margin-bottom:14px">
+          <div class="ad-ch"><h3>Salud de agentes</h3><span class="sh-chip" id="shChip">Sin datos</span><span style="flex:1"></span>
+            <span class="sh-top"><select id="shPer" aria-label="Periodo"><option value="24">Últimas 24 h</option><option value="168" selected>7 días</option><option value="720">30 días</option></select><button class="bt" type="button" id="shRef">Actualizar</button></span></div>
+          <div class="ad-kpi" id="shKpi"></div>
+          <div id="shTab"></div>
+          <div class="sh-h" id="shEH" hidden>Últimas fallas</div>
+          <div id="shErr"></div>
+        </div>
         <div id="mrBox">
           <div class="ad-kpi" id="mrKpi" data-ms="resumen"></div>
           <div data-ms="agencias">
@@ -2177,7 +2204,7 @@ function showView(id){
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
   var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
-  if(adm){adRender();AD.loadExp();PH.count()}
+  if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
   else if(id==='cfg'){crumb.textContent=VIEWS.cfg;crumbSep.hidden=true;crumb2.hidden=true;CFG.open()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
@@ -6144,6 +6171,52 @@ LS.render=function(){
     if(e.target.id==='lsRun'){e.target.disabled=true;e.target.textContent='Procesando…';await LS.learnNow();e.target.disabled=false;e.target.textContent='Procesar pendientes';LS.load()}
   });
 })();
+/* ══ Salud de agentes ═════════════════════════════════════
+   Lee la bitácora agent_runs con salud_agentes(): cuántas corridas hizo cada agente, cuántas salieron bien, cuántas
+   necesitaron reintentos, cuánto tardaron y las últimas fallas. La función corre con los permisos de quien mira: el
+   administrador de agencia ve a su gente y la marca ve todo (incluido el aprendizaje automático). */
+var SH={d:null,t:0,busy:false,
+  NOM:{'manual:garantias':'Agente de Garantías (chat)','manual:cobros':'Agente de Cobros (chat)','manual:prueba':'Agente de pruebas (manual)','ai:garantia':'Formulario de PREA','ai:chat':'Chat de la agencia','ai:agente':'Mi Agente','ai:garantias_chat':'Conversación de una orden','ai:extraer':'Lectura de documentos (entrenamiento)','ai:probar':'Agente de pruebas','documento':'Documentos del expediente','evidencia':'Inspección de evidencia','aprender':'Aprendizaje del cerebro'},
+  ERR:{upstream:'El proveedor de IA no respondió',ai_not_configured:'La IA no está configurada',bad_output:'La IA devolvió una respuesta inválida',expediente_no_disponible:'Expediente no disponible',archivo_invalido:'Archivo inválido'}};
+SH.nom=function(a){return SH.NOM[a]||a};
+SH.ms=function(n){return n==null?'—':n<1000?n+' ms':(n/1000).toFixed(1)+' s'};
+SH.err=function(e){return e?(SH.ERR[e]||String(e).slice(0,90)):'Sin cerrar (no terminó)'};
+SH.load=async function(force){
+  if(!SB.c||!SB.entered||SH.busy)return;
+  if(!force&&Date.now()-SH.t<15000)return;
+  SH.busy=true;
+  try{
+    var r=await SB.c.rpc('salud_agentes',{p_horas:Number($('#shPer').value)||168});
+    if(r.error){SB.fail(r.error);return}
+    SH.d=r.data;SH.t=Date.now();SH.render();
+  }finally{SH.busy=false}
+};
+SH.render=function(){
+  var d=SH.d;if(!d)return;
+  var fin=d.ok+d.error,rate=fin?Math.round(100*d.ok/fin):null,per=d.horas<=24?'24 h':d.horas>=720?'30 días':'7 días';
+  var cls=!d.total?'':(rate!=null&&rate>=95&&!d.colgadas)?'ok':(rate!=null&&rate<80)?'err':'warn';
+  var chip=$('#shChip');chip.className='sh-chip '+cls;chip.textContent=!d.total?'Sin datos':cls==='ok'?'Sana':cls==='err'?'Con fallas':'Atención';
+  var K=function(l,v,sb,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+sb+'</small></div>'};
+  $('#shKpi').innerHTML=K('Corridas',d.total,'últimas '+per)+
+    K('Éxito',rate==null?'—':rate+'%',fin?d.ok+' de '+fin+' terminadas':'sin corridas terminadas',rate!=null&&rate<80?'warn':'')+
+    K('Con reintentos',d.con_reintentos,d.total?Math.round(100*d.con_reintentos/d.total)+'% de las corridas':'—')+
+    K('Tiempo medio',SH.ms(d.ms_prom),'p95 '+SH.ms(d.ms_p95))+
+    K('Sin cerrar',d.colgadas,'en curso hace más de 10 min',d.colgadas?'warn':'');
+  var tab=$('#shTab');
+  if(!d.total){tab.innerHTML='<div class="sh-empty">Aún no hay corridas en este periodo.<br>Aparecerán en cuanto se use el chat, se arme una PREA o se suba un documento al expediente.</div>';$('#shErr').innerHTML='';$('#shEH').hidden=true;return}
+  tab.innerHTML='<div class="sh-row hd"><span>Agente</span><span>Corridas</span><span>Éxito</span><span>Reintentos</span><span>Tiempo medio</span><span>Último error</span></div>'+
+    d.agentes.map(function(a){
+      var f=a.ok+a.error,p=f?Math.round(100*a.ok/f):null;
+      return '<div class="sh-row"><b>'+esc(SH.nom(a.agent))+'</b><span class="m">'+a.total+'</span><span class="'+(p!=null&&p<80?'bad':'m')+'">'+(p==null?'—':p+'%')+'</span><span class="m">'+a.con_reintentos+'</span><span class="m">'+SH.ms(a.ms_prom)+'</span>'+
+        '<span class="m" title="'+ea(a.ultimo_error?SH.err(a.ultimo_error):'')+'">'+(a.ultimo_error_at?ago(+new Date(a.ultimo_error_at)):'—')+'</span></div>'}).join('');
+  $('#shEH').hidden=!d.fallas.length;
+  $('#shErr').innerHTML=d.fallas.map(function(f){
+    return '<div class="sh-err"><span><b>'+esc(SH.nom(f.agent))+'</b> · '+esc(SH.err(f.error))+'</span><small>'+ago(+new Date(f.at))+' · '+f.intentos+(f.intentos===1?' intento':' intentos')+(f.ms!=null?' · '+SH.ms(f.ms):'')+'</small></div>'}).join('');
+};
+$('#shPer').addEventListener('change',function(){SH.load(true)});
+$('#shRef').addEventListener('click',function(){SH.load(true)});
+/* con el tablero abierto se refresca solo cada 30 s */
+setInterval(function(){if(document.visibilityState==='visible'&&(S.view==='admin'||String(S.view).indexOf('m_')===0))SH.load(true)},30000);
 var AD={filter:'todas',q:'',open:{},raf:0,exp:[]};
 AD.loadExp=async function(){
   if(!SB.c||!SB.entered)return;
