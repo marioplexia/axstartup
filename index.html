@@ -1901,7 +1901,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
             <span class="menu-host" id="brandHost"><button class="dd" aria-haspopup="menu" aria-expanded="false"><span id="brandLabel">General Motors</span></button></span>
           </div>
           <div class="card">
-            <p class="ev-hint" id="evHint" role="alert" hidden>Para armar la PREA primero adjunta la evidencia: orden de reparación, diagnóstico, fotos o mediciones. Sin evidencia no puedo continuar.</p>
+            <p class="ev-hint" id="evHint" role="alert" hidden>Para armar la PREA primero adjunta la evidencia del caso: orden de reparación o de ingreso, fotos o lo que demuestre la falla. Los códigos, la mano de obra, las piezas y las descripciones los armo yo con lo que aprendió el cerebro. Sin evidencia no puedo continuar.</p>
             <div class="files" id="files" hidden></div>
             <textarea id="ta" rows="3" placeholder="Describe tu caso de garantía…" aria-label="Describe tu caso de garantía"></textarea>
             <div class="c-foot">
@@ -6277,7 +6277,7 @@ async function run(text,files){
     s3.done(!sm?'no pude consultar tus expedientes':sm.n?sm.n+' parecidos de '+sm.total+' ('+sm.acc+' aceptadas, '+sm.rej+' rechazadas)':'ninguno parecido entre '+sm.total);
   }
   if(!my.aborted&&text&&!SB.aiOff&&SB.entered){
-    var s4=tk.step('Consultando al modelo de IA'),form=await SB.aiPrea(evi?String(text||'').slice(0,1700)+'\n\n[Evidencia inspeccionada ('+evi.archivos+' archivos)]\n'+evi.resumen+(evi.inconsistencias.length?'\nInconsistencias: '+evi.inconsistencias.join('; '):''):text);
+    var s4=tk.step('Consultando al modelo de IA'),form=await SB.aiPrea(evi?String(text||'').slice(0,1700)+'\n\n[Evidencia inspeccionada ('+evi.archivos+' archivos)]\nHechos comprobados: '+evi.resumen+(evi.inconsistencias.length?'\nInconsistencias: '+evi.inconsistencias.join('; '):'')+(evi.datos&&(evi.datos.piezas_mencionadas&&evi.datos.piezas_mencionadas.length||evi.datos.codigos_falla&&evi.datos.codigos_falla.length)?'\nPistas de la evidencia (no definitivas): '+[].concat(evi.datos.piezas_mencionadas||[],evi.datos.codigos_falla||[]).slice(0,10).join(', '):'')+'\nEl asesor no aporta códigos, mano de obra, piezas ni redacción técnica: arma TÚ los códigos de queja, causa y corrección, la operación y el tiempo, las piezas (valida con las reglas y lecciones del cerebro las que aparecen en la evidencia y agrega o quita las que planta acepta) y mejora las descripciones.':text);
     if(form&&!my.aborted)SB.applyForm(ctx,form);
     s4.done(form?'formulario propuesto, '+(form.rule_id?'regla '+form.rule_id:'sin regla del catálogo'):'no disponible, uso el catálogo');
   }
