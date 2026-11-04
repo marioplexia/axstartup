@@ -336,6 +336,208 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .fx-btn[aria-pressed="true"]{color:var(--bg)}
 .fx-btn:active{scale:.94}
 .fx-btn:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+
+/* ══ Assignees ════════════════════════════════════════════
+   (Bencho · MIT · bencho.dev/licence.) A pill that fills with faces, and
+   the list it fills from. The rail's width is an inline number computed
+   from the count, never measured — see ASG in the script.
+
+   TOKENS, mapped on the component's own root so nothing leaks:
+     --fill-slab         → the project's own --card (pill and list)
+     --fill-on, --ink    → --fg
+     --fill-on-rgb,
+     --ink-rgb           → 22,22,22 light / 237,237,235 dark: three bare
+                           numbers, because rgba() is built from them
+     --pane-edge         → --line
+     --font-ui           → --f-ui
+   --card is the project's own and is not redefined here. */
+.pik{
+  --fill-slab: var(--card);
+  --fill-on: var(--fg);
+  --ink: var(--fg);
+  --fill-on-rgb: 22, 22, 22;
+  --ink-rgb: 22, 22, 22;
+  --pane-edge: var(--line);
+  --font-ui: var(--f-ui);
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  font-family: var(--font-ui);
+  color: var(--fill-on, var(--ink));}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pik{--fill-on-rgb:237,237,235;--ink-rgb:237,237,235}}
+:root[data-theme="dark"] .pik{--fill-on-rgb:237,237,235;--ink-rgb:237,237,235}
+.pik.open { z-index: 40; }
+
+.pik-pill {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  /* tighter on the left, because a face is a filled circle and a word is
+     not: 16 of air beside a word is the same amount of air as 8 beside a
+     picture */
+  padding: 0 12px 0 8px;
+  border: 0;
+  background: var(--fill-slab, var(--card));
+  /* ── NO SHADOW, AND NO HAIRLINE EITHER ────────────────────
+     The ring comes back only when Stroke asks for it, and nothing here
+     needs lifting: the pill and the card are the fill's own slab and they
+     sit on the note's grey ground, which separates them on its own. */
+  border-radius: 20px;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: -0.01em;}
+.pik.ro .pik-pill { cursor: default; padding-right: 8px; }
+[data-stroke="on"] .pik-pill { box-shadow: 0 0 0 1px var(--pane-edge); }
+.pik-pill:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.45); }
+
+/* ── the rail the faces sit in ──────────────────────────────
+   Its width is the whole animation. The faces are absolute inside it, so
+   none of them moves when another arrives — the rail simply has more room,
+   and the pill is sized by it. Nothing here measures anything. */
+.pik-rail { position: relative; flex: none; height: 28px; width: 0; transition: width 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+.pik-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  /* placed by its translate; the face inside carries the arrival */
+  transition: translate 380ms cubic-bezier(0.3, 1.4, 0.5, 1);
+  /* the ring is the CARD's colour, not white: it is the gap between two
+     overlapping faces, so it has to be whatever is behind them or the
+     stack grows a halo in dark mode */
+  box-shadow: 0 0 0 2px var(--fill-slab, var(--card));}
+.pik-face > i { display: block; width: 100%; height: 100%; border-radius: 999px; }
+.pik-face > i.in { animation: pik-face-in 480ms cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+.pik-face > i.out { animation: pik-face-out 180ms ease-in both; }
+@keyframes pik-face-in { from { opacity: 0; transform: translateY(-10px) scale(0.2) rotate(-22deg); } to { opacity: 1; transform: none; } }
+@keyframes pik-face-out { to { opacity: 0; transform: translateY(-6px) scale(0.2) rotate(14deg); } }
+
+/* with no faces the rail collapses to nothing but the pill's gap still
+   sits in front of the word; pull it back so the text is inset 12 from the
+   edge, matching the pill's own right padding */
+.pik-say { margin-left: -6px; color: var(--fill-on, var(--ink)); }
+.pik-say[hidden] { display: none; }
+
+/* ── the chevron IS the hover state ─────────────────────────
+   With the shadow gone the pill had nothing left to answer the cursor
+   with, and a fill appearing behind it would be a second shape arriving
+   on a control whose whole subject is shapes. The glyph goes to a stronger
+   ink instead: same thing said, nothing new on screen. */
+.pik-chev { flex: none; margin-left: -2px; color: color-mix(in srgb, var(--fill-on, #17181a) 32%, var(--fill-slab, #ffffff)); transition: rotate 220ms cubic-bezier(0.22, 1, 0.36, 1), color 160ms ease; }
+.pik-pill:hover .pik-chev { color: color-mix(in srgb, var(--fill-on, #17181a) 72%, var(--fill-slab, #ffffff)); }
+.pik-pill[aria-expanded="true"] .pik-chev { rotate: 180deg; }
+
+/* ── the list ───────────────────────────────────────────────
+   Absolute, so opening it moves nothing. It unfolds from the PILL'S
+   corner (top left, or top right when it opens leftwards), not the
+   middle, which is what a box appearing does. ADAPTED: a soft shadow,
+   because here it floats over a white page and not over the block's own
+   grey ground. */
+.pik-card {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  width: min(264px, calc(100vw - 24px));
+  padding: 8px;
+  background: var(--fill-slab, var(--card));
+  border-radius: 20px;
+  box-shadow: 0 0 0 1px var(--pane-edge), var(--shadow-focus);
+  transform-origin: 0 0;
+  animation: pik-pop 420ms cubic-bezier(0.3, 1.5, 0.5, 1) both;}
+.pik.r .pik-card { left: auto; right: 0; transform-origin: 100% 0; }
+.pik-card[hidden] { display: none; }
+.pik-card.closing { animation: pik-pop-out 160ms ease-in both; pointer-events: none; }
+@keyframes pik-pop { from { opacity: 0; transform: translateY(-10px) scale(0.86, 0.72); } to { opacity: 1; transform: none; } }
+@keyframes pik-pop-out { to { opacity: 0; transform: translateY(-8px) scale(0.92, 0.86); } }
+@keyframes pik-row-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+.pik-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 48px;
+  padding: 0 8px;
+  border: 0;
+  /* the card's corner less its 6px padding: the radius of a thing inside
+     another, LESS the gap between them */
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  animation: pik-row-in 300ms cubic-bezier(0.3, 1.3, 0.5, 1) both;
+  transition: background 160ms ease;}
+.pik-row:hover, .pik-row:focus-visible { background: color-mix(in srgb, var(--fill-on, #17181a) 6%, transparent); outline: none; }
+.pik-av { flex: none; width: 32px; height: 32px; border-radius: 999px; display: block; }
+.pik-who { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+/* the same type as the other lists: the regular weight at 13, not the
+   label setting — a name in a row of people is not a label */
+.pik-name { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0em; }
+.pik-role { font-size: 11px; color: color-mix(in srgb, var(--fill-on, #17181a) 52%, var(--fill-slab, #ffffff)); letter-spacing: 0em; }
+
+/* ── the mark ───────────────────────────────────────────────
+   Drawn at rest as an empty box and filled when it is on, so the row
+   always shows that it CAN be chosen. A rounded square, not a disc: round
+   enough to belong to the pill and the card, square enough that a column
+   of four reads as checkboxes and not as a second set of avatars. */
+.pik-mark { flex: none; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 6px; box-shadow: inset 0 0 0 1.5px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.22); transition: background 160ms ease, box-shadow 160ms ease; }
+.pik-row[data-on] .pik-mark { background: var(--fill-on, var(--ink)); box-shadow: inset 0 0 0 1.5px var(--fill-on, var(--ink)); }
+.pik-tick { display: none; place-items: center; color: var(--fill-slab, var(--card)); }
+.pik-row[data-on] .pik-tick { display: grid; animation: pik-tick-in 300ms cubic-bezier(0.3, 1.7, 0.5, 1); }
+@keyframes pik-tick-in { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .pik-rail, .pik-chev, .pik-face { transition-duration: 160ms; }
+  .pik-card, .pik-row, .pik-face > i, .pik-tick { animation: none !important; }
+}
+
+/* ---------- Notas: la semana ---------- */
+.admin.nt { background: var(--bg); }
+.nt-in { max-width: 1280px; }
+.nt-nav { display: flex; gap: 8px; }
+.nt-nav .hm-btn { min-width: 36px; justify-content: center; padding: 0 12px; }
+.nt-week { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 22px 18px; padding-bottom: 48px; }
+.nt-day { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.nt-day > header { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px 8px; border-bottom: 1px solid var(--line); }
+.nt-dn { font-size: 13px; font-weight: 500; color: var(--muted); }
+.nt-dd { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 999px; font: 500 20px var(--f-display); letter-spacing: -.02em; }
+.nt-day[data-today] .nt-dn { color: var(--fg); }
+.nt-day[data-today] .nt-dd { background: var(--fg); color: var(--bg); font-family: var(--f-ui); font-size: 14px; }
+.nt-list { display: flex; flex-direction: column; gap: 10px; }
+.nt-note { position: relative; padding: 12px 12px 10px 14px; border-radius: 16px; background: var(--surface); }
+.nt-row { display: flex; gap: 10px; align-items: flex-start; }
+.nt-chk { flex: none; display: grid; place-items: center; width: 18px; height: 18px; margin-top: 2px; border-radius: 6px; color: transparent; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--fg) 25%, transparent); transition: background .16s, color .16s, box-shadow .16s, scale .18s cubic-bezier(.3,1.6,.5,1); }
+.nt-chk:not(:disabled):hover { scale: 1.1; }
+.nt-chk:disabled { cursor: default; }
+.nt-note[data-done] .nt-chk { background: var(--fg); color: var(--bg); box-shadow: inset 0 0 0 1.5px var(--fg); }
+.nt-tx { margin: 0; flex: 1; min-width: 0; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; cursor: text; }
+.nt-note[data-ro] .nt-tx { cursor: default; }
+.nt-note[data-done] .nt-tx { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--fg) 35%, transparent); }
+.nt-del { flex: none; width: 22px; height: 22px; margin: -2px -4px 0 0; border-radius: 999px; color: var(--faint); font-size: 18px; line-height: 1; display: grid; place-items: center; opacity: 0; transition: opacity .15s, background .15s, color .15s; }
+.nt-note:hover .nt-del, .nt-del:focus-visible { opacity: 1; }
+.nt-del:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--fg); }
+@media (hover: none) { .nt-del { opacity: 1; } }
+.nt-by { margin: 6px 0 0 28px; font-size: 11.5px; color: var(--muted); }
+.nt-foot { margin: 10px 0 0 28px; }
+.nt-ed { flex: 1; width: 100%; min-width: 0; font: inherit; font-size: 13.5px; line-height: 1.5; color: var(--fg); background: var(--bg); border: 1px solid var(--card-line); border-radius: 10px; padding: 6px 8px; outline: none; resize: vertical; }
+.nt-ed:focus { border-color: var(--fg); }
+.nt-add { align-self: flex-start; height: 34px; padding: 0 12px; border-radius: 999px; font-size: 13px; color: var(--muted); transition: background .15s, color .15s; }
+.nt-add:hover { background: var(--surface); color: var(--fg); }
+.nt-new { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 16px; background: var(--surface); }
+.nt-new textarea { font: inherit; font-size: 13.5px; line-height: 1.5; color: var(--fg); background: var(--bg); border: 1px solid var(--card-line); border-radius: 10px; padding: 8px 10px; outline: none; resize: vertical; width: 100%; }
+.nt-new textarea:focus { border-color: var(--fg); }
+.nt-act { display: flex; gap: 8px; }
 @media (prefers-reduced-motion: reduce){.fx-ind,.fx-btn{transition:none}.fx-ind.hit{animation:none}}
 
 /* ══ Action node ══════════════════════════════════════════
@@ -1432,6 +1634,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         <button class="nav" data-nm data-view="inicio" data-i="home" aria-current="true">Inicio</button>
         <button class="nav" data-nm data-view="mi" data-i="chat">Mi Agente</button>
         <button class="nav" data-nm data-view="bitacora" data-i="clip">Bitácora</button>
+        <button class="nav" data-nm data-view="notas" data-i="note">Notas</button>
         <button class="nav" data-nm data-view="exp" data-i="folderopen">Expedientes</button>
         <button class="nav" data-nm data-view="cobros" data-i="dollar">Agente de Cobros</button>
         <button class="nav" data-nm data-view="cartera" data-i="wallet">Agente de Cartera</button>
@@ -1554,6 +1757,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         <div class="ad-card" id="caList"></div>
       </div>
     </section>
+    <section class="admin nt" id="viewNotas" hidden><div class="ad-in nt-in" id="ntBody"></div></section>
     <section class="admin" id="viewCfg" hidden><div class="ad-in"><div class="ad-head"><div><h2>Configuración</h2><p id="cfSub">Tu cuenta, tu nombre y cómo ves la plataforma</p></div></div><div class="cf-grid" id="cfBody"></div></div></section>
     <section class="admin" id="viewAdmin" hidden>
       <div class="mr-hero" id="mrHero" hidden><canvas id="mrCv" aria-hidden="true"></canvas><h1 id="mrH"></h1><p id="mrP"></p></div>
@@ -1697,6 +1901,7 @@ var P={
   mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/>',
   bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
   search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  note:'<path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/>',
   panel:'<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
   history:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/>',
   moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
@@ -1744,15 +1949,16 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){if(!MI.due().length){toast('Sin avisos pendientes');return}showView('mi');MI.send('¿Qué tengo pendiente?')});
 
-var VIEWS={cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas'};
+var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'}
 function showView(id){
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count()}
+  else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
   else if(id==='cfg'){crumb.textContent=VIEWS.cfg;crumbSep.hidden=true;crumb2.hidden=true;CFG.open()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
   else{crumb.textContent=AG[S.agent].crumb;syncCrumb()}
@@ -1858,6 +2064,240 @@ CFG.others=async function(){
 $('#themeBtn').addEventListener('click',function(){setTimeout(function(){try{localStorage.setItem('ax_theme',document.documentElement.dataset.theme||'auto')}catch(_){}if($('#cfSeg'))CFG.paintSeg()},0)});
 $('#settings').addEventListener('click',function(){showView('cfg')});
 $('#userBtn').addEventListener('click',function(){showView('cfg')});
+
+/* ══ Assignees ════════════════════════════════════════════
+   Bencho · MIT · bencho.dev/licence. A pill that opens a list, and fills
+   up with faces as you assign them. One, two, four — the pill grows to
+   hold them and they overlap into a stack rather than a row. Here it puts
+   names against a note: who in the agency it is for.
+
+   THE PILL IS THE READOUT. There is no count badge and no "3 selected"
+   caption: the faces themselves say who, which is the thing a person
+   actually wants back. A number tells you how many you picked; a stack of
+   faces tells you whether you picked the right ones.
+
+   ADAPTED to vanilla JS and this project:
+   · AVATARS was Bencho's own photographs, which are not licensed to
+     travel and would be somebody else's face next to a colleague's name.
+     The faces are soft gradient orbs, one palette per person, chosen from
+     their id so the same colleague is the same colour everywhere.
+   · The cast is the agency's real advisors (ADVISORS), not four names.
+   · Framer's springs became CSS keyframes with an overshooting curve (the
+     same character: a face lands, it does not fade in; the list unfolds
+     out of the pill with a bounce), and the rail's width is still
+     COMPUTED from the count — "Framer's `layout` would animate this by
+     measuring screen rectangles"; a width worked out from the count is the
+     same number at any zoom and CSS can transition it.
+   · It DOES close on an outside press. The original leaves that listener
+     out because of the wall it was drawn on ("anyone lifting this into a
+     real interface wants the listener back"); this is a real interface. */
+var ASG=(function(){
+  var FACE=28;      /* the faces in the pill */
+  var LAP=10;       /* how much of each face the next one covers, px */
+  var PAL=[['#ff3fb0','#b44bff'],['#18a8ff','#6a2bff'],['#2cff4f','#00e6c8'],['#ff1f6a','#ff5a2a'],['#ffb020','#ff3d6a'],['#7a5cff','#2fd3ff'],['#00d68f','#c6ff3a'],['#ff7ac8','#ffae5c']];
+  function orb(id){
+    var h=0,i;for(i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;
+    var c=PAL[h%PAL.length];
+    return 'background:radial-gradient(circle at 30% 26%,'+c[0]+' 0,'+c[0]+' 22%,transparent 68%),radial-gradient(circle at 74% 80%,'+c[1]+' 0,transparent 62%),'+c[1];
+  }
+  var CHEV='<svg class="pik-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  var TICK='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  var cur=null;     /* the one that is open */
+  function role(p){return p.role==='admin'?'Administrador':'Asesor'}
+
+  /* o: {people:[{id,name,role,tag}], picked:[ids], ro:bool, onChange(ids)} */
+  function make(o){
+    var picked=(o.picked||[]).filter(function(id){return o.people.some(function(p){return p.id===id})});
+    var root=document.createElement('div');root.className='pik'+(o.ro?' ro':'');
+    root.innerHTML='<button class="pik-pill" type="button" aria-expanded="false" aria-haspopup="listbox"'+(o.ro?' disabled':'')+' aria-label="Asignados"><span class="pik-rail"></span><span class="pik-say">Sin asignar</span>'+(o.ro?'':CHEV)+'</button>'+
+      '<div class="pik-card" role="listbox" aria-multiselectable="true" hidden>'+o.people.map(function(p){
+        return '<button class="pik-row" type="button" role="option" data-id="'+ea(p.id)+'" aria-selected="false"><i class="pik-av" style="'+orb(p.id)+'"></i><span class="pik-who"><span class="pik-name">'+esc(p.name)+(p.tag?' (tú)':'')+'</span><span class="pik-role">'+esc(role(p))+'</span></span><span class="pik-mark"><span class="pik-tick">'+TICK+'</span></span></button>'}).join('')+'</div>';
+    var pill=root.querySelector('.pik-pill'),rail=root.querySelector('.pik-rail'),say=root.querySelector('.pik-say'),card=root.querySelector('.pik-card'),faces={};
+    var byId={};o.people.forEach(function(p){byId[p.id]=p});
+
+    /* ── the width is COMPUTED, not measured ─────────────────
+       Reversed z-order: the first face sits on top of the second, so the
+       stack reads left to right the way the list does. Painted the other
+       way the newest arrival covers everyone before it, and adding a
+       fourth person looks like losing the first three. */
+    function paint(animate){
+      picked.forEach(function(id,i){
+        var f=faces[id];
+        if(!f){
+          f=faces[id]=document.createElement('span');f.className='pik-face';f.title=byId[id].name;
+          /* ── a face lands, it does not fade in ──────────────
+             It drops from slightly above with a turn on it and overshoots
+             on the way to rest, so adding somebody reads as a token being
+             put down. The rotation is small and it is the reason this
+             feels different from a scale: a circle scaling is a circle,
+             and a circle scaling while it turns is an object. */
+          f.innerHTML='<i style="'+orb(id)+'"></i>';
+          if(animate)f.firstChild.classList.add('in');
+          rail.appendChild(f);
+        }
+        f.style.translate=(i*(FACE-LAP))+'px 0';
+        f.style.zIndex=String(20-i);
+      });
+      Object.keys(faces).forEach(function(id){
+        if(picked.indexOf(id)>=0)return;
+        var f=faces[id];delete faces[id];
+        f.firstChild.classList.remove('in');f.firstChild.classList.add('out');
+        setTimeout(function(){f.remove()},200);
+      });
+      rail.style.width=(picked.length?FACE+(picked.length-1)*(FACE-LAP):0)+'px';
+      /* ── what the pill says with nothing in it ────────────
+         It is a READOUT: with faces in it, it reports who is on this, so
+         with none in it, it should report that nobody is. And it goes the
+         moment there is a face, because a label beside three pictures is
+         the control describing itself instead of answering. */
+      say.hidden=picked.length>0;
+      card.querySelectorAll('.pik-row').forEach(function(r){var on=picked.indexOf(r.dataset.id)>=0;r.toggleAttribute('data-on',on);r.setAttribute('aria-selected',String(on))});
+    }
+
+    function show(){
+      if(cur&&cur!==api)cur.close();
+      cur=api;
+      /* open from the pill's corner: aligned left, or right when there is no
+         room for the 264px card on this side */
+      var r=root.getBoundingClientRect();
+      root.classList.toggle('r',r.left+264>window.innerWidth-12&&r.right-264>8);
+      card.hidden=false;card.classList.remove('closing');
+      /* ── it unfolds OUT OF the pill ──────────────────────────
+         Origin at the card's corner nearest the pill, so it opens down and
+         out from where it belongs rather than growing from its middle like
+         a box appearing. The scale starts high — 0.86 across, 0.72 down —
+         because a card is a rounded rectangle and a scale drags its corner
+         radius with it; the BOUNCE is where the character is, not the
+         distance. */
+      card.style.animation='none';void card.offsetWidth;card.style.animation='';
+      /* the rows deal out under the card rather than arriving with it */
+      card.querySelectorAll('.pik-row').forEach(function(r,i){r.style.animationDelay=(0.04*i+0.03)+'s'});
+      root.classList.add('open');pill.setAttribute('aria-expanded','true');
+    }
+    function close(){
+      if(card.hidden)return;
+      card.classList.add('closing');root.classList.remove('open');pill.setAttribute('aria-expanded','false');
+      if(cur===api)cur=null;
+      setTimeout(function(){if(card.classList.contains('closing')){card.hidden=true;card.classList.remove('closing')}},170);
+    }
+    var api={el:root,close:close};
+    pill.addEventListener('click',function(){card.hidden||card.classList.contains('closing')?show():close()});
+    card.addEventListener('click',function(e){
+      var r=e.target.closest('.pik-row');if(!r)return;
+      var id=r.dataset.id,at=picked.indexOf(id);
+      if(at>=0)picked.splice(at,1);else picked.push(id);
+      paint(true);o.onChange&&o.onChange(picked.slice());
+    });
+    root.addEventListener('keydown',function(e){if(e.key==='Escape'&&!card.hidden){e.stopPropagation();close();pill.focus()}});
+    paint(false);
+    return api;
+  }
+  document.addEventListener('pointerdown',function(e){if(cur&&!cur.el.contains(e.target))cur.close()});
+  return {make:make};
+})();
+
+/* ---------- Notas: la semana, día por día ----------
+   Una pantalla blanca con los siete días de la semana. Cada día guarda sus
+   notas; cada nota puede marcarse como hecha, editarse, borrarse y asignarse
+   a compañeros de la agencia (los ven en su propia pantalla de Notas). Todo
+   vive en la tabla `notas` de Supabase, con RLS: la ve quien la escribió y a
+   quien se la asignó, y solo su autora la cambia. */
+var NT={mon:null,rows:[],loading:false,adding:null};
+NT.pad=function(n){return ('0'+n).slice(-2)};
+NT.iso=function(d){return d.getFullYear()+'-'+NT.pad(d.getMonth()+1)+'-'+NT.pad(d.getDate())};
+NT.monday=function(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+NT.day=function(i){var d=new Date(NT.mon);d.setDate(d.getDate()+i);return d};
+NT.open=function(){if(!NT.mon)NT.mon=NT.monday(new Date());NT.load()};
+NT.load=async function(){
+  NT.render();
+  if(!SB.c||!SB.entered)return;
+  NT.loading=true;
+  var r=await SB.c.from('notas').select('*,profiles(name)').gte('fecha',NT.iso(NT.day(0))).lte('fecha',NT.iso(NT.day(6))).order('created_at',{ascending:true});
+  NT.loading=false;
+  if(r.error){SB.fail(r.error);NT.rows=[]}else NT.rows=r.data;
+  if(S.view==='notas')NT.render();
+};
+NT.range=function(){
+  var a=NT.day(0),b=NT.day(6),m=function(d){return d.toLocaleDateString('es-MX',{month:'long'})};
+  return a.getMonth()===b.getMonth()?a.getDate()+' – '+b.getDate()+' de '+m(b)+' de '+b.getFullYear():a.getDate()+' de '+m(a)+' – '+b.getDate()+' de '+m(b)+' de '+b.getFullYear();
+};
+NT.render=function(){
+  var body=$('#ntBody'),today=NT.iso(new Date()),days='',i;
+  for(i=0;i<7;i++){
+    var d=NT.day(i),k=NT.iso(d),L=NT.rows.filter(function(n){return n.fecha===k});
+    var nm=HM.cap(d.toLocaleDateString('es-MX',{weekday:'long'}));
+    days+='<section class="nt-day" data-d="'+k+'"'+(k===today?' data-today':'')+'><header><span class="nt-dn">'+nm+'</span><span class="nt-dd">'+d.getDate()+'</span></header><div class="nt-list">'+
+      L.map(function(n){
+        var mine=n.user_id===ME,by=!mine&&n.profiles?n.profiles.name:'';
+        return '<article class="nt-note" data-id="'+ea(n.id)+'"'+(n.hecha?' data-done':'')+(mine?'':' data-ro')+'>'+
+          '<div class="nt-row"><button class="nt-chk" type="button" data-a="done" aria-label="'+(n.hecha?'Marcar como pendiente':'Marcar como hecha')+'"'+(mine?'':' disabled')+'><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>'+
+          '<p class="nt-tx"'+(mine?' data-a="edit" title="Clic para editar"':'')+'>'+esc(n.texto)+'</p>'+(mine?'<button class="nt-del" type="button" data-a="del" aria-label="Borrar nota">×</button>':'')+'</div>'+
+          (by?'<div class="nt-by">De '+esc(by)+'</div>':'')+'<div class="nt-foot"></div></article>'}).join('')+
+      '</div>'+(NT.adding===k?'<form class="nt-new" data-d="'+k+'"><textarea rows="2" maxlength="2000" placeholder="Escribe la nota…" aria-label="Nueva nota"></textarea><div class="nt-act"><button class="hm-btn dark" type="submit">Guardar</button><button class="hm-btn" type="button" data-a="cancel">Cancelar</button></div></form>':'<button class="nt-add" type="button" data-a="add">+ Agregar nota</button>')+'</section>';
+  }
+  var n=NT.rows.length,hechas=NT.rows.filter(function(x){return x.hecha}).length;
+  body.innerHTML='<div class="ad-head"><div><h2>Notas</h2><p>'+esc(NT.range())+(n?' · '+n+(n===1?' nota':' notas')+' · '+hechas+(hechas===1?' hecha':' hechas'):'')+'</p></div>'+
+    '<div class="nt-nav"><button class="hm-btn" type="button" data-a="prev" aria-label="Semana anterior">‹</button><button class="hm-btn" type="button" data-a="today">Hoy</button><button class="hm-btn" type="button" data-a="next" aria-label="Semana siguiente">›</button></div></div>'+
+    '<div class="nt-week">'+days+'</div>';
+  /* el selector de personas de cada nota */
+  var ppl=ADVISORS.slice();
+  $$('.nt-note',body).forEach(function(el){
+    var row=NT.rows.filter(function(r){return r.id===el.dataset.id})[0];if(!row)return;
+    var a=ASG.make({people:ppl,picked:(row.asignados||[]).slice(),ro:row.user_id!==ME,onChange:function(ids){NT.setAsg(row,ids)}});
+    el.querySelector('.nt-foot').appendChild(a.el);
+  });
+  var f=$('.nt-new textarea',body);if(f)f.focus();
+};
+NT.setAsg=async function(row,ids){
+  var old=row.asignados;row.asignados=ids;
+  var r=await SB.c.from('notas').update({asignados:ids}).eq('id',row.id);
+  if(r.error){row.asignados=old;SB.fail(r.error);toast('No se pudo cambiar a quién se asignó');NT.render()}
+};
+NT.add=async function(k,texto){
+  var r=await SB.c.from('notas').insert({fecha:k,texto:texto}).select('*,profiles(name)');
+  if(r.error){SB.fail(r.error);toast('No se pudo guardar la nota');return}
+  NT.rows.push(r.data[0]);NT.adding=null;NT.render();
+};
+NT.patch=async function(row,patch){
+  var old={};Object.keys(patch).forEach(function(k){old[k]=row[k]});Object.assign(row,patch);NT.render();
+  var r=await SB.c.from('notas').update(patch).eq('id',row.id);
+  if(r.error){Object.assign(row,old);SB.fail(r.error);toast('No se pudo guardar el cambio');NT.render()}
+};
+NT.del=async function(row){
+  NT.rows=NT.rows.filter(function(r){return r!==row});NT.render();
+  var r=await SB.c.from('notas').delete().eq('id',row.id);
+  if(r.error){NT.rows.push(row);SB.fail(r.error);toast('No se pudo borrar la nota');NT.render()}
+};
+NT.edit=function(el,row){
+  var p=$('.nt-tx',el),ta=document.createElement('textarea');ta.className='nt-ed';ta.rows=3;ta.maxLength=2000;ta.value=row.texto;
+  p.replaceWith(ta);ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);
+  var done=false,fin=function(save){if(done)return;done=true;var v=ta.value.trim();if(save&&v&&v!==row.texto)NT.patch(row,{texto:v});else NT.render()};
+  ta.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();fin(true)}else if(e.key==='Escape'){e.preventDefault();fin(false)}});
+  ta.addEventListener('blur',function(){fin(true)});
+};
+(function(){
+  var root=$('#viewNotas');
+  root.addEventListener('click',function(e){
+    var b=e.target.closest('[data-a]');if(!b||!root.contains(b))return;
+    var a=b.dataset.a,note=b.closest('.nt-note'),row=note&&NT.rows.filter(function(r){return r.id===note.dataset.id})[0];
+    if(a==='prev'||a==='next'||a==='today'){NT.mon=a==='today'?NT.monday(new Date()):new Date(NT.mon.getFullYear(),NT.mon.getMonth(),NT.mon.getDate()+(a==='next'?7:-7));NT.adding=null;NT.load()}
+    else if(a==='add'){NT.adding=b.closest('.nt-day').dataset.d;NT.render()}
+    else if(a==='cancel'){NT.adding=null;NT.render()}
+    else if(a==='done'&&row)NT.patch(row,{hecha:!row.hecha});
+    else if(a==='del'&&row)NT.del(row);
+    else if(a==='edit'&&row&&row.user_id===ME)NT.edit(note,row);
+  });
+  root.addEventListener('submit',function(e){
+    var f=e.target.closest('.nt-new');if(!f)return;e.preventDefault();
+    var v=$('textarea',f).value.trim();if(!v){NT.adding=null;NT.render();return}
+    NT.add(f.dataset.d,v);
+  });
+  root.addEventListener('keydown',function(e){
+    var t=e.target;if(!t.matches||!t.matches('.nt-new textarea'))return;
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();t.form.requestSubmit()}
+    else if(e.key==='Escape'){e.preventDefault();NT.adding=null;NT.render()}
+  });
+})();
 
 /* ---------- Theme ---------- */
 function isDark(){var t=document.documentElement.dataset.theme;return t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches}
@@ -5875,7 +6315,7 @@ var SK=(function(){
   /* ── results ─────────────────────────────────────────────
      ADAPTED: the old Ctrl+K palette's list, now hanging from the
      field. Same sections, same filter, same icons. */
-  var ICON={cfg:'settings',agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'};
+  var ICON={notas:'note',cfg:'settings',agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'};
   function results(){
     var v=norm(field.value.trim());
     list=Object.keys(VIEWS).filter(function(k){return k==='cfg'||(MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&norm(VIEWS[k]).indexOf(v)>-1});
