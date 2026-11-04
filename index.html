@@ -1687,6 +1687,26 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .xd-bar{height:100%;border-radius:inherit;background:var(--signal);transform-origin:left center;transition:transform 200ms ease}
 .xd-tick{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;font-size:12px;animation:xd-pop 380ms cubic-bezier(.3,1.6,.4,1) both}
 @keyframes xd-pop{from{scale:0}}
+.xd-q{margin-top:16px;padding:18px 16px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);display:flex;flex-direction:column;gap:16px}
+.xd-q h3{margin:0;font-size:15px;font-weight:600}
+.xd-q>p{margin:-10px 0 0;font-size:12.5px;color:color-mix(in srgb,var(--fill-on) 52%,var(--bg))}
+.xd-qs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px 24px}
+.xd-qi{display:flex;flex-direction:column;gap:8px;border:0;margin:0;padding:0;min-width:0}
+.xd-qi legend,.xd-qi>label.xd-ql{padding:0;font-size:13px;font-weight:500}
+.xd-opts{display:flex;flex-wrap:wrap;gap:6px}
+.xd-opt{position:relative}
+.xd-opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.xd-opt span{display:block;padding:7px 13px;border-radius:999px;background:var(--fill-slab);font-size:12.5px;color:color-mix(in srgb,var(--fill-on) 72%,var(--fill-slab));transition:background-color 200ms,color 200ms,scale 300ms cubic-bezier(.24,1.34,.38,1)}
+.xd-opt input:checked+span{background:var(--fill-on);color:var(--bg)}
+.xd-opt input:active+span{scale:.95}
+.xd-opt input:focus-visible+span{outline:2px solid var(--signal);outline-offset:2px}
+.xd-qi input[type=number],.xd-qi textarea{width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--card-line);border-radius:10px;background:var(--fill-slab);color:inherit;font:13px var(--font-ui)}
+.xd-qi textarea{min-height:64px;resize:vertical}
+.xd-qf{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.xd-save{height:36px;padding:0 18px;border:0;border-radius:999px;background:var(--fill-on);color:var(--bg);font:500 13px var(--font-ui);cursor:pointer}
+.xd-save:active{scale:.97}
+.xd-verd{font-size:13px;font-weight:500}
+.xd-verd[data-v="bien"]{color:var(--ok)}.xd-verd[data-v="mal"]{color:#e5484d}
 @media (prefers-reduced-motion: reduce){.xd,.xd-row,.xd-tick,.xd-zone{animation:none;transition:none}}
 </style>
 
@@ -5251,10 +5271,11 @@ XD.open=function(id){
         '<div class="xd-zone" tabindex="0" role="button" aria-label="Subir '+ea(d[1])+'"><span class="xd-icon" aria-hidden="true">'+
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
         '<span class="xd-say"><b>Arrastra un archivo aquí</b><span>o haz clic · hasta '+XD.MAX+' MB</span></span>'+
-        '<input type="file" multiple hidden></div><div class="xd-list"></div></section>'}).join('')+'</div></div>';
+        '<input type="file" multiple hidden></div><div class="xd-list"></div></section>'}).join('')+'</div>'+XD.qHtml()+'</div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
+  XD.qLoad(x.id);
 };
 XD.close=function(){if(!XD.cur)return;$('#exDoc').hidden=true;$('#viewExp').hidden=false;XD.cur=null};
 XD.sec=function(k){return $('#exDoc .xd-sec[data-k="'+k+'"]')};
@@ -5292,10 +5313,53 @@ XD.send=async function(k,file){
   setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>');
     var nm=row.querySelector('.xd-name');nm.outerHTML='<button type="button" class="xd-name" data-xdopen="'+ea(path)+'">'+esc(file.name)+'</button>'},350);
 };
+/* mini cuestionario: ¿planta pagó bien? Se guarda como cuestionario.json junto a los
+   documentos (sin tocar el esquema de la tabla) y, de respaldo, en este navegador. */
+XD.Q=[['mo','¿Planta pagó la mano de obra?',[['si','Completa'],['parcial','Parcial'],['no','No']]],
+  ['pz','¿Planta pagó las piezas?',[['si','Completas'],['parcial','Parcial'],['no','No']]],
+  ['tiempo','¿Pagó a tiempo?',[['si','Sí'],['no','Con retraso'],['aun','Aún no pagó']]],
+  ['ajuste','¿Planta recortó o ajustó la PREA?',[['no','No'],['si','Sí']]]];
+XD.qHtml=function(){
+  return '<section class="xd-q" id="xdQ"><h3>¿Fue bien pagado por planta?</h3><p>Un minuto: con esto el agente aprende qué PREAs paga planta completas.</p><div class="xd-qs">'+
+    XD.Q.map(function(q){return '<fieldset class="xd-qi"><legend>'+esc(q[1])+'</legend><div class="xd-opts">'+q[2].map(function(o){
+      return '<label class="xd-opt"><input type="radio" name="xq_'+q[0]+'" value="'+o[0]+'"><span>'+esc(o[1])+'</span></label>'}).join('')+'</div></fieldset>'}).join('')+
+    '<div class="xd-qi"><label class="xd-ql" for="xqMonto">Monto que pagó planta (opcional)</label><input id="xqMonto" type="number" min="0" step="0.01" placeholder="0.00"></div>'+
+    '<div class="xd-qi"><label class="xd-ql" for="xqCom">Comentarios (opcional)</label><textarea id="xqCom" placeholder="Ej. Recortó 0.5 h de mano de obra"></textarea></div></div>'+
+    '<div class="xd-qf"><button type="button" class="xd-save" data-xdsave>Guardar respuestas</button><span class="xd-verd" id="xdVerd" aria-live="polite"></span></div></section>'};
+XD.qRead=function(){
+  var o={};XD.Q.forEach(function(q){var c=$('#xdQ input[name="xq_'+q[0]+'"]:checked');if(c)o[q[0]]=c.value});
+  o.monto=$('#xqMonto').value;o.com=$('#xqCom').value.trim();return o};
+XD.verdict=function(o){
+  if(!o.mo||!o.pz)return ['',''];
+  if(o.mo==='si'&&o.pz==='si'&&o.ajuste!=='si')return ['bien','✓ Bien pagada por planta'];
+  if(o.mo==='no'&&o.pz==='no')return ['mal','✕ Planta no la pagó'];
+  return ['','Pagada con diferencias'];
+};
+XD.qShow=function(o){
+  o=o||{};XD.Q.forEach(function(q){var i=$('#xdQ input[name="xq_'+q[0]+'"][value="'+o[q[0]]+'"]');if(i)i.checked=true});
+  $('#xqMonto').value=o.monto||'';$('#xqCom').value=o.com||'';XD.qVerd(o);
+};
+XD.qVerd=function(o){var v=XD.verdict(o),e=$('#xdVerd');if(!e)return;e.dataset.v=v[0];e.textContent=v[1]};
+XD.qKey=function(id){return 'ax_xdq_'+id};
+XD.qLoad=async function(id){
+  var o=null;try{o=JSON.parse(localStorage.getItem(XD.qKey(id))||'null')}catch(_){}
+  try{var d=await SB.c.storage.from(XD.B).download(id+'/cuestionario.json');if(d.data)o=JSON.parse(await d.data.text())}catch(_){}
+  if(XD.cur&&XD.cur.id===id)XD.qShow(o);
+};
+XD.qSave=async function(){
+  var x=XD.cur;if(!x)return;var o=XD.qRead();
+  if(!o.mo||!o.pz){toast('Responde al menos mano de obra y piezas');return}
+  o.at=new Date().toISOString();
+  try{localStorage.setItem(XD.qKey(x.id),JSON.stringify(o))}catch(_){}
+  XD.qVerd(o);
+  var r;try{r=await SB.c.storage.from(XD.B).upload(x.id+'/cuestionario.json',new Blob([JSON.stringify(o)],{type:'application/json'}),{upsert:true,contentType:'application/json'})}catch(e){r={error:e}}
+  toast(r.error?'Guardado solo en este navegador (falta el bucket "'+XD.B+'")':'Respuestas guardadas');
+};
 XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k,f)})};
 document.addEventListener('click',function(e){
   var t=e.target;if(!t.closest)return;
   if(t.closest('[data-xdclose]')){XD.close();return}
+  if(t.closest('[data-xdsave]')){XD.qSave();return}
   var o=t.closest('[data-xdopen]');
   if(o){SB.c.storage.from(XD.B).createSignedUrl(o.dataset.xdopen,300).then(function(r){if(r.data&&r.data.signedUrl)window.open(r.data.signedUrl,'_blank','noopener');else toast('No pude abrir el archivo')});return}
   var z=t.closest('#exDoc .xd-zone');if(z){if(t.tagName!=='INPUT')$('input',z).click();return}
@@ -5303,7 +5367,8 @@ document.addEventListener('click',function(e){
   var c=t.closest('#exList .nod');if(c&&EX.f==='prea'&&!t.closest('.nod-act')&&c.dataset.id)XD.open(c.dataset.id);
 });
 document.addEventListener('change',function(e){
-  var i=e.target;if(!i.matches||!i.matches('#exDoc input[type=file]'))return;
+  var i=e.target;if(i.matches&&i.matches('#xdQ input[type=radio]')){XD.qVerd(XD.qRead());return}
+  if(!i.matches||!i.matches('#exDoc input[type=file]'))return;
   XD.take(i.closest('.xd-sec').dataset.k,i.files);i.value='';
 });
 ['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#exDoc .xd-zone');if(!z)return;e.preventDefault();z.setAttribute('data-over','')})});
