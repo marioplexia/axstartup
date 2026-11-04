@@ -5242,7 +5242,7 @@ XD.rowHtml=function(o){
     '<span class="xd-meta">'+esc(o.meta||'')+'</span>'+(o.bar?'<span class="xd-track"><span class="xd-bar" style="transform:scaleX(0)"></span></span>':'')+'</span>'+
     (o.ok?'<span class="xd-tick">✓</span>':'')+'</div>'};
 XD.open=function(id){
-  var x=EX.rows.filter(function(r){return r.id===id})[0];if(!x)return;
+  var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x){toast('No encontré ese expediente');return}
   XD.cur=x;var el=$('#exDoc');
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div></div>'+
