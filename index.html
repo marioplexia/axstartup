@@ -1778,6 +1778,9 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 @media (hover:hover){.crt-item button:hover::before{opacity:1;transition-duration:160ms}}
 .crt-item button:focus-visible::before{opacity:1}
 @media (prefers-reduced-motion: reduce){.crt-body,.crt-pill,.crt-item{transition-duration:160ms}.crt-stage[data-sink="true"] .crt-body,.crt-stage[data-sink="true"] .crt-pill{scale:1}}
+.ev-hint{margin:0;padding:10px 14px;font-size:13px;line-height:1.45;color:#b42318;background:color-mix(in srgb,#e5484d 9%,var(--card));border-bottom:1px solid color-mix(in srgb,#e5484d 22%,var(--card-line));border-radius:12px 12px 0 0}
+.fb.ev-need,.chip.ev-need{animation:ev-pulse 1.4s ease 2;color:#b42318}
+@keyframes ev-pulse{50%{box-shadow:0 0 0 4px color-mix(in srgb,#e5484d 28%,transparent)}}
 /* la compuerta: mientras no se elija tipo y orden, no hay composer */
 .gate{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:8px;animation:gt-in 320ms cubic-bezier(.22,1,.36,1) both}
 @keyframes gt-in{from{opacity:0;translate:0 10px}}
@@ -1898,6 +1901,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
             <span class="menu-host" id="brandHost"><button class="dd" aria-haspopup="menu" aria-expanded="false"><span id="brandLabel">General Motors</span></button></span>
           </div>
           <div class="card">
+            <p class="ev-hint" id="evHint" role="alert" hidden>Para armar la PREA primero adjunta la evidencia: orden de reparación, diagnóstico, fotos o mediciones. Sin evidencia no puedo continuar.</p>
             <div class="files" id="files" hidden></div>
             <textarea id="ta" rows="3" placeholder="Describe tu caso de garantía…" aria-label="Describe tu caso de garantía"></textarea>
             <div class="c-foot">
@@ -2804,6 +2808,7 @@ function fileChip(o,removable,idx){
 }
 function renderFiles(){
   filesEl.innerHTML='';filesEl.hidden=S.files.length===0;
+  if(S.files.length){var eh=$('#evHint');if(eh)eh.hidden=true}
   S.files.forEach(function(o,i){filesEl.appendChild(fileChip(o,true,i))});
 }
 filesEl.addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(!b)return;S.files.splice(+b.dataset.rm,1);renderFiles();updateSend()});
@@ -2826,7 +2831,7 @@ function enterChat(title){
   syncCrumb();if(GATE)GATE.sync();
 }
 function resetChat(){
-  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(typeof PR!=='undefined'&&PR)PR.msgs=[];if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.caseText='';GP.lastExpP=null}if(typeof CB!=='undefined'&&CB)CB.last=null
+  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(typeof PR!=='undefined'&&PR)PR.msgs=[];if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.evid=false;GP.caseText='';GP.lastExpP=null}if(typeof CB!=='undefined'&&CB)CB.last=null
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
     flip(function(){stage.dataset.state='home';thread.hidden=true;ta.placeholder=AG[S.agent].ph;autosize()});
@@ -6239,6 +6244,28 @@ async function run(text,files){
   var tk=TK.make();$('.ai-col',w).insertBefore(tk.el,$('.ai-body',w));w._noThink=true;
   var kw=words(text||'').slice(0,5),s1=tk.step('Leyendo tu mensaje');
   await nap(550,my);s1.done(kw.length?'claves: '+kw.join(', '):'sin palabras clave claras');
+  /* inspección de TODA la evidencia adjunta: sin archivos legibles y suficientes, no se arma la PREA */
+  var evi=null;
+  if(!my.aborted&&S.agent==='garantias'&&files&&files.length&&SB.entered){
+    var se=tk.step('Inspeccionando evidencia ('+files.length+(files.length===1?' archivo)':' archivos)')),stopTxt=null;
+    try{
+      var att=[];for(var fi=0;fi<files.length&&!my.aborted;fi++)att.push(await TR.prep(files[fi].file));
+      if(!my.aborted){var er=await SB.ai({text:text,brand:S.brand,orden:ordn||'',tipo:(GATE.v&&GATE.v.tipo)||'PREA',attachments:att},'evidencia');evi=er&&er.inspeccion}
+    }catch(e){
+      var em=String((e&&e.message)||e);
+      if(/ai_not_configured/.test(em)){SB.aiFail(e);se.done('la IA no está configurada: no pude inspeccionarla')}
+      else{se.done('no pude inspeccionarla');stopTxt='**No pude inspeccionar la evidencia, así que no armo la PREA.** '+(/archivo_invalido|sin_evidencia/.test(em)?'Revisa que los archivos sean PDF o imágenes legibles (hasta 4.5 MB cada PDF).':/^Solo PDF|más de 4\.5/.test(em)?em:'Inténtalo de nuevo en un momento.')}
+    }
+    if(evi&&!my.aborted){
+      se.done(evi.archivos+(evi.archivos===1?' archivo leído':' archivos leídos')+' · '+(evi.suficiente?'evidencia suficiente':'evidencia insuficiente')+(evi.inconsistencias.length?' · '+evi.inconsistencias.length+(evi.inconsistencias.length===1?' inconsistencia':' inconsistencias'):''));
+      if(!evi.suficiente)stopTxt=GP.evMsg(evi);
+      else GP.evid=true;
+    }
+    if(stopTxt&&!my.aborted){
+      tk.end(false);var bd=$('.ai-body',w);bd.innerHTML=md(stopTxt,false);w._text=stopTxt.replace(/\*\*/g,'');hideRegen(w);$('.ai-actions',w).hidden=false;finish(my);return;
+    }
+    if(!evi)GP.evid=true;
+  }
   if(!my.aborted){
     var s2=tk.step('Buscando en el catálogo de reglas');await nap(700,my);
     s2.done(ctx.matched?'regla '+ctx.ruleId+' · '+ctx.ruleN+' PREAs aceptadas':'ninguna coincide · '+RS.d.rules.length+' reglas revisadas');
@@ -6250,7 +6277,7 @@ async function run(text,files){
     s3.done(!sm?'no pude consultar tus expedientes':sm.n?sm.n+' parecidos de '+sm.total+' ('+sm.acc+' aceptadas, '+sm.rej+' rechazadas)':'ninguno parecido entre '+sm.total);
   }
   if(!my.aborted&&text&&!SB.aiOff&&SB.entered){
-    var s4=tk.step('Consultando al modelo de IA'),form=await SB.aiPrea(text);
+    var s4=tk.step('Consultando al modelo de IA'),form=await SB.aiPrea(evi?String(text||'').slice(0,1700)+'\n\n[Evidencia inspeccionada ('+evi.archivos+' archivos)]\n'+evi.resumen+(evi.inconsistencias.length?'\nInconsistencias: '+evi.inconsistencias.join('; '):''):text);
     if(form&&!my.aborted)SB.applyForm(ctx,form);
     s4.done(form?'formulario propuesto, '+(form.rule_id?'regla '+form.rule_id:'sin regla del catálogo'):'no disponible, uso el catálogo');
   }
@@ -6259,7 +6286,7 @@ async function run(text,files){
   RS.note(ctx.matched);
   try{await LS.apply(ctx)}catch(_){}
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
-  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
+  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(evi?'\n\n> **Evidencia inspeccionada** ('+evi.archivos+(evi.archivos===1?' archivo':' archivos')+'): '+evi.resumen+(evi.inconsistencias.length?' **Ojo:** '+evi.inconsistencias.join('; '):''):'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
   if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;GP.nPrea++;GP.caseText=text;GP.remember(text,w._text);GP.suggest(w,[{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'¿Cuánto pagará planta?',q:'¿Cuánto crees que pagará planta por esto?'}])}
   finish(my);
 }
@@ -6605,10 +6632,32 @@ $('#gtTagX').addEventListener('click',GATE.reset);
 /* el primer mensaje lleva la orden y el tipo, para que el chat la guarde y el agente la conozca */
 GATE.pre=function(){return S.agent==='garantias'&&GATE.v&&!S.convId&&!GP.cur?'Orden '+GATE.v.orden+' ('+GATE.v.tipo+'). ':''};
 GATE.sync();
+/* ══ Sin evidencia no hay PREA ═════════════════════════════
+   Armar una PREA (no platicar sobre una ya armada) exige adjuntar evidencia.
+   Los archivos se envían a la función "evidencia", que los inspecciona todos;
+   si no alcanzan, el agente se detiene y dice qué falta. */
+GP.needsEvidence=function(text,files){
+  if(S.agent!=='garantias'||(files&&files.length)||GP.evid||GP.nPrea>0)return false;
+  if(GP.orderOnly(text))return false;
+  return !GP.isChat(text);
+};
+GP.evBlock=function(){
+  var h=$('#evHint');h.hidden=false;toast('Adjunta la evidencia para continuar');
+  ['#plusBtn','#evBtn'].forEach(function(q){var b=$(q);if(!b)return;b.classList.remove('ev-need');void b.offsetWidth;b.classList.add('ev-need');setTimeout(function(){b.classList.remove('ev-need')},3000)});
+};
+GP.evMsg=function(ev){
+  var L=function(a){return a.map(function(x){return '- '+x}).join('\n')};
+  var t='**No puedo armar la PREA todavía: la evidencia no es suficiente.**';
+  if(ev.faltantes&&ev.faltantes.length)t+='\n\n### Qué falta\n'+L(ev.faltantes);
+  if(ev.inconsistencias&&ev.inconsistencias.length)t+='\n\n### Lo que no coincide\n'+L(ev.inconsistencias);
+  if(ev.documentos&&ev.documentos.length)t+='\n\n### Lo que revisé\n'+L(ev.documentos.map(function(d){return '**'+d.archivo+'** ('+d.tipo+(d.legible?'':', no se lee')+'): '+d.hallazgos}));
+  return t+'\n\nAdjunta lo que falta (todos los archivos, junto con los anteriores) y vuelve a enviar.';
+};
 function onSend(){
   if(S.streaming){if(S.ctrl)S.ctrl.aborted=true;return}
   var text=ta.value.trim(),files=S.files.slice();
   if(!text&&!files.length)return;
+  if(GP.needsEvidence(text,files)){GP.evBlock();return}
   closeMenu();showView(curView());
   enterChat(text||files[0].name);
   addUser(text,files);

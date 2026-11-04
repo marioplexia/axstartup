@@ -6,3 +6,9 @@ Desplegada en Supabase (versión 4). El fuente vive allá; este archivo document
   pagos y documentos enseñados desde el tablero de agencia).
 - `buscar_todo` revisa todas esas fuentes a la vez; el prompt obliga a usarla antes de decir "no sé".
 - `buscar_ejemplos` busca en nombre de archivo, resumen, lecciones y datos leídos (no solo en `busqueda`).
+
+# Función `evidencia` (Agente de Garantías)
+
+Desplegada en Supabase (versión 1). Recibe el caso y TODOS los archivos adjuntos (PDF/imagen), los inspecciona
+uno por uno y devuelve `{suficiente, documentos, datos, faltantes, inconsistencias, resumen}`.
+Sin archivos válidos responde `sin_evidencia` y la PREA no procede. El chat la llama antes de armar la PREA.
