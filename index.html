@@ -1686,6 +1686,8 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .xd-meta{font-size:12px;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--fill-on) 52%,var(--fill-slab))}
 .xd-meta.err{color:#e5484d}
+.xd-retry{margin-left:6px;padding:2px 10px;border:1px solid var(--card-line);border-radius:999px;background:var(--card);color:var(--fg);font:500 11.5px var(--f-ui);cursor:pointer}
+.xd-retry:hover{background:var(--hover)}
 .xd-track{height:4px;overflow:hidden;border-radius:2px;background:color-mix(in srgb,var(--fill-on) 10%,var(--fill-slab))}
 .xd-bar{height:100%;border-radius:inherit;background:var(--signal);transform-origin:left center;transition:transform 200ms ease}
 .xd-tick{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;font-size:12px;animation:xd-pop 380ms cubic-bezier(.3,1.6,.4,1) both}
@@ -3501,7 +3503,7 @@ SB.user=null;SB.chan=null;SB.mode='in';SB.acct='asesor';SB.aiOff=false;
 SB.ai=async function(body,fn){
   if(!SB.c||!SB.entered)throw new Error('sin sesión');
   var r=await SB.c.functions.invoke(fn||'ai',{body:body});
-  if(r.error){var m=r.error.message;try{var j=await r.error.context.json();m=(j.error||m)+(j.detalle?' :: '+j.detalle:'')}catch(_){}throw new Error(m)}
+  if(r.error){var m=r.error.message;var rid=null;try{var j=await r.error.context.json();m=(j.error||m)+(j.detalle?' :: '+j.detalle:'');rid=j.run_id||null}catch(_){}var er=new Error(m);er.run_id=rid;throw er}
   return r.data;
 };
 SB.aiFail=function(e){var m=(e&&e.message)||'';
@@ -5472,24 +5474,41 @@ XD.qSave=async function(){
 };
 /* subido el archivo, el agente lo LEE y el cerebro aprende: factura y pago de planta se asientan en cartera,
    y todo queda como conocimiento para la siguiente PREA parecida */
-XD.learn=async function(k,file,meta){
+XD.learn=async function(k,file,meta,runId,intento){
   var x=XD.cur;if(!x||!SB.c)return;
+  intento=intento||0;
   var base=XD.fmt(file.size)+' · Subido';
-  meta.className='xd-meta';meta.textContent=base+' · el cerebro lo está leyendo…';
+  meta.className='xd-meta';
+  meta.textContent=base+(intento?' · reintentando ('+intento+')…':runId?' · reanudando…':' · el cerebro lo está leyendo…');
+  /* "Reintentar" reanuda con el mismo run_id: solo se repite lo que faltó, no se vuelve a leer con la IA */
+  var again=function(rid,why){
+    meta.className='xd-meta err';meta.textContent=base+' · '+why+' ';
+    var b=document.createElement('button');b.type='button';b.className='xd-retry';b.textContent='Reintentar';
+    b.addEventListener('click',function(){XD.learn(k,file,meta,rid,0)});meta.appendChild(b);
+  };
   try{
     var f;
     if(/\.(xml|txt|csv|json)$/i.test(file.name)||/^text\//.test(file.type)){
       if(file.size>2e5)throw new Error('El archivo de texto es muy grande para leerlo');
       f={name:file.name,text:await file.text()};
     }else f=await TR.prep(file);
-    var r=await SB.ai({expediente_id:x.id,tipo:k,file:f},'documento');
+    var r=await SB.ai({expediente_id:x.id,tipo:k,file:f,run_id:runId||undefined},'documento');
     if(r&&r.corresponde===false){meta.className='xd-meta err';meta.textContent=base+' · '+(r.motivo||'No es el documento esperado')+'. No lo aprendí: súbelo en la caja correcta.';return}
-    meta.textContent=base+' · ✓ '+((r&&r.aplicado&&r.aplicado.length)?r.aplicado.join(' · '):'El cerebro lo leyó');
+    var ok=(r&&r.aplicado&&r.aplicado.length)?r.aplicado.join(' · '):'El cerebro lo leyó';
+    if(r&&r.pendiente&&r.pendiente.length){
+      /* una parte se aplicó y otra no: se conserva lo hecho y se ofrece reanudar */
+      if(intento<2&&r.run_id){setTimeout(function(){XD.learn(k,file,meta,r.run_id,intento+1)},1200);return}
+      again(r.run_id,'se aplicó parte ('+ok+'), pero falló: '+r.pendiente.join(', ')+'.');return;
+    }
+    meta.textContent=base+' · ✓ '+ok;
     if(r&&r.lecciones){try{LS.learnNow()}catch(_){}}
   }catch(e){
-    meta.className='xd-meta err';
-    var m=String((e&&e.message)||e);
-    meta.textContent=base+' · '+(/ai_not_configured/.test(m)?'la IA no está configurada: se guardó, pero el cerebro no lo leyó':/Solo PDF/.test(m)?'se guardó, pero el cerebro solo lee PDF, imágenes y archivos de texto o XML':'se guardó, pero el cerebro no pudo leerlo ('+TR.errTxt(e)+')');
+    var m=String((e&&e.message)||e),rid=(e&&e.run_id)||runId||null;
+    /* fallas transitorias (el proveedor de IA, la red): se reintenta solo, hasta dos veces */
+    if(/upstream|failed to fetch|network|timeout|bad_output/i.test(m)&&intento<2){setTimeout(function(){XD.learn(k,file,meta,rid,intento+1)},1500);return}
+    if(/ai_not_configured/.test(m)){meta.className='xd-meta err';meta.textContent=base+' · la IA no está configurada: se guardó, pero el cerebro no lo leyó';return}
+    if(/Solo PDF/.test(m)){meta.className='xd-meta err';meta.textContent=base+' · se guardó, pero el cerebro solo lee PDF, imágenes y archivos de texto o XML';return}
+    again(rid,'se guardó, pero el cerebro no pudo leerlo ('+TR.errTxt(e)+').');
   }
 };
 XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k,f)})};

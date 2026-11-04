@@ -25,3 +25,13 @@ Evidencia, Factura, Transacción de planta) el chat lo lee con IA (PDF, imagen, 
 
 Bucket de Storage `expedientes-docs` (privado, 20 MB): `<expediente_id>/<tipo>/<archivo>`; las políticas dejan ver,
 subir y borrar solo a quien puede ver ese expediente.
+
+# Harness de agentes · paso 1 (ejecuciones, reintentos y reanudación)
+
+- Tabla `agent_runs`: cada corrida de `documento` y `evidencia` guarda sus pasos, intentos, duración y resultado.
+  RLS: cada quien ve y reanuda lo suyo; el administrador de la agencia ve lo de su gente.
+- Código en `supabase/functions/documento/` y `supabase/functions/evidencia/` (cada función lleva su copia de `harness.ts`;
+  deben mantenerse idénticas). Desplegado en Supabase: `documento` v2, `evidencia` v4.
+- Reintentos solo ante fallas transitorias (red, tiempo agotado, 429, 5xx) con espera creciente. Reanudar con el mismo
+  `run_id` repite solo lo pendiente: la lectura de la IA, si ya salió bien, no se vuelve a pagar.
+- Pendiente (pasos siguientes): módulo común para `manual`/`ai`/`aprender`, panel de salud de agentes, habilidades propuestas.
