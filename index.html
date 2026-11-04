@@ -321,6 +321,23 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .ex-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .ex-bar .bt[aria-pressed=true]{background:var(--fg);color:var(--bg)}
 
+/* ---------- Filtro de Expedientes: pastilla oscura que se desliza ----------
+   Una sola pastilla (la oscura) que viaja al botón elegido con un resorte
+   corto, y un golpe de escala al pulsar: cede, rebota y se asienta. El texto
+   del botón activo cambia al color del fondo para leerse sobre ella. */
+.ex-bar.fx-seg{position:relative;display:inline-flex;gap:4px;padding:4px;margin-bottom:16px;border:1px solid var(--card-line);border-radius:999px;background:var(--surface)}
+.fx-ind{position:absolute;left:0;top:4px;bottom:4px;width:0;border-radius:999px;background:var(--fg);pointer-events:none;
+  transition:transform .46s cubic-bezier(.3,1.5,.5,1),width .46s cubic-bezier(.3,1.5,.5,1)}
+.fx-ind.hit{animation:fx-hit .42s cubic-bezier(.3,1.5,.5,1)}
+@keyframes fx-hit{0%{scale:1 1}30%{scale:.9 .88}100%{scale:1 1}}
+.fx-btn{position:relative;z-index:1;height:38px;padding:0 20px;border-radius:999px;font:500 14px var(--f-ui);color:var(--muted);letter-spacing:-.005em;
+  transition:color .25s ease,scale .18s cubic-bezier(.3,1.5,.5,1);-webkit-tap-highlight-color:transparent}
+.fx-btn:hover{color:var(--fg)}
+.fx-btn[aria-pressed="true"]{color:var(--bg)}
+.fx-btn:active{scale:.94}
+.fx-btn:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.fx-ind,.fx-btn{transition:none}.fx-ind.hit{animation:none}}
+
 /* ══ Action node ══════════════════════════════════════════
    (Bencho · MIT · bencho.dev/licence.) A node card whose controls live in
    its top-right corner until the pointer asks for them. The component owns
@@ -1504,7 +1521,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
       <div class="ad-in">
         <div class="ad-head">
           <div><h2>Expedientes</h2><p id="exSub">Tus PREAs generadas por el agente y lo que respondió el fabricante</p></div>
-          <input type="search" id="exQ" placeholder="Buscar folio, queja o VIN" aria-label="Buscar expedientes">
+          <input type="search" id="exQ" placeholder="Buscar folio, queja, VIN, orden o servicio" aria-label="Buscar expedientes">
         </div>
         <div class="ex-bar" id="exBar"></div>
         <div class="nod-grid" id="exList"></div>
@@ -2992,7 +3009,7 @@ RC.ask=async function(q){
 $('#rcForm').addEventListener('submit',function(e){e.preventDefault();var i=$('#rcIn'),q=i.value;i.value='';RC.ask(q)});
 document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('#rcSug [data-q]');if(b){RC.ask(b.dataset.q);return}
-  var f=e.target.closest&&e.target.closest('#rcThread [data-folio]');if(f){EX.q=f.dataset.folio;$('#exQ').value=EX.q;EX.f='todos';showView('exp')}
+  var f=e.target.closest&&e.target.closest('#rcThread [data-folio]');if(f){EX.q=f.dataset.folio;$('#exQ').value=EX.q;EX.f='prea';showView('exp')}
 });
 /* ---- Agente de Cartera: cuentas por cobrar de las PREAs aceptadas ---- */
 var CAR={rows:[],f:'todas',q:'',loading:false,PLAZO:30};
@@ -3511,7 +3528,7 @@ HM.newCam=async function(){
     if((el=t.closest('[data-pz]'))){HM.pieza(el.dataset.pz,el.dataset.to);return}
     if((el=t.closest('[data-cm]'))){HM.campana(el.dataset.cm,el.dataset.to);return}
     if((el=t.closest('[data-cli]'))){HM.editCliente(el.dataset.cli);return}
-    if((el=t.closest('[data-exp]'))){if(el.dataset.exp){EX.q=el.dataset.exp;$('#exQ').value=EX.q;EX.f='todos';showView('exp')}return}
+    if((el=t.closest('[data-exp]'))){if(el.dataset.exp){EX.q=el.dataset.exp;$('#exQ').value=EX.q;EX.f='prea';showView('exp')}return}
     if((el=t.closest('[data-card]'))&&!t.closest('select,.hm-sel')){HM.go(el.dataset.card)}
   });
   root.addEventListener('change',function(e){
@@ -3951,7 +3968,7 @@ document.addEventListener('click',function(e){
   else if(a==='cal'||a==='day'){var c=b.closest('.mi-calcard');if(c)c.innerHTML=MI.cal(+b.dataset.y,+b.dataset.m,a==='day'?+b.dataset.d:null)}
 });
 
-document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('.mi-wrap [data-folio]');if(f){EX.q=f.dataset.folio;$('#exQ').value=EX.q;EX.f='todos';showView('exp')}});
+document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('.mi-wrap [data-folio]');if(f){EX.q=f.dataset.folio;$('#exQ').value=EX.q;EX.f='prea';showView('exp')}});
 /* ===== Agentes de Garantías y Cobros: panel de conversaciones (título = número de orden) y charla sobre la orden ===== */
 var GP={all:[],q:'',cur:null,msgs:[],t:0,nPrea:0,caseText:'',lastExpP:null};
 GP.COLS='id,folio,status,wo,cliente,vin,sys,rule_id,queja,op,opd,hours,parts,parts_total,labor,codes,created_at';
@@ -4238,7 +4255,7 @@ async function runConv(text){
   $('#gpNew').addEventListener('click',function(){document.getElementById('newChat').click()});
   document.addEventListener('click',function(e){
     var c=e.target.closest&&e.target.closest('[data-gpcopy]');if(c){copyText(c.dataset.gpcopy).then(function(){toast('Copiado')});return}
-    var x=e.target.closest&&e.target.closest('[data-gpexp]');if(x){EX.q=x.dataset.gpexp;$('#exQ').value=EX.q;EX.f='todos';showView('exp');return}
+    var x=e.target.closest&&e.target.closest('[data-gpexp]');if(x){EX.q=x.dataset.gpexp;$('#exQ').value=EX.q;EX.f='prea';showView('exp');return}
     var o=e.target.closest&&e.target.closest('.gp-chip[data-gpopen]');if(o){GP.open(o.dataset.gpopen);return}
     var q=e.target.closest&&e.target.closest('.gp-chip[data-gpq]');
     if(q){
@@ -4452,8 +4469,8 @@ var NODE=(function(){
   }
   /* un servicio (Inicio → Servicios): {name, n, tot, per} */
   function srv(x){
-    return shell({id:x.name,pal:'srv',name:x.name,say:x.n+(x.n===1?' PREA aprobada':' PREAs aprobadas')+' · '+x.per,
-      more:(x.tot?Math.round(x.n/x.tot*100):0)+'% de las aprobadas',
+    return shell({id:x.name,pal:'srv',name:x.name,say:x.say||(x.n+(x.n===1?' PREA aprobada':' PREAs aprobadas')+' · '+x.per),
+      more:x.more||((x.tot?Math.round(x.n/x.tot*100):0)+'% de las aprobadas'),
       acts:[A('data-exp="'+ea(x.name)+'"','Ver PREAs de este servicio','doc'),A(cp(x.name,'Servicio copiado'),'Copiar servicio','copy')]});
   }
   /* an expediente (Expedientes) */
@@ -4573,25 +4590,69 @@ var NODE=(function(){
   }};
 })();
 
-var EX={rows:[],f:'todos',q:'',loading:false};
+var EX={rows:[],cam:[],f:'prea',q:'',loading:false};
+EX.SUB={prea:function(){return SB.user&&SB.user.role==='admin'?'Todas las PREAs de la agencia y lo que respondió el fabricante':'Tus PREAs generadas por el agente y lo que respondió el fabricante'},
+  cam:function(){return 'Campañas de las unidades de tu agencia'},srv:function(){return 'Tus PREAs agrupadas por tipo de servicio'}};
 EX.load=async function(){
   if(!SB.c||!SB.entered){return}
-  $('#exSub').textContent=SB.user&&SB.user.role==='admin'?'Todas las PREAs de la agencia y lo que respondió el fabricante':'Tus PREAs generadas por el agente y lo que respondió el fabricante';
   EX.loading=true;EX.render();
-  var r=await SB.c.from('expedientes').select('*,profiles(name)').order('created_at',{ascending:false}).limit(200);
+  var r=await Promise.all([SB.c.from('expedientes').select('*,profiles(name)').order('created_at',{ascending:false}).limit(200),
+    SB.c.from('campanas').select('*').order('created_at',{ascending:false}).limit(200)]);
   EX.loading=false;
-  if(r.error){SB.fail(r.error);EX.rows=[]}else EX.rows=r.data;
+  if(r[0].error){SB.fail(r[0].error);EX.rows=[]}else EX.rows=r[0].data;
+  if(r[1].error){SB.fail(r[1].error);EX.cam=[]}else EX.cam=r[1].data;
   EX.render();
 };
 EX.money=function(n){return '$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})};
+
+/* ── el filtro: PREAs · Campañas · Servicios ───────────────
+   Una pastilla oscura que se desliza al botón elegido con un pequeño
+   rebote, y el botón cede un instante al pulsarlo. La barra se construye
+   una sola vez (si se reconstruyera en cada render, la pastilla nacería
+   ya en su sitio y no habría nada que animar). */
+EX.TIPOS=[['prea','PREAs'],['cam','Campañas'],['srv','Servicios']];
+EX.bar=function(){
+  var bar=$('#exBar');
+  if(!bar.querySelector('.fx-ind')){
+    bar.classList.add('fx-seg');bar.setAttribute('role','group');bar.setAttribute('aria-label','Tipo de expediente');
+    bar.innerHTML='<i class="fx-ind" aria-hidden="true"></i>'+EX.TIPOS.map(function(t){return '<button class="fx-btn" type="button" data-f="'+t[0]+'">'+t[1]+'</button>'}).join('');
+    EX.indFirst=true;
+  }
+  var on=null;
+  $$('.fx-btn',bar).forEach(function(b){var a=b.dataset.f===EX.f;b.setAttribute('aria-pressed',String(a));if(a)on=b});
+  var ind=$('.fx-ind',bar);
+  if(on&&on.offsetWidth){
+    if(EX.indFirst){ind.style.transition='none'}
+    ind.style.width=on.offsetWidth+'px';ind.style.transform='translateX('+on.offsetLeft+'px)';
+    if(EX.indFirst){void ind.offsetWidth;ind.style.transition='';EX.indFirst=false}
+  }
+};
+EX.pick=function(f){
+  var ind=$('#exBar .fx-ind');
+  if(ind){ind.classList.remove('hit');void ind.offsetWidth;ind.classList.add('hit')}
+  EX.f=f;EX.render();
+};
 EX.render=function(){
-  var cnt={todos:EX.rows.length,borrador:0,aceptada:0,rechazada:0};EX.rows.forEach(function(x){cnt[x.status]++});
-  var lbl={todos:'Todos',borrador:'Pendientes',aceptada:'Aceptadas',rechazada:'Rechazadas'};
-  $('#exBar').innerHTML=Object.keys(lbl).map(function(k){return '<button class="bt" type="button" data-f="'+k+'" aria-pressed="'+(EX.f===k)+'">'+lbl[k]+' · '+cnt[k]+'</button>'}).join('');
-  var q=norm(EX.q),list=EX.rows.filter(function(x){return (EX.f==='todos'||x.status===EX.f)&&(!q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0)});
-  var admin=SB.user&&SB.user.role==='admin',stl={borrador:'Pendiente',aceptada:'Aceptada',rechazada:'Rechazada'};
-  $('#exList').innerHTML=EX.loading?'<div class="ex-empty">Cargando…</div>':!list.length?'<div class="ex-empty">'+(EX.rows.length?'Sin resultados para este filtro.':'Aún no hay expedientes. Cada PREA que arme el agente aparecerá aquí.')+'</div>':
-    list.map(function(x){return NODE.card(x,admin,stl)}).join('');
+  EX.bar();
+  $('#exSub').textContent=EX.SUB[EX.f]();
+  var q=norm(EX.q),admin=SB.user&&SB.user.role==='admin',stl={borrador:'Pendiente',aceptada:'Aceptada',rechazada:'Rechazada'},html='',n=0;
+  if(EX.loading){$('#exList').innerHTML='<div class="ex-empty">Cargando…</div>';return}
+  if(EX.f==='prea'){
+    var list=EX.rows.filter(function(x){return !q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0});
+    n=list.length;html=list.map(function(x){return NODE.card(x,admin,stl)}).join('');
+    if(!n)html='<div class="ex-empty">'+(EX.rows.length?'Sin resultados para esa búsqueda.':'Aún no hay expedientes. Cada PREA que arme el agente aparecerá aquí.')+'</div>';
+  }else if(EX.f==='cam'){
+    var lc=EX.cam.filter(function(x){return !q||norm([x.orden,x.cliente,x.unidad,x.campana].join(' ')).indexOf(q)>=0});
+    n=lc.length;html=lc.map(function(x){return NODE.cam(x)}).join('');
+    if(!n)html='<div class="ex-empty">'+(EX.cam.length?'Sin resultados para esa búsqueda.':'Aún no hay campañas registradas.')+'</div>';
+  }else{
+    var g={};EX.rows.forEach(function(x){var k=x.sys||'Sin sistema';(g[k]=g[k]||{name:k,n:0,acc:0,pen:0});g[k].n++;if(x.status==='aceptada')g[k].acc++;if(x.status==='borrador')g[k].pen++});
+    var ls=Object.keys(g).map(function(k){var o=g[k];o.say=o.n+(o.n===1?' PREA':' PREAs')+' · '+o.acc+(o.acc===1?' aceptada':' aceptadas');o.more=o.pen?o.pen+(o.pen===1?' pendiente':' pendientes'):'Sin pendientes';return o})
+      .filter(function(o){return !q||norm(o.name).indexOf(q)>=0}).sort(function(a,b){return b.n-a.n});
+    n=ls.length;html=ls.map(function(o){return NODE.srv(o)}).join('');
+    if(!n)html='<div class="ex-empty">'+(EX.rows.length?'Sin resultados para esa búsqueda.':'Aún no hay servicios: aparecerán con tus PREAs.')+'</div>';
+  }
+  $('#exList').innerHTML=html;
   NODE.mount($('#exList'));
 };
 EX.resolve=async function(id,ok){
@@ -4626,7 +4687,7 @@ EX.resolve=async function(id,ok){
   SB.setExpStatus(id,x.status,ext).then(function(){LS.learnNow()});
 };
 document.addEventListener('click',function(e){
-  var f=e.target.closest&&e.target.closest('#exBar [data-f]');if(f){EX.f=f.dataset.f;EX.render();return}
+  var f=e.target.closest&&e.target.closest('#exBar [data-f]');if(f){EX.pick(f.dataset.f);return}
   var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('[data-id]');EX.resolve(row.dataset.id,b.dataset.r==='ok');return}
 });
 $('#exQ').addEventListener('input',function(){EX.q=this.value;EX.render()});
