@@ -1708,6 +1708,90 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .xd-verd{font-size:13px;font-weight:500}
 .xd-verd[data-v="bien"]{color:var(--ok)}.xd-verd[data-v="mal"]{color:#e5484d}
 @media (prefers-reduced-motion: reduce){.xd,.xd-row,.xd-tick,.xd-zone{animation:none;transition:none}}
+/* ══ Create menu: elegir qué se va a trabajar antes de iniciar el chat ═══
+   (Bencho · MIT · bencho.dev/licence.) Adapted to vanilla JS: Framer's
+   spring on width/height/radius became one CSS curve with no overshoot
+   (a spring past its target takes the corner radius with it: a wobble, not
+   a bounce). The shape is ONE element with NO goo filter: the filter fuses
+   several shapes, this has exactly one, so a blur could only damage it. The
+   liquid is entirely in the timing: the press sinks, and the spread starts
+   while the sink is still running so there is never a still frame.
+   TOKENS, mapped on the component's own root so nothing leaks:
+     --board, --fill-slab → the project's own --card (the panel)
+     --ink, --fill-on     → --fg
+     --ink-rgb, --fill-on-rgb → 22,22,22 light / 237,237,235 dark: three bare
+                            numbers, because rgba() is built from them
+     --pane-edge          → --card-line (an edge: white on a white page has none)
+     --font-ui            → --f-ui */
+.crt-stage{
+  --board:var(--card);--fill-slab:var(--card);--ink:var(--fg);--fill-on:var(--fg);
+  --ink-rgb:22,22,22;--fill-on-rgb:22,22,22;--pane-edge:var(--card-line);--font-ui:var(--f-ui);
+  --slab:var(--fill-slab,var(--board));--on-slab:var(--fill-on,var(--ink));--on-slab-rgb:var(--fill-on-rgb,var(--ink-rgb));
+  position:relative;width:244px;height:176px;margin:0 auto;
+  /* the pill's WIDTH is written from the measured label (--pill-w), so the label
+     can change without the shape jumping; the rest are the two states */
+  --pill-w:176px;--pill-h:38px;--panel-w:212px;--panel-h:130px;/* three rows and the padding */
+  --w:var(--pill-w);--h:var(--pill-h);--r:19px;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .crt-stage{--ink-rgb:237,237,235;--fill-on-rgb:237,237,235}}
+:root[data-theme="dark"] .crt-stage{--ink-rgb:237,237,235;--fill-on-rgb:237,237,235}
+.crt-stage[data-open="true"]{--w:var(--panel-w);--h:var(--panel-h);
+  /* 20 outside against a 10px inset leaves 10 for the rows to nest in: concentric,
+     which is what makes a row look like it belongs in the panel */
+  --r:20px}
+.crt-blobs{position:absolute;inset:0;pointer-events:none}
+/* centred by AUTO MARGINS: no transform to lose, and the same answer every frame */
+.crt-body{position:absolute;inset:0;margin:auto;width:var(--w);height:var(--h);border-radius:var(--r);background:var(--slab);
+  box-shadow:0 0 0 1px var(--pane-edge),var(--shadow);
+  /* one move: width, height and the corner run the same curve for the same time,
+     quick off the mark and landing without passing its number */
+  transition:width 220ms cubic-bezier(.22,1,.36,1),height 220ms cubic-bezier(.22,1,.36,1),border-radius 220ms cubic-bezier(.22,1,.36,1),scale 420ms cubic-bezier(.22,1,.36,1)}
+/* the first beat: pressed down. A plain uniform shrink, in fast, because a press
+   should be felt at once; 160 against a 60ms handoff so the spread starts under it */
+.crt-stage[data-sink="true"] .crt-body,.crt-stage[data-sink="true"] .crt-pill{scale:.94;transition:scale 160ms cubic-bezier(.22,1,.36,1)}
+.crt-stage:not([data-open="true"]) .crt-body{transition:width 220ms cubic-bezier(.22,1,.36,1),height 220ms cubic-bezier(.22,1,.36,1),border-radius 220ms cubic-bezier(.22,1,.36,1),scale 220ms cubic-bezier(.22,1,.36,1)}
+.crt-pill{position:absolute;inset:0;margin:auto;width:var(--pill-w);height:var(--pill-h);display:flex;align-items:center;justify-content:center;gap:8px;
+  border:0;background:none;color:var(--on-slab);font:500 13px var(--font-ui);letter-spacing:0;cursor:pointer;
+  transition:opacity 160ms ease,scale 420ms cubic-bezier(.22,1,.36,1)}
+.crt-pill:focus-visible{outline:2px solid var(--fg);outline-offset:3px;border-radius:19px}
+/* it does not move aside, it is simply not there once the shape has spread */
+.crt-stage[data-open="true"] .crt-pill{opacity:0;pointer-events:none;transition:opacity 160ms ease}
+/* held at full strength through the press: fading it during the squash would hide the beat the squash is for */
+.crt-stage[data-sink="true"] .crt-pill{opacity:1}
+.crt-glyph{display:grid;place-items:center}
+/* clips what it cannot fit, so its width is measured twice: now, and once the font is real */
+.crt-say{display:block;overflow:hidden;white-space:nowrap;text-align:left}
+.crt-say>span{display:inline-block}
+.crt-panel{position:absolute;inset:0;margin:auto;width:var(--panel-w);height:var(--panel-h);padding:12px;box-sizing:border-box;color:var(--on-slab);pointer-events:none}
+.crt-stage[data-open="true"] .crt-panel{pointer-events:auto}
+.crt-menu{margin:0;padding:0;list-style:none;display:grid;align-content:start;gap:2px}
+.crt-item{opacity:0;transform:translateY(6px);transition:opacity 160ms ease,transform 220ms cubic-bezier(.22,1,.36,1)}
+.crt-stage[data-open="true"] .crt-item{opacity:1;transform:none}
+.crt-item button{position:relative;isolation:isolate;width:100%;display:flex;align-items:center;gap:12px;height:34px;padding:0 16px;border:0;border-radius:10px;background:none;
+  /* 0.78, not 0.72: dark type on white at 0.72 lands at 4.6:1, over the line but only just, and this is the menu's only body text */
+  color:rgba(var(--on-slab-rgb),.78);font:13px var(--font-ui);letter-spacing:0;text-align:left;cursor:pointer;transition:color 220ms ease}
+.crt-item button:hover{color:var(--on-slab)}
+/* the hover wash, one per row: each fades its own in and out, nothing travels between them */
+.crt-item button::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:rgba(var(--on-slab-rgb),.08);opacity:0;transition:opacity 220ms ease;pointer-events:none}
+@media (hover:hover){.crt-item button:hover::before{opacity:1;transition-duration:160ms}}
+.crt-item button:focus-visible::before{opacity:1}
+@media (prefers-reduced-motion: reduce){.crt-body,.crt-pill,.crt-item{transition-duration:160ms}.crt-stage[data-sink="true"] .crt-body,.crt-stage[data-sink="true"] .crt-pill{scale:1}}
+/* la compuerta: mientras no se elija tipo y orden, no hay composer */
+.gate{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:8px;animation:gt-in 320ms cubic-bezier(.22,1,.36,1) both}
+@keyframes gt-in{from{opacity:0;translate:0 10px}}
+.stage[data-gate="on"] #composer,.stage[data-gate="on"] #chips{display:none}
+.gt-hint{margin:0;font-size:13px;color:var(--muted);text-align:center}
+.gt-ord{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:360px}
+.gt-tipo{display:inline-flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--card-line);font:500 13px var(--f-ui)}
+.gt-tipo button,.gt-tag button{border:0;background:none;color:var(--muted);font:12px var(--f-ui);cursor:pointer;padding:2px 6px;border-radius:999px}
+.gt-tipo button:hover,.gt-tag button:hover{color:var(--fg);background:var(--hover)}
+.gt-row{display:flex;gap:8px;width:100%}
+.gt-row input{flex:1;min-width:0;height:44px;padding:0 16px;border:1px solid var(--card-line);border-radius:12px;background:var(--card);color:var(--fg);font:500 15px var(--f-ui);letter-spacing:.02em;text-transform:uppercase;outline:none}
+.gt-row input::placeholder{text-transform:none;letter-spacing:0;font-weight:400;color:var(--faint)}
+.gt-row input:focus{border-color:color-mix(in srgb,var(--fg) 40%,var(--card-line))}
+.gt-row input[aria-invalid="true"]{border-color:#e5484d}
+.gt-row .go{height:44px;padding:0 20px;border:0;border-radius:12px;background:var(--send-on);color:var(--send-fg);font:500 14px var(--f-ui);cursor:pointer}
+.gt-err{min-height:16px;margin:0;font-size:12.5px;color:#e5484d}
+.gt-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 6px 4px 10px;border-radius:999px;background:var(--chip);font:500 12.5px var(--f-ui)}
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -1784,8 +1868,28 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
       <div class="thread" id="thread" hidden><div class="thread-in" id="threadIn"></div></div>
       <div class="dock" id="dock">
         <h1 class="hero-title" id="title">Trabajemos en tu próxima PREA</h1>
+        <div class="gate" id="gate" hidden>
+          <div id="gtMenu">
+            <div class="crt-stage" id="crt">
+              <div class="crt-blobs" aria-hidden="true"><div class="crt-body"></div></div>
+              <button class="crt-pill" id="crtPill" type="button" aria-haspopup="menu" aria-expanded="false"><span class="crt-glyph" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="crt-say"><span id="crtSay">Nueva conversación</span></span></button>
+              <div class="crt-panel" id="crtPanel" inert><ul class="crt-menu" role="menu">
+                <li class="crt-item" style="transition-delay:30ms"><button type="button" role="menuitem" data-tipo="PREA">PREA</button></li>
+                <li class="crt-item" style="transition-delay:52ms"><button type="button" role="menuitem" data-tipo="Campaña">Campaña</button></li>
+                <li class="crt-item" style="transition-delay:74ms"><button type="button" role="menuitem" data-tipo="Servicio">Servicio</button></li>
+              </ul></div>
+            </div>
+            <p class="gt-hint">Elige qué vas a trabajar para iniciar</p>
+          </div>
+          <form class="gt-ord" id="gtOrd" hidden novalidate>
+            <span class="gt-tipo"><span id="gtTipo"></span><button type="button" id="gtBack" aria-label="Cambiar tipo">Cambiar</button></span>
+            <div class="gt-row"><input id="gtIn" autocomplete="off" placeholder="Número de orden, ej. GA4043" aria-label="Número de orden"><button class="go" type="submit">Continuar</button></div>
+            <p class="gt-err" id="gtErr" role="alert"></p>
+          </form>
+        </div>
         <div class="composer rise d1" id="composer">
           <div class="c-head">
+            <span class="gt-tag" id="gtTag" hidden><span id="gtTagTx"></span><button type="button" id="gtTagX" aria-label="Cambiar tipo y orden">Cambiar</button></span>
             <span class="menu-host" id="preaHost"><button class="dd" aria-haspopup="menu" aria-expanded="false"><span data-i="folder" style="display:contents"></span><span id="preaLabel">Nueva PREA</span><svg class="ic chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button></span>
             <span class="menu-host" id="brandHost"><button class="dd" aria-haspopup="menu" aria-expanded="false"><span id="brandLabel">General Motors</span></button></span>
           </div>
@@ -2498,7 +2602,7 @@ function setAgent(a){
   titleEl.textContent=typeof c.title==='function'?c.title():c.title;
   if(a==='prueba'){setTimeout(function(){PR.stat();PR.tick()},50)}
   var mi=a==='mi',pr=a==='prueba';$('#brandHost').style.display=mi||pr?'none':'';$('#evBtn').style.display=mi?'none':'';$('#plusBtn').style.display=mi||pr?'none':'';
-  replayIntro();autosize();updateSend();
+  replayIntro();autosize();updateSend();if(GATE)GATE.sync();
 }
 function histBuild(m){head(m,'Conversaciones recientes');var L=SB.hist[S.agent];if(!L.length){var e=document.createElement('div');e.className='mh';e.textContent='Aún no hay conversaciones';m.appendChild(e)}L.forEach(function(h){item(m,{icon:'chat',t:h.t,s:h.s,fn:function(){loadHistory(h)}})})}
 menu('#histChip',histBuild);
@@ -2715,7 +2819,7 @@ function enterChat(title){
   if(stage.dataset.state!=='chat'){
     flip(function(){stage.dataset.state='chat';thread.hidden=false;ta.placeholder='Responde o agrega detalles…';autosize()});
   }
-  syncCrumb();
+  syncCrumb();if(GATE)GATE.sync();
 }
 function resetChat(){
   if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(typeof PR!=='undefined'&&PR)PR.msgs=[];if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.caseText='';GP.lastExpP=null}if(typeof CB!=='undefined'&&CB)CB.last=null
@@ -2724,6 +2828,7 @@ function resetChat(){
     flip(function(){stage.dataset.state='home';thread.hidden=true;ta.placeholder=AG[S.agent].ph;autosize()});
     replayIntro();
   }
+  if(GATE){GATE.v=null;GATE.sync()}
   syncCrumb();updateSend();
 }
 $('#newChat').addEventListener('click',function(){showView(curView());resetChat();ta.value='';S.files=[];renderFiles();autosize();updateSend();ta.focus()});
@@ -6420,6 +6525,70 @@ function start(text,files){
   if(S.agent==='cobros'&&!(files&&files.length)&&GP.cobrosChat(text,files))return runConv(text);
   return S.agent==='cobros'?runCobros(text,files):S.agent==='mi'?runMi(text,files):run(text,files)}
 
+/* ══ La compuerta del Agente de Garantías ═════════════════
+   Antes de escribir nada: se elige si es PREA, Campaña o Servicio (el botón
+   Create) y después se escribe el número de orden (GA4043). Solo entonces
+   aparece el composer. Cada chat nuevo vuelve a pedirlo. */
+var gStill=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+var GATE={v:null,open:false,beat:0,ORD:/^(GA-?\d{3,8}|G-[A-Z0-9]{6,10}|[A-Z]{1,3}-?\d{3,8})$/};
+GATE.on=function(){return S.agent==='garantias'&&stage.dataset.state!=='chat'&&!GATE.v};
+GATE.sync=function(){
+  var on=GATE.on(),g=$('#gate');
+  if(on){stage.dataset.gate='on';if(g.hidden){g.hidden=false;GATE.menu()}}
+  else{delete stage.dataset.gate;g.hidden=true;GATE.shut()}
+  var t=$('#gtTag');t.hidden=!(S.agent==='garantias'&&GATE.v&&stage.dataset.state!=='chat');
+  if(!t.hidden)$('#gtTagTx').textContent=GATE.v.tipo+' · '+GATE.v.orden;
+};
+GATE.set=function(open){
+  GATE.open=open;var st=$('#crt'),pn=$('#crtPanel'),pill=$('#crtPill');
+  st.dataset.open=open?'true':'false';pill.setAttribute('aria-expanded',String(open));pn.inert=!open;
+};
+GATE.shut=function(){clearTimeout(GATE.beat);var st=$('#crt');delete st.dataset.sink;GATE.set(false)};
+/* the pill's width is measured from its own label: +1 because offsetWidth is an integer
+   and the label is not ("Create" measured 42.46 and came back 42, taking the edge off the e) */
+GATE.measure=function(){
+  var w=$('#crtSay').offsetWidth+1;if(w<=1)return;
+  $('#crt').style.setProperty('--pill-w',(18+8+w+34)+'px');
+};
+GATE.menu=function(){$('#gtMenu').hidden=false;$('#gtOrd').hidden=true;GATE.measure();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(GATE.measure)};
+GATE.press=function(){
+  var st=$('#crt');st.dataset.sink='true';clearTimeout(GATE.beat);
+  /* 60ms handoff against a 160ms sink: the spread begins while the press is still running */
+  GATE.beat=setTimeout(function(){delete st.dataset.sink;GATE.set(true);var b=$('#crtPanel button');if(b)b.focus({preventScroll:true})},gStill?0:60);
+};
+GATE.pick=function(tipo){
+  GATE.set(false);GATE.tipo=tipo;
+  setTimeout(function(){
+    $('#gtMenu').hidden=true;$('#gtOrd').hidden=false;$('#gtTipo').textContent=tipo;$('#gtErr').textContent='';
+    var i=$('#gtIn');i.value='';i.removeAttribute('aria-invalid');i.focus();
+  },gStill?0:200);
+};
+GATE.fix=function(t){return String(t||'').toUpperCase().replace(/\s+/g,'').replace(/^([A-Z]{1,3})(\d)/,'$1$2')};
+GATE.reset=function(){GATE.v=null;GATE.sync()};
+$('#crtPill').addEventListener('click',function(){if(!GATE.open)GATE.press()});
+$('#crtPanel').addEventListener('click',function(e){var b=e.target.closest('[data-tipo]');if(b)GATE.pick(b.dataset.tipo)});
+/* No close button and no title bar: anywhere but the menu puts it away. A press by SOMEBODY
+   (isTrusted), and hit-tested against the panel's own rectangle, because the stage that
+   holds it is larger than the menu and a contains() would count its dead ground as the menu. */
+document.addEventListener('pointerdown',function(e){
+  if(!GATE.open||!e.isTrusted)return;
+  var st=$('#crt').getBoundingClientRect();
+  /* the panel is 212x130 inside the stage: the visible box is the centred one */
+  var w=212,h=130,l=st.left+(st.width-w)/2,t=st.top+(st.height-h)/2;
+  if(!(e.clientX>=l&&e.clientX<=l+w&&e.clientY>=t&&e.clientY<=t+h))GATE.set(false);
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&GATE.open){GATE.set(false);$('#crtPill').focus()}});
+$('#gtBack').addEventListener('click',GATE.menu);
+$('#gtIn').addEventListener('input',function(){this.removeAttribute('aria-invalid');$('#gtErr').textContent=''});
+$('#gtOrd').addEventListener('submit',function(e){
+  e.preventDefault();var i=$('#gtIn'),o=GATE.fix(i.value);
+  if(!GATE.ORD.test(o)){i.setAttribute('aria-invalid','true');$('#gtErr').textContent='Escribe un número de orden válido, por ejemplo GA4043';i.focus();return}
+  GATE.v={tipo:GATE.tipo,orden:o};GATE.sync();ta.focus();
+});
+$('#gtTagX').addEventListener('click',GATE.reset);
+/* el primer mensaje lleva la orden y el tipo, para que el chat la guarde y el agente la conozca */
+GATE.pre=function(){return S.agent==='garantias'&&GATE.v&&!S.convId&&!GP.cur?'Orden '+GATE.v.orden+' ('+GATE.v.tipo+'). ':''};
+GATE.sync();
 function onSend(){
   if(S.streaming){if(S.ctrl)S.ctrl.aborted=true;return}
   var text=ta.value.trim(),files=S.files.slice();
@@ -6427,8 +6596,9 @@ function onSend(){
   closeMenu();showView(curView());
   enterChat(text||files[0].name);
   addUser(text,files);
+  var pre=GATE.pre();
   typeTok++;ta.value='';S.files=[];renderFiles();autosize();updateSend();
-  start(text,files);
+  start(pre+text,files);
 }
 async function loadHistory(h){
   if(S.agent==='garantias'||S.agent==='cobros')return GP.open(h.id);
