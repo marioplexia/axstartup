@@ -329,16 +329,14 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
    is here is what the card and the buttons are MADE of.
 
    TOKENS, mapped on the component's own root so nothing leaks:
-     --card, --fill-slab → the card's fill: --surface, so it reads against
-                           the white page (Bencho's flat fill on its own
-                           ground); the buttons share it
+     --fill-slab         → the card's fill: white (the project's own --card), the buttons share it
      --fill-on, --ink    → --fg
      --ink-3             → --muted     (the sentence)
      --ink-4             → --faint     (the small print)
      --ink-rgb           → 22,22,22 light / 237,237,235 dark: three bare
                            numbers, because rgba() is built from them
      --wash              → .06 light / .1 dark: the mark's ground
-     --pane-edge         → --card-line (the project's own hairline)
+     --pane-edge         → --line (the project's own faintest hairline)
      --font-ui           → --f-ui
    The faces' pictures and the green "Connected" dot are not carried: see
    the notes in NODE and the original's own note on the dot. */
@@ -346,15 +344,14 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .nod-grid{display:grid;grid-template-columns:repeat(auto-fill,272px);gap:64px 64px;justify-content:start;padding:56px 56px 8px 0}
 .nod-grid .ex-empty{grid-column:1/-1;padding:32px 14px;text-align:center;color:var(--muted)}
 .nod{
-  --card: var(--surface);
-  --fill-slab: var(--surface);
+  --fill-slab: var(--card);
   --fill-on: var(--fg);
   --ink: var(--fg);
   --ink-3: var(--muted);
   --ink-4: var(--faint);
   --ink-rgb: 22, 22, 22;
   --wash: .06;
-  --pane-edge: var(--card-line);
+  --pane-edge: var(--line);
   --font-ui: var(--f-ui);}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nod{--ink-rgb:237,237,235;--wash:.1}}
 :root[data-theme="dark"] .nod{--ink-rgb:237,237,235;--wash:.1}
@@ -390,8 +387,9 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
   border-radius: var(--nod-r, 20px);
   background: var(--fill-slab, var(--card));
   color: var(--fill-on, var(--ink));
-  /* the hairline: this project draws one round every card */
-  box-shadow: 0 0 0 1px var(--pane-edge);
+  /* white on white: a faint ring and the project's own soft shadow are
+     what lift it off the page */
+  box-shadow: 0 0 0 1px var(--pane-edge), var(--shadow);
   /* ── it lifts a hair while the fan is out ──────────────
      The card is the thing the buttons came out of, and a card that answers
      at the same moment they do reads as one object doing one thing. */
@@ -418,7 +416,6 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
    this line does not need to be bold to be the name, it needs to be the
    darkest and the largest, and it is both. */
 .nod-name { font-size: 16px; font-weight: 500; letter-spacing: -0.01em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nod-date { margin-left: auto; flex: none; font-size: 11.5px; color: var(--ink-4); }
 
 .nod-say {
   margin: 13px 0 0;
@@ -430,7 +427,6 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;}
-.nod-meta { margin: 6px 0 0; font-size: 11.5px; color: var(--ink-4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ── after the sentence, and further from it than the sentence is from
    the name ─────────────────────────────────────────────────
@@ -439,21 +435,43 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
    aside under it. 16 against the description's 13 is what says so. */
 .nod-chain { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
 
-.nod-link {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
+/* ── the three colours, overlapped ────────────────────────
+   Each orb is a few soft radial blobs of colour, blurred into one another
+   and drifting slowly — the same idea as the agent's own sphere, in three
+   palettes. The ring is the card's own fill, so they read as a stack and
+   not as a row with a spacing problem; on a dark card a fixed white ring
+   would draw three bright arcs across the middle of it. */
+.nod-orbs { display: flex; align-items: center; flex: none; }
+.nod-orb {
+  position: relative;
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
   overflow: hidden;
-  background: color-mix(in srgb, var(--fill-on, #17181a) 12%, transparent);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--ink-4);
-  letter-spacing: 0em;}
+  flex: none;
+  background: var(--ob);
+  box-shadow: 0 0 0 2px var(--fill-slab, var(--card));}
+.nod-orb + .nod-orb { margin-left: -8px; }
+.nod-orb::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  background:
+    radial-gradient(circle at 28% 32%, var(--oa) 0 22%, transparent 58%),
+    radial-gradient(circle at 74% 68%, var(--oc) 0 24%, transparent 60%),
+    radial-gradient(circle at 70% 24%, var(--od) 0 18%, transparent 54%);
+  filter: blur(2.5px);
+  animation: nod-drift 11s linear infinite;}
+.nod-orb.o1 { --ob: #2b6cff; --oa: #5fe0ff; --oc: #7a5cff; --od: #2fd3c8; }
+.nod-orb.o2 { --ob: #ff4a3d; --oa: #ffb02e; --oc: #ff2f7a; --od: #ffd45e; }
+.nod-orb.o2::before { animation-duration: 14s; animation-direction: reverse; }
+.nod-orb.o3 { --ob: #f02aa8; --oa: #ff7be0; --oc: #ff7a4a; --od: #b04bff; }
+.nod-orb.o3::before { animation-duration: 9s; }
+@keyframes nod-drift { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce){ .nod-orb::before { animation: none; } }
 
-.nod-more { margin-left: auto; font-size: 11.5px; font-weight: 500; color: var(--ink-3); letter-spacing: 0em; white-space: nowrap; }
+.nod-more { margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--ink-4); letter-spacing: 0em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 
 /* ── the fan ───────────────────────────────────────────────
    A zero-sized box pinned to the card's top-right corner. Every button is
@@ -3333,7 +3351,7 @@ HM.PG={
       return [{n:ap,d:HM.delta(ap,ap0),l:'Aprobadas'},{n:ng,d:HM.delta(ng,ng0),l:'Negadas'},{n:ap+ng?(ap/(ap+ng)*100).toFixed(1)+'%':'—',l:'Tasa de aprobación'}]},
     list:function(){var P=HM.per.pre,w=HM.winM(P.m,P.y);return HM.exp().filter(function(x){return x.status==='aceptada'&&HM.inW(x.updated_at,w.s,w.e)}).sort(function(a,b){return +new Date(b.updated_at)-+new Date(a.updated_at)})},
     search:function(x){return HM.orden(x)+' '+(x.cliente||'')},
-    unit:'órdenes',
+    unit:'órdenes',nod:function(x){return NODE.prea(x)},
     row:function(x){return '<td><button class="hm-or" type="button" data-exp="'+ea(x.folio)+'">'+esc(HM.orden(x))+'</button></td><td><button class="hm-cli'+(x.cliente?'':' no')+'" type="button" data-cli="'+ea(x.id)+'">'+esc(x.cliente||'Agregar cliente')+'</button></td><td>'+HM.date(x.updated_at)+'</td><td>'+EX.money(Number(x.parts_total)+Number(x.labor))+'</td>'},
     csv:function(x){return [HM.orden(x),x.cliente||'',HM.date(x.updated_at),Number(x.parts_total)+Number(x.labor)]}},
   piezas:{title:'Piezas en pedido',card:'Piezas por PREA autorizada',ph:'Buscar orden, cliente o pieza',pills:[['todas','Todas'],['en_planta','En planta'],['pedida','Pedida'],['por_pedir','Por pedir']],
@@ -3357,7 +3375,7 @@ HM.PG={
 };
 HM.rows=function(){
   var cfg=HM.PG[HM.page],q=norm(HM.q),all=cfg.list(),list=all.filter(function(x){return !q||norm(cfg.search(x)).indexOf(q)>=0});
-  var body=list.length?list.slice(0,300).map(function(x){return '<tr>'+cfg.row(x)+'</tr>'}).join(''):'<tr><td colspan="'+cfg.cols.length+'" class="hm-none">'+(all.length?'Sin resultados para esa búsqueda.':'Aún no hay registros. Se llenará con tu trabajo diario.')+'</td></tr>';
+  var body=cfg.nod?(list.length?list.slice(0,300).map(cfg.nod).join(''):'<div class="ex-empty">'+(all.length?'Sin resultados para esa búsqueda.':'Aún no hay registros. Se llenará con tu trabajo diario.')+'</div>'):list.length?list.slice(0,300).map(function(x){return '<tr>'+cfg.row(x)+'</tr>'}).join(''):'<tr><td colspan="'+cfg.cols.length+'" class="hm-none">'+(all.length?'Sin resultados para esa búsqueda.':'Aún no hay registros. Se llenará con tu trabajo diario.')+'</td></tr>';
   var n=cfg.orders?new Set(list.map(function(x){return x.expediente_id})).size:list.length,t=cfg.orders?new Set(all.map(function(x){return x.expediente_id})).size:all.length;
   return {body:body,count:cfg.orders?n+' de '+t+' '+cfg.unit:n+' '+cfg.unit,list:list};
 };
@@ -3369,11 +3387,12 @@ HM.rDetail=function(){
     '<section class="hm-tcard"><div class="hm-thead"><div><h3>'+cfg.card+'</h3><p id="hmCount">'+r.count+'</p></div>'+
     (cfg.pills?'<div class="hm-pills">'+cfg.pills.map(function(p){return '<button class="hm-pill" type="button" data-tf="'+p[0]+'" aria-pressed="'+(HM.tf[HM.page]===p[0])+'">'+p[1]+'</button>'}).join('')+'</div>':'')+
     '<label class="hm-search">'+svg('search')+'<input id="hmQ" type="search" placeholder="'+cfg.ph+'" value="'+ea(HM.q)+'" aria-label="Buscar"></label></div>'+
-    '<div class="hm-scroll"><table class="hm-tb"><thead><tr>'+cfg.cols.map(function(c){return '<th>'+c+'</th>'}).join('')+'</tr></thead><tbody id="hmRows">'+r.body+'</tbody></table></div></section>';
+    (cfg.nod?'<div class="nod-grid" id="hmRows">'+r.body+'</div>':'<div class="hm-scroll"><table class="hm-tb"><thead><tr>'+cfg.cols.map(function(c){return '<th>'+c+'</th>'}).join('')+'</tr></thead><tbody id="hmRows">'+r.body+'</tbody></table></div>')+'</section>';
 };
 HM.render=function(){
   if(S.view!=='inicio')return;
   var b=$('#hmBody');b.innerHTML=HM.page==='home'?HM.rHome():HM.rDetail();
+  if(HM.page!=='home')NODE.mount(b);
 };
 
 /* ---- diálogo reutilizable, descarga CSV y menú de filtro ---- */
@@ -3480,7 +3499,7 @@ HM.newCam=async function(){
   });
   root.addEventListener('input',function(e){
     if(e.target.id!=='hmQ')return;
-    HM.q=e.target.value;var r=HM.rows();$('#hmRows').innerHTML=r.body;$('#hmCount').textContent=r.count;
+    HM.q=e.target.value;var r=HM.rows();$('#hmRows').innerHTML=r.body;$('#hmCount').textContent=r.count;NODE.mount($('#hmRows'));
   });
   root.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('[data-act="cmp"]')){e.preventDefault();HM.cmp=!HM.cmp;HM.render()}});
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.hm-pop [data-adv]');if(b){HM.adv=b.dataset.adv;HM.render();toast(HM.adv==='all'?'Mostrando toda la agencia':'Filtrado por asesor')}});
@@ -4352,43 +4371,62 @@ var NODE=(function(){
     ok:'<path d="M20 6 9 17l-5-5"/>',
     no:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
     copy:'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
-    doc:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'
+    doc:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+    user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'
   };
   function ico(k){return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+'</svg>'}
   function ini(n){return String(n||'?').split(/\s+/).filter(Boolean).map(function(w){return w[0]}).join('').slice(0,2).toUpperCase()||'?'}
 
   /* ── what the buttons do, and why these ───────────────────
-     The things you do to an expediente without opening it. A draft gets
-     the two answers planta can give; everything gets the copies.
+     The things you do to a step without opening it. Each item is
+     {attrs, label, icon}; the attrs carry the real handler (the existing
+     data-r / data-exp / data-cli ones, or data-copy handled below).
      Deliberately not delete: the one action that cannot be undone does not
      belong in a row that appears under your cursor. */
+  function A(attrs,l,i){return {a:attrs,l:l,i:i}}
+  function cp(text,msg){return 'data-copy="'+ea(text)+'" data-msg="'+ea(msg)+'"'}
   function acts(x){
-    var A=[];
-    if(x.status==='borrador'){
-      A.push({a:'data-r="ok"',l:'Fue aceptada',i:'ok'});
-      A.push({a:'data-r="no"',l:'Fue rechazada',i:'no'});
-    }
-    A.push({a:'data-c="folio"',l:'Copiar folio',i:'copy'});
-    if(x.status!=='borrador')A.push({a:'data-c="res"',l:'Copiar resumen',i:'doc'});
-    return A;
+    var L=[];
+    if(x.status==='borrador'){L.push(A('data-r="ok"','Fue aceptada','ok'));L.push(A('data-r="no"','Fue rechazada','no'))}
+    L.push(A(cp(x.folio,'Folio copiado'),'Copiar folio','copy'));
+    if(x.status!=='borrador')L.push(A(cp([x.folio,x.queja,[x.sys,x.op].filter(Boolean).join(' · ')].filter(Boolean).join(' — '),'Resumen copiado'),'Copiar resumen','doc'));
+    return L;
   }
-
+  /* ── the three colours ─────────────────────────────────────
+     Bencho's faces are pictures of people and are not licensed to travel,
+     and a step's "crew" would be invented data here. In their place: soft
+     blurred orbs, the same family as the agent's own sphere (drifting blobs
+     of colour, blurred into each other), three palettes overlapped with a
+     ring in the card's own fill so they read as a stack. They are
+     decoration and say so (aria-hidden); what a card really knows — state,
+     hours, total — is the text beside them, where the original has "+3". */
+  var ORBS3='<span class="nod-orbs" aria-hidden="true"><i class="nod-orb o1"></i><i class="nod-orb o2"></i><i class="nod-orb o3"></i></span>';
+  var MARK='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><line x1="3" x2="9" y1="12" y2="12"/><line x1="15" x2="21" y1="12" y2="12"/></svg>';
   /* the card: mark and name on top, then what the step does, then — last,
-     because it is the least urgent and the heaviest to look at — who and
-     how much. */
-  function card(x,admin,stl){
-    var A=acts(x),who=(x.profiles&&x.profiles.name)||(SB.user&&SB.user.name)||'';
-    var meta=[x.sys,x.op,x.rule_id?'regla '+x.rule_id:''].filter(Boolean).map(esc).join(' · ');
-    return '<div class="nod" data-id="'+ea(x.id)+'" tabindex="0" aria-label="Expediente '+ea(x.folio)+'">'+
-      '<div class="nod-card"><div class="nod-top"><span class="nod-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><line x1="3" x2="9" y1="12" y2="12"/><line x1="15" x2="21" y1="12" y2="12"/></svg></span>'+
-        '<span class="nod-name">'+esc(x.folio)+'</span><span class="nod-date">'+esc(SB.dayLbl(x.created_at))+'</span></div>'+
-      '<p class="nod-say" title="'+ea(x.queja||'')+'">'+esc(x.queja||'Sin descripción')+'</p>'+
-      (meta?'<p class="nod-meta">'+meta+'</p>':'')+
-      '<div class="nod-chain"><span class="nod-link" title="'+ea(who)+'">'+esc(ini(who))+'</span><span class="ex-st '+x.status+'">'+esc(stl[x.status])+'</span>'+
-        '<span class="nod-more">'+esc(String(x.hours||0))+' h · '+EX.money(Number(x.parts_total)+Number(x.labor))+'</span></div></div>'+
+     because it is the least urgent and the heaviest to look at — the
+     colours and the small print. o: {id,name,say,more,tip,acts} */
+  function shell(o){
+    return '<div class="nod" data-id="'+ea(o.id)+'" tabindex="0" aria-label="'+ea(o.name)+'"'+(o.tip?' title="'+ea(o.tip)+'"':'')+'>'+
+      '<div class="nod-card"><div class="nod-top"><span class="nod-mark" aria-hidden="true">'+MARK+'</span><span class="nod-name">'+esc(o.name)+'</span></div>'+
+      '<p class="nod-say">'+esc(o.say)+'</p>'+
+      '<div class="nod-chain">'+ORBS3+'<span class="nod-more">'+esc(o.more)+'</span></div></div>'+
       '<div class="nod-fan"><i class="nod-reach" aria-hidden="true"></i>'+
-        A.map(function(b){return '<button class="nod-act" type="button" '+b.a+' aria-label="'+b.l+'" title="'+b.l+'" tabindex="-1">'+ico(b.i)+'</button>'}).join('')+
+        o.acts.map(function(b){return '<button class="nod-act" type="button" '+b.a+' aria-label="'+ea(b.l)+'" title="'+ea(b.l)+'" tabindex="-1">'+ico(b.i)+'</button>'}).join('')+
       '</div></div>';
+  }
+  /* an expediente (Expedientes) */
+  function card(x,admin,stl){
+    return shell({id:x.id,name:x.folio,say:x.queja||'Sin descripción',
+      more:stl[x.status]+' · '+(x.hours||0)+' h · '+EX.money(Number(x.parts_total)+Number(x.labor)),
+      tip:[x.sys,x.op,x.rule_id?'regla '+x.rule_id:'',admin&&x.profiles?x.profiles.name:''].filter(Boolean).join(' · '),acts:acts(x)});
+  }
+  /* a PREA aprobada (Inicio) */
+  function prea(x){
+    var ord=HM.orden(x);
+    return shell({id:x.id,name:ord,say:x.cliente||'Sin cliente asignado',
+      more:'Aprobada · '+EX.money(Number(x.parts_total)+Number(x.labor)),
+      tip:[HM.date(x.updated_at),x.sys,x.folio&&x.folio!==ord?x.folio:''].filter(Boolean).join(' · '),
+      acts:[A('data-exp="'+ea(x.folio||'')+'"','Ver expediente','doc'),A('data-cli="'+ea(x.id)+'"',x.cliente?'Cambiar cliente':'Agregar cliente','user'),A(cp(ord,'Orden copiada'),'Copiar orden','copy')]});
   }
 
   /* ── state per card: the pointer, then what each spring is aiming at ──
@@ -4487,7 +4525,8 @@ var NODE=(function(){
     $$('.nod[data-open]').forEach(function(el){var o=cards.get(el);if(o&&o!==c)setOn(o,false)});
     if(c&&!e.target.closest('.nod-act'))setOn(c,!c.on);
   });
-  return {card:card,mount:mount,copy:function(t,msg){
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-copy]');if(b)NODE.copy(b.dataset.copy,b.dataset.msg||'Copiado')});
+  return {card:card,prea:prea,mount:mount,copy:function(t,msg){
     try{navigator.clipboard.writeText(t).then(function(){toast(msg)},function(){toast('No pude copiar')})}catch(_){toast('No pude copiar')}
   }};
 })();
@@ -4547,7 +4586,6 @@ EX.resolve=async function(id,ok){
 document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('#exBar [data-f]');if(f){EX.f=f.dataset.f;EX.render();return}
   var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('[data-id]');EX.resolve(row.dataset.id,b.dataset.r==='ok');return}
-  var cp=e.target.closest&&e.target.closest('#exList [data-c]');if(cp){var r2=cp.closest('[data-id]'),xx=EX.rows.filter(function(r){return r.id===r2.dataset.id})[0];if(xx)NODE.copy(cp.dataset.c==='folio'?xx.folio:[xx.folio,xx.queja,[xx.sys,xx.op].filter(Boolean).join(' · ')].filter(Boolean).join(' — '),cp.dataset.c==='folio'?'Folio copiado':'Resumen copiado')}
 });
 $('#exQ').addEventListener('input',function(){EX.q=this.value;EX.render()});
 SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='axl-msg'+(t?' on':'')+(t&&err?' err':'')};
