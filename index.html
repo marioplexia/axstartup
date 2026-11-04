@@ -53,7 +53,7 @@ textarea,input{font:inherit;color:inherit}
 .sb-wrap{flex:none;width:232px;overflow:hidden;background:var(--sb-bg);transition:width .34s cubic-bezier(.3,.8,.3,1)}
 .app[data-sb="closed"] .sb-wrap{width:0}
 .sb{width:232px;height:100%;display:flex;flex-direction:column;color:var(--sb-fg);padding-left:env(safe-area-inset-left,0px)}
-.sb-head{display:flex;align-items:center;justify-content:space-between;padding:16px 12px 14px 16px}
+.sb-head{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:16px 12px 14px 16px}
 .brand{font-size:22px;font-weight:500;letter-spacing:-.015em}
 .sb-tools{display:flex;align-items:center;gap:4px}
 .sb-ib{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#c9c9c6;transition:background .15s,color .15s}
@@ -823,6 +823,293 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .gmf .gfa{height:28px;padding:0 12px;border-radius:6px;border:1px solid #b9cfee;background:#fff;color:var(--g-acc);font:500 12px var(--f-ui);cursor:pointer}
 .gmf .gfa:hover{background:#eaf3ff}.gmf .gfa:disabled{opacity:.5;cursor:default}
 .gmf .gfb.sent{border-style:solid;background:#effaf4;border-color:#a8dcc0;color:var(--g-ok)}
+
+/* ══ Seek ═══════════════════════════════════════════════════
+   A search icon that becomes a search field, as one object.
+   (Bencho · MIT · bencho.dev/licence) — ported to this project's
+   vanilla JS; see SK in the script for the behaviour.
+
+   Everything below is width and radius. There is no crossfade
+   between two components, no second element to keep in sync,
+   and nothing that animates on a clock of its own — the box
+   is sprung in JS and every other value here is derived from
+   how far through that spring it is. That is the whole reason
+   the transformation reads as continuous: there is only one
+   number, so nothing can arrive at the wrong time relative to
+   anything else.
+
+   TOKENS. Seek reads Bencho's design tokens; they are mapped to
+   this project's own here, on the component's root, so nothing
+   leaks out. The sidebar is dark in both themes, so the ink
+   scale runs light-on-dark:
+     --bg        → --sb-bg        (the sidebar ground)
+     --font-ui   → --f-ui
+     --ink       → white, the hover/typing end of the scale
+     --ink-2     → --sb-fg
+     --ink-3     → #c9c9c6        (the colour .sb-ib icons rest at)
+     --ink-4     → #a8a8a5
+     --ink-5     → --sb-muted     (placeholder)
+     --ink-rgb   → 255,255,255    (three bare numbers: rgba() is built from it)
+     --pane      → --sb-active    (the same material as .sb-ib.dark)
+     --pane-edge → #2e2e2e
+   This project has no glass dial, so --g-blur / --g-sat / --g-bright
+   are pinned to "off": the pane is a solid fill. */
+.sek {
+  --bg: var(--sb-bg);
+  --font-ui: var(--f-ui);
+  --g-blur: 0px;
+  --g-sat: 100%;
+  --g-bright: 100%;
+  --ink: #ffffff;
+  --ink-2: var(--sb-fg);
+  --ink-3: #c9c9c6;
+  --ink-4: #a8a8a5;
+  --ink-5: var(--sb-muted);
+  --ink-rgb: 255, 255, 255;
+  --pane: var(--sb-active);
+  --pane-edge: #2e2e2e;
+  /* ADAPTED: the frame is the sidebar header. In Bencho it sits alone
+     on a card and is sized by --frame / --frameh; here it is laid over
+     the head row (absolute, same height as the head) and the JS measures
+     it, so the open field is exactly as wide as the menu. It never moves
+     during an interaction, which is what the magnet needs, and it lets
+     clicks through to the brand and the other tools — only the skin is
+     a target. */
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font-family: var(--font-ui);}
+
+/* ADAPTED: in Bencho the closed circle is the middle of its frame, so
+   the box can simply grow in place. In a sidebar the closed circle sits
+   at the right, between the bell and the panel button, and the open
+   field is centred. So the whole object slides from the slot to the
+   middle by (1 - p) of the measured offset — the same single number
+   that drives the width, so it is still one thing changing. It is on
+   its own wrapper with NO transition: the skin below has one for the
+   magnet and the press, and a transition on a value that changes every
+   frame is a spring smeared by a spring. */
+.sek-pos {
+  width: 100%;
+  display: grid;
+  /* a percentage max-width on the skin needs a track that does not
+     size itself to the skin */
+  grid-template-columns: minmax(0, 100%);
+  place-items: center;
+  transform: translate(var(--ox, 0px), var(--oy, 0px));
+  pointer-events: none;}
+
+/* the placeholder the circle keeps in the row, so the bell and the
+   panel button never shift when the object leaves its slot */
+.sek-slot { width: 28px; height: 28px; flex: none; }
+
+/* the brand and the tools give way while it is open. The skin is opaque
+   and covers them anyway; fading them is what stops a ghost of the
+   brand showing through the first few frames of the growth. */
+.sb-head .brand, .sb-head .sb-tools { transition: opacity .16s ease; }
+.sb-head[data-seek="open"] .brand,
+.sb-head[data-seek="open"] .sb-tools { opacity: 0; pointer-events: none; }
+
+/* ── the object ─────────────────────────────────────────────
+   Width is the state. Height is fixed, so the radius can be
+   derived from the width rather than animated beside it —
+   at --shut the corner is half of it and the shape IS a circle,
+   and there is no frame where the two disagree.
+
+   The surface is the quietest thing that still reads as an
+   object: a solid fill. No shadow, no glass, no gradient — at
+   this size any of them would be the loudest thing on an
+   otherwise empty header. */
+.sek-skin {
+  position: relative;
+  pointer-events: auto;
+  width: var(--w, 28px);
+  /* ADAPTED: a spring that overshoots would push the pill past the
+     menu's edge; the cap makes it arrive instead of clip */
+  max-width: 100%;
+  /* --shut, NOT a number. The component sets the closed width
+     and the height from one constant precisely so they cannot
+     drift, and its own comment says so: "the skin's height and
+     the closed width are the same number by definition, and
+     two places holding it is two places to get it wrong." A
+     circle that is not round is the one shape everybody
+     notices. */
+  height: var(--shut, 28px);
+  /* ── ONE SHAPE RULE ─────────────────────────────────────
+     Fully round, at every width. The radius used to
+     interpolate; a stadium corner needs no agreement at all.
+     At --shut wide it is a circle and at full width a pill, and
+     those are the same rule rather than two ends of a tween.
+     Height is fixed, so it cannot be anything else. */
+  border-radius: var(--sek-r, 999px);
+  /* ── FLAT, and glass only if asked ──────────────────────
+     `--pane` is the material token, so this follows whatever the
+     project says a surface is rather than deciding for itself. */
+  background: var(--pane);
+  -webkit-backdrop-filter:
+    blur(var(--g-blur, 2px)) saturate(var(--g-sat, 150%)) brightness(var(--g-bright, 100%));
+  backdrop-filter:
+    blur(var(--g-blur, 2px)) saturate(var(--g-sat, 150%)) brightness(var(--g-bright, 100%));
+  isolation: isolate;
+  /* the magnet, and the press, on one transform — two
+     transforms on one element is one of them winning */
+  transform: translate(var(--lx, 0px), var(--ly, 0px)) scale(var(--sk, 1));
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 220ms ease;
+  /* the field is inside from the first frame; this is what
+     keeps it from spilling out of a 28px circle */
+  overflow: hidden;}
+
+/* the edge, and NOTHING until Stroke asks for it. A hairline
+   nobody switched on is a hairline the control cannot remove,
+   which is the same bug the background had. */
+.sek-skin::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  pointer-events: none;
+  z-index: 2;}
+
+/* ══ stroke ═════════════════════════════════════════════════
+   Whether a component draws a hairline round itself. OFF by
+   default: a grey line round everything makes a wall of
+   components look like a wall of boxes rather than a wall of
+   things. The line is not load-bearing — a flat pane is a fill
+   against a different fill and reads on its own. Set
+   data-stroke="on" on any ancestor to draw it. */
+[data-stroke="on"] .sek-skin::before {
+  border-color: var(--pane-edge);}
+
+/* Hover: it comes up a hair and lifts off the ground. Both
+   are small enough to be felt rather than seen, which is the
+   point — a hover state you notice is a hover state that has
+   said too much. (ADAPTED: --pane steps up one shade as well,
+   because the pane is opaque here and a brightness filter on
+   what is behind it would show nothing.) */
+.sek:not([data-open="true"]) .sek-skin:hover {
+  --sk: 1.045;
+  --pane: #262626;
+  --g-bright: 104%;}
+
+/* pressed: it yields before it moves. A thing that gives
+   under a click reads as having been pushed; a thing that
+   only expands reads as having been triggered.
+
+   Two moments, one rule. `:active` is the button held down —
+   a click only fires on release, so without it there was
+   nothing under a finger that stayed. `data-press` is the 90ms
+   beat after the click (and after Enter or Space) before it
+   opens. Both carry the hover rule's own :not([data-open]) and
+   come after it, so they win on order at equal specificity:
+   written as `.sek[data-press] .sek-skin` they were one class
+   short, and a pointer still over the button — which is where
+   a pointer is when it clicks — kept the hover's 1.045 and the
+   squeeze never showed. Reported in cabralorenzo/bencho#5. */
+.sek:not([data-open="true"]) .sek-skin:active,
+.sek:not([data-open="true"])[data-press="true"] .sek-skin {
+  --sk: 0.93;
+  transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1);}
+
+/* the field is a text target, and the object is a button */
+.sek[data-open="true"] .sek-skin { cursor: text; }
+
+/* ── the lens ───────────────────────────────────────────────
+   Fixed to the box's left inset and never animated. At the
+   shut width that inset centres it; at the open width it is
+   the field's padding. The lens crossing the page is the box
+   growing around a mark that stayed still. */
+.sek-lens {
+  position: absolute;
+  left: var(--inset, 6px);
+  top: 50%;
+  width: var(--lens, 16px);
+  height: var(--lens, 16px);
+  margin-top: calc(var(--lens, 16px) / -2);
+  fill: none;
+  stroke: var(--ink-3);
+  /* 1.35, AND THE NUMBER CANNOT BE COMPARED TO OTHER ICONS'.
+     This glyph is drawn on an 18-unit grid and the project's other
+     icons (.ic) on 24 with a stroke of 1.6. A stroke-width of u
+     paints at u/viewBox of the icon's size, so what has to agree is
+     the PAINTED weight: .ic paints 1.6 * 18/24 = 1.2px at 18px, and
+     this paints 1.35 * 16/18 = 1.2px at 16px. Same line as the bell
+     next to it. (Bencho's own: 1.5 on 18 = lucide's 2 on 24.) */
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  pointer-events: none;
+  transition: stroke 220ms ease, stroke-width 220ms ease;}
+
+.sek-skin:hover .sek-lens { stroke: var(--ink); }
+
+.sek[data-open="true"] .sek-lens { stroke: var(--ink-4); }
+
+/* typing: the lens thickens a hair and darkens. One beat per
+   burst, not one per keystroke — a mark that flickers at the
+   rate of your typing is noise wearing the costume of
+   feedback. */
+.sek[data-busy="true"] .sek-lens { stroke: var(--ink-2); stroke-width: 1.6; }
+
+/* ── the field ──────────────────────────────────────────────
+   Present from the first frame and revealed by --say, which
+   is the last third of the width's own progress. It slides a
+   few pixels as it arrives, from the left, so it reads as
+   having come out of the lens rather than as having faded up
+   where it stood. */
+.sek-field {
+  position: absolute;
+  left: calc(var(--inset, 6px) + var(--lens, 16px) + 8px);
+  right: 12px;
+  top: 0;
+  height: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  /* 13px: the size every other search field in this project uses
+     (.hm-search, .gp-s). Bencho's 16 is 0.25 of a 64px pill; this
+     pill is 28, so the same proportion would be unreadably small and
+     13 is the project's own answer. */
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  outline: none;
+  opacity: var(--say, 0);
+  transform: translateX(calc((1 - var(--say, 0)) * -6px));
+  /* until it is most of the way open it is not a target, and
+     a caret that can be placed in a 28px circle is a caret in
+     the wrong place */
+  pointer-events: var(--say-hit, none);}
+
+.sek[data-open="true"] .sek-field { --say-hit: auto; }
+
+.sek-field::placeholder { color: var(--ink-5); }
+
+/* the way in, while there is one */
+.sek-hit {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  cursor: pointer;}
+
+.sek-hit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(var(--ink-rgb), 0.4);}
+
+/* the results hang from the header, over the nav, and only while the
+   field is open. They use the project's own .menu / .mi surface. */
+.sek-res { top: calc(100% - 6px); left: 8px; right: 8px; min-width: 0; max-width: none; max-height: 320px; overflow-y: auto; z-index: 8; }
+.sek-res[hidden] { display: none; }
+.sek-res .mi[data-sel="true"] { background: var(--hover); }
+.sek-res .empty { padding: 10px 12px; font-size: 13px; color: var(--muted); }
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -832,9 +1119,19 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         <div class="brand">Ax Ai</div>
         <div class="sb-tools">
           <button class="sb-ib" data-i="bell" id="bell" aria-label="Notificaciones"></button>
-          <button class="sb-ib" data-i="search" id="searchBtn" aria-label="Buscar"></button>
+          <span class="sek-slot" aria-hidden="true"></span>
           <button class="sb-ib dark" data-i="panel" id="sbClose" aria-label="Ocultar barra lateral"></button>
         </div>
+        <div class="sek" id="sek" data-open="false" data-press="false" data-busy="false">
+          <div class="sek-pos">
+            <div class="sek-skin">
+              <svg class="sek-lens" viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.6" cy="7.6" r="5.4"/><path d="M11.6 11.6 L15.4 15.4"/></svg>
+              <input class="sek-field" id="sekQ" type="text" placeholder="Buscar" aria-label="Buscar sección" autocomplete="off" tabindex="-1">
+              <button class="sek-hit" id="sekHit" aria-label="Buscar (Ctrl+K)"></button>
+            </div>
+          </div>
+        </div>
+        <div class="sek-res menu" id="sekRes" role="menu" hidden></div>
       </div>
       <div class="sb-scroll">
         <div class="grp" data-nm style="margin-top:6px">Agentes</div>
@@ -4549,34 +4846,215 @@ async function loadHistory(h){
   $('.ai-actions',w).hidden=false;S.last={text:h.q,files:[]};toBottom(true);
 }
 
-/* ---------- Buscar (Ctrl/Cmd+K) ---------- */
-function openSearch(){
-  if($('.scrim'))return;closeMenu();
-  var sc=document.createElement('div');sc.className='scrim';
-  sc.innerHTML='<div class="palette" role="dialog" aria-label="Buscar"><input id="q" placeholder="Ir a…" autocomplete="off" aria-label="Buscar sección"><div class="pl" id="pl"></div></div>';
-  document.body.appendChild(sc);
-  var q=$('#q',sc),pl=$('#pl',sc),sel=0,cur=[];
-  function paint(){
-    var v=q.value.trim().toLowerCase();
-    cur=Object.keys(VIEWS).filter(function(k){return (MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&VIEWS[k].toLowerCase().indexOf(v)>-1});
-    if(sel>=cur.length)sel=0;pl.innerHTML='';
-    if(!cur.length){pl.innerHTML='<div class="empty">Sin resultados</div>';return}
-    cur.forEach(function(k,i){var b=item(pl,{icon:{agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'}[k],t:VIEWS[k],fn:function(){close();showView(k)}});b.dataset.sel=String(i===sel)});
+/* ---------- Buscar: Seek (Ctrl/Cmd+K) ----------
+   A search icon that becomes a search field. ONE OBJECT, NOT TWO.
+   Bencho · MIT · bencho.dev/licence — the maths and the reasons are
+   the original's; the React state became plain variables, and the
+   CSS custom properties are written straight onto the element each
+   frame (no re-render to wait for).
+
+   · The lens never moves relative to the box. It sits at a fixed
+     inset from the left edge, and at the closed width that inset
+     happens to centre it — (SHUT - LENS) / 2 — and the same number
+     is also the padding the open field wants. So the lens travelling
+     across the header is not an animation anybody wrote. It is the
+     box growing around a mark that stayed put.
+   · Height never changes and the corner is fully round at every
+     width, so the SHAPE is one rule rather than a tween with two
+     ends.
+   · The press is a real beat. A click compresses the object for a
+     moment before it expands, because a thing that yields before it
+     moves reads as having been pushed. */
+var SK=(function(){
+  var SHUT=28;                 /* the closed object: a circle, so the width IS the height. 28 = the other .sb-ib */
+  var LENS=16;                 /* the lens, and its inset — 16/28 sits with the bell's 18/28 */
+  var INSET=(SHUT-LENS)/2;     /* this number is doing two jobs and they agree by construction */
+  var CORNER=SHUT/2;           /* a stadium corner: half the height, circle shut and pill open */
+  var TUNE=34;                 /* spring 0..100; a control, so toward the heavy end — the overshoot is capped by CSS */
+  var el=$('#sek'),skin=$('.sek-skin',el),field=$('#sekQ'),slot=$('.sek-slot'),res=$('#sekRes'),headEl=el.parentNode;
+  var still=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var open=false,cur=SHUT,vel=0,target=SHUT,raf=0,prev=0,span=216,beat=0,rest=0,sel=0,list=[];
+  var off={x:0,y:0},lean={x:0,y:0},leanRaf=0;
+
+  function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v))}
+
+  /* The pair is chosen by DAMPING RATIO and then written back as
+     stiffness and decay, because the ratio is the thing a person is
+     actually setting:  zeta = -ln(d) / (2 * sqrt(k)).
+       0 → zeta ~0.85, heavy, arrives without a ring
+       50 → zeta ~0.41     100 → zeta ~0.20, lively, two rebounds */
+  function springOf(t){return {k:.08+(t/100)*.16,d:.62+(t/100)*.2}}
+
+  /* Frames, not milliseconds. `dt` is in sixtieths of a second and the
+     damping is RAISED to it rather than multiplied by it, so a dropped
+     frame decays the same amount of energy as the two frames it
+     replaced. The loop parks itself the moment the value has settled. */
+  function tick(t){
+    var dt=prev?clamp((t-prev)/16.67,0,2.5):1;prev=t;
+    var sp=springOf(TUNE);
+    vel+=(target-cur)*sp.k*dt;
+    vel*=Math.pow(sp.d,dt);
+    cur+=vel*dt;
+    if(Math.abs(target-cur)<.02&&Math.abs(vel)<.02){cur=target;vel=0;paint();raf=0;prev=0;return}
+    paint();raf=requestAnimationFrame(tick);
   }
-  function close(){sc.remove()}
-  sc.addEventListener('mousedown',function(e){if(e.target===sc)close()});
-  q.addEventListener('input',function(){sel=0;paint()});
-  q.addEventListener('keydown',function(e){
-    if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(sel+1,cur.length-1);paint()}
-    else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(sel-1,0);paint()}
-    else if(e.key==='Enter'&&cur[sel]){close();showView(cur[sel])}
+  function go(){
+    if(still){cur=target;vel=0;paint();return}
+    if(!raf){prev=0;raf=requestAnimationFrame(tick)}
+  }
+
+  /* how far through the transformation, 0 shut and 1 open */
+  function paint(){
+    var p=clamp((cur-SHUT)/Math.max(1,span-SHUT),0,1),st=el.style;
+    st.setProperty('--w',cur.toFixed(2)+'px');
+    st.setProperty('--p',p.toFixed(3));
+    /* the placeholder and the caret arrive in the last third, once
+       there is somewhere for them to be */
+    st.setProperty('--say',clamp((p-.55)/.45,0,1).toFixed(3));
+    /* ADAPTED: slot → middle of the header, by the same p */
+    st.setProperty('--ox',(off.x*(1-p)).toFixed(2)+'px');
+    st.setProperty('--oy',(off.y*(1-p)).toFixed(2)+'px');
+    st.setProperty('--lx',lean.x.toFixed(2)+'px');
+    st.setProperty('--ly',lean.y.toFixed(2)+'px');
+  }
+  el.style.setProperty('--sek-r',CORNER+'px');
+  el.style.setProperty('--inset',INSET+'px');
+  el.style.setProperty('--lens',LENS+'px');
+  el.style.setProperty('--shut',SHUT+'px');
+  if(still)el.dataset.flat='true';
+
+  /* ADAPTED: measured, never typed in. The frame is the header row, so
+     its width is the open width, and the slot is where the circle rests. */
+  function measure(){
+    var f=el.getBoundingClientRect(),sl=slot.getBoundingClientRect();
+    if(!f.width||!sl.width)return;
+    span=Math.max(SHUT,Math.round(f.width));
+    off.x=(sl.left+sl.width/2)-(f.left+f.width/2);
+    off.y=(sl.top+sl.height/2)-(f.top+f.height/2);
+    target=open?span:SHUT;
+    if(!raf)cur=target;
+    paint();
+  }
+
+  /* ── the magnet ──────────────────────────────────────────
+     Measured from the SLOT, which never moves, and not from the
+     object, which does. A vector read off a thing the vector is
+     currently displacing is a feedback loop: it converges, but it
+     converges by ringing, and the ring is visible as a shiver on an
+     object this small.
+
+     Off entirely once open. A field that drifts toward the pointer
+     while you are trying to click into it is a field fighting you. */
+  function pushLean(x,y){
+    lean.x=x;lean.y=y;
+    if(!leanRaf)leanRaf=requestAnimationFrame(function(){leanRaf=0;paint()});
+  }
+  document.addEventListener('pointermove',function(e){
+    if(open||still)return;
+    var b=slot.getBoundingClientRect();if(!b.width)return;
+    var dx=e.clientX-(b.left+b.width/2),dy=e.clientY-(b.top+b.height/2),d=Math.hypot(dx,dy),R=56;
+    if(d>R){if(lean.x||lean.y)pushLean(0,0);return}
+    /* A FEW PIXELS. The brief is "responsive, not following" and the
+       difference is entirely in the ceiling: past about seven the object
+       stops being a thing that acknowledges you and starts being a thing
+       you are dragging around. Scaled to a 28px circle, about two. */
+    var pull=Math.pow(1-d/R,1.4)*2.2;
+    pushLean(dx/(d||1)*pull,dy/(d||1)*pull);
+  },{passive:true});
+  document.addEventListener('pointerleave',function(){if(lean.x||lean.y)pushLean(0,0)});
+
+  /* ── results ─────────────────────────────────────────────
+     ADAPTED: the old Ctrl+K palette's list, now hanging from the
+     field. Same sections, same filter, same icons. */
+  var ICON={agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'};
+  function results(){
+    var v=norm(field.value.trim());
+    list=Object.keys(VIEWS).filter(function(k){return (MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&norm(VIEWS[k]).indexOf(v)>-1});
+    if(sel>=list.length)sel=0;
+    res.innerHTML='';
+    if(!open){res.hidden=true;return}
+    res.hidden=false;
+    if(!list.length){res.innerHTML='<div class="empty">Sin resultados</div>';return}
+    list.forEach(function(k,i){var b=item(res,{icon:ICON[k],t:VIEWS[k],fn:function(){choose(k)}});b.dataset.sel=String(i===sel)});
+  }
+  function choose(k){
+    field.value='';
+    swap(false);field.blur();
+    showView(k);
+  }
+
+  /* ── opening ─────────────────────────────────────────────
+     Compress, then expand, then focus. The order matters and the gap
+     is short: 90ms is long enough to be felt as the object yielding
+     and short enough that nobody waits for it. Focus lands with the
+     expansion rather than at the end of it, so the caret is already
+     there when the field arrives — waiting for the width to settle
+     puts a visible pause between the box being ready and the box being
+     usable. */
+  function swap(o){
+    open=o;
+    el.dataset.open=String(o);
+    headEl.dataset.seek=o?'open':'shut';
+    field.tabIndex=o?0:-1;
+    target=o?Math.max(SHUT,span):SHUT;
+    go();results();
+  }
+  function start(){
+    if(open){field.focus();return}
+    setSb(true);
+    measure();
+    el.dataset.press='true';
+    clearTimeout(beat);
+    beat=setTimeout(function(){
+      el.dataset.press='false';
+      swap(true);
+      field.focus();
+    },still?0:90);
+  }
+
+  /* Away with nothing typed and it goes back. Away with something typed
+     and it stays: the value IS the reason the field exists, and closing
+     over it would either hide it or throw it away. */
+  function away(){
+    if(field.value.trim()){res.hidden=true;return}
+    swap(false);
+  }
+
+  /* the lens acknowledges typing without performing it — one short beat
+     per burst, not one per character. A note per character is a
+     typewriter, which is a different component. */
+  function tapped(){
+    el.dataset.busy='true';
+    clearTimeout(rest);
+    rest=setTimeout(function(){el.dataset.busy='false'},340);
+  }
+
+  $('#sekHit').addEventListener('click',start);
+  field.addEventListener('input',function(){sel=0;tapped();results()});
+  field.addEventListener('focus',function(){if(open)results()});
+  field.addEventListener('blur',away);
+  /* a click on a result must not blur the field, or the list is gone
+     before the click lands */
+  res.addEventListener('mousedown',function(e){e.preventDefault()});
+  field.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(sel+1,list.length-1);results()}
+    else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(sel-1,0);results()}
+    else if(e.key==='Enter'&&list[sel]){e.preventDefault();choose(list[sel])}
+    else if(e.key==='Escape'){
+      e.preventDefault();
+      field.value='';
+      swap(false);
+      field.blur();
+    }
   });
-  paint();q.focus();
-}
-$('#searchBtn').addEventListener('click',openSearch);
+  window.addEventListener('resize',measure);
+  if(window.ResizeObserver)new ResizeObserver(measure).observe(el);
+  measure();paint();
+  return {start:start,measure:measure};
+})();
 document.addEventListener('keydown',function(e){
-  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openSearch()}
-  else if(e.key==='Escape'){closeMenu();var s=$('.scrim');if(s)s.remove()}
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();SK.start()}
+  else if(e.key==='Escape'){closeMenu()}
 });
 
 updateSend();
