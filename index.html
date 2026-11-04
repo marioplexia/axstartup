@@ -1772,12 +1772,12 @@ RS.seed=function(){
   var now=Date.now(),rules=[];
   CASES.forEach(function(c,i){
     var k=GMCODES[c.sys]||GMCODES['Diagnóstico general'],n=SEEDN[i]||5,pm={};
-    c.parts.forEach(function(p){pm[p[0]]={d:p[1],q:p[2],pr:p[3],n:n}});
-    var r={id:'R-'+('000'+(i+1)).slice(-4),sys:c.sys,q:k.q,c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,hSum:c.h*n,parts:pm,kw:SEEDKW[i]||[],n:n,rej:0,status:'activa',created:now-864e5*(30-i),updated:now-864e5*(3+i),src:{base:n,historico:0,asesor:0},dist:{}};
+    c.parts.forEach(function(p){pm[p[0]]={d:p[1],q:p[2],pr:p[3],n:0}});
+    var r={id:'R-'+('000'+(i+1)).slice(-4),sys:c.sys,q:k.q,c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,hSum:0,parts:pm,kw:SEEDKW[i]||[],n:0,rej:0,status:'activa',created:now-864e5*(30-i),updated:now-864e5*(3+i),src:{base:n,historico:0,asesor:0},dist:{}};
     ADVISORS.forEach(function(a){r.dist[a.id]=r.created});
     rules.push(r);
   });
-  return {v:1,rules:rules,log:[{t:now,type:'info',rule:'',msg:'Catálogo base cargado con '+rules.length+' reglas de la agencia'}],cfg:{th:3,auto:true},stats:{q:0,hit:0},seq:rules.length};
+  return {v:1,rules:rules,log:[{t:now,type:'info',rule:'',msg:'Catálogo base de arranque cargado con '+rules.length+' reglas (sin respaldo de PREAs reales todavía)'}],cfg:{th:3,auto:true},stats:{q:0,hit:0},seq:rules.length};
 };
 RS.load=function(){
   var raw=null;try{raw=localStorage.getItem(RS.K)}catch(_){raw=RS.mem}
@@ -1809,7 +1809,7 @@ RS.match=function(text){return RS.find(text,false)};
 RS.toCase=function(r){
   var arr=Object.keys(r.parts).map(function(no){var p=r.parts[no];return {no:no,p:p}}).sort(function(a,b){return b.p.n-a.p.n});
   var keep=arr.filter(function(x){return x.p.n>=r.n*0.5});if(!keep.length)keep=arr.slice(0,1);
-  return {sys:r.sys,op:r.op,opd:r.opd,h:r1(r.hSum/Math.max(r.n,1)),parts:keep.map(function(x){return [x.no,x.p.d,x.p.q,x.p.pr]})};
+  return {sys:r.sys,op:r.op,opd:r.opd,h:(r.n>0&&r.hSum>0?r1(r.hSum/r.n):r.h),parts:keep.map(function(x){return [x.no,x.p.d,x.p.q,x.p.pr]})};
 };
 RS.note=function(hit){};  /* las consultas se cuentan desde la tabla expedientes */
 RS.mk=function(rec){
@@ -4111,7 +4111,7 @@ function adRender(){
   var eq=AD.exp.length,eh=AD.exp.filter(function(x){return x.rule_id}).length,ea_=AD.exp.filter(function(x){return x.status==='aceptada'}).length,er=AD.exp.filter(function(x){return x.status==='rechazada'}).length;
   var rate=eq?Math.round(100*eh/eq):null,acc=ea_+er?Math.round(100*ea_/(ea_+er)):null;
   var K=function(l,v,s,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
-  $('#adKpi').innerHTML=K('Reglas en el catálogo',rules.length,act+' activas')+K('En aprendizaje',learn,pend?pend+' por aprobar':'Necesitan '+d.cfg.th+' PREAs',pend?'warn':'')+K('PREAs aprendidas',tot,'aceptadas por el fabricante')+K('Consultas resueltas con regla',rate==null?'—':rate+'%',eq?eh+' de '+eq+' PREAs':'Aún sin PREAs','ok')+K('Aceptación del fabricante',acc==null?'—':acc+'%',ea_+er?ea_+' aceptadas · '+er+' rechazadas':'Sin respuestas todavía','ok');
+  $('#adKpi').innerHTML=K('Reglas en el catálogo',rules.length,act+' activas')+K('En aprendizaje',learn,pend?pend+' por aprobar':'Necesitan '+d.cfg.th+' PREAs',pend?'warn':'')+K('PREAs aprendidas',tot,tot?'aceptadas por el fabricante':'aún ninguna: las 6 reglas base son de arranque')+K('Consultas resueltas con regla',rate==null?'—':rate+'%',eq?eh+' de '+eq+' PREAs':'Aún sin PREAs','ok')+K('Aceptación del fabricante',acc==null?'—':acc+'%',ea_+er?ea_+' aceptadas · '+er+' rechazadas':'Sin respuestas todavía','ok');
   var nb=$('#adBadge');if(nb){nb.textContent=pend||'';nb.hidden=!pend}var nb2=$('#mrBadge');if(nb2){nb2.textContent=pend||'';nb2.hidden=!pend}
   $('#adThr').value=String(d.cfg.th);$('#adDist').value=d.cfg.auto?'auto':'manual';
   $('#adLive span').textContent=RS.busy?'Distribuyendo…':'En vivo';$('#adLive').classList.toggle('busy',RS.busy);
@@ -4136,7 +4136,7 @@ function adRender(){
     acts+='<button class="bt dng" data-act="eliminar" data-id="'+r.id+'">Eliminar</button>';
     var parts=Object.keys(r.parts).map(function(no){var p=r.parts[no];return '<li><b>'+esc(no)+'</b> '+esc(p.d)+' · cant. '+p.q+' · $'+p.pr.toLocaleString('es-MX')+' <em>'+p.n+' de '+r.n+' PREAs</em></li>'}).join('');
     return '<div class="rl'+(o?' open':'')+(r._new?' fresh':'')+'" data-id="'+r.id+'"><button class="rl-h" data-tog="'+r.id+'"><span class="rid">'+r.id+'</span><span class="rq"><b>'+esc(r.q[1].toLowerCase())+'</b><small>'+esc(r.sys)+' · '+esc(r.op)+' · '+RS.toCase(r).h.toFixed(1)+' h</small></span>'+
-      '<span class="rc"><span class="cb"><i style="width:'+cf+'%"></i></span><small>'+r.n+' PREAs · '+cf+'%</small></span>'+
+      '<span class="rc"><span class="cb"><i style="width:'+cf+'%"></i></span><small>'+r.n+(r.n===1?' PREA':' PREAs')+(r.src.base&&!r.n?' · base inicial':'')+' · '+cf+'%</small></span>'+
       '<span class="rd"><span class="dots">'+ADVISORS.map(function(a){return '<i class="'+(r.dist[a.id]?'on':'')+'"></i>'}).join('')+'</span><small>'+got+'/'+nAdv+'</small></span>'+
       '<span class="bg s-'+r.status+'">'+ST_LBL[r.status]+'</span></button>'+
       '<div class="rl-b"><div class="rl-g"><div><span>Queja</span>'+esc(r.q.join(' - '))+'</div><div><span>Causa</span>'+esc(r.c.join(' - '))+'</div><div><span>Corrección</span>'+esc(r.r.join(' - '))+'</div><div><span>Operación</span>'+esc(r.op)+' · '+esc(r.opd)+'</div></div>'+
