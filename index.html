@@ -1110,6 +1110,41 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .sek-res[hidden] { display: none; }
 .sek-res .mi[data-sel="true"] { background: var(--hover); }
 .sek-res .empty { padding: 10px 12px; font-size: 13px; color: var(--muted); }
+
+/* ══ Eye tracker ═══════════════════════════════════════════
+   A ball with two eyes that watches your cursor, wherever it is
+   on the page. (Bencho · MIT · bencho.dev/licence — ported to this
+   project's vanilla JS as EYE, and used as the composer's send
+   button in every chat.)
+
+   TOKENS, mapped here on the component's own root so nothing leaks:
+     --fill-slab → the send button's own fill: --send-off while there is
+                   nothing to send, --send-on once there is
+     --fill-on   → --send-fg, the eyes' ink (white on the dark body, dark
+                   on the light one — the theme already swaps it)
+   The CSS the original also carries for a speech bubble, the logo
+   test and the lock face is left out: nothing here uses it. */
+.send.eyt-send {
+  --fill-slab: var(--send-off);
+  --fill-on: var(--send-fg);
+  /* the body is drawn by the svg; the old square fill would show
+     behind the corners */
+  background: transparent;}
+
+.send.eyt-send.on { --fill-slab: var(--send-on); }
+
+.eyt-ball {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;}
+
+/* the ball is the Fill's own slab and the eyes its ink: white
+   with dark eyes on a light fill, near-black with light eyes on
+   a dark one */
+.eyt-body { fill: var(--fill-slab, #ffffff); transition: fill .2s; }
+
+.eyt-eye { fill: var(--fill-on, #0b0b0d); }
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -1564,10 +1599,170 @@ menu('#histTop',histBuild,{right:true});
 
 /* ---------- Composer ---------- */
 function autosize(){ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,220)+'px'}
+/* ══ Eye tracker ═══════════════════════════════════════════
+   A ball with two eyes that watches your cursor, wherever it is on
+   the page. Bencho · MIT · bencho.dev/licence. It is the composer's
+   send button, in every chat.
+
+   ── THE EYES ARE ON THE BALL, NOT IN FRONT OF IT ───────────
+   The easy version slides two shapes toward the pointer, and it
+   reads as stickers on a disc. Here each eye is a point on the
+   sphere's surface: looking left turns the ball, so an eye travels
+   along the curve, and the one heading for the rim moves less and
+   narrows as it turns away from you while the other swings wide.
+   That foreshortening is the whole trick — it is what makes a flat
+   shape read as something round.
+
+   One turn (yaw and pitch) is the state, sprung toward where the
+   pointer is; both eyes are read off it, so they can never
+   disagree. It relaxes back to facing you when the pointer leaves
+   the window, and it blinks on its own now and then.
+
+   Written straight to the DOM every frame, never through state: a
+   pointer move is not a render.
+
+   ADAPTED: one shape (the soft cube — it is the send button, and the
+   old button was a rounded square), one eye style (Slant), no
+   chat-bubble-on-poke (a press here sends the message), no morph. */
+var EYE=(function(){
+  var R=50;                    /* the ball's radius, in the 100-unit viewBox */
+  /* half the gap between the eyes, as a fraction of the radius */
+  var GAP=.19;
+  /* how far a look to a corner tilts the pair, in degrees at the rim —
+     a glance up and right leans them back, like the logo */
+  var TILT=64;
+  /* Every style is two rounded rectangles, the same size as each other,
+     so they ride the same sphere and blink the same way. Any difference
+     in SIZE between the two is depth, worked out from the turn, never
+     drawn in. */
+  var BASE={w:9,h:15,r:4.5};   /* Slant */
+  /* the eyes' size against the body; a small mark wants them bigger
+     than a big one does to read at all — this one is 32px */
+  var SCALE=1.25;
+  var FOLLOW=60;               /* how far the ball turns toward the pointer, 0..100 */
+  var BOUNCE=30;               /* how much the turn overshoots and settles, 0..100 */
+  /* the cube: a soft square, which keeps the eyes' resting spot inside */
+  var SHAPE='M30 6 H70 A24 24 0 0 1 94 30 V70 A24 24 0 0 1 70 94 H30 A24 24 0 0 1 6 70 V30 A24 24 0 0 1 30 6 Z';
+  var NS='http://www.w3.org/2000/svg';
+  var still=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function clamp(v,a,b){return Math.min(b,Math.max(a,v))}
+
+  var svgEl=document.createElementNS(NS,'svg');
+  svgEl.setAttribute('class','eyt-ball');svgEl.setAttribute('viewBox','0 0 100 100');svgEl.setAttribute('aria-hidden','true');
+  svgEl.innerHTML='<defs><clipPath id="eyt-clip-send"><path d="'+SHAPE+'"/></clipPath></defs><path class="eyt-body" d="'+SHAPE+'"/><g clip-path="url(#eyt-clip-send)"><g><rect class="eyt-eye"/></g><g><rect class="eyt-eye"/></g></g>';
+  var eyes=[].slice.call(svgEl.querySelectorAll('g g'));
+
+  /* where the face is on the ball (fractions of the radius), its speed,
+     and where it is heading — one spring on a point, read as a turn when
+     the eyes are drawn */
+  var t={x:0,y:0,vx:0,vy:0,tx:0,ty:0};
+  var raf=0,prev=0,blink=0,nextBlink=performance.now()+2200,seen=false;
+  var host=null,app=null;
+
+  function draw(now){
+    /* a blink is 160ms down and up, as a squash on each eye */
+    var lid=1;
+    if(now>nextBlink){blink=now;nextBlink=now+2600+Math.random()*3200}
+    var since=now-blink;
+    if(since<160)lid=1-.9*Math.sin(since/160*Math.PI);
+
+    /* the turn that brings the front of the ball to the face's spot:
+       yaw about the vertical, pitch about the horizontal */
+    var as=function(v){return Math.asin(clamp(v,-.92,.92))};
+    var yaw=as(t.x),pitch=-as(t.y);
+    var cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
+    /* the pair leans with a diagonal look and stands level on the axes:
+       up-right and down-left lean one way, the other two the other,
+       nothing straight on */
+    var tilt=TILT*t.x*t.y;
+    /* bigger eyes stand a little further apart */
+    var g0=GAP*Math.max(1,SCALE*.8);
+
+    [-g0,g0].forEach(function(x0,i){
+      var g=eyes[i];if(!g)return;
+      /* the eye as a point on the unit sphere, either side of the
+         front, turned with the ball */
+      var z0=Math.sqrt(1-x0*x0);
+      var x1=x0*cy+z0*sy,z1=-x0*sy+z0*cy;
+      var y2=-z1*sp,z2=z1*cp;
+      /* depth: the eye nearer the rim is further from you, so it is
+         smaller all over and narrower still across the turn */
+      var near=clamp(z2,0,1),k=.45+.55*near,sx=k*(.7+.3*near);
+      /* ── the size is written as a size, never as a scale ──
+         A scale stretches the corner with the shape: an eye narrowed
+         for depth or squashed by a blink had elliptical corners,
+         rounder on one side than the other. Writing the width and
+         height directly keeps every corner the same radius, clamped so
+         it never exceeds half a side. */
+      var ew=BASE.w*SCALE,eh=BASE.h*SCALE,er=BASE.r*SCALE;
+      var w=ew*sx,h=Math.max(.6,eh*k*lid),rect=g.firstChild;
+      rect.setAttribute('x',(-w/2).toFixed(2));rect.setAttribute('y',(-h/2).toFixed(2));
+      rect.setAttribute('width',w.toFixed(2));rect.setAttribute('height',h.toFixed(2));
+      rect.setAttribute('rx',Math.min(er,w/2,h/2).toFixed(2));
+      g.setAttribute('transform','translate('+(50+x1*R).toFixed(2)+' '+(50+y2*R).toFixed(2)+') rotate('+tilt.toFixed(2)+')');
+      g.style.opacity=z2<.05?'0':'1';
+    });
+  }
+
+  /* ── it only runs while it can be seen ───────────────────
+     Off screen or in a background tab the loop stops; it starts again
+     the moment the ball comes back into view. The composer is hidden
+     in the views that have no chat, so there it costs nothing. */
+  function tick(now){
+    if(!seen||document.hidden){raf=0;prev=0;return}
+    var dt=prev?Math.min(2.5,(now-prev)/16.67):1;prev=now;
+    if(still){t.x=t.tx;t.y=t.ty}
+    else{
+      /* one spring for both axes; Bounce loosens the damping */
+      var k=.06,d=.34-(clamp(BOUNCE,0,100)/100)*.22;
+      t.vx+=((t.tx-t.x)*k-t.vx*d)*dt;t.vy+=((t.ty-t.y)*k-t.vy*d)*dt;
+      t.x+=t.vx*dt;t.y+=t.vy*dt;
+    }
+    draw(now);
+    raf=requestAnimationFrame(tick);
+  }
+  function resume(){if(!raf&&seen&&!document.hidden)raf=requestAnimationFrame(tick)}
+  document.addEventListener('visibilitychange',resume);
+
+  /* ── the face goes where you are ──────────────────────────
+     A spot out along the pointer's direction, further the further away
+     you are — so on top of it the face is dead centre, and off in a
+     corner it is out by that corner's rim, turned, one eye smaller and
+     the pair leaning. ADAPTED: the box it watches is the whole app, so
+     it follows you wherever you are on the page. */
+  function aim(e){
+    if(!host||!seen)return;
+    var f=(app||document.documentElement).getBoundingClientRect();
+    var r=host.getBoundingClientRect();
+    var dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
+    var d=Math.hypot(dx,dy)||1;
+    var reach=Math.max(60,Math.min(f.width,f.height)*.28);
+    var far=Math.min(.85,Math.tanh(d/reach)*(clamp(FOLLOW,0,100)/100)*1.5);
+    t.tx=dx/d*far;t.ty=dy/d*far;
+  }
+  function rest(){t.tx=0;t.ty=0}
+  window.addEventListener('pointermove',aim,{passive:true});
+  document.documentElement.addEventListener('pointerleave',rest);
+
+  var io=window.IntersectionObserver?new IntersectionObserver(function(es){seen=es[0].isIntersecting;resume()}):null;
+
+  return {
+    mount:function(btn){
+      if(btn.firstChild===svgEl&&btn.classList.contains('eyt-send'))return;
+      host=btn;app=$('#app');
+      btn.classList.add('eyt-send');btn.replaceChildren(svgEl);
+      if(io){io.disconnect();io.observe(btn)}else{seen=true;resume()}
+    },
+    unmount:function(btn){btn.classList.remove('eyt-send')}
+  };
+})();
 function updateSend(){
   var on=S.streaming||ta.value.trim().length>0||S.files.length>0;
   sendBtn.classList.toggle('on',on);sendBtn.disabled=!on;
-  sendBtn.innerHTML=svg(S.streaming?'stop':'up');
+  /* sending: the eyes. Streaming: the stop square, because that press
+     has to read as "stop" and nothing else */
+  if(S.streaming){EYE.unmount(sendBtn);sendBtn.innerHTML=svg('stop')}
+  else EYE.mount(sendBtn);
   sendBtn.setAttribute('aria-label',S.streaming?'Detener':'Enviar');
 }
 ta.addEventListener('input',function(){typeTok++;autosize();updateSend()});
