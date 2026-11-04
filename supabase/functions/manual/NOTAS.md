@@ -12,3 +12,16 @@ Desplegada en Supabase (versión 4). El fuente vive allá; este archivo document
 Desplegada en Supabase (versión 1). Recibe el caso y TODOS los archivos adjuntos (PDF/imagen), los inspecciona
 uno por uno y devuelve `{suficiente, documentos, datos, faltantes, inconsistencias, resumen}`.
 Sin archivos válidos responde `sin_evidencia` y la PREA no procede. El chat la llama antes de armar la PREA.
+
+# Función `documento` (documentos del expediente → cerebro)
+
+Desplegada en Supabase (versión 1). Al subir un archivo en la pantalla del expediente (Contrato firmado, Piezas,
+Evidencia, Factura, Transacción de planta) el chat lo lee con IA (PDF, imagen, texto o XML) y:
+- comprueba que es del tipo esperado (si no, no aprende y avisa);
+- Factura → registra número y fecha en `cartera`; Transacción de planta → registra mano de obra y piezas pagadas
+  (su disparador `cartera_evento` crea el evento de aprendizaje de pagos);
+- guarda lecciones en `reglas_lecciones` (origen `pdf`) y lo leído en `entrenamiento_docs` (kind `expediente`),
+  que el agente encuentra con `buscar_todo`.
+
+Bucket de Storage `expedientes-docs` (privado, 20 MB): `<expediente_id>/<tipo>/<archivo>`; las políticas dejan ver,
+subir y borrar solo a quien puede ver ese expediente.
