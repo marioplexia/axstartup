@@ -1645,12 +1645,11 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
   --font-ui: var(--f-ui);
   --signal: #2231dd;
   --ok: #15803d;
-  position:fixed;inset:0;z-index:900;overflow:auto;background:var(--bg);color:var(--fill-on);font-family:var(--font-ui);
-  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);animation:xd-in 260ms cubic-bezier(.24,1.2,.38,1) both}
+  flex:1;min-height:0;overflow:auto;background:var(--bg);color:var(--fill-on);font-family:var(--font-ui);animation:xd-in 260ms cubic-bezier(.24,1.2,.38,1) both}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .xd{--fill-on-rgb:237,237,235;--ink-rgb:237,237,235;--signal:#6b79ff;--ok:#4ac17b}}
 :root[data-theme="dark"] .xd{--fill-on-rgb:237,237,235;--ink-rgb:237,237,235;--signal:#6b79ff;--ok:#4ac17b}
 @keyframes xd-in{from{opacity:0;translate:0 14px}}
-.xd-in{max-width:1040px;margin:0 auto;padding:24px 24px 56px}
+.xd-in{max-width:1180px;margin:0 auto;padding:6px max(20px,env(safe-area-inset-right,0px)) 48px max(20px,env(safe-area-inset-left,0px))}
 .xd-top{display:flex;align-items:center;gap:14px;margin-bottom:22px}
 .xd-back{flex:none;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--card-line);background:var(--card);color:inherit;font:500 13px var(--font-ui);cursor:pointer}
 .xd-back:hover{background:var(--hover)}
@@ -1815,7 +1814,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div class="nod-grid" id="exList"></div>
       </div>
     </section>
-    <div class="xd" id="exDoc" hidden role="dialog" aria-modal="true" aria-label="Expediente"></div>
+    <div class="xd" id="exDoc" hidden aria-label="Expediente"></div>
     <section class="admin" id="viewBit" hidden>
       <div class="ad-in">
         <div class="ad-head">
@@ -2038,6 +2037,7 @@ $('#bell').addEventListener('click',function(){if(!MI.due().length){toast('Sin a
 var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'}
 function showView(id){
+  if(XD.cur)XD.close();
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
@@ -5252,11 +5252,11 @@ XD.open=function(id){
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
         '<span class="xd-say"><b>Arrastra un archivo aquí</b><span>o haz clic · hasta '+XD.MAX+' MB</span></span>'+
         '<input type="file" multiple hidden></div><div class="xd-list"></div></section>'}).join('')+'</div></div>';
-  el.hidden=false;document.body.style.overflow='hidden';el.scrollTop=0;
+  $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
 };
-XD.close=function(){$('#exDoc').hidden=true;document.body.style.overflow='';XD.cur=null};
+XD.close=function(){if(!XD.cur)return;$('#exDoc').hidden=true;$('#viewExp').hidden=false;XD.cur=null};
 XD.sec=function(k){return $('#exDoc .xd-sec[data-k="'+k+'"]')};
 /* lo ya subido */
 XD.load=async function(id,k){
