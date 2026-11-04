@@ -468,6 +468,14 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .nod-orb.o2::before { animation-duration: 14s; animation-direction: reverse; }
 .nod-orb.o3 { --ob: #f02aa8; --oa: #ff7be0; --oc: #ff7a4a; --od: #b04bff; }
 .nod-orb.o3::before { animation-duration: 9s; }
+/* Campañas: greens and gold */
+.cam .nod-orb.o1 { --ob: #1fb86a; --oa: #b6f36a; --oc: #14c3b0; --od: #0f9d58; }
+.cam .nod-orb.o2 { --ob: #ffb300; --oa: #ffe066; --oc: #ff8f3a; --od: #f5d90a; }
+.cam .nod-orb.o3 { --ob: #2ec4a6; --oa: #9af0d4; --oc: #36b37e; --od: #d4f56b; }
+/* Servicios: violets and reds */
+.srv .nod-orb.o1 { --ob: #6d4aff; --oa: #b79cff; --oc: #3b2fd1; --od: #e0a8ff; }
+.srv .nod-orb.o2 { --ob: #e8264b; --oa: #ff7a8a; --oc: #b3123f; --od: #ffb3a0; }
+.srv .nod-orb.o3 { --ob: #3a4a8c; --oa: #9db4ff; --oc: #1f2a5c; --od: #d6e0ff; }
 @keyframes nod-drift { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce){ .nod-orb::before { animation: none; } }
 
@@ -3139,7 +3147,7 @@ SB.similar=async function(text){
 };
 /* ===== Inicio: tablero personal, todo con datos de Supabase ===== */
 var HM={page:'home',cmp:true,adv:'all',per:{pre:{m:6,y:new Date().getFullYear()},pie:{m:6},cam:{k:'mes'},srv:{k:'mes'}},
-  d:{exp:[],pie:[],cam:[],car:[]},loaded:0,loading:false,tf:{piezas:'todas',campanas:'todas'},q:'',raf:0,pixInit:false};
+  d:{exp:[],pie:[],cam:[],car:[]},loaded:0,loading:false,tf:{piezas:'todas',campanas:'todas',servicios:'mes'},q:'',raf:0,pixInit:false};
 var MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],DAYMS=864e5;
 var IC_F='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>';
 var IC_D='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14"/></svg>';
@@ -3230,11 +3238,12 @@ HM.open=function(){
 };
 HM.go=function(p,keep){
   HM.page=p;if(!keep)HM.q='';
+  if(p==='servicios')HM.tf.servicios=HM.per.srv.k;
   $('#hmHero').hidden=p!=='home';HM.render();$('#viewHome').scrollTop=0;
   if(p==='home')HM.pixStart();
 };
 HM.nav=function(t){
-  if(t==='preas'||t==='piezas'||t==='campanas'||t==='home')HM.go(t);
+  if(t==='preas'||t==='piezas'||t==='campanas'||t==='servicios'||t==='home')HM.go(t);
   else showView(t);
 };
 
@@ -3318,7 +3327,7 @@ HM.srvList=function(){
 };
 HM.cardSrv=function(){
   var L=HM.srvList(),top=L.slice(0,6),mx=Math.max(1,top.length?top[0][1]:1),K=HM.per.srv.k;
-  return '<article class="hm-card" data-card="preas"><header><div><h3 class="hm-title">Servicios realizados</h3><p class="hm-sub">Por tipo de servicio</p></div><div class="hm-sel">'+HM.sel('srv.k',HM.KOPT,K)+'</div></header>'+
+  return '<article class="hm-card" data-card="servicios"><header><div><h3 class="hm-title">Servicios realizados</h3><p class="hm-sub">Por tipo de servicio</p></div><div class="hm-sel">'+HM.sel('srv.k',HM.KOPT,K)+'</div></header>'+
     '<div class="hm-chart" style="justify-content:center">'+(top.length?'<div class="hm-hb">'+top.map(function(r){return '<div><span>'+esc(r[0])+'</span><i><u style="width:'+Math.max(3,r[1]/mx*78)+'%"></u><s>'+r[1]+'</s></i></div>'}).join('')+'</div>':'<div class="hm-none">Aún no hay servicios aprobados en este periodo.</div>')+'</div>'+HM.foot('servicios',false)+'</article>';
 };
 
@@ -3368,10 +3377,23 @@ HM.PG={
     kpis:function(){var K=HM.mine(HM.d.cam),c=function(s){return K.filter(function(x){return x.estado===s}).length};return [{n:c('cerrada'),l:'Cerradas (cobradas y realizadas)'},{n:c('realizada'),l:'Realizadas, pendientes de cobro'},{n:c('pendiente'),att:'atención',l:'Por realizar'}]},
     list:function(){var f=HM.tf.campanas;return HM.mine(HM.d.cam).filter(function(x){return f==='todas'||x.estado===f}).sort(function(a,b){return +new Date(b.created_at)-+new Date(a.created_at)})},
     search:function(x){return (x.orden||'')+' '+(x.cliente||'')+' '+x.unidad+' '+x.campana},
-    unit:'campañas',newBtn:true,
+    unit:'campañas',newBtn:true,nod:function(x){return NODE.cam(x)},
     row:function(x){var lb={cerrada:'Cerrada',realizada:'Realizada',pendiente:'Pendiente'},act=x.estado==='pendiente'?'<button class="hm-act" type="button" data-cm="'+x.id+'" data-to="realizada">Marcar realizada</button>':x.estado==='realizada'?'<button class="hm-act" type="button" data-cm="'+x.id+'" data-to="cerrada">Marcar cobrada</button>':'';
       return '<td>'+(x.orden?'<span class="hm-or" style="cursor:default">'+esc(x.orden)+'</span>':'—')+'</td><td>'+esc(x.cliente||'—')+'</td><td>'+esc(x.unidad)+'<div style="color:var(--muted);font-size:12px">'+esc(x.campana)+'</div></td><td><span class="'+(x.estado==='cerrada'?'hm-st ok':'hm-st')+'">'+lb[x.estado]+'</span></td><td>'+esc(HM.camDet(x))+'</td><td>'+act+'</td>'},
-    csv:function(x){return [x.orden||'',x.cliente||'',x.unidad,x.campana,x.estado,HM.camDet(x)]}}
+    csv:function(x){return [x.orden||'',x.cliente||'',x.unidad,x.campana,x.estado,HM.camDet(x)]}},
+  servicios:{title:'Servicios',card:'Servicios realizados',ph:'Buscar servicio',pills:HM.KOPT,
+    cols:['Servicio','PREAs aprobadas'],
+    kpis:function(){var L=HM.srvL(),t=L.reduce(function(a,r){return a+r.n},0);return [{n:t,l:'PREAs aprobadas en el periodo'},{n:L.length,l:'Tipos de servicio'},{n:L.length?L[0].name:'—',l:'El más frecuente'}]},
+    list:function(){return HM.srvL()},
+    search:function(x){return x.name},
+    unit:'servicios',nod:function(x){return NODE.srv(x)},
+    csv:function(x){return [x.name,x.n]}}
+};
+/* servicios del periodo elegido en la página, con su total para el porcentaje */
+HM.srvL=function(){
+  HM.per.srv.k=HM.tf.servicios||HM.per.srv.k;
+  var L=HM.srvList(),tot=L.reduce(function(a,r){return a+r[1]},0),per=(HM.KOPT.filter(function(k){return k[0]===HM.per.srv.k})[0]||[0,''])[1].toLowerCase();
+  return L.map(function(r){return {name:r[0],n:r[1],tot:tot,per:per}});
 };
 HM.rows=function(){
   var cfg=HM.PG[HM.page],q=norm(HM.q),all=cfg.list(),list=all.filter(function(x){return !q||norm(cfg.search(x)).indexOf(q)>=0});
@@ -4409,10 +4431,30 @@ var NODE=(function(){
     return '<div class="nod" data-id="'+ea(o.id)+'" tabindex="0" aria-label="'+ea(o.name)+'"'+(o.tip?' title="'+ea(o.tip)+'"':'')+'>'+
       '<div class="nod-card"><div class="nod-top"><span class="nod-mark" aria-hidden="true">'+MARK+'</span><span class="nod-name">'+esc(o.name)+'</span></div>'+
       '<p class="nod-say">'+esc(o.say)+'</p>'+
-      '<div class="nod-chain">'+ORBS3+'<span class="nod-more">'+esc(o.more)+'</span></div></div>'+
+      '<div class="nod-chain">'+ORBS3.replace('nod-orbs','nod-orbs '+(o.pal||'prea'))+'<span class="nod-more">'+esc(o.more)+'</span></div></div>'+
       '<div class="nod-fan"><i class="nod-reach" aria-hidden="true"></i>'+
         o.acts.map(function(b){return '<button class="nod-act" type="button" '+b.a+' aria-label="'+ea(b.l)+'" title="'+ea(b.l)+'" tabindex="-1">'+ico(b.i)+'</button>'}).join('')+
       '</div></div>';
+  }
+  /* ── one palette per kind of card ───────────────────────────
+     PREAs keep the blue / orange / pink set; Campañas are greens and gold;
+     Servicios are violets and reds (see .nod-orbs.cam / .srv). The palette
+     says which list you are in before you read a word. */
+  /* una campaña (Inicio → Campañas) */
+  function cam(x){
+    var lb={cerrada:'Cerrada',realizada:'Realizada',pendiente:'Pendiente'},L=[];
+    if(x.estado==='pendiente')L.push(A('data-cm="'+ea(x.id)+'" data-to="realizada"','Marcar realizada','ok'));
+    else if(x.estado==='realizada')L.push(A('data-cm="'+ea(x.id)+'" data-to="cerrada"','Marcar cobrada','ok'));
+    if(x.orden)L.push(A(cp(x.orden,'Orden copiada'),'Copiar orden','copy'));
+    L.push(A(cp([x.orden,x.unidad,x.campana].filter(Boolean).join(' — '),'Resumen copiado'),'Copiar resumen','doc'));
+    return shell({id:x.id,pal:'cam',name:x.orden||x.unidad||'Campaña',say:[x.campana,x.unidad].filter(Boolean).join(' · ')||'Sin detalle',
+      more:HM.camDet(x),tip:[lb[x.estado],x.cliente].filter(Boolean).join(' · '),acts:L});
+  }
+  /* un servicio (Inicio → Servicios): {name, n, tot, per} */
+  function srv(x){
+    return shell({id:x.name,pal:'srv',name:x.name,say:x.n+(x.n===1?' PREA aprobada':' PREAs aprobadas')+' · '+x.per,
+      more:(x.tot?Math.round(x.n/x.tot*100):0)+'% de las aprobadas',
+      acts:[A('data-exp="'+ea(x.name)+'"','Ver PREAs de este servicio','doc'),A(cp(x.name,'Servicio copiado'),'Copiar servicio','copy')]});
   }
   /* an expediente (Expedientes) */
   function card(x,admin,stl){
@@ -4526,7 +4568,7 @@ var NODE=(function(){
     if(c&&!e.target.closest('.nod-act'))setOn(c,!c.on);
   });
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-copy]');if(b)NODE.copy(b.dataset.copy,b.dataset.msg||'Copiado')});
-  return {card:card,prea:prea,mount:mount,copy:function(t,msg){
+  return {card:card,prea:prea,cam:cam,srv:srv,mount:mount,copy:function(t,msg){
     try{navigator.clipboard.writeText(t).then(function(){toast(msg)},function(){toast('No pude copiar')})}catch(_){toast('No pude copiar')}
   }};
 })();
