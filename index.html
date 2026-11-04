@@ -6276,8 +6276,31 @@ async function run(text,files){
     await nap(450,my);
     s3.done(!sm?'no pude consultar tus expedientes':sm.n?sm.n+' parecidos de '+sm.total+' ('+sm.acc+' aceptadas, '+sm.rej+' rechazadas)':'ninguno parecido entre '+sm.total);
   }
+  /* ── el bucle de autoaprendizaje, de vuelta al asesor ──────────────
+     El cerebro (reglas, lecciones, casos con la respuesta de planta, pagos y los antecedentes
+     enseñados) se consulta EN VIVO para este caso. Lo que sabe alimenta el formulario y también se
+     le muestra al asesor: qué suele aceptar planta, qué rechazó en casos parecidos y cómo redactar. */
+  var brain=null;
   if(!my.aborted&&text&&!SB.aiOff&&SB.entered){
-    var s4=tk.step('Consultando al modelo de IA'),form=await SB.aiPrea(evi?String(text||'').slice(0,1200)+'\n\n[Evidencia inspeccionada ('+evi.archivos+' archivos)]\nHechos comprobados: '+evi.resumen.slice(0,700)+(evi.inconsistencias.length?'\nInconsistencias: '+evi.inconsistencias.join('; ').slice(0,300):'')+(evi.datos&&(evi.datos.piezas_mencionadas&&evi.datos.piezas_mencionadas.length||evi.datos.codigos_falla&&evi.datos.codigos_falla.length)?'\nPistas de la evidencia (no definitivas): '+[].concat(evi.datos.piezas_mencionadas||[],evi.datos.codigos_falla||[]).slice(0,10).join(', '):'')+'\nEl asesor no aporta códigos, mano de obra, piezas ni redacción técnica: arma TÚ los códigos de queja, causa y corrección, la operación y el tiempo, las piezas (valida con las reglas y lecciones del cerebro las que aparecen en la evidencia y agrega o quita las que planta acepta) y mejora las descripciones.':text);
+    var sbr=tk.step('Consultando el cerebro (reglas, lecciones, antecedentes y pagos de planta)'),br=null;
+    try{
+      br=await SB.ai({rol_agente:'garantias',orden:ordn||null,ahora:MI.nowInfo(),messages:[{role:'user',content:
+        'Voy a armar una PREA ('+((GATE.v&&GATE.v.tipo)||'PREA')+'). Caso del asesor: '+String(text).slice(0,900)+(evi?'\nHechos comprobados en la evidencia: '+evi.resumen.slice(0,500):'')+
+        '\n\nConsulta TODO el manual (buscar_todo) y dame, en máximo 120 palabras y en viñetas cortas, lo que el cerebro sabe para ayudarme a armarla: la regla y la operación, horas y piezas que suele aceptar planta, rechazos o comentarios de planta en casos parecidos, antecedentes enseñados parecidos y cómo redactar queja, causa y corrección para que la acepten. Si no hay nada aprendido de esto, dilo en una línea.'}]},'manual');
+      brain=br&&br.text?String(br.text).trim():null;
+    }catch(e){SB.aiFail(e)}
+    if(my.aborted)brain=null;
+    sbr.done(brain?'conocimiento reunido ('+((br&&br.pasos&&br.pasos.length)||0)+' consultas)':'sin respuesta del cerebro: uso el catálogo');
+  }
+  var t2=text;
+  if(evi||brain){
+    t2=String(text||'').slice(0,evi?1000:1500);
+    if(evi)t2+='\n\n[Evidencia inspeccionada ('+evi.archivos+' archivos)]\nHechos comprobados: '+evi.resumen.slice(0,600)+(evi.inconsistencias.length?'\nInconsistencias: '+evi.inconsistencias.join('; ').slice(0,200):'')+(evi.datos&&(evi.datos.piezas_mencionadas&&evi.datos.piezas_mencionadas.length||evi.datos.codigos_falla&&evi.datos.codigos_falla.length)?'\nPistas de la evidencia (no definitivas): '+[].concat(evi.datos.piezas_mencionadas||[],evi.datos.codigos_falla||[]).slice(0,6).join(', '):'');
+    if(brain)t2+='\n\n[Conocimiento del cerebro para este caso]\n'+brain.replace(/\s+/g,' ').slice(0,500);
+    t2+='\nEl asesor no aporta códigos, mano de obra, piezas ni redacción técnica: arma TÚ los códigos de queja, causa y corrección, la operación y el tiempo, las piezas (valida con las reglas y lecciones del cerebro las de la evidencia y agrega o quita las que planta acepta) y mejora las descripciones.';
+  }
+  if(!my.aborted&&text&&!SB.aiOff&&SB.entered){
+    var s4=tk.step('Consultando al modelo de IA'),form=await SB.aiPrea(t2);
     if(form&&!my.aborted)SB.applyForm(ctx,form);
     s4.done(form?'formulario propuesto, '+(form.rule_id?'regla '+form.rule_id:'sin regla del catálogo'):'no disponible, uso el catálogo');
   }
@@ -6286,7 +6309,7 @@ async function run(text,files){
   RS.note(ctx.matched);
   try{await LS.apply(ctx)}catch(_){}
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
-  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(evi?'\n\n> **Evidencia inspeccionada** ('+evi.archivos+(evi.archivos===1?' archivo':' archivos')+'): '+evi.resumen+(evi.inconsistencias.length?' **Ojo:** '+evi.inconsistencias.join('; '):''):'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
+  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(evi?'\n\n> **Evidencia inspeccionada** ('+evi.archivos+(evi.archivos===1?' archivo':' archivos')+'): '+evi.resumen+(evi.inconsistencias.length?' **Ojo:** '+evi.inconsistencias.join('; '):''):'')+(brain?'\n\n### Lo que sabe el cerebro para tu PREA\n'+brain:'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
   if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;GP.nPrea++;GP.caseText=text;GP.remember(text,w._text);GP.suggest(w,[{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'¿Cuánto pagará planta?',q:'¿Cuánto crees que pagará planta por esto?'}])}
   finish(my);
 }
