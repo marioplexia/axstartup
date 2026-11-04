@@ -320,6 +320,194 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .ex-empty{padding:32px 14px;text-align:center;color:var(--muted)}
 .ex-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .ex-bar .bt[aria-pressed=true]{background:var(--fg);color:var(--bg)}
+
+/* ══ Action node ══════════════════════════════════════════
+   (Bencho · MIT · bencho.dev/licence.) A node card whose controls live in
+   its top-right corner until the pointer asks for them. The component owns
+   the geometry — every number that decides where a button sits is in NODE
+   in the script, because it is arithmetic on an arc and not a style. What
+   is here is what the card and the buttons are MADE of.
+
+   TOKENS, mapped on the component's own root so nothing leaks:
+     --card, --fill-slab → the card's fill: --surface, so it reads against
+                           the white page (Bencho's flat fill on its own
+                           ground); the buttons share it
+     --fill-on, --ink    → --fg
+     --ink-3             → --muted     (the sentence)
+     --ink-4             → --faint     (the small print)
+     --ink-rgb           → 22,22,22 light / 237,237,235 dark: three bare
+                           numbers, because rgba() is built from them
+     --wash              → .06 light / .1 dark: the mark's ground
+     --pane-edge         → --card-line (the project's own hairline)
+     --font-ui           → --f-ui
+   The faces' pictures and the green "Connected" dot are not carried: see
+   the notes in NODE and the original's own note on the dot. */
+@property --zoom{syntax:'<number>';inherits:false;initial-value:1}
+.nod-grid{display:grid;grid-template-columns:repeat(auto-fill,272px);gap:64px 64px;justify-content:start;padding:56px 56px 8px 0}
+.nod-grid .ex-empty{grid-column:1/-1;padding:32px 14px;text-align:center;color:var(--muted)}
+.nod{
+  --card: var(--surface);
+  --fill-slab: var(--surface);
+  --fill-on: var(--fg);
+  --ink: var(--fg);
+  --ink-3: var(--muted);
+  --ink-4: var(--faint);
+  --ink-rgb: 22, 22, 22;
+  --wash: .06;
+  --pane-edge: var(--card-line);
+  --font-ui: var(--f-ui);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nod{--ink-rgb:237,237,235;--wash:.1}}
+:root[data-theme="dark"] .nod{--ink-rgb:237,237,235;--wash:.1}
+
+/* ── the box is the card ─────────────────────────────────────
+   Never beside: the fan overflows into the grid's own gaps instead of
+   reserving room of its own, which is what keeps every card its real
+   size. An open card is raised so its fan paints over the neighbours. */
+.nod {
+  position: relative;
+  z-index: 0;
+  width: max-content;
+  max-width: 100%;
+  font-family: var(--font-ui);
+  outline: none;}
+.nod[data-open] { z-index: 6; }
+.nod:focus-visible .nod-card { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(var(--ink-rgb), .4); }
+
+/* ── the card is painted OVER the fan ──────────────────────
+   Which is what makes the buttons come out of the corner rather than out
+   of the middle of the card. At rest they are sitting under the card with
+   nothing of them showing; travelling out along the path is what brings
+   them past the edge. One line of stacking, and the whole gesture changes
+   meaning. */
+.nod-card {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  /* 272: a card on a canvas is taller than it looks wide */
+  width: 272px;
+  max-width: 100%;
+  padding: 20px;
+  border-radius: var(--nod-r, 20px);
+  background: var(--fill-slab, var(--card));
+  color: var(--fill-on, var(--ink));
+  /* the hairline: this project draws one round every card */
+  box-shadow: 0 0 0 1px var(--pane-edge);
+  /* ── it lifts a hair while the fan is out ──────────────
+     The card is the thing the buttons came out of, and a card that answers
+     at the same moment they do reads as one object doing one thing. */
+  transition: translate 220ms cubic-bezier(0.24, 1.34, 0.38, 1);}
+
+.nod-card[data-on] { translate: 0 -1px; }
+
+.nod-top { display: flex; align-items: center; gap: 8px; }
+
+/* the mark, on its own ground, cut with the card (a share of its radius,
+   capped at half its own 30 — see --nod-mark-r in the original) */
+.nod-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: min(15px, calc(var(--nod-r, 20px) * 0.47));
+  background: rgba(var(--ink-rgb), var(--wash));
+  color: var(--fill-on, var(--ink));}
+
+/* ── the step's name ────────────────────────────────
+   500, not 600. At 15px nothing has been given away, so 600 is just loud;
+   this line does not need to be bold to be the name, it needs to be the
+   darkest and the largest, and it is both. */
+.nod-name { font-size: 16px; font-weight: 500; letter-spacing: -0.01em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nod-date { margin-left: auto; flex: none; font-size: 11.5px; color: var(--ink-4); }
+
+.nod-say {
+  margin: 13px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  letter-spacing: 0em;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;}
+.nod-meta { margin: 6px 0 0; font-size: 11.5px; color: var(--ink-4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── after the sentence, and further from it than the sentence is from
+   the name ─────────────────────────────────────────────────
+   A different KIND of thing from the two lines above it — a name and a
+   description are one block of reading, and who made it and how much is an
+   aside under it. 16 against the description's 13 is what says so. */
+.nod-chain { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
+
+.nod-link {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--fill-on, #17181a) 12%, transparent);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-4);
+  letter-spacing: 0em;}
+
+.nod-more { margin-left: auto; font-size: 11.5px; font-weight: 500; color: var(--ink-3); letter-spacing: 0em; white-space: nowrap; }
+
+/* ── the fan ───────────────────────────────────────────────
+   A zero-sized box pinned to the card's top-right corner. Every button is
+   absolutely placed against it and carries its own translate, so they all
+   share one origin and the arc is the only thing that separates them.
+   `position: absolute` with width 0: the anchor is a POINT, and giving it a
+   size would mean every button's offset was measured from an edge that has
+   nothing to do with the corner they are coming out of. Under the card:
+   it comes after it in the markup, so without z-index 0 it would paint on
+   top and every button would be visible from the first frame. */
+.nod-fan { position: absolute; top: 0; right: 0; z-index: 0; width: 0; height: 0; }
+
+/* ── the pad that makes the fan reachable ───────────────
+   Invisible. Its whole job is to be part of .nod so that the air between
+   the card and the buttons stops being a place the pointer can fall
+   through. Inert until the fan is out: a pad that could open it would put
+   a trigger in blank space beside the card. */
+.nod-reach { position: absolute; pointer-events: none; }
+.nod-reach[data-on] { pointer-events: auto; }
+
+.nod-act {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fill-slab, var(--card));
+  color: var(--fill-on, var(--ink));
+  /* the hairline, as on the card; no shadow — a filled disc on flat ground
+     is already separated, and a shadow makes four small objects look like
+     they are hovering above a card they came out of */
+  box-shadow: 0 0 0 1px var(--pane-edge);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  /* ── two writers, one scale ────────────────────────────
+     The spring owns how far out of the corner a button is and the hover
+     owns whether it is being pointed at, and both want to scale it. An
+     inline `scale` beats any rule, so the script writes --pop instead and
+     the two are multiplied here. ONLY --zoom IS TRANSITIONED: a transition
+     on `scale` itself would smooth the spring's own frames — two
+     animations arguing over one property. */
+  scale: calc(var(--pop, 1) * var(--zoom, 1));
+  transition: --zoom 160ms cubic-bezier(0.24, 1.34, 0.38, 1);}
+
+/* ── the hover is the size, and nothing else ───────────────
+   It inverted first, which made four small buttons the darkest thing on
+   screen the moment you went near them. One cue: the button grows and
+   stays the colour it was. */
+.nod-act:hover { --zoom: 1.12; }
+.nod-act:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+@media (max-width: 700px){.nod-grid{grid-template-columns:272px;padding-right:56px}}
 @media(max-width:700px){.ex-row{grid-template-columns:1fr auto}.ex-row .ex-h,.ex-row .ex-c{display:none}.ex-act{grid-column:1/-1}}
 .bt-row{display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:11px 14px;border-bottom:1px solid var(--line);font-size:13px}
 .bt-row:last-child{border-bottom:0}
@@ -1293,7 +1481,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
           <input type="search" id="exQ" placeholder="Buscar folio, queja o VIN" aria-label="Buscar expedientes">
         </div>
         <div class="ex-bar" id="exBar"></div>
-        <div class="ad-card" id="exList"></div>
+        <div class="nod-grid" id="exList"></div>
       </div>
     </section>
     <section class="admin" id="viewBit" hidden>
@@ -4039,6 +4227,271 @@ AG.prueba={crumb:'Agente de pruebas',title:'Pregúntale al manual de garantías'
   {t:'¿Cuánto paga planta?',s:'Pagos aprendidos',q:'¿Cuánto suele pagar planta de mano de obra y de piezas según lo aprendido?'},
   {t:'Revisa mi PREA',s:'Adjunta un PDF o imagen',q:'Revisa la PREA adjunta contra el manual y dime qué corregir.'}]};
 var ctxReg={};function ctxOf(id){return ctxReg[id]}
+/* ══ Action node ══════════════════════════════════════════
+   Bencho · MIT · bencho.dev/licence. A card for one step, with its
+   controls folded into the corner until you want them. Here each card is
+   one expediente and the controls are what you do to it.
+
+   THE CONTROLS ARE THE COMPONENT. What this block is about is where a
+   card's actions live when you are not using them, and the answer it
+   argues for is: inside the corner they belong to.
+
+   ── THEY COME OUT OF THE CORNER, THEY DO NOT ARRIVE AT IT ─
+   The reflex is to fade a toolbar in above the card, and it is wrong in a
+   way that is easy to miss: a control that fades in has no relationship
+   to the thing it controls. These are drawn on a path offset from the
+   card's own top-right corner, they start AT that corner, and they travel
+   out along it — so the card is visibly where they came from.
+
+   ── ONE SPRING EACH, AND THE STAGGER IS A DELAY ON THE TARGET, NOT AN EASE
+   Each button is told to open a beat after the one before it, and the
+   spring does the rest: the cascade is objects with their own physics
+   rather than one animation with offsets, which is the difference between
+   a fan opening and a list appearing in order. Closing runs the other way,
+   last out first back, so the fan folds into the corner.
+
+   ADAPTED to vanilla JS: the springs are plain arrays stepped by one
+   shared requestAnimationFrame loop that parks itself the moment every fan
+   has settled (a page with two hundred cards must not run two hundred
+   loops); the translate and scale are written straight to each button, no
+   render in between. The faces are not Bencho's pictures (not licensed to
+   travel) and a step's "crew" would be invented data here, so the row
+   under the sentence carries what an expediente really has: who made it,
+   its state, and its figures. */
+var NODE=(function(){
+  /* the button and half of it. Everything else that has a size is
+     measured off this one — the spacing, the hiding place — so the buttons
+     grow by changing this number and nothing else. */
+  var DOT=36,R=DOT/2;
+  /* centre to centre along the path. A real distance rather than an angle:
+     twelve pixels of air between two buttons is twelve pixels whatever the
+     corner is doing. */
+  var SPACING=DOT+12;
+  var BEAT=90;          /* the beat between one button and the next, at the top of the range */
+  var REACH=25,BOUNCE=20,STAGGER=55,CORNER=20,BLEED=6;
+  var still=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v))}
+
+  /* The pair is chosen by DAMPING RATIO and then written back as stiffness
+     and decay: zeta = -ln(d) / (2 * sqrt(k)).  0 → ~0.85 heavy, 50 → ~0.41,
+     100 → ~0.20 lively. */
+  function springOf(t){return {k:.08+(t/100)*.16,d:.62+(t/100)*.2}}
+  var SP=springOf(BOUNCE);
+
+  /* ── Reach is the air between the card and the fan ─────────
+     20..40 on the original 0..100 scale, which is 11px of gap to 16 —
+     tighter and the buttons foul the corner, wider and they stop reading
+     as attached to the card. NOT a pixel count: the scale a value was
+     judged on is part of the value. */
+  function gapPx(reach){return 6+(clamp(reach,20,40)/100)*24}
+
+  /* ── they ride the card's OWN corner, offset ───────────────
+     The path is the card's outline pushed out by a constant distance:
+     straight along the top edge, round the corner on an arc concentric
+     with it, straight down the right edge. Buttons are placed by how far
+     along that path they are. A circle struck from one point only looked
+     right at one corner radius, and could not go round more than a quarter
+     turn; an offset path is the card's own shape, so every point on it is
+     exactly `gap` from the nearest card surface at every radius.
+
+     `s` is arc length from where the corner arc meets the top edge; the
+     corner occupies 0..len and anything outside has run onto a straight.
+     Returns the point and the direction out of the card there. */
+  function ride(s,corner,off){
+    var arc=Math.max(.001,corner+off),len=arc*Math.PI/2;
+    if(s<=0)return {x:-corner+s,y:-off};
+    if(s>=len)return {x:off,y:corner+(s-len)};
+    var th=Math.PI/2-s/arc;
+    return {x:-corner+arc*Math.cos(th),y:corner-arc*Math.sin(th)};
+  }
+
+  /* ── where they hide, and it has to be PROVABLY inside ─────
+     A point on the card's diagonal, far enough in that a whole button fits
+     behind the card with nothing showing past the corner. Two cases,
+     because a rounded corner is bitten out of the very material a square
+     one has: with corner >= R + 2 the corner's own centre is the answer (a
+     margin of two pixels, because at exactly R the button is tangent to the
+     boundary, which draws a hairline of it); below that, go past the
+     corner's disc entirely and stop where both edges are clear. */
+  function hideAt(corner){
+    return corner>=R+2?corner*Math.SQRT2:Math.max(R*Math.SQRT2+2,corner*Math.SQRT2+corner+2);
+  }
+
+  /* the geometry only depends on how many buttons there are, so it is
+     worked out once per count */
+  var LAY={};
+  function layout(n){
+    if(LAY[n])return LAY[n];
+    var c=CORNER,off=gapPx(REACH)+R,mid=(c+off)*Math.PI/4;
+    var spots=[];for(var i=0;i<n;i++)spots.push(ride(mid+(i-(n-1)/2)*SPACING,c,off));
+    var deep=hideAt(c)/Math.SQRT2,hid={x:-deep,y:deep};
+    /* ── the air between the card and the fan is a HOLE ─────
+       The buttons hang outside the card, so the air between the two
+       belongs to nothing at all: move the pointer from the card toward a
+       button and it leaves .nod on the way across — the fan folds itself
+       away from under the cursor that was reaching for it. So the fan
+       carries a hit area: the box its own buttons occupy, bled a little,
+       hung off the same corner anchor. Live only while the fan is open —
+       an always-on pad would mean empty space beside the card opened it. */
+    var box={l:0,r:0,t:0,d:0};
+    spots.forEach(function(sp){
+      box.l=Math.min(box.l,sp.x-R-BLEED);box.r=Math.max(box.r,sp.x+R+BLEED);
+      box.t=Math.min(box.t,sp.y-R-BLEED);box.d=Math.max(box.d,sp.y+R+BLEED);
+    });
+    var pw=box.r-box.l,ph=box.d-box.t,px=-box.l,py=-box.t;
+    /* ── and the bite taken out of it is INSIDE the card ────
+       The pad is a rectangle and the card is in one corner of it, so a
+       piece has to come out. x < -c with y > c is card at every radius, so
+       that is the rectangle to lose: the card keeps its whole surface and
+       the pad keeps every scrap of the air. */
+    var bx=Math.max(0,px-c),by=Math.min(ph,py+c);
+    return LAY[n]={spots:spots,hid:hid,box:box,pw:pw,ph:ph,bx:bx,by:by};
+  }
+
+  var ICON={
+    ok:'<path d="M20 6 9 17l-5-5"/>',
+    no:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    copy:'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+    doc:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'
+  };
+  function ico(k){return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+'</svg>'}
+  function ini(n){return String(n||'?').split(/\s+/).filter(Boolean).map(function(w){return w[0]}).join('').slice(0,2).toUpperCase()||'?'}
+
+  /* ── what the buttons do, and why these ───────────────────
+     The things you do to an expediente without opening it. A draft gets
+     the two answers planta can give; everything gets the copies.
+     Deliberately not delete: the one action that cannot be undone does not
+     belong in a row that appears under your cursor. */
+  function acts(x){
+    var A=[];
+    if(x.status==='borrador'){
+      A.push({a:'data-r="ok"',l:'Fue aceptada',i:'ok'});
+      A.push({a:'data-r="no"',l:'Fue rechazada',i:'no'});
+    }
+    A.push({a:'data-c="folio"',l:'Copiar folio',i:'copy'});
+    if(x.status!=='borrador')A.push({a:'data-c="res"',l:'Copiar resumen',i:'doc'});
+    return A;
+  }
+
+  /* the card: mark and name on top, then what the step does, then — last,
+     because it is the least urgent and the heaviest to look at — who and
+     how much. */
+  function card(x,admin,stl){
+    var A=acts(x),who=(x.profiles&&x.profiles.name)||(SB.user&&SB.user.name)||'';
+    var meta=[x.sys,x.op,x.rule_id?'regla '+x.rule_id:''].filter(Boolean).map(esc).join(' · ');
+    return '<div class="nod" data-id="'+ea(x.id)+'" tabindex="0" aria-label="Expediente '+ea(x.folio)+'">'+
+      '<div class="nod-card"><div class="nod-top"><span class="nod-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><line x1="3" x2="9" y1="12" y2="12"/><line x1="15" x2="21" y1="12" y2="12"/></svg></span>'+
+        '<span class="nod-name">'+esc(x.folio)+'</span><span class="nod-date">'+esc(SB.dayLbl(x.created_at))+'</span></div>'+
+      '<p class="nod-say" title="'+ea(x.queja||'')+'">'+esc(x.queja||'Sin descripción')+'</p>'+
+      (meta?'<p class="nod-meta">'+meta+'</p>':'')+
+      '<div class="nod-chain"><span class="nod-link" title="'+ea(who)+'">'+esc(ini(who))+'</span><span class="ex-st '+x.status+'">'+esc(stl[x.status])+'</span>'+
+        '<span class="nod-more">'+esc(String(x.hours||0))+' h · '+EX.money(Number(x.parts_total)+Number(x.labor))+'</span></div></div>'+
+      '<div class="nod-fan"><i class="nod-reach" aria-hidden="true"></i>'+
+        A.map(function(b){return '<button class="nod-act" type="button" '+b.a+' aria-label="'+b.l+'" title="'+b.l+'" tabindex="-1">'+ico(b.i)+'</button>'}).join('')+
+      '</div></div>';
+  }
+
+  /* ── state per card: the pointer, then what each spring is aiming at ──
+     `on` is the pointer; `lit` is the same thing a moment later — and the
+     moment is the stagger. Kept per button so the reverse fold is the same
+     mechanism read backwards rather than a second one. */
+  var live=[],raf=0,prev=0;
+  function put(a,b,u){return a+(b-a)*u}
+  function paint(c){
+    var L=c.lay;
+    c.btns.forEach(function(b,i){
+      /* `u` is not clamped past 1.4, so the spring's overshoot carries each
+         button a little past its place and back, rather than being
+         flattened at the end of the journey. */
+      var u=clamp(c.p[i]/100,0,1.4),sp=L.spots[i];
+      b.style.translate=put(L.hid.x,sp.x,u).toFixed(2)+'px '+put(L.hid.y,sp.y,u).toFixed(2)+'px';
+      /* ── barely any scale, and no fade at all ──────────────
+         A button hidden UNDER the card does not need to be transparent to
+         be hidden, and a fade on something sliding out of a drawer is the
+         one cue that says it was never really in there. The 0.18 that is
+         left is weight, not concealment. It is a VARIABLE and not the
+         scale because the hover grows the button too, and two writers
+         cannot share one property — see .nod-act. */
+      b.style.setProperty('--pop',(.82+.18*Math.min(u,1)).toFixed(3));
+    });
+  }
+  function tick(t){
+    var dt=prev?clamp((t-prev)/16.67,0,2.5):1;prev=t;
+    live=live.filter(function(c){
+      if(!c.el.isConnected)return false;
+      var moving=false;
+      for(var i=0;i<c.n;i++){
+        var tg=c.lit[i]?100:0;
+        c.v[i]+=(tg-c.p[i])*SP.k*dt;c.v[i]*=Math.pow(SP.d,dt);c.p[i]+=c.v[i]*dt;
+        if(Math.abs(tg-c.p[i])<.02&&Math.abs(c.v[i])<.02){c.p[i]=tg;c.v[i]=0}else moving=true;
+      }
+      paint(c);return moving;
+    });
+    if(live.length)raf=requestAnimationFrame(tick);else{raf=0;prev=0}
+  }
+  function wake(c){if(live.indexOf(c)<0)live.push(c);if(!raf){prev=0;raf=requestAnimationFrame(tick)}}
+
+  function setOn(c,on){
+    if(c.on===on)return;
+    c.on=on;
+    c.el.toggleAttribute('data-open',on);
+    c.cardEl.toggleAttribute('data-on',on);
+    c.reach.toggleAttribute('data-on',on);
+    /* a control you cannot see should not be the next thing tab lands on */
+    c.btns.forEach(function(b){b.tabIndex=on?0:-1});
+    c.timers.forEach(clearTimeout);c.timers=[];
+    var gap=still?0:(STAGGER/100)*BEAT;
+    for(var i=0;i<c.n;i++)(function(i){
+      /* opening runs first to last; closing runs last to first, so the fan
+         folds back into the corner in the order it came out of it */
+      var at=gap*(on?i:c.n-1-i);
+      var set=function(){c.lit[i]=on;if(still){c.p[i]=on?100:0;c.v[i]=0;paint(c)}else wake(c)};
+      if(at<=0)set();else c.timers.push(setTimeout(set,at));
+    })(i);
+  }
+
+  var cards=new WeakMap();
+  function mount(root){
+    root.querySelectorAll('.nod').forEach(function(el){
+      var btns=[].slice.call(el.querySelectorAll('.nod-act')),n=btns.length,L=layout(n);
+      var c={el:el,cardEl:el.querySelector('.nod-card'),reach:el.querySelector('.nod-reach'),btns:btns,n:n,lay:L,on:false,lit:[],p:[],v:[],timers:[]};
+      for(var i=0;i<n;i++){c.lit.push(false);c.p.push(0);c.v.push(0)}
+      /* its own centre on the anchor before anything moves it: exactly half
+         a button, set next to the DOT it is half OF */
+      btns.forEach(function(b){b.style.width=DOT+'px';b.style.height=DOT+'px';b.style.marginTop=-R+'px';b.style.marginLeft=-R+'px'});
+      c.reach.style.cssText='left:'+L.box.l+'px;top:'+L.box.t+'px;width:'+L.pw+'px;height:'+L.ph+'px;clip-path:polygon(0 0,'+L.pw+'px 0,'+L.pw+'px '+L.ph+'px,'+L.bx+'px '+L.ph+'px,'+L.bx+'px '+L.by+'px,0 '+L.by+'px)';
+      cards.set(el,c);paint(c);
+    });
+  }
+  function of(e){var el=e.target.closest&&e.target.closest('.nod');return el&&cards.get(el)}
+
+  /* ── `out` with a containment test, not `leave` ──────────
+     A scripted or lifted pointer can leave a card carrying a null
+     relatedTarget; testing containment instead of trusting a leave event
+     is what stops a fan staying out forever. Touch has no hover: a tap on
+     the card opens it and a tap elsewhere closes it. */
+  document.addEventListener('pointerover',function(e){
+    var c=of(e);if(!c||e.pointerType==='touch')return;
+    cards.has(c.el)&&setOn(c,true);
+  });
+  document.addEventListener('pointerout',function(e){
+    var c=of(e);if(!c||e.pointerType==='touch')return;
+    var to=e.relatedTarget;if(!to||!c.el.contains(to))setOn(c,false);
+  });
+  document.addEventListener('pointercancel',function(e){var c=of(e);if(c)setOn(c,false)});
+  document.addEventListener('focusin',function(e){var c=of(e);if(c)setOn(c,true)});
+  document.addEventListener('focusout',function(e){var c=of(e);if(c&&!(e.relatedTarget&&c.el.contains(e.relatedTarget)))setOn(c,false)});
+  document.addEventListener('pointerdown',function(e){
+    if(e.pointerType!=='touch')return;
+    var c=of(e);
+    $$('.nod[data-open]').forEach(function(el){var o=cards.get(el);if(o&&o!==c)setOn(o,false)});
+    if(c&&!e.target.closest('.nod-act'))setOn(c,!c.on);
+  });
+  return {card:card,mount:mount,copy:function(t,msg){
+    try{navigator.clipboard.writeText(t).then(function(){toast(msg)},function(){toast('No pude copiar')})}catch(_){toast('No pude copiar')}
+  }};
+})();
+
 var EX={rows:[],f:'todos',q:'',loading:false};
 EX.load=async function(){
   if(!SB.c||!SB.entered){return}
@@ -4057,13 +4510,8 @@ EX.render=function(){
   var q=norm(EX.q),list=EX.rows.filter(function(x){return (EX.f==='todos'||x.status===EX.f)&&(!q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0)});
   var admin=SB.user&&SB.user.role==='admin',stl={borrador:'Pendiente',aceptada:'Aceptada',rechazada:'Rechazada'};
   $('#exList').innerHTML=EX.loading?'<div class="ex-empty">Cargando…</div>':!list.length?'<div class="ex-empty">'+(EX.rows.length?'Sin resultados para este filtro.':'Aún no hay expedientes. Cada PREA que arme el agente aparecerá aquí.')+'</div>':
-    list.map(function(x){
-      return '<div class="ex-row" data-id="'+x.id+'"><div><b>'+esc(x.folio)+'</b><small>'+SB.dayLbl(x.created_at)+'</small></div>'+
-        '<div class="q"><span title="'+esc(x.queja||'').replace(/"/g,'&quot;')+'">'+esc(x.queja||'')+'</span><small>'+esc(x.sys||'')+' · '+esc(x.op||'')+(x.rule_id?' · regla '+esc(x.rule_id):'')+(admin&&x.profiles?' · '+esc(x.profiles.name):'')+'</small></div>'+
-        '<div class="ex-h">'+esc(String(x.hours||0))+' h<small>mano de obra</small></div><div class="ex-c">'+EX.money(Number(x.parts_total)+Number(x.labor))+'<small>total</small></div>'+
-        '<div><span class="ex-st '+x.status+'">'+stl[x.status]+'</span></div>'+
-        (x.status==='borrador'?'<div class="ex-act"><button class="bt" type="button" data-r="ok">Fue aceptada</button><button class="bt" type="button" data-r="no">Fue rechazada</button></div>':'')+'</div>';
-    }).join('');
+    list.map(function(x){return NODE.card(x,admin,stl)}).join('');
+  NODE.mount($('#exList'));
 };
 EX.resolve=async function(id,ok){
   var x=EX.rows.filter(function(r){return r.id===id})[0];if(!x||x.status!=='borrador')return;
@@ -4098,7 +4546,8 @@ EX.resolve=async function(id,ok){
 };
 document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('#exBar [data-f]');if(f){EX.f=f.dataset.f;EX.render();return}
-  var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('.ex-row');EX.resolve(row.dataset.id,b.dataset.r==='ok')}
+  var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('[data-id]');EX.resolve(row.dataset.id,b.dataset.r==='ok');return}
+  var cp=e.target.closest&&e.target.closest('#exList [data-c]');if(cp){var r2=cp.closest('[data-id]'),xx=EX.rows.filter(function(r){return r.id===r2.dataset.id})[0];if(xx)NODE.copy(cp.dataset.c==='folio'?xx.folio:[xx.folio,xx.queja,[xx.sys,xx.op].filter(Boolean).join(' · ')].filter(Boolean).join(' — '),cp.dataset.c==='folio'?'Folio copiado':'Resumen copiado')}
 });
 $('#exQ').addEventListener('input',function(){EX.q=this.value;EX.render()});
 SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='axl-msg'+(t?' on':'')+(t&&err?' err':'')};
