@@ -370,7 +370,15 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 /* the colour list is narrower: one orb and a name per row */
 .pik.clr .pik-card { width: min(212px, calc(100vw - 24px)); }
 .pik.clr .pik-row { height: 44px; }
-.pik.clr .pik-pill { height: 40px; padding: 0 10px 0 6px; gap: 8px; }
+.pik.clr .pik-card { top: calc(var(--fs, 28px) + 10px); }
+/* ── in the notes it is NOT a container ───────────────────
+   No pill behind the orb, no ring round it: the orb is just the note's
+   colour, and the chevron only shows when the cursor is near, so a column
+   of notes is a column of text with a dot beside each line. */
+.pik.clr .pik-pill { height: auto; padding: 0; gap: 2px; background: transparent; border-radius: 999px; }
+.pik.clr .pik-face { box-shadow: none; }
+.pik.clr .pik-chev { width: 0; margin: 0; opacity: 0; transition: width .18s, opacity .18s, rotate 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+.pik.clr:hover .pik-chev, .pik.clr.open .pik-chev, .pik.clr:focus-within .pik-chev { width: 16px; opacity: 1; }
 
 .pik-pill {
   position: relative;
@@ -403,13 +411,13 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
    Its width is the whole animation. The faces are absolute inside it, so
    none of them moves when another arrives — the rail simply has more room,
    and the pill is sized by it. Nothing here measures anything. */
-.pik-rail { position: relative; flex: none; height: 28px; width: 0; transition: width 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+.pik-rail { position: relative; flex: none; height: var(--fs, 28px); width: 0; transition: width 220ms cubic-bezier(0.22, 1, 0.36, 1); }
 .pik-face {
   position: absolute;
   top: 0;
   left: 0;
-  width: 28px;
-  height: 28px;
+  width: var(--fs, 28px);
+  height: var(--fs, 28px);
   border-radius: 999px;
   /* placed by its translate; the face inside carries the arrival */
   transition: translate 380ms cubic-bezier(0.3, 1.4, 0.5, 1);
@@ -505,46 +513,48 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 
 /* ---------- Notas: la semana ---------- */
 .admin.nt { background: var(--bg); }
-.nt-in { max-width: 1280px; }
+.nt-in { max-width: none; }
 .nt-nav { display: flex; gap: 8px; }
 .nt-nav .hm-btn { min-width: 36px; justify-content: center; padding: 0 12px; }
-.nt-week { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 22px 18px; padding-bottom: 48px; }
+/* los siete días en una sola fila, cada uno con sus notas hacia abajo; si la
+   ventana es angosta, la pantalla se desplaza de lado en vez de partir la semana */
+.nt-week { display: grid; grid-template-columns: repeat(7, minmax(172px, 1fr)); min-width: 1240px; gap: 0 26px; padding-bottom: 48px; align-items: start; }
+@media (max-width: 760px) { .nt-week { grid-template-columns: 1fr; min-width: 0; gap: 22px; } }
 .nt-day { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .nt-day > header { display: flex; align-items: baseline; justify-content: space-between; padding: 0 4px 8px; border-bottom: 1px solid var(--line); }
 .nt-dn { font-size: 13px; font-weight: 500; color: var(--muted); }
 .nt-dd { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 999px; font: 500 20px var(--f-display); letter-spacing: -.02em; }
 .nt-day[data-today] .nt-dn { color: var(--fg); }
 .nt-day[data-today] .nt-dd { background: var(--fg); color: var(--bg); font-family: var(--f-ui); font-size: 14px; }
-.nt-list { display: flex; flex-direction: column; gap: 10px; }
-/* ── la nota: fondo BLANCO, y su color en el degradado ─────
-   El fondo es el blanco de la tarjeta, también al escribir; el color de la
-   nota vive en la barra de degradado de su borde izquierdo y en el orbe del
-   selector, no en el fondo. Blanco sobre blanco necesita un aro y una
-   sombra suave para despegarse de la página. */
-.nt-note, .nt-new { position: relative; border-radius: 16px; background: var(--card); box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(20,20,20,.04), 0 10px 22px -16px rgba(20,20,20,.22); }
-.nt-note::before, .nt-new::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: var(--g, linear-gradient(180deg,#ff3fb0,#b44bff)); }
-.nt-note { padding: 14px 14px 10px 18px; }
-.nt-row { display: flex; gap: 10px; align-items: flex-start; }
-.nt-tx { margin: 0; flex: 1; min-width: 0; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; cursor: text; }
+.nt-list { display: flex; flex-direction: column; gap: 0; }
+/* ── una nota es una línea, no una caja ───────────────────
+   Sin contenedor: ni fondo, ni aro, ni sombra. Cada nota es su texto con el
+   punto de su color al lado, todas en una sola columna hacia abajo; lo
+   demás (hecha, borrar) aparece solo al acercarse. El fondo es el blanco de
+   la pantalla, también al escribir. */
+.nt-note, .nt-new { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 10px; padding: 7px 0; }
+.nt-clr { display: flex; align-items: center; height: 22px; margin-top: 1px; transition: opacity .2s; }
+.nt-note[data-done] .nt-clr { opacity: .4; }
+.nt-tx { margin: 0; min-width: 0; font-size: 13.5px; line-height: 24px; white-space: pre-wrap; overflow-wrap: anywhere; cursor: text; }
 .nt-note[data-done] .nt-tx { color: var(--muted); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--fg) 35%, transparent); }
-.nt-note[data-done]::before { opacity: .45; }
-.nt-del { flex: none; width: 22px; height: 22px; margin: -2px -4px 0 0; border-radius: 999px; color: var(--faint); font-size: 18px; line-height: 1; display: grid; place-items: center; opacity: 0; transition: opacity .15s, background .15s, color .15s; }
-.nt-note:hover .nt-del, .nt-del:focus-visible { opacity: 1; }
-.nt-del:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--fg); }
-@media (hover: none) { .nt-del { opacity: 1; } }
-.nt-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
-.nt-chk { white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 8px; border-radius: 999px; font-size: 12px; color: var(--muted); transition: background .15s, color .15s; }
-.nt-chk:hover { background: var(--surface); color: var(--fg); }
-.nt-chk i { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 5px; color: transparent; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--fg) 28%, transparent); transition: background .16s, color .16s, box-shadow .16s; }
-.nt-chk[aria-pressed="true"] { color: var(--fg); }
-.nt-chk[aria-pressed="true"] i { background: var(--fg); color: var(--bg); box-shadow: inset 0 0 0 1.5px var(--fg); }
-/* al editar, el fondo sigue siendo blanco */
-.nt-ed, .nt-new textarea { font: inherit; font-size: 13.5px; line-height: 1.5; color: var(--fg); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; outline: none; resize: vertical; width: 100%; min-width: 0; }
-.nt-ed:focus, .nt-new textarea:focus { border-color: var(--fg); }
-.nt-add { align-self: flex-start; height: 34px; padding: 0 12px; border-radius: 999px; font-size: 13px; color: var(--muted); transition: background .15s, color .15s; }
-.nt-add:hover { background: var(--surface); color: var(--fg); }
-.nt-new { display: flex; flex-direction: column; gap: 10px; padding: 12px 12px 12px 18px; }
-.nt-new .nt-foot { margin-top: 0; }
+/* sobre el texto, no a su lado: así la nota usa todo el ancho de la columna */
+.nt-ctl { position: absolute; right: 0; top: 8px; display: inline-flex; gap: 2px; padding-left: 10px; background: linear-gradient(90deg, transparent, var(--bg) 10px); opacity: 0; transition: opacity .15s; }
+.nt-note:hover .nt-ctl, .nt-note:focus-within .nt-ctl { opacity: 1; }
+@media (hover: none) { .nt-ctl { opacity: 1; } }
+.nt-chk, .nt-del { width: 22px; height: 22px; border-radius: 999px; display: grid; place-items: center; color: var(--faint); transition: background .15s, color .15s, scale .18s cubic-bezier(.3,1.6,.5,1); }
+.nt-del { font-size: 18px; line-height: 1; }
+.nt-chk:hover, .nt-del:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--fg); }
+.nt-chk:active, .nt-del:active { scale: .88; }
+.nt-chk[aria-pressed="true"] { color: var(--bg); background: var(--fg); }
+.nt-chk[aria-pressed="true"]:hover { background: var(--fg); color: var(--bg); }
+/* al escribir o editar, el fondo sigue siendo blanco */
+.nt-ed, .nt-new textarea { font: inherit; font-size: 13.5px; line-height: 1.5; color: var(--fg); background: var(--bg); border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 3px 0 5px; outline: none; resize: none; width: 100%; min-width: 0; }
+.nt-ed:focus, .nt-new textarea:focus { border-bottom-color: var(--fg); }
+.nt-new { grid-template-columns: auto minmax(0, 1fr); }
+.nt-new .nt-act { grid-column: 1 / -1; padding-left: 32px; flex-wrap: nowrap; }
+.nt-new .nt-act .hm-btn { padding: 0 11px; }
+.nt-add { align-self: flex-start; height: 34px; padding: 0 12px 0 0; border-radius: 999px; font-size: 13px; color: var(--muted); transition: background .15s, color .15s; }
+.nt-add:hover { color: var(--fg); }
 .nt-act { display: flex; flex-wrap: wrap; gap: 8px; }
 .nt-act .hm-btn { height: 32px; padding: 0 12px; font-size: 12.5px; }
 @media (prefers-reduced-motion: reduce){.fx-ind,.fx-btn{transition:none}.fx-ind.hit{animation:none}}
@@ -2097,7 +2107,6 @@ $('#userBtn').addEventListener('click',function(){showView('cfg')});
      out because of the wall it was drawn on ("anyone lifting this into a
      real interface wants the listener back"); this is a real interface. */
 var ASG=(function(){
-  var FACE=28;      /* the orb in the pill */
   var PAL=[['Rosa','#ff3fb0','#b44bff'],['Azul','#18a8ff','#6a2bff'],['Verde','#2cff4f','#00e6c8'],['Rojo','#ff1f6a','#ff5a2a'],['Ámbar','#ffb020','#ff3d6a'],['Violeta','#7a5cff','#2fd3ff'],['Menta','#00d68f','#c6ff3a'],['Durazno','#ff7ac8','#ffae5c']];
   function orb(i){
     var c=PAL[i%PAL.length];
@@ -2111,7 +2120,8 @@ var ASG=(function(){
   /* o: {value:0..7, onChange(i)} */
   function make(o){
     var val=((o.value|0)%PAL.length+PAL.length)%PAL.length;
-    var root=document.createElement('div');root.className='pik clr';
+    var FACE=o.size||28;      /* the orb in the pill */
+    var root=document.createElement('div');root.className='pik clr';root.style.setProperty('--fs',FACE+'px');
     root.innerHTML='<button class="pik-pill" type="button" aria-expanded="false" aria-haspopup="listbox" aria-label="Color de la nota"><span class="pik-rail"></span>'+CHEV+'</button>'+
       '<div class="pik-card" role="listbox" aria-label="Color" hidden>'+PAL.map(function(c,i){
         return '<button class="pik-row" type="button" role="option" data-i="'+i+'" aria-selected="false"><i class="pik-av" style="'+orb(i)+'"></i><span class="pik-who"><span class="pik-name">'+c[0]+'</span></span><span class="pik-mark"><span class="pik-tick">'+TICK+'</span></span></button>'}).join('')+'</div>';
@@ -2209,10 +2219,11 @@ NT.render=function(){
     var nm=HM.cap(d.toLocaleDateString('es-MX',{weekday:'long'}));
     days+='<section class="nt-day" data-d="'+k+'"'+(k===today?' data-today':'')+'><header><span class="nt-dn">'+nm+'</span><span class="nt-dd">'+d.getDate()+'</span></header><div class="nt-list">'+
       L.map(function(n){
-        return '<article class="nt-note" data-id="'+ea(n.id)+'"'+(n.hecha?' data-done':'')+' style="--g:'+ASG.line(n.color)+'">'+
-          '<div class="nt-row"><p class="nt-tx" data-a="edit" title="Clic para editar">'+esc(n.texto)+'</p><button class="nt-del" type="button" data-a="del" aria-label="Borrar nota">×</button></div>'+
-          '<div class="nt-foot"><span class="nt-clr"></span><button class="nt-chk" type="button" data-a="done" aria-pressed="'+(!!n.hecha)+'"><i><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></i>'+'Hecha'+'</button></div></article>'}).join('')+
-      '</div>'+(NT.adding===k?'<form class="nt-new" data-d="'+k+'" style="--g:'+ASG.line(NT.newColor)+'"><textarea rows="2" maxlength="2000" placeholder="Escribe la nota…" aria-label="Nueva nota"></textarea><div class="nt-foot"><span class="nt-clr"></span></div><div class="nt-act"><button class="hm-btn dark" type="submit">Guardar</button><button class="hm-btn" type="button" data-a="cancel">Cancelar</button></div></form>':'<button class="nt-add" type="button" data-a="add">+ Agregar nota</button>')+'</section>';
+        return '<article class="nt-note" data-id="'+ea(n.id)+'"'+(n.hecha?' data-done':'')+'>'+
+          '<span class="nt-clr"></span><p class="nt-tx" data-a="edit" title="Clic para editar">'+esc(n.texto)+'</p>'+
+          '<span class="nt-ctl"><button class="nt-chk" type="button" data-a="done" aria-pressed="'+(!!n.hecha)+'" aria-label="'+(n.hecha?'Marcar como pendiente':'Marcar como hecha')+'" title="'+(n.hecha?'Hecha':'Marcar hecha')+'"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>'+
+          '<button class="nt-del" type="button" data-a="del" aria-label="Borrar nota" title="Borrar">×</button></span></article>'}).join('')+
+      '</div>'+(NT.adding===k?'<form class="nt-new" data-d="'+k+'"><span class="nt-clr"></span><textarea rows="2" maxlength="2000" placeholder="Escribe la nota…" aria-label="Nueva nota"></textarea><div class="nt-act"><button class="hm-btn dark" type="submit">Guardar</button><button class="hm-btn" type="button" data-a="cancel">Cancelar</button></div></form>':'<button class="nt-add" type="button" data-a="add">+ Agregar nota</button>')+'</section>';
   }
   var n=NT.rows.length,hechas=NT.rows.filter(function(x){return x.hecha}).length;
   body.innerHTML='<div class="ad-head"><div><h2>Notas</h2><p>'+esc(NT.range())+(n?' · '+n+(n===1?' nota':' notas')+' · '+hechas+(hechas===1?' hecha':' hechas'):'')+'</p></div>'+
@@ -2221,12 +2232,13 @@ NT.render=function(){
   /* el selector de color de cada nota */
   $$('.nt-note',body).forEach(function(el){
     var row=NT.rows.filter(function(r){return r.id===el.dataset.id})[0];if(!row)return;
-    var a=ASG.make({value:row.color,onChange:function(c){el.style.setProperty('--g',ASG.line(c));NT.setColor(row,c)}});
+    var a=ASG.make({value:row.color,size:22,onChange:function(c){NT.setColor(row,c)}});
     el.querySelector('.nt-clr').appendChild(a.el);
+    if(row.hecha)el.style.setProperty('--dim','.45');
   });
   var nf=$('.nt-new',body);
   if(nf){
-    var a2=ASG.make({value:NT.newColor,onChange:function(c){NT.newColor=c;nf.style.setProperty('--g',ASG.line(c))}});
+    var a2=ASG.make({value:NT.newColor,size:22,onChange:function(c){NT.newColor=c}});
     $('.nt-clr',nf).appendChild(a2.el);$('textarea',nf).focus();
   }
 };
