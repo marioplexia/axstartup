@@ -1628,6 +1628,67 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .eyt-body { fill: var(--fill-slab, #ffffff); transition: fill .2s; }
 
 .eyt-eye { fill: var(--fill-on, #0b0b0d); }
+/* ══ Expediente a pantalla completa + Upload dropzone ═════
+   (Bencho · MIT · bencho.dev/licence.) Adapted to vanilla JS and to REAL
+   files: the box takes a drag from the computer or a click to browse.
+   TOKENS, mapped on the component's own root so nothing leaks:
+     --fill-slab → --card · --fill-on, --ink → --fg · --pane-edge → --line
+     --font-ui → --f-ui · --signal → the app's blue · --ok → its green
+     --fill-on-rgb, --ink-rgb → three bare numbers (rgba is built from them) */
+.xd{
+  --fill-slab: var(--surface);
+  --fill-on: var(--fg);
+  --ink: var(--fg);
+  --fill-on-rgb: 22, 22, 22;
+  --ink-rgb: 22, 22, 22;
+  --pane-edge: var(--line);
+  --font-ui: var(--f-ui);
+  --signal: #2231dd;
+  --ok: #15803d;
+  position:fixed;inset:0;z-index:900;overflow:auto;background:var(--bg);color:var(--fill-on);font-family:var(--font-ui);
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);animation:xd-in 260ms cubic-bezier(.24,1.2,.38,1) both}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .xd{--fill-on-rgb:237,237,235;--ink-rgb:237,237,235;--signal:#6b79ff;--ok:#4ac17b}}
+:root[data-theme="dark"] .xd{--fill-on-rgb:237,237,235;--ink-rgb:237,237,235;--signal:#6b79ff;--ok:#4ac17b}
+@keyframes xd-in{from{opacity:0;translate:0 14px}}
+.xd-in{max-width:1040px;margin:0 auto;padding:24px 24px 56px}
+.xd-top{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.xd-back{flex:none;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--card-line);background:var(--card);color:inherit;font:500 13px var(--font-ui);cursor:pointer}
+.xd-back:hover{background:var(--hover)}
+.xd-top h2{margin:0;font-size:22px;font-weight:600;letter-spacing:-.01em}
+.xd-top p{margin:2px 0 0;font-size:13px;color:color-mix(in srgb,var(--fill-on) 52%,var(--bg))}
+.xd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.xd-sec{display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
+.xd-sec h3{margin:0;font-size:14px;font-weight:600}
+.xd-zone{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;height:132px;padding:0 16px;border-radius:14px;
+  background:var(--fill-slab);cursor:pointer;text-align:center;outline:none;
+  transition:scale 420ms cubic-bezier(.24,1.34,.38,1),background-color 220ms ease}
+/* a file over it and it grows, with a bounce */
+.xd-zone[data-over]{scale:1.02}
+.xd-zone:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.xd-icon{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;
+  background:color-mix(in srgb,var(--fill-on) 6%,var(--fill-slab));color:color-mix(in srgb,var(--fill-on) 72%,var(--fill-slab));
+  transition:translate 420ms cubic-bezier(.24,1.34,.38,1)}
+.xd-zone[data-over] .xd-icon{translate:0 -4px;color:var(--fill-on)}
+.xd-say{display:flex;flex-direction:column;gap:3px;font-size:13px}
+.xd-say b{font-weight:500}
+.xd-say span{font-size:12px;color:color-mix(in srgb,var(--fill-on) 52%,var(--fill-slab))}
+.xd-zone[data-refuse] .xd-say b{color:#e5484d}
+.xd-zone[data-refuse]{animation:xd-shake 420ms}
+@keyframes xd-shake{20%{translate:-7px 0}40%{translate:6px 0}60%{translate:-4px 0}80%{translate:2px 0}}
+.xd-list{display:flex;flex-direction:column;gap:8px}
+.xd-row{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:12px;background:var(--fill-slab);animation:xd-land 420ms cubic-bezier(.3,1.5,.4,1) both}
+@keyframes xd-land{from{opacity:0;scale:.85;translate:0 10px}}
+.xd-ext{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--signal);color:#fff;font:600 9.5px var(--font-ui)}
+.xd-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.xd-name{overflow:hidden;font-size:13px;font-weight:500;white-space:nowrap;text-overflow:ellipsis;background:none;border:0;padding:0;color:inherit;text-align:left;font-family:inherit}
+button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
+.xd-meta{font-size:12px;font-variant-numeric:tabular-nums;color:color-mix(in srgb,var(--fill-on) 52%,var(--fill-slab))}
+.xd-meta.err{color:#e5484d}
+.xd-track{height:4px;overflow:hidden;border-radius:2px;background:color-mix(in srgb,var(--fill-on) 10%,var(--fill-slab))}
+.xd-bar{height:100%;border-radius:inherit;background:var(--signal);transform-origin:left center;transition:transform 200ms ease}
+.xd-tick{flex:none;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff;font-size:12px;animation:xd-pop 380ms cubic-bezier(.3,1.6,.4,1) both}
+@keyframes xd-pop{from{scale:0}}
+@media (prefers-reduced-motion: reduce){.xd,.xd-row,.xd-tick,.xd-zone{animation:none;transition:none}}
 </style>
 
 <div class="app" id="app" data-sb="open">
@@ -1754,6 +1815,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
         <div class="nod-grid" id="exList"></div>
       </div>
     </section>
+    <div class="xd" id="exDoc" hidden role="dialog" aria-modal="true" aria-label="Expediente"></div>
     <section class="admin" id="viewBit" hidden>
       <div class="ad-in">
         <div class="ad-head">
@@ -5164,6 +5226,94 @@ document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('[data-id]');EX.resolve(row.dataset.id,b.dataset.r==='ok');return}
 });
 $('#exQ').addEventListener('input',function(){EX.q=this.value;EX.render()});
+
+/* ══ Expediente a pantalla completa ═══════════════════════
+   Al hacer clic en una tarjeta de PREA se abre su expediente: una zona para
+   subir cada documento desde la computadora (arrastrando o con clic). Los
+   archivos van a Supabase Storage, bucket "expedientes-docs", en la ruta
+   <expediente>/<tipo>/<archivo>. */
+var XD={cur:null,B:'expedientes-docs',MAX:20,
+  DOCS:[['contrato','Contrato firmado'],['piezas','Piezas'],['evidencia','Evidencia de la PREA, campaña o servicio'],['factura','Factura'],['planta','Transacción de planta']]};
+XD.fmt=function(b){return b>=1e6?(b/1e6).toFixed(1)+' MB':Math.max(1,Math.round(b/1e3))+' KB'};
+XD.ext=function(n){var m=/\.([a-z0-9]{1,4})$/i.exec(n);return m?m[1].toUpperCase():'ARCH'};
+XD.rowHtml=function(o){
+  return '<div class="xd-row"'+(o.id?' id="'+o.id+'"':'')+'><span class="xd-ext">'+esc(XD.ext(o.name))+'</span><span class="xd-txt">'+
+    (o.path?'<button type="button" class="xd-name" data-xdopen="'+ea(o.path)+'">'+esc(o.name)+'</button>':'<span class="xd-name">'+esc(o.name)+'</span>')+
+    '<span class="xd-meta">'+esc(o.meta||'')+'</span>'+(o.bar?'<span class="xd-track"><span class="xd-bar" style="transform:scaleX(0)"></span></span>':'')+'</span>'+
+    (o.ok?'<span class="xd-tick">✓</span>':'')+'</div>'};
+XD.open=function(id){
+  var x=EX.rows.filter(function(r){return r.id===id})[0];if(!x)return;
+  XD.cur=x;var el=$('#exDoc');
+  el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
+    '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div></div>'+
+    '<div class="xd-grid">'+XD.DOCS.map(function(d){
+      return '<section class="xd-sec" data-k="'+d[0]+'"><h3>'+esc(d[1])+'</h3>'+
+        '<div class="xd-zone" tabindex="0" role="button" aria-label="Subir '+ea(d[1])+'"><span class="xd-icon" aria-hidden="true">'+
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
+        '<span class="xd-say"><b>Arrastra un archivo aquí</b><span>o haz clic · hasta '+XD.MAX+' MB</span></span>'+
+        '<input type="file" multiple hidden></div><div class="xd-list"></div></section>'}).join('')+'</div></div>';
+  el.hidden=false;document.body.style.overflow='hidden';el.scrollTop=0;
+  $('.xd-back',el).focus();
+  XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
+};
+XD.close=function(){$('#exDoc').hidden=true;document.body.style.overflow='';XD.cur=null};
+XD.sec=function(k){return $('#exDoc .xd-sec[data-k="'+k+'"]')};
+/* lo ya subido */
+XD.load=async function(id,k){
+  if(!SB.c)return;
+  var r=await SB.c.storage.from(XD.B).list(id+'/'+k,{limit:100,sortBy:{column:'created_at',order:'desc'}});
+  if(r.error||!XD.cur||XD.cur.id!==id)return;
+  var ls=$('.xd-list',XD.sec(k));
+  ls.innerHTML=(r.data||[]).filter(function(f){return f.name&&f.name!=='.emptyFolderPlaceholder'}).map(function(f){
+    return XD.rowHtml({name:f.name.replace(/^\d+_/,''),path:id+'/'+k+'/'+f.name,meta:XD.fmt((f.metadata&&f.metadata.size)||0)+' · Subido',ok:true})}).join('');
+};
+XD.refuse=function(k,msg){
+  var z=$('.xd-zone',XD.sec(k)),b=$('.xd-say b',z),old='Arrastra un archivo aquí';
+  z.removeAttribute('data-refuse');void z.offsetWidth;z.setAttribute('data-refuse','');b.textContent=msg;
+  setTimeout(function(){z.removeAttribute('data-refuse');b.textContent=old},1800);
+};
+XD.send=async function(k,file){
+  var x=XD.cur;if(!x)return;
+  if(file.size>XD.MAX*1e6){XD.refuse(k,'Pesa más de '+XD.MAX+' MB');return}
+  var ls=$('.xd-list',XD.sec(k)),rid='xdr'+Date.now()+Math.floor(Math.random()*1e3);
+  ls.insertAdjacentHTML('afterbegin',XD.rowHtml({id:rid,name:file.name,meta:XD.fmt(file.size)+' · Subiendo 0%',bar:true}));
+  var row=document.getElementById(rid),bar=$('.xd-bar',row),meta=$('.xd-meta',row),p=0;
+  /* supabase-js no reporta avance: sube hacia 90% y cierra al terminar */
+  var iv=setInterval(function(){p+=(0.9-p)*0.08;bar.style.transform='scaleX('+p+')';meta.textContent=XD.fmt(file.size)+' · Subiendo '+Math.round(p*100)+'%'},120);
+  var path=x.id+'/'+k+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]+/g,'_');
+  var r;try{r=await SB.c.storage.from(XD.B).upload(path,file,{contentType:file.type||undefined})}catch(e){r={error:e}}
+  clearInterval(iv);
+  if(r.error){
+    row.querySelector('.xd-track').remove();meta.className='xd-meta err';
+    meta.textContent=/bucket/i.test(r.error.message||'')?'Falta crear el bucket "'+XD.B+'" en Supabase Storage':'No se pudo subir: '+((r.error.message)||'error');
+    return;
+  }
+  bar.style.transform='scaleX(1)';meta.textContent=XD.fmt(file.size)+' · Subido';
+  setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>');
+    var nm=row.querySelector('.xd-name');nm.outerHTML='<button type="button" class="xd-name" data-xdopen="'+ea(path)+'">'+esc(file.name)+'</button>'},350);
+};
+XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k,f)})};
+document.addEventListener('click',function(e){
+  var t=e.target;if(!t.closest)return;
+  if(t.closest('[data-xdclose]')){XD.close();return}
+  var o=t.closest('[data-xdopen]');
+  if(o){SB.c.storage.from(XD.B).createSignedUrl(o.dataset.xdopen,300).then(function(r){if(r.data&&r.data.signedUrl)window.open(r.data.signedUrl,'_blank','noopener');else toast('No pude abrir el archivo')});return}
+  var z=t.closest('#exDoc .xd-zone');if(z){if(t.tagName!=='INPUT')$('input',z).click();return}
+  /* la tarjeta del expediente (no sus botones) */
+  var c=t.closest('#exList .nod');if(c&&EX.f==='prea'&&!t.closest('.nod-act')&&c.dataset.id)XD.open(c.dataset.id);
+});
+document.addEventListener('change',function(e){
+  var i=e.target;if(!i.matches||!i.matches('#exDoc input[type=file]'))return;
+  XD.take(i.closest('.xd-sec').dataset.k,i.files);i.value='';
+});
+['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#exDoc .xd-zone');if(!z)return;e.preventDefault();z.setAttribute('data-over','')})});
+document.addEventListener('dragleave',function(e){var z=e.target.closest&&e.target.closest('#exDoc .xd-zone');if(z&&!z.contains(e.relatedTarget))z.removeAttribute('data-over')});
+document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.closest('#exDoc .xd-zone');if(!z)return;e.preventDefault();z.removeAttribute('data-over');XD.take(z.closest('.xd-sec').dataset.k,e.dataTransfer.files)});
+document.addEventListener('keydown',function(e){
+  if(XD.cur&&e.key==='Escape'){XD.close();return}
+  var z=e.target.closest&&e.target.closest('#exDoc .xd-zone');if(z&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('input',z).click()}
+  var c=e.target.classList&&e.target.classList.contains('nod')&&e.target.closest('#exList');if(c&&e.key==='Enter'&&EX.f==='prea')XD.open(e.target.dataset.id);
+});
 SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='axl-msg'+(t?' on':'')+(t&&err?' err':'')};
 SB.lgMode=function(m){
   SB.mode=m;var up=m==='up';
