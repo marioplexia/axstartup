@@ -165,7 +165,15 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .ai-col{min-width:0;flex:1}
 .ai-body{font-size:15px;line-height:1.7;overflow-wrap:anywhere}
 .ai-body p{margin:0 0 14px}
-.ai-body p:last-child,.ai-body ol:last-child,.ai-body blockquote:last-child{margin-bottom:0}
+.ai-body p:last-child,.ai-body ol:last-child,.ai-body ul:last-child,.ai-body blockquote:last-child{margin-bottom:0}
+.ai-body ul{margin:0 0 14px;padding-left:22px}
+.ai-body h4.md-h{margin:22px 0 8px;font:inherit;font-weight:600;color:inherit;display:flex;align-items:center;gap:9px;line-height:1.35}
+.ai-body h4.md-h::before{content:"";flex:none;width:3px;height:1.05em;border-radius:2px;background:#2a6df4}
+.ai-body>h4.md-h:first-child{margin-top:2px}
+.ai-body h4.md-h+ul,.ai-body h4.md-h+ol,.ai-body h4.md-h+p,.ai-body h4.md-h+blockquote{margin-top:0}
+.ai-body hr.md-hr{border:0;border-top:1px solid var(--card-line);margin:18px 0}
+.ai-body ul li::marker,.ai-body ol li::marker{color:var(--muted)}
+.ai-body em{font-style:italic}
 .ai-body ol{margin:0 0 14px;padding-left:22px}
 .ai-body li{margin-bottom:6px;padding-left:2px}
 .ai-body blockquote{margin:0 0 14px;padding:2px 0 2px 14px;border-left:2px solid var(--card-line);color:var(--muted)}
@@ -1406,16 +1414,32 @@ threadIn.addEventListener('click',function(e){
 function inl(s){
   s=esc(s);
   if((s.match(/\*\*/g)||[]).length%2){var i=s.lastIndexOf('**');s=s.slice(0,i)+s.slice(i+2)}
-  return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  return s.replace(/(^|[\s("«])\*([^*\s][^*]*?)\*(?=[\s).,;:!?"»]|$)/g,'$1<em>$2</em>');
 }
 function md(src,caret){
-  var blocks=src.replace(/\s+$/,'').split(/\n{2,}/).filter(Boolean),ch=caret?'<span class="caret"></span>':'';
-  return blocks.map(function(b,i){
-    var last=i===blocks.length-1,c=last?ch:'',ls=b.split('\n');
-    if(ls.every(function(l){return /^>\s?/.test(l)}))return '<blockquote>'+inl(ls.map(function(l){return l.replace(/^>\s?/,'')}).join(' '))+c+'</blockquote>';
-    if(ls.every(function(l){return /^\d+\.(\s|$)/.test(l)}))return '<ol>'+ls.map(function(l,j){return '<li>'+inl(l.replace(/^\d+\.\s?/,''))+(last&&j===ls.length-1?c:'')+'</li>'}).join('')+'</ol>';
-    return '<p>'+inl(ls.join(' '))+c+'</p>';
-  }).join('');
+  var ch=caret?'<span class="caret"></span>':'',out=[];
+  var blocks=String(src||'').replace(/\s+$/,'').split(/\n{2,}/).filter(Boolean);
+  blocks.forEach(function(b){
+    var ls=b.split('\n'),i=0;
+    while(i<ls.length){
+      var l=ls[i],m;
+      if((m=l.match(/^\s{0,3}#{1,4}\s+(.*)$/))){out.push('<h4 class="md-h">'+inl(m[1].replace(/\s*#+\s*$/,''))+'</h4>');i++;continue}
+      if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(l)){out.push('<hr class="md-hr">');i++;continue}
+      if(/^>\s?/.test(l)){var q=[];while(i<ls.length&&/^>\s?/.test(ls[i])){q.push(ls[i].replace(/^>\s?/,''));i++}out.push('<blockquote>'+inl(q.join(' '))+'</blockquote>');continue}
+      if(/^\s*(?:[-*•–]|•)\s+/.test(l)){var u=[];while(i<ls.length&&/^\s*(?:[-*•–]|•)\s+/.test(ls[i])){u.push(ls[i].replace(/^\s*(?:[-*•–]|•)\s+/,''));i++}out.push('<ul>'+u.map(function(t){return '<li>'+inl(t)+'</li>'}).join('')+'</ul>');continue}
+      if(/^\s*\d+[.)](\s|$)/.test(l)){var o=[];while(i<ls.length&&/^\s*\d+[.)](\s|$)/.test(ls[i])){o.push(ls[i].replace(/^\s*\d+[.)]\s?/,''));i++}out.push('<ol>'+o.map(function(t){return '<li>'+inl(t)+'</li>'}).join('')+'</ol>');continue}
+      var pr=[];
+      while(i<ls.length&&!/^\s{0,3}#{1,4}\s+/.test(ls[i])&&!/^>\s?/.test(ls[i])&&!/^\s*(?:[-*•–]|•)\s+/.test(ls[i])&&!/^\s*\d+[.)](\s|$)/.test(ls[i])&&!/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(ls[i])){pr.push(ls[i]);i++}
+      if(pr.length)out.push('<p>'+inl(pr.join(' '))+'</p>');
+    }
+  });
+  if(ch){
+    if(!out.length)return ch;
+    var k=out.length-1,e=out[k],t=/<\/(ul|ol)>$/.test(e)?e.lastIndexOf('</li>'):e.lastIndexOf('</');
+    out[k]=t>0?e.slice(0,t)+ch+e.slice(t):e+ch;
+  }
+  return out.join('');
 }
 
 /* ---------- Simulación del agente en el portal ---------- */
