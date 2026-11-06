@@ -728,6 +728,12 @@ Deno.serve(async (req) => {
   };
   return await corrida.run(run, async () => {
 
+  /* un asesor sube una PREA que ya existe en planta: se lee el documento (sin guardar nada; la pantalla crea el expediente) */
+  if (body.mode === "importar_prea") {
+    const r = await extraer({ kind: "prea", file: body.file });
+    return respond(r.body, r.status);
+  }
+
   if (body.mode === "extraer" || body.mode === "probar") {
     const { data: prof } = await sb.from("profiles").select("role").eq("id", u.user.id).single();
     if (!prof || (prof.role !== "marca" && prof.role !== "admin")) return respond({ error: "forbidden" }, 403);
