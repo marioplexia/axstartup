@@ -5922,7 +5922,7 @@ TR.cardPago=function(it){
   var d=it.d,N=function(n){return d[n]!=null&&d[n]!==''?d[n]:''},I=function(n,l){return '<div><label>'+l+'</label><input inputmode="decimal" data-f="'+n+'" value="'+ea(N(n))+'" placeholder="0.00"></div>'};
   var split=Number(d.labor_pagada||0)+Number(d.piezas_pagadas||0)>0;
   return '<div class="tr-card"><div class="tr-h"><b>'+esc(d.folio||it.name)+'</b><span class="tr-badge aceptada">Pago de planta</span><small>'+esc(it.name)+(d.confianza!=null?' · lectura '+Math.round(Number(d.confianza)*100)+'%':'')+'</small></div>'+
-    '<div class="tr-grid"><div><span>Orden</span>'+esc(d.orden||'—')+'</div><div><span>Sistema</span>'+esc(d.sistema||'—')+'</div><div><span>Operación</span>'+esc(d.operacion||'—')+'</div><div><span>Vehículo</span>'+esc(TR.veh(d)||'—')+'</div><div><span>Fecha de pago</span>'+esc(d.fecha_pago||'—')+'</div><div><span>Referencia</span>'+esc(d.referencia||'—')+'</div></div>'+
+    '<div class="tr-grid"><div><span>Orden</span>'+esc(d.orden||'—')+'</div><div><span>Sistema</span>'+esc(d.sistema||'—')+'</div><div><span>Operación</span>'+esc((d.operacion||'—')+(d.operacion_desc?' · '+d.operacion_desc:''))+'</div><div><span>Tiempo</span>'+esc(d.horas!=null&&d.horas!==''?d.horas+' h':'—')+'</div><div><span>Pieza</span>'+esc(d.numero_parte?d.numero_parte+(d.pieza?' · '+d.pieza:'')+(d.cantidad>1?' ×'+d.cantidad:''):'—')+'</div><div><span>Vehículo</span>'+esc(TR.veh(d)||'—')+'</div><div><span>Fecha de pago</span>'+esc(d.fecha_pago||'—')+'</div><div><span>Referencia</span>'+esc(d.referencia||'—')+'</div></div>'+
     '<div class="tr-amt">'+I('labor_reclamada','Mano de obra reclamada')+I('piezas_reclamadas','Piezas reclamadas')+I('labor_pagada','Mano de obra pagada')+I('piezas_pagadas','Piezas pagadas')+'</div>'+
     (split?'':'<div class="tr-note warn"><b>Falta el desglose:</b> el comprobante no separa mano de obra y piezas pagadas. Captúralo para que el agente pueda aprender de este pago.</div>')+
     (d.reclamado_igual?'<div class="tr-note"><b>Reclamado = pagado:</b> la transacción aceptada de planta se tomó como lo reclamado (planta pagó el 100%). Cámbialo si no fue así.</div>':'')+
@@ -5942,7 +5942,7 @@ TR.renderQ=function(k){
 /* el agente busca en este texto: lleva también el nombre del archivo (p. ej. CARPLAY.pdf) y las lecciones,
    o una pregunta con la palabra del archivo no encontraba nada */
 TR.search=function(k,d,name){
-  var v=TR.veh(d),a=[d.folio,d.orden,v,d.sistema,d.operacion&&d.operacion.code||d.operacion,d.operacion&&d.operacion.desc,d.queja&&d.queja.code,d.queja&&d.queja.desc,d.causa&&d.causa.desc,d.correccion&&d.correccion.desc,d.estado,d.motivo_resolucion,d.referencia,String(name||'').replace(/\.[a-z0-9]{2,4}$/i,'').replace(/[_\-]+/g,' '),d.como_se_lleno,d.errores_y_correcciones,d.lecciones];
+  var v=TR.veh(d),a=[d.folio,d.orden,v,d.sistema,d.operacion&&d.operacion.code||d.operacion,d.operacion&&d.operacion.desc,d.queja&&d.queja.code,d.queja&&d.queja.desc,d.causa&&d.causa.desc,d.correccion&&d.correccion.desc,d.estado,d.motivo_resolucion,d.referencia,d.numero_parte,d.pieza,d.operacion_desc,String(name||'').replace(/\.[a-z0-9]{2,4}$/i,'').replace(/[_\-]+/g,' '),d.como_se_lleno,d.errores_y_correcciones,d.lecciones];
   (d.piezas||[]).forEach(function(p){a.push(p.no,p.d)});(d.comentarios||[]).forEach(function(c){a.push(c.texto)});
   return norm(a.filter(Boolean).join(' ')).slice(0,6000);
 };
@@ -5960,6 +5960,16 @@ TR.save=async function(k,id){
       try{await CB.get()}catch(_){}
       var rl=ph.labor_reclamada>0?Math.round(100*ph.labor_pagada/ph.labor_reclamada):null,rp=ph.piezas_reclamadas>0?Math.round(100*ph.piezas_pagadas/ph.piezas_reclamadas):null;
       msg='Pago aprendido: planta pagó '+(rl!=null?rl+'% de la mano de obra':money(ph.labor_pagada)+' de mano de obra')+' y '+(rp!=null?rp+'% de las piezas':money(ph.piezas_pagadas)+' de piezas')+'. El Agente de Cobros ya lo usa.';
+      /* lo que el agente aprende de este pago: operación, tiempo y pieza → qué se reclamó y qué pagó planta */
+      if(d.operacion&&(Number(d.horas)>0||d.numero_parte)){
+        var hs=Number(d.horas)>0?Number(d.horas):null,tp=ph.labor_reclamada+ph.piezas_reclamadas>0?Math.round(100*(ph.labor_pagada+ph.piezas_pagadas)/(ph.labor_reclamada+ph.piezas_reclamadas)):null;
+        var lecP={tipo:'tiempo',origen:'pdf',vehiculo:(TR.veh(d)||'').replace(/\b[A-HJ-NPR-Z0-9]{17}\b/g,'').trim()||null,
+          texto:'La operación '+d.operacion+(d.operacion_desc?' ('+d.operacion_desc+')':'')+(hs?' se reclamó con '+hs+' h de mano de obra':' se reclamó')+(d.numero_parte?' y la pieza '+d.numero_parte+(d.pieza?' ('+d.pieza+')':'')+(d.cantidad>1?' ×'+d.cantidad:''):'')+': mano de obra '+money(ph.labor_reclamada)+' y piezas '+money(ph.piezas_reclamadas)+'; planta pagó '+money(ph.labor_pagada)+' y '+money(ph.piezas_pagadas)+(tp!=null?' ('+tp+'% de lo reclamado)':'')+'.',
+          contexto:{operacion:String(d.operacion).slice(0,60),sistema:d.sistema?String(d.sistema).slice(0,60):undefined,pieza:d.pieza?String(d.pieza).slice(0,60):undefined},
+          efecto:Object.assign({},hs?{horas:hs}:{},d.numero_parte?{piezas_agregar:[{no:String(d.numero_parte).slice(0,30),d:String(d.pieza||d.numero_parte).slice(0,80),q:Math.max(1,Math.min(20,Number(d.cantidad)||1))}]}:{})};
+        var li2=await SB.c.from('reglas_lecciones').insert({rule_id:null,tipo:lecP.tipo,texto:lecP.texto,vehiculo:lecP.vehiculo,origen:lecP.origen,contexto:lecP.contexto,efecto:Object.keys(lecP.efecto).length?lecP.efecto:null});
+        if(li2.error)SB.fail(li2.error);else msg+=' <br>Aprendió la operación <b>'+esc(d.operacion)+'</b>'+(hs?' con <b>'+hs+' h</b>':'')+(d.numero_parte?' y la pieza <b>'+esc(d.numero_parte)+'</b>':'')+'.';
+      }
       row={kind:'pago',folio:d.folio||null,wo:d.orden||null,file_name:it.name,vehiculo:TR.veh(d)||null,sys:d.sistema||null,op:d.operacion||null,resultado:'pagada',resumen:(d.sistema||'Pago')+' '+(d.operacion||'')+': reclamado '+money(ph.labor_reclamada+ph.piezas_reclamadas)+', pagado '+money(ph.labor_pagada+ph.piezas_pagadas)+(d.ajustes?'. Ajustes: '+d.ajustes:''),lecciones:d.lecciones||null,datos:d,busqueda:TR.search(k,d,it.name)};
     }else{
       var lr=null,est=d.estado||'desconocido',rule=TR.ruleFor(d),dup=d.folio?TR.lib.prea.filter(function(x){return x.folio===d.folio})[0]:null;
