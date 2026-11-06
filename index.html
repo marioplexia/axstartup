@@ -5885,7 +5885,8 @@ TR.pump=async function(k){
       it.started=true;
       try{
         var f=await TR.prep(it.file);
-        var r=await SB.ai({modo:'extraer',kind:k,file:f},'aprender');
+        /* los pagos se leen con la función "ai" (instrucciones para "Ver Transacción"); las PREAs siguen en "aprender" */
+        var r=k==='pago'?await SB.ai({mode:'extraer',kind:k,file:f}):await SB.ai({modo:'extraer',kind:k,file:f},'aprender');
         var d=r&&r.datos;if(!d)throw new Error('bad_output');
         if(k==='prea'&&d.es_prea===false){it.state='error';it.err='No parece una PREA'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
         else if(k==='pago'&&d.es_pago===false){it.state='error';it.err='No parece un pago de planta'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
