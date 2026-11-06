@@ -5889,7 +5889,11 @@ TR.pump=async function(k){
         var d=r&&r.datos;if(!d)throw new Error('bad_output');
         if(k==='prea'&&d.es_prea===false){it.state='error';it.err='No parece una PREA'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
         else if(k==='pago'&&d.es_pago===false){it.state='error';it.err='No parece un pago de planta'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
-        else{it.state='listo';it.d=d}
+        else{
+          /* una transacción aceptada de planta no trae "reclamado": se toma igual a lo pagado (planta pagó lo reclamado) */
+          if(k==='pago'&&!(Number(d.labor_reclamada||0)+Number(d.piezas_reclamadas||0)>0)&&Number(d.labor_pagada||0)+Number(d.piezas_pagadas||0)>0){d.labor_reclamada=Number(d.labor_pagada)||0;d.piezas_reclamadas=Number(d.piezas_pagadas)||0;d.reclamado_igual=true}
+          it.state='listo';it.d=d
+        }
       }catch(e){it.state='error';it.err=TR.errTxt(e)}
       TR.renderQ(k);
     }
@@ -5920,7 +5924,8 @@ TR.cardPago=function(it){
     '<div class="tr-grid"><div><span>Orden</span>'+esc(d.orden||'—')+'</div><div><span>Sistema</span>'+esc(d.sistema||'—')+'</div><div><span>Operación</span>'+esc(d.operacion||'—')+'</div><div><span>Vehículo</span>'+esc(TR.veh(d)||'—')+'</div><div><span>Fecha de pago</span>'+esc(d.fecha_pago||'—')+'</div><div><span>Referencia</span>'+esc(d.referencia||'—')+'</div></div>'+
     '<div class="tr-amt">'+I('labor_reclamada','Mano de obra reclamada')+I('piezas_reclamadas','Piezas reclamadas')+I('labor_pagada','Mano de obra pagada')+I('piezas_pagadas','Piezas pagadas')+'</div>'+
     (split?'':'<div class="tr-note warn"><b>Falta el desglose:</b> el comprobante no separa mano de obra y piezas pagadas. Captúralo para que el agente pueda aprender de este pago.</div>')+
-    (Number(d.labor_reclamada||0)+Number(d.piezas_reclamadas||0)>0?'':'<div class="tr-note"><b>Solo trae lo pagado:</b> se guarda como ejemplo de lo que paga planta. No entra al promedio de porcentajes porque no hay reclamado.</div>')+
+    (d.reclamado_igual?'<div class="tr-note"><b>Reclamado = pagado:</b> la transacción aceptada de planta se tomó como lo reclamado (planta pagó el 100%). Cámbialo si no fue así.</div>':'')+
+    (Number(d.labor_reclamada||0)+Number(d.piezas_reclamadas||0)>0?'':'<div class="tr-note"><b>Reclamado:</b> no aparece en el documento; captúralo si es distinto de lo pagado.</div>')+
     (d.ajustes?'<div class="tr-note"><b>Ajustes de planta:</b> '+esc(d.ajustes)+'</div>':'')+(d.lecciones?'<div class="tr-note"><b>Lección:</b> '+esc(d.lecciones)+'</div>':'')+
     '<div class="tr-act"><button class="bt pri" type="button" data-tr="save" data-id="'+it.id+'">Enseñar al agente</button><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Descartar</button></div></div>';
 };
