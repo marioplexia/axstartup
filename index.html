@@ -1807,6 +1807,10 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 @keyframes gt-in{from{opacity:0;translate:0 10px}}
 .stage[data-gate="on"] #composer,.stage[data-gate="on"] #chips{display:none}
 .gt-hint{margin:0;font-size:13px;color:var(--muted);text-align:center}
+.gt-row .go.alt{background:var(--card);color:var(--fg);border:1px solid var(--card-line)}
+.gt-row .go.alt:hover{background:var(--hover)}.gt-row .go[disabled]{opacity:.55;cursor:progress}
+#gtOrig .gt-row .go{flex:1;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.gt-upst{margin:0;font-size:13px;color:var(--muted);text-align:center;max-width:440px;min-height:0}.gt-upst:empty{display:none}.gt-upst.bad{color:#c0392b}
 .gt-ord{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:360px}
 .gt-tipo{display:inline-flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--card-line);font:500 13px var(--f-ui)}
 .gt-tipo button,.gt-tag button{border:0;background:none;color:var(--muted);font:12px var(--f-ui);cursor:pointer;padding:2px 6px;border-radius:999px}
@@ -1914,6 +1918,13 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
             <div class="gt-row"><input id="gtIn" autocomplete="off" placeholder="Número de orden, ej. GA4043" aria-label="Número de orden"><button class="go" type="submit">Continuar</button></div>
             <p class="gt-err" id="gtErr" role="alert"></p>
           </form>
+          <div class="gt-ord" id="gtOrig" hidden>
+            <span class="gt-tipo"><span>PREA</span><button type="button" id="gtOrigBack" aria-label="Cambiar tipo">Cambiar</button></span>
+            <div class="gt-row"><button class="go" type="button" id="gtNew">Nueva</button><button class="go alt" type="button" id="gtUp">Ya existe · subir PDF</button></div>
+            <p class="gt-hint">Si ya la tienes avanzada en planta, sube su PDF y la agrego a tu tablero</p>
+            <input type="file" id="gtUpIn" accept="application/pdf,image/*" multiple hidden>
+            <p class="gt-upst" id="gtUpSt" role="status" aria-live="polite"></p>
+          </div>
         </div>
         <div class="composer rise d1" id="composer">
           <div class="c-head">
@@ -5885,11 +5896,16 @@ TR.pump=async function(k){
       it.started=true;
       try{
         var f=await TR.prep(it.file);
-        var r=await SB.ai({modo:'extraer',kind:k,file:f},'aprender');
+        /* los pagos se leen con la función "ai" (instrucciones para "Ver Transacción"); las PREAs siguen en "aprender" */
+        var r=k==='pago'?await SB.ai({mode:'extraer',kind:k,file:f}):await SB.ai({modo:'extraer',kind:k,file:f},'aprender');
         var d=r&&r.datos;if(!d)throw new Error('bad_output');
         if(k==='prea'&&d.es_prea===false){it.state='error';it.err='No parece una PREA'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
         else if(k==='pago'&&d.es_pago===false){it.state='error';it.err='No parece un pago de planta'+(d.motivo_invalido?': '+d.motivo_invalido:'.')}
-        else{it.state='listo';it.d=d}
+        else{
+          /* una transacción aceptada de planta no trae "reclamado": se toma igual a lo pagado (planta pagó lo reclamado) */
+          if(k==='pago'&&!(Number(d.labor_reclamada||0)+Number(d.piezas_reclamadas||0)>0)&&Number(d.labor_pagada||0)+Number(d.piezas_pagadas||0)>0){d.labor_reclamada=Number(d.labor_pagada)||0;d.piezas_reclamadas=Number(d.piezas_pagadas)||0;d.reclamado_igual=true}
+          it.state='listo';it.d=d
+        }
       }catch(e){it.state='error';it.err=TR.errTxt(e)}
       TR.renderQ(k);
     }
@@ -5917,9 +5933,11 @@ TR.cardPago=function(it){
   var d=it.d,N=function(n){return d[n]!=null&&d[n]!==''?d[n]:''},I=function(n,l){return '<div><label>'+l+'</label><input inputmode="decimal" data-f="'+n+'" value="'+ea(N(n))+'" placeholder="0.00"></div>'};
   var split=Number(d.labor_pagada||0)+Number(d.piezas_pagadas||0)>0;
   return '<div class="tr-card"><div class="tr-h"><b>'+esc(d.folio||it.name)+'</b><span class="tr-badge aceptada">Pago de planta</span><small>'+esc(it.name)+(d.confianza!=null?' · lectura '+Math.round(Number(d.confianza)*100)+'%':'')+'</small></div>'+
-    '<div class="tr-grid"><div><span>Orden</span>'+esc(d.orden||'—')+'</div><div><span>Sistema</span>'+esc(d.sistema||'—')+'</div><div><span>Operación</span>'+esc(d.operacion||'—')+'</div><div><span>Vehículo</span>'+esc(TR.veh(d)||'—')+'</div><div><span>Fecha de pago</span>'+esc(d.fecha_pago||'—')+'</div><div><span>Referencia</span>'+esc(d.referencia||'—')+'</div></div>'+
+    '<div class="tr-grid"><div><span>Orden</span>'+esc(d.orden||'—')+'</div><div><span>Sistema</span>'+esc(d.sistema||'—')+'</div><div><span>Operación</span>'+esc((d.operacion||'—')+(d.operacion_desc?' · '+d.operacion_desc:''))+'</div><div><span>Tiempo</span>'+esc(d.horas!=null&&d.horas!==''?d.horas+' h':'—')+'</div><div><span>Pieza</span>'+esc(d.numero_parte?d.numero_parte+(d.pieza?' · '+d.pieza:'')+(d.cantidad>1?' ×'+d.cantidad:''):'—')+'</div><div><span>Vehículo</span>'+esc(TR.veh(d)||'—')+'</div><div><span>Fecha de pago</span>'+esc(d.fecha_pago||'—')+'</div><div><span>Referencia</span>'+esc(d.referencia||'—')+'</div></div>'+
     '<div class="tr-amt">'+I('labor_reclamada','Mano de obra reclamada')+I('piezas_reclamadas','Piezas reclamadas')+I('labor_pagada','Mano de obra pagada')+I('piezas_pagadas','Piezas pagadas')+'</div>'+
     (split?'':'<div class="tr-note warn"><b>Falta el desglose:</b> el comprobante no separa mano de obra y piezas pagadas. Captúralo para que el agente pueda aprender de este pago.</div>')+
+    (d.reclamado_igual?'<div class="tr-note"><b>Reclamado = pagado:</b> la transacción aceptada de planta se tomó como lo reclamado (planta pagó el 100%). Cámbialo si no fue así.</div>':'')+
+    (Number(d.labor_reclamada||0)+Number(d.piezas_reclamadas||0)>0?'':'<div class="tr-note"><b>Reclamado:</b> no aparece en el documento; captúralo si es distinto de lo pagado.</div>')+
     (d.ajustes?'<div class="tr-note"><b>Ajustes de planta:</b> '+esc(d.ajustes)+'</div>':'')+(d.lecciones?'<div class="tr-note"><b>Lección:</b> '+esc(d.lecciones)+'</div>':'')+
     '<div class="tr-act"><button class="bt pri" type="button" data-tr="save" data-id="'+it.id+'">Enseñar al agente</button><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Descartar</button></div></div>';
 };
@@ -5935,7 +5953,7 @@ TR.renderQ=function(k){
 /* el agente busca en este texto: lleva también el nombre del archivo (p. ej. CARPLAY.pdf) y las lecciones,
    o una pregunta con la palabra del archivo no encontraba nada */
 TR.search=function(k,d,name){
-  var v=TR.veh(d),a=[d.folio,d.orden,v,d.sistema,d.operacion&&d.operacion.code||d.operacion,d.operacion&&d.operacion.desc,d.queja&&d.queja.code,d.queja&&d.queja.desc,d.causa&&d.causa.desc,d.correccion&&d.correccion.desc,d.estado,d.motivo_resolucion,d.referencia,String(name||'').replace(/\.[a-z0-9]{2,4}$/i,'').replace(/[_\-]+/g,' '),d.como_se_lleno,d.errores_y_correcciones,d.lecciones];
+  var v=TR.veh(d),a=[d.folio,d.orden,v,d.sistema,d.operacion&&d.operacion.code||d.operacion,d.operacion&&d.operacion.desc,d.queja&&d.queja.code,d.queja&&d.queja.desc,d.causa&&d.causa.desc,d.correccion&&d.correccion.desc,d.estado,d.motivo_resolucion,d.referencia,d.numero_parte,d.pieza,d.operacion_desc,String(name||'').replace(/\.[a-z0-9]{2,4}$/i,'').replace(/[_\-]+/g,' '),d.como_se_lleno,d.errores_y_correcciones,d.lecciones];
   (d.piezas||[]).forEach(function(p){a.push(p.no,p.d)});(d.comentarios||[]).forEach(function(c){a.push(c.texto)});
   return norm(a.filter(Boolean).join(' ')).slice(0,6000);
 };
@@ -5953,6 +5971,16 @@ TR.save=async function(k,id){
       try{await CB.get()}catch(_){}
       var rl=ph.labor_reclamada>0?Math.round(100*ph.labor_pagada/ph.labor_reclamada):null,rp=ph.piezas_reclamadas>0?Math.round(100*ph.piezas_pagadas/ph.piezas_reclamadas):null;
       msg='Pago aprendido: planta pagó '+(rl!=null?rl+'% de la mano de obra':money(ph.labor_pagada)+' de mano de obra')+' y '+(rp!=null?rp+'% de las piezas':money(ph.piezas_pagadas)+' de piezas')+'. El Agente de Cobros ya lo usa.';
+      /* lo que el agente aprende de este pago: operación, tiempo y pieza → qué se reclamó y qué pagó planta */
+      if(d.operacion&&(Number(d.horas)>0||d.numero_parte)){
+        var hs=Number(d.horas)>0?Number(d.horas):null,tp=ph.labor_reclamada+ph.piezas_reclamadas>0?Math.round(100*(ph.labor_pagada+ph.piezas_pagadas)/(ph.labor_reclamada+ph.piezas_reclamadas)):null;
+        var lecP={tipo:'tiempo',origen:'pdf',vehiculo:(TR.veh(d)||'').replace(/\b[A-HJ-NPR-Z0-9]{17}\b/g,'').trim()||null,
+          texto:'La operación '+d.operacion+(d.operacion_desc?' ('+d.operacion_desc+')':'')+(hs?' se reclamó con '+hs+' h de mano de obra':' se reclamó')+(d.numero_parte?' y la pieza '+d.numero_parte+(d.pieza?' ('+d.pieza+')':'')+(d.cantidad>1?' ×'+d.cantidad:''):'')+': mano de obra '+money(ph.labor_reclamada)+' y piezas '+money(ph.piezas_reclamadas)+'; planta pagó '+money(ph.labor_pagada)+' y '+money(ph.piezas_pagadas)+(tp!=null?' ('+tp+'% de lo reclamado)':'')+'.',
+          contexto:{operacion:String(d.operacion).slice(0,60),sistema:d.sistema?String(d.sistema).slice(0,60):undefined,pieza:d.pieza?String(d.pieza).slice(0,60):undefined},
+          efecto:Object.assign({},hs?{horas:hs}:{},d.numero_parte?{piezas_agregar:[{no:String(d.numero_parte).slice(0,30),d:String(d.pieza||d.numero_parte).slice(0,80),q:Math.max(1,Math.min(20,Number(d.cantidad)||1))}]}:{})};
+        var li2=await SB.c.from('reglas_lecciones').insert({rule_id:null,tipo:lecP.tipo,texto:lecP.texto,vehiculo:lecP.vehiculo,origen:lecP.origen,contexto:lecP.contexto,efecto:Object.keys(lecP.efecto).length?lecP.efecto:null});
+        if(li2.error)SB.fail(li2.error);else msg+=' <br>Aprendió la operación <b>'+esc(d.operacion)+'</b>'+(hs?' con <b>'+hs+' h</b>':'')+(d.numero_parte?' y la pieza <b>'+esc(d.numero_parte)+'</b>':'')+'.';
+      }
       row={kind:'pago',folio:d.folio||null,wo:d.orden||null,file_name:it.name,vehiculo:TR.veh(d)||null,sys:d.sistema||null,op:d.operacion||null,resultado:'pagada',resumen:(d.sistema||'Pago')+' '+(d.operacion||'')+': reclamado '+money(ph.labor_reclamada+ph.piezas_reclamadas)+', pagado '+money(ph.labor_pagada+ph.piezas_pagadas)+(d.ajustes?'. Ajustes: '+d.ajustes:''),lecciones:d.lecciones||null,datos:d,busqueda:TR.search(k,d,it.name)};
     }else{
       var lr=null,est=d.estado||'desconocido',rule=TR.ruleFor(d),dup=d.folio?TR.lib.prea.filter(function(x){return x.folio===d.folio})[0]:null;
@@ -6731,7 +6759,7 @@ GATE.measure=function(){
   var w=$('#crtSay').offsetWidth+1;if(w<=1)return;
   $('#crt').style.setProperty('--pill-w',(18+8+w+34)+'px');
 };
-GATE.menu=function(){$('#gtMenu').hidden=false;$('#gtOrd').hidden=true;GATE.measure();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(GATE.measure)};
+GATE.menu=function(){$('#gtMenu').hidden=false;$('#gtOrd').hidden=true;$('#gtOrig').hidden=true;if(typeof IMP!=='undefined')IMP.say('');GATE.measure();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(GATE.measure)};
 GATE.press=function(){
   var st=$('#crt');st.dataset.sink='true';clearTimeout(GATE.beat);
   /* 60ms handoff against a 160ms sink: the spread begins while the press is still running */
@@ -6740,10 +6768,14 @@ GATE.press=function(){
 GATE.pick=function(tipo){
   GATE.set(false);GATE.tipo=tipo;
   setTimeout(function(){
-    $('#gtMenu').hidden=true;$('#gtOrd').hidden=false;$('#gtTipo').textContent=tipo;$('#gtErr').textContent='';
+    $('#gtMenu').hidden=true;$('#gtTipo').textContent=tipo;$('#gtErr').textContent='';
+    /* una PREA puede ser nueva o una que el asesor ya tiene avanzada en planta */
+    if(tipo==='PREA'){$('#gtOrd').hidden=true;$('#gtOrig').hidden=false;IMP.say('');$('#gtNew').focus();return}
+    $('#gtOrig').hidden=true;$('#gtOrd').hidden=false;
     var i=$('#gtIn');i.value='';i.removeAttribute('aria-invalid');i.focus();
   },gStill?0:200);
 };
+GATE.nueva=function(){$('#gtOrig').hidden=true;$('#gtOrd').hidden=false;var i=$('#gtIn');i.value='';i.removeAttribute('aria-invalid');$('#gtErr').textContent='';i.focus()};
 GATE.fix=function(t){return String(t||'').toUpperCase().replace(/\s+/g,'').replace(/^([A-Z]{1,3})(\d)/,'$1$2')};
 GATE.reset=function(){GATE.v=null;GATE.sync()};
 $('#crtPill').addEventListener('click',function(){if(!GATE.open)GATE.press()});
@@ -6767,6 +6799,69 @@ $('#gtOrd').addEventListener('submit',function(e){
   GATE.v={tipo:GATE.tipo,orden:o};GATE.sync();ta.focus();
 });
 $('#gtTagX').addEventListener('click',GATE.reset);
+/* ══ Subir una PREA que ya existe en planta ═════════════════
+   Para asesores que ya traen PREAs avanzadas: se sube el PDF (o captura) de la PREA, el agente lee
+   todo (vehículo, códigos, piezas, estado, comentarios de planta) y la crea en el tablero de Expedientes
+   con el estado que muestra el documento (aceptada, rechazada o esperando respuesta). */
+var IMP={busy:false};
+IMP.say=function(t,bad){var s=$('#gtUpSt');s.textContent=t||'';s.classList.toggle('bad',!!bad)};
+IMP.row=function(d,name){
+  var folio=String(d.folio||d.orden||'').trim();
+  if(!folio)throw new Error('No encontré el folio ni la orden en '+name);
+  var v=d.vehiculo&&typeof d.vehiculo==='object'?d.vehiculo:{},up=function(x){return String(x||'').toUpperCase()};
+  var parts=(Array.isArray(d.piezas)?d.piezas:[]).filter(function(p){return p&&(p.no||p.d)}).slice(0,30).map(function(p){return {no:String(p.no||'').slice(0,40),d:String(p.d||p.no||'').slice(0,120),q:Math.max(1,Math.round(Number(p.q)||1)),pr:Math.max(0,Number(p.pr)||0)}});
+  var labor=Math.max(0,Number(d.mano_obra)||0),pt=parts.reduce(function(a,p){return a+p.q*p.pr},0);
+  if(!(pt>0)&&Number(d.total)>labor)pt=Number(d.total)-labor;
+  var est=d.estado==='aceptada'?'aceptada':d.estado==='rechazada'?'rechazada':'borrador';
+  var cod=function(c){return c&&(c.code||c.desc)?[c.code||'',up(c.desc)]:null};
+  var codes=null;if(cod(d.queja)||cod(d.causa)||cod(d.correccion))codes={q:cod(d.queja)||['',''],c:cod(d.causa)||['',''],r:cod(d.correccion)||['','']};
+  var coms=(Array.isArray(d.comentarios)?d.comentarios:[]).map(function(c){return c&&c.texto?(c.autor?String(c.autor).split(' ')[0]+': ':'')+c.texto:''}).filter(Boolean);
+  var rule=TR.ruleFor(d);
+  return {id:crypto.randomUUID(),folio:folio,brand:'General Motors',sys:d.sistema||null,rule_id:rule?rule.id:null,
+    queja:(d.queja&&d.queja.desc)||null,vin:d.vin||null,wo:d.orden||null,
+    vehicle:[v.marca,v.modelo,v.anio].filter(Boolean).join(' ')||null,km:Number(v.km)>0?Math.round(Number(v.km)):null,
+    op:(d.operacion&&d.operacion.code)||null,opd:(d.operacion&&d.operacion.desc)||null,hours:Number(d.horas)>0?Number(d.horas):null,
+    parts:parts,parts_total:Math.max(0,Math.round(pt*100)/100),labor:labor,codes:codes,cliente:d.cliente||null,status:est,
+    comentario_fabricante:(d.motivo_resolucion||coms.slice(-3).join(' | ')||'').slice(0,1500)||null,
+    modificaciones:d.errores_y_correcciones?String(d.errores_y_correcciones).slice(0,1500):null};
+};
+IMP.one=async function(file){
+  var f=await TR.prep(file);
+  var r=await SB.ai({mode:'importar_prea',kind:'prea',file:f});
+  var d=r&&r.datos;if(!d)throw new Error('No pude leer '+file.name);
+  if(d.es_prea===false)throw new Error(file.name+': no parece una PREA'+(d.motivo_invalido?' ('+d.motivo_invalido+')':''));
+  var row=IMP.row(d,file.name);
+  var ex=await SB.c.from('expedientes').select('id').eq('folio',row.folio).limit(1);
+  if(ex.error)throw ex.error;
+  if(ex.data&&ex.data.length)return {dup:row.folio};
+  var ins=await SB.c.from('expedientes').insert(row);
+  if(ins.error)throw ins.error;
+  return {ok:row.folio,estado:row.status};
+};
+IMP.run=async function(files){
+  if(IMP.busy)return;
+  files=files.filter(function(f){return f&&(/^image\//.test(f.type)||f.type==='application/pdf'||/\.pdf$/i.test(f.name))}).slice(0,10);
+  if(!files.length){IMP.say('Elige un PDF o una imagen de la PREA',true);return}
+  if(!SB.c||!SB.entered){IMP.say('Inicia sesión para subir tu PREA',true);return}
+  IMP.busy=true;$('#gtUp').disabled=true;
+  var ok=[],dup=[],bad=[],lbl={aceptada:'aceptada',rechazada:'rechazada',borrador:'esperando respuesta'};
+  for(var i=0;i<files.length;i++){
+    IMP.say('Leyendo '+files[i].name+(files.length>1?' ('+(i+1)+' de '+files.length+')':'')+'…');
+    try{var r=await IMP.one(files[i]);if(r.dup)dup.push(r.dup);else ok.push(r.ok+' ('+lbl[r.estado]+')')}
+    catch(e){bad.push(TR.errTxt(e))}
+  }
+  IMP.busy=false;$('#gtUp').disabled=false;
+  var msg=[];
+  if(ok.length)msg.push('Creé '+(ok.length===1?'la PREA ':'las PREAs ')+ok.join(', ')+'.');
+  if(dup.length)msg.push('Ya existía: '+dup.join(', ')+'.');
+  if(bad.length)msg.push(bad.join(' '));
+  IMP.say(msg.join(' '),!ok.length&&!dup.length);
+  if(ok.length){toast(ok.length===1?'PREA creada en tu tablero':ok.length+' PREAs creadas en tu tablero');EX.q=ok.length===1?ok[0].split(' ')[0]:'';$('#exQ').value=EX.q;EX.f='prea';showView('exp')}
+};
+$('#gtUp').addEventListener('click',function(){if(!IMP.busy)$('#gtUpIn').click()});
+$('#gtNew').addEventListener('click',GATE.nueva);
+$('#gtOrigBack').addEventListener('click',GATE.menu);
+$('#gtUpIn').addEventListener('change',function(){var f=[].slice.call(this.files);this.value='';IMP.run(f)});
 /* el primer mensaje lleva la orden y el tipo, para que el chat la guarde y el agente la conozca */
 GATE.pre=function(){return S.agent==='garantias'&&GATE.v&&!S.convId&&!GP.cur?'Orden '+GATE.v.orden+' ('+GATE.v.tipo+'). ':''};
 GATE.sync();
