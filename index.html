@@ -6972,6 +6972,16 @@ IMP.row=function(d,name){
     comentario_fabricante:(d.motivo_resolucion||coms.slice(-3).join(' | ')||'').slice(0,1500)||null,
     modificaciones:[prea&&orden&&prea!==orden?'PREA de planta: '+prea:'',d.errores_y_correcciones?String(d.errores_y_correcciones):''].filter(Boolean).join(' · ').slice(0,1500)||null};
 };
+/* cada orden tiene su propia conversación en el historial del Agente de Garantías: se reutiliza la que ya exista */
+IMP.conv=async function(ord,queja,viaPdf){
+  if(!ord)return null;
+  var f=await SB.c.from('conversations').select('id').eq('agent','garantias').eq('orden',ord).limit(1);
+  if(!f.error&&f.data&&f.data[0])return f.data[0].id;
+  var id=crypto.randomUUID(),t='Orden '+ord+' (PREA). '+(viaPdf?'PREA existente subida desde planta':'PREA')+(queja?': '+String(queja).slice(0,300):'');
+  var ins=await SB.c.from('conversations').insert({id:id,agent:'garantias',title:ord,text:t.slice(0,2000),orden:ord});
+  if(ins.error){SB.fail(ins.error);return null}
+  return id;
+};
 IMP.num=function(x){var n=Number(String(x==null?'':x).replace(/[^\d.\-]/g,''));return isFinite(n)?n:0};
 /* guarda el PDF en el expediente: el formulario de planta va en "Actualización de PREA"; otra cosa, en "Evidencia" */
 IMP.store=async function(id,file,isForm){
@@ -7003,18 +7013,21 @@ IMP.one=async function(file){
   }
   var row=IMP.row(d,file.name),now=new Date().toISOString();
   /* repetida = misma orden y mismo número de PREA de planta (una orden puede tener más de una PREA) */
-  var prea=String(d.folio||'').trim(),ex=await SB.c.from('expedientes').select('id,modificaciones,prea_form').eq('folio',row.folio).limit(20);
+  var prea=String(d.folio||'').trim(),ex=await SB.c.from('expedientes').select('id,modificaciones,prea_form,conversation_id').eq('folio',row.folio).limit(20);
   if(ex.error)throw ex.error;
   var hit=(ex.data||[]).filter(function(x){return !prea||prea===row.folio||String(x.modificaciones||'').indexOf(prea)>=0})[0];
   if(hit){
     /* ya estaba en el tablero: subir otra vez su PDF es una actualización de la PREA */
     if(!form)return {dup:row.folio};
-    var up=await SB.c.from('expedientes').update({prea_form:XD.formMerge(hit.prea_form,form),prea_form_at:now,prea_form_src:file.name}).eq('id',hit.id);
+    var upd0={prea_form:XD.formMerge(hit.prea_form,form),prea_form_at:now,prea_form_src:file.name};
+    if(!hit.conversation_id&&row.wo){var cid0=await IMP.conv(row.wo,row.queja,true);if(cid0)upd0.conversation_id=cid0}
+    var up=await SB.c.from('expedientes').update(upd0).eq('id',hit.id);
     if(up.error)throw up.error;
     var st1=await IMP.store(hit.id,file,true);
     return {upd:row.folio,id:hit.id,stored:st1};
   }
   if(form){row.prea_form=form;row.prea_form_at=now;row.prea_form_src=file.name}
+  var cid=await IMP.conv(row.wo,row.queja,true);if(cid)row.conversation_id=cid;
   var ins=await SB.c.from('expedientes').insert(row);
   if(ins.error)throw ins.error;
   var st=await IMP.store(row.id,file,!!form);
@@ -7046,6 +7059,7 @@ IMP.run=async function(files){
   if(bad.length)msg.push(bad.join(' '));
   IMP.say(msg.join(' '),!ids.length&&!dup.length);
   if(ids.length){
+    SB.loadHist();GP.load();   /* su conversación aparece en el historial del agente */
     toast(ok.length&&!upd.length?(ok.length===1?'PREA creada en tu tablero':ok.length+' PREAs creadas en tu tablero'):'PREA actualizada');
     EX.f='prea';EX.q='';$('#exQ').value='';showView('exp');
     /* una sola PREA: se abre directo su expediente, con el formulario ya lleno */

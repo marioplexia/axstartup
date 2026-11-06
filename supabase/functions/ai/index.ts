@@ -380,7 +380,7 @@ const CHAT_ESTILO = `ESTILO: conversa como una persona cercana y profesional, no
 
 const GARANTIAS_SYSTEM = `Eres el Agente de {AGENTE} de Ax AI Garantías (agencias Chevrolet en México). Conversas con un asesor sobre UNA orden de trabajo y las PREAs de garantía que le corresponden.
 
-TU CEREBRO es lo que la agencia ha aprendido y viene en <contexto>: reglas (id, sistema, códigos de queja/causa/corrección, operación, horas, piezas; n = PREAs aceptadas por el fabricante que la respaldan; rej = rechazos; kw = palabras clave que la activan), resultados por sistema (aceptadas, rechazadas y pendientes), para cobros cuánto paga planta en promedio (por operación, por sistema y global, separando mano de obra y piezas, con n pagos) y el estado de cartera de la orden. También puede venir un resumen de la conversación del otro agente sobre la misma orden.
+TU CEREBRO es lo que la agencia ha aprendido y viene en <contexto>: reglas (id, sistema, códigos de queja/causa/corrección, operación, horas, piezas; n = PREAs aceptadas por el fabricante que la respaldan; rej = rechazos; kw = palabras clave que la activan), resultados por sistema (aceptadas, rechazadas y pendientes), para cobros cuánto paga planta en promedio (por operación, por sistema y global, separando mano de obra y piezas, con n pagos) y el estado de cartera de la orden. Cada PREA puede traer prea_form: el formulario «Ver Pre-Autorización» de planta tal cual (estatus, comentarios de planta y del asesor, códigos, operación, tiempo, partes, adjuntos); úsalo para contestar qué respondió planta y qué falta. También puede venir un resumen de la conversación del otro agente sobre la misma orden.
 
 CÓMO AYUDAS: resuelve dudas y consultas sobre esta orden y sus PREAs: por qué esa operación, qué piezas y horas lleva y de dónde salen, qué tan seguido se acepta algo parecido, qué riesgo de rechazo hay según lo aprendido, qué falta para facturar, cuánto va a pagar planta. Razona con el cerebro y cita la regla (por ejemplo R-0006) con sus PREAs aceptadas, rechazos y confianza. Con las herramientas "consultar" y "agregar" puedes mirar cualquier otro dato de la plataforma a la que el asesor tiene acceso (PREAs parecidas, cartera, piezas, campañas).
 
@@ -398,7 +398,7 @@ const compactRule = (r) => ({
 async function contextoOrden(sb, body, agente) {
   const convId = UUID_RE.test(String(body.conversation_id || "")) ? body.conversation_id : null;
   const orden = clip(body.orden, 24).trim();
-  const cols = "id,folio,status,wo,cliente,vin,sys,rule_id,queja,op,opd,hours,parts,parts_total,labor,codes,created_at,updated_at";
+  const cols = "id,folio,status,wo,cliente,vin,sys,rule_id,queja,op,opd,hours,parts,parts_total,labor,codes,prea_form,created_at,updated_at";
   let exps = [];
   if (convId) { const r = await sb.from("expedientes").select(cols).eq("conversation_id", convId).order("created_at", { ascending: true }).limit(10); exps = r.data || []; }
   if (!exps.length && orden) { const r = await sb.from("expedientes").select(cols).eq("wo", orden).order("created_at", { ascending: true }).limit(10); exps = r.data || []; }
