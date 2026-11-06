@@ -6806,8 +6806,9 @@ $('#gtTagX').addEventListener('click',GATE.reset);
 var IMP={busy:false};
 IMP.say=function(t,bad){var s=$('#gtUpSt');s.textContent=t||'';s.classList.toggle('bad',!!bad)};
 IMP.row=function(d,name){
-  var folio=String(d.folio||d.orden||'').trim();
-  if(!folio)throw new Error('No encontré el folio ni la orden en '+name);
+  /* el título del expediente es siempre el número de orden (GA4006); el número de PREA de planta queda en las notas */
+  var prea=String(d.folio||'').trim(),orden=String(d.orden||'').trim().toUpperCase().replace(/\s+/g,''),folio=orden||prea;
+  if(!folio)throw new Error('No encontré la orden ni el folio en '+name);
   var v=d.vehiculo&&typeof d.vehiculo==='object'?d.vehiculo:{},up=function(x){return String(x||'').toUpperCase()};
   var parts=(Array.isArray(d.piezas)?d.piezas:[]).filter(function(p){return p&&(p.no||p.d)}).slice(0,30).map(function(p){return {no:String(p.no||'').slice(0,40),d:String(p.d||p.no||'').slice(0,120),q:Math.max(1,Math.round(Number(p.q)||1)),pr:Math.max(0,Number(p.pr)||0)}});
   var labor=Math.max(0,Number(d.mano_obra)||0),pt=parts.reduce(function(a,p){return a+p.q*p.pr},0);
@@ -6818,12 +6819,12 @@ IMP.row=function(d,name){
   var coms=(Array.isArray(d.comentarios)?d.comentarios:[]).map(function(c){return c&&c.texto?(c.autor?String(c.autor).split(' ')[0]+': ':'')+c.texto:''}).filter(Boolean);
   var rule=TR.ruleFor(d);
   return {id:crypto.randomUUID(),folio:folio,brand:'General Motors',sys:d.sistema||null,rule_id:rule?rule.id:null,
-    queja:(d.queja&&d.queja.desc)||null,vin:d.vin||null,wo:d.orden||null,
+    queja:(d.queja&&d.queja.desc)||null,vin:d.vin||null,wo:orden||null,
     vehicle:[v.marca,v.modelo,v.anio].filter(Boolean).join(' ')||null,km:Number(v.km)>0?Math.round(Number(v.km)):null,
     op:(d.operacion&&d.operacion.code)||null,opd:(d.operacion&&d.operacion.desc)||null,hours:Number(d.horas)>0?Number(d.horas):null,
     parts:parts,parts_total:Math.max(0,Math.round(pt*100)/100),labor:labor,codes:codes,cliente:d.cliente||null,status:est,
     comentario_fabricante:(d.motivo_resolucion||coms.slice(-3).join(' | ')||'').slice(0,1500)||null,
-    modificaciones:d.errores_y_correcciones?String(d.errores_y_correcciones).slice(0,1500):null};
+    modificaciones:[prea&&orden&&prea!==orden?'PREA de planta: '+prea:'',d.errores_y_correcciones?String(d.errores_y_correcciones):''].filter(Boolean).join(' · ').slice(0,1500)||null};
 };
 IMP.one=async function(file){
   var f=await TR.prep(file);
@@ -6831,9 +6832,10 @@ IMP.one=async function(file){
   var d=r&&r.datos;if(!d)throw new Error('No pude leer '+file.name);
   if(d.es_prea===false)throw new Error(file.name+': no parece una PREA'+(d.motivo_invalido?' ('+d.motivo_invalido+')':''));
   var row=IMP.row(d,file.name);
-  var ex=await SB.c.from('expedientes').select('id').eq('folio',row.folio).limit(1);
+  /* repetida = misma orden y mismo número de PREA de planta (una orden puede tener más de una PREA) */
+  var prea=String(d.folio||'').trim(),ex=await SB.c.from('expedientes').select('id,modificaciones').eq('folio',row.folio).limit(20);
   if(ex.error)throw ex.error;
-  if(ex.data&&ex.data.length)return {dup:row.folio};
+  if((ex.data||[]).some(function(x){return !prea||prea===row.folio||String(x.modificaciones||'').indexOf(prea)>=0}))return {dup:row.folio};
   var ins=await SB.c.from('expedientes').insert(row);
   if(ins.error)throw ins.error;
   return {ok:row.folio,estado:row.status};
