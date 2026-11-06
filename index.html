@@ -5920,6 +5920,7 @@ TR.cardPago=function(it){
     '<div class="tr-grid"><div><span>Orden</span>'+esc(d.orden||'—')+'</div><div><span>Sistema</span>'+esc(d.sistema||'—')+'</div><div><span>Operación</span>'+esc(d.operacion||'—')+'</div><div><span>Vehículo</span>'+esc(TR.veh(d)||'—')+'</div><div><span>Fecha de pago</span>'+esc(d.fecha_pago||'—')+'</div><div><span>Referencia</span>'+esc(d.referencia||'—')+'</div></div>'+
     '<div class="tr-amt">'+I('labor_reclamada','Mano de obra reclamada')+I('piezas_reclamadas','Piezas reclamadas')+I('labor_pagada','Mano de obra pagada')+I('piezas_pagadas','Piezas pagadas')+'</div>'+
     (split?'':'<div class="tr-note warn"><b>Falta el desglose:</b> el comprobante no separa mano de obra y piezas pagadas. Captúralo para que el agente pueda aprender de este pago.</div>')+
+    (Number(d.labor_reclamada||0)+Number(d.piezas_reclamadas||0)>0?'':'<div class="tr-note warn"><b>Falta lo reclamado:</b> el comprobante no trae lo reclamado. Captúralo (mano de obra o piezas) para poder guardar el pago.</div>')+
     (d.ajustes?'<div class="tr-note"><b>Ajustes de planta:</b> '+esc(d.ajustes)+'</div>':'')+(d.lecciones?'<div class="tr-note"><b>Lección:</b> '+esc(d.lecciones)+'</div>':'')+
     '<div class="tr-act"><button class="bt pri" type="button" data-tr="save" data-id="'+it.id+'">Enseñar al agente</button><button class="bt" type="button" data-tr="drop" data-id="'+it.id+'">Descartar</button></div></div>';
 };
@@ -5947,6 +5948,7 @@ TR.save=async function(k,id){
     if(k==='pago'){
       $$('input[data-f]',btn.closest('.tr-card')).forEach(function(i){var n=PH.num(i.value);d[i.dataset.f]=n==null?0:n});
       if(!(Number(d.labor_pagada)+Number(d.piezas_pagadas)>0))throw new Error('Captura la mano de obra y las piezas pagadas para enseñarle este pago.');
+      if(!(Number(d.labor_reclamada)+Number(d.piezas_reclamadas)>0))throw new Error('Captura lo reclamado (mano de obra o piezas): el comprobante solo trae lo pagado y el agente necesita compararlo contra lo reclamado.');
       var ph={folio:d.folio||null,sys:d.sistema||null,op:d.operacion||null,labor_reclamada:Number(d.labor_reclamada)||0,piezas_reclamadas:Number(d.piezas_reclamadas)||0,labor_pagada:Number(d.labor_pagada)||0,piezas_pagadas:Number(d.piezas_pagadas)||0,fecha:/^\d{4}-\d{2}-\d{2}$/.test(d.fecha_pago||'')?d.fecha_pago:null};
       var w=ph.folio?await SB.c.from('pagos_historicos').upsert(ph,{onConflict:'folio'}):await SB.c.from('pagos_historicos').insert(ph);
       if(w.error)throw w.error;
