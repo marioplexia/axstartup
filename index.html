@@ -1841,6 +1841,11 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .xp-txt-h{display:flex;align-items:center;gap:10px;margin:14px 0 4px;font-weight:600}
 .xp-txt{white-space:pre-wrap;border:1px solid var(--card-line);border-radius:10px;background:var(--surface);padding:10px 12px;font-size:13px}
 .xp-src{margin-top:12px;font-size:12px;color:var(--muted)}
+/* lo que el cerebro aprendió de la PREA */
+.xb{margin:0 0 20px;border:1px solid #bfe5cb;border-radius:16px;background:#f3fbf5;padding:14px 20px;font-size:13px}.xb[hidden]{display:none}
+.xb h3{margin:0 0 6px;font:600 14px var(--f-ui)}.xb-l{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.xb-c{font-size:12px;padding:2px 9px;border-radius:999px;background:#fff;border:1px solid #cfe9d6}.xb-c b{font-weight:600}
+.xb p{margin:4px 0;color:var(--muted);font-size:12.5px}
 .xf-empty-card{padding:18px 20px;font-size:13px;color:var(--muted)}
 @media (max-width:700px){.xf-r{grid-template-columns:1fr;gap:0}.xf-l{text-align:left}}
 .gt-row .go.alt{background:var(--card);color:var(--fg);border:1px solid var(--card-line)}
@@ -3294,8 +3299,8 @@ document.addEventListener('click',function(e){
   if(b.classList.contains('gfa')){
     var bar=b.parentNode,cx=f._ctx;if(!cx)return;
     $$('.gfa',bar).forEach(function(x){x.disabled=true});
-    if(b.dataset.r==='ok'){SB.setExpStatus(cx.expId,'aceptada');var o=RS.learn(ctxToRec(cx));bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia.</span>'}
-    else{SB.setExpStatus(cx.expId,'rechazada');if(cx.ruleId)RS.reject(cx.ruleId);bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+'</span>'}
+    if(b.dataset.r==='ok'){SB.setExpStatus(cx.expId,'aceptada');var o=RS.learn(ctxToRec(cx));BR.marcar(cx.expId,'aceptada');bar.className='gfb sent';bar.innerHTML='<span>Aceptada. '+(o.kind==='creada'?'El agente creó la regla '+o.rule.id+' (en aprendizaje).':'Se reforzó la regla '+o.rule.id+' ('+o.rule.n+' PREAs).')+' Ya aparece en el tablero de agencia.</span>'}
+    else{SB.setExpStatus(cx.expId,'rechazada');if(cx.ruleId)RS.reject(cx.ruleId);BR.marcar(cx.expId,'rechazada');bar.className='gfb sent';bar.innerHTML='<span>Rechazo registrado'+(cx.ruleId?'. Bajó la confianza de la regla '+cx.ruleId+'.':'.')+'</span>'}
     return;
   }
   if(b.classList.contains('gall')){
@@ -5427,6 +5432,7 @@ EX.resolve=async function(id,ok){
   x.status=ok?'aceptada':'rechazada';EX.render();
   if(ok){var o=RS.learn(rec);toast(o.kind==='creada'?'Aceptada: el agente creó la regla '+o.rule.id:'Aceptada: se reforzó la regla '+o.rule.id)}
   else{if(x.rule_id)RS.reject(x.rule_id);toast('Rechazo registrado')}
+  BR.marcar(id,ok?'aceptada':'rechazada');   /* la regla ya se contó: el aprendizaje automático no la cuenta otra vez */
   var hf=parseFloat(String(dv.h||'').replace(',','.')),ext={};
   if(dv.c)ext.comentario_fabricante=dv.c;if(dv.m)ext.modificaciones=dv.m;if(hf>0)ext.final={horas:hf};
   SB.setExpStatus(id,x.status,ext).then(function(){LS.learnNow()});
@@ -5456,7 +5462,7 @@ XD.open=function(id){
   XD.cur=x;var el=$('#exDoc');
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div></div>'+
-    '<section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section>'+'<div class="xd-grid">'+XD.DOCS.map(function(d){
+    '<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section>'+'<div class="xd-grid">'+XD.DOCS.map(function(d){
       return '<section class="xd-sec" data-k="'+d[0]+'"><h3>'+esc(d[1])+'</h3>'+
         '<div class="xd-zone" tabindex="0" role="button" aria-label="Subir '+ea(d[1])+'"><span class="xd-icon" aria-hidden="true">'+
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
@@ -5681,7 +5687,7 @@ XD.formRead1=async function(id,file,name,path,meta){
     var u=await SB.c.from('expedientes').update({prea_form:merged,prea_form_at:now,prea_form_src:name}).eq('id',id).select('id,prea_form,prea_form_at,prea_form_src').single();
     if(u.error)throw u.error;
     if(mine())XD.formApply(u.data);
-    XD.planCheck(id,merged);   /* ¿planta la rechazó o devolvió? el agente arma el plan con el cerebro */
+    XD.afterForm(id,merged);   /* sigue la respuesta de planta: estado, plan si la rechazó y lo que aprende el cerebro */
     row('✓ formulario actualizado');
     return true;
   }catch(e){row('no pude leerlo ('+TR.errTxt(e)+')',true);if(mine())XD.fSay('No pude leer el formulario: '+TR.errTxt(e),true);return false}
@@ -5690,8 +5696,8 @@ XD.formRead1=async function(id,file,name,path,meta){
 /* al abrir el expediente (o con el botón): revisa lo subido en Actualización de PREA y lee lo más reciente que sea el formulario */
 XD.formInit=async function(x,force){
   XD.formDraw();
-  XD.planDraw();
-  if(x.prea_form)XD.planCheck(x.id,x.prea_form);
+  XD.planDraw();XD.brainDraw();
+  if(x.prea_form)XD.afterForm(x.id,x.prea_form,true);
   if(!SB.c)return;
   try{
     var r=await SB.c.storage.from(XD.B).list(x.id+'/actualizacion',{limit:100,sortBy:{column:'created_at',order:'desc'}});
@@ -5809,6 +5815,7 @@ XD.planCheck=async function(id,form,force){
     if(rech&&g.data.status==='borrador')upd.status='rechazada';
     if(rech&&pl&&pl.comentario)upd.comentario_fabricante=String(pl.comentario).slice(0,1500);
     if(Object.keys(upd).length){var su=await SB.c.from('expedientes').update(upd).eq('id',id);if(su.error)SB.fail(su.error);else if(mine()&&upd.status)XD.cur.status=upd.status}
+    if(rech)BR.aprender(id,'rechazada');   /* el cerebro aprende de este rechazo: códigos, horas, piezas y evidencia */
     /* 2) el plan */
     var r=await SB.ai({expediente_id:id,ref:ref},'correccion'),plan=r&&r.plan;
     if(!plan)throw new Error('bad_output');
@@ -5828,6 +5835,197 @@ document.addEventListener('click',function(e){
   var c=e.target.closest&&e.target.closest('[data-xpcopy]');
   if(c){var tx=$('#xdPlanTxt');if(tx&&navigator.clipboard)navigator.clipboard.writeText(tx.textContent).then(function(){toast('Texto copiado')},function(){toast('No pude copiar')})}
 });
+/* ══ Cerebro: aprender de cada PREA ══════════════════════════
+   Cuando planta resuelve una PREA (aceptada o rechazada) el cerebro aprende TODO de ella, con los datos exactos del
+   formulario de planta: queja (código y texto), causa (código y texto), corrección, código de operación de mano de
+   obra y su tiempo, números de parte y la evidencia que subió el asesor. Lo guarda de dos maneras:
+   · en la REGLA (agency_rules): se crea o se refuerza (aceptada) o baja su confianza (rechazada);
+   · en LECCIONES (reglas_lecciones) con contexto y efecto: qué combinación de códigos, horas y piezas aceptaron o
+     rechazaron, con qué evidencia, y qué cambió entre un rechazo y la aceptación posterior.
+   Cada PREA cuenta UNA vez (expedientes.cerebro lleva la huella de lo aprendido). */
+var BR={busy:{}};
+BR.E=function(x){return esc(String(x==null?'':x))};
+BR.num=function(x){var n=Number(String(x==null?'':x).replace(/[^\d.\-]/g,''));return isFinite(n)?n:0};
+BR.scrub=function(t){return String(t==null?'':t).replace(/\b[A-HJ-NPR-Z0-9]{17}\b/g,'[VIN]').replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g,'[correo]').replace(/(\+?\d[\d\s().-]{8,}\d)/g,'[tel]').replace(/\b(PREA-[A-Z0-9-]+|G-[A-Z0-9]{6,10}|GA\d{3,8})\b/gi,'[ref]').replace(/\s+/g,' ').trim()};
+/* "0313 - Dirección/ Suspensión - Ruido" → código 0313 + descripción del catálogo de GM */
+BR.code=function(t){t=String(t==null?'':t).trim();var m=/^([A-Za-z]{0,3}-?\d{2,8})\s*[-–:]\s*(.+)$/.exec(t);return m?{codigo:m[1],catalogo:m[2].trim()}:{codigo:'',catalogo:t}};
+BR.tipoArchivo=function(n){var e=((/\.([a-z0-9]{1,5})$/i.exec(n||'')||[])[1]||'').toLowerCase();return /^(mp4|mov|avi|mkv|webm|3gp)$/.test(e)?'video':/^(jpg|jpeg|png|webp|gif|heic)$/.test(e)?'foto':e==='pdf'?'documento PDF':/^(xml|txt|csv|json)$/.test(e)?'archivo de texto':'archivo'};
+/* la evidencia: lo que se mandó a planta (adjuntos del formulario), lo que el asesor subió aquí y lo que el cerebro leyó */
+BR.evidencia=async function(row,form){
+  var A=[],seen={};
+  var add=function(n,o){var k=String(n||'').toLowerCase();if(!k||seen[k])return;seen[k]=1;A.push({nombre:String(n).slice(0,120),tipo:BR.tipoArchivo(n),origen:o})};
+  (form&&Array.isArray(form.adjuntos)?form.adjuntos:[]).forEach(function(a){add(a&&a.nombre,'enviada a planta')});
+  try{
+    var r=await SB.c.storage.from(XD.B).list(row.id+'/evidencia',{limit:40,sortBy:{column:'created_at',order:'desc'}});
+    (r.data||[]).forEach(function(f){if(f.name&&f.name!=='.emptyFolderPlaceholder')add(f.name.replace(/^\d+_/,''),'subida por el asesor')});
+  }catch(_){}
+  var hechos='';
+  try{
+    var ors=['wo.eq.'+row.wo,'folio.eq.'+row.folio];if(form&&form.id_preautorizacion)ors.push('folio.eq.'+form.id_preautorizacion);
+    var q=await SB.c.from('entrenamiento_docs').select('resumen,lecciones,resultado').eq('kind','expediente').eq('resultado','evidencia').or(ors.filter(function(z){return !/\.eq\.(null|undefined|)$/.test(z)}).join(',')).order('created_at',{ascending:false}).limit(3);
+    hechos=(q.data||[]).map(function(x){return [x.resumen,x.lecciones].filter(Boolean).join(' ')}).join(' ').slice(0,700);
+  }catch(_){}
+  return {archivos:A,hechos:BR.scrub(hechos)};
+};
+/* lo que se aprende, con los datos EXACTOS del formulario de planta (si no hay formulario, los de la PREA) */
+BR.snapshot=function(row,form,ev){
+  form=form||{};var cd=row.codes||{},T=function(x){return String(x==null?'':x).trim()};
+  var q=BR.code(form.queja_codigo),c=BR.code(form.causa_codigo),r=BR.code(form.correccion_codigo);
+  var qc=cd.q||[],cc=cd.c||[],rc=cd.r||[];
+  var qt=T(form.queja_texto)||T(row.queja)||T(qc[1]),ct=T(form.causa_texto)||T(cc[1]),rt=T(form.correccion_texto)||T(rc[1]);
+  var P=[];(Array.isArray(row.parts)?row.parts:[]).forEach(function(p){if(p&&(p.no||p.d))P.push({no:T(p.no),d:T(p.d||p.no),q:Math.max(1,Math.round(+p.q||1)),pr:+p.pr||0})});
+  String(form.numeros_parte||'').split(/[,;\s]+/).filter(function(z){return /\d/.test(z)}).forEach(function(n){if(!P.some(function(p){return p.no===n}))P.push({no:n,d:'Parte '+n,q:1,pr:0})});
+  P=P.filter(function(p){return p.no||p.d});
+  var comentarios=Array.isArray(form.comentarios)?form.comentarios:[],pl=(typeof XD!=='undefined'&&XD.planta?XD.planta(form):null);
+  var op=T(form.operacion)||T(row.op),opd=T(row.opd);if(opd===op)opd='';
+  return {
+    sistema:T(row.sys)||'Por clasificar',vehiculo:T(row.vehicle),km:row.km||BR.num(form.odometro)||null,
+    queja:{codigo:q.codigo||T(qc[0]).replace(/^(S\/C|NUEVA)$/,''),catalogo:q.catalogo,texto:qt},
+    causa:{codigo:c.codigo||T(cc[0]).replace(/^S\/C$/,''),catalogo:c.catalogo,texto:ct},
+    correccion:{codigo:r.codigo||T(rc[0]).replace(/^S\/C$/,''),catalogo:r.catalogo,texto:rt},
+    operacion:{codigo:op,descripcion:opd},horas:BR.num(form.tiempo)||Number(row.hours)||0,tarifa:BR.num(form.tarifa_mano_obra),
+    mano_obra:BR.num(form.total_mano_obra)||Number(row.labor)||0,total_partes:BR.num(form.total_partes)||Number(row.parts_total)||0,partes:P,
+    estatus:T(form.estatus),motivo_planta:BR.scrub(pl&&pl.comentario?pl.comentario:row.comentario_fabricante||''),
+    evidencia:ev||{archivos:[],hechos:''}
+  };
+};
+BR.ref=function(sn,res){return XD.hash(JSON.stringify([res,sn.queja.codigo,sn.queja.texto,sn.causa.codigo,sn.causa.texto,sn.correccion.texto,sn.operacion.codigo,sn.horas,sn.partes.map(function(p){return p.no}),sn.evidencia.archivos.map(function(a){return a.nombre})]))};
+BR.rec=function(row,sn){
+  if(!(sn.queja.texto&&sn.operacion.codigo&&sn.horas>0))return null;
+  var kw=String(row.vehicle||'').split(/\s+/).map(function(w){return norm(w)}).filter(function(w){return w.length>=3&&!/^\d+$/.test(w)});
+  return {ruleId:row.rule_id||null,sys:sn.sistema,q:[sn.queja.codigo||'S/C',sn.queja.texto.toUpperCase()],c:[sn.causa.codigo||'S/C',(sn.causa.texto||'SIN CAUSA').toUpperCase()],r:[sn.correccion.codigo||'S/C',(sn.correccion.texto||'SIN CORRECCIÓN').toUpperCase()],
+    op:sn.operacion.codigo,opd:sn.operacion.descripcion||sn.operacion.codigo,h:sn.horas,parts:sn.partes,kwText:sn.queja.texto,kw:kw,src:'asesor',advisor:(SB.user&&SB.user.name)||'asesor'};
+};
+BR.reglaDe=function(row,sn){
+  if(row.rule_id){var r=RS.byId(row.rule_id);if(r)return r}
+  return RS.d.rules.filter(function(x){return x.sys===sn.sistema&&sn.queja.codigo&&x.q[0]===sn.queja.codigo})[0]||null;
+};
+/* ¿el administrador ya enseñó esta misma PREA de planta en el Centro de Entrenamiento? (no se cuenta dos veces) */
+BR.yaEnsenada=async function(form,res){
+  var id=form&&form.id_preautorizacion;if(!id)return false;
+  try{var q=await SB.c.from('entrenamiento_docs').select('id').eq('kind','prea').eq('folio',id).eq('resultado',res).limit(1);return !!(q.data&&q.data.length)}catch(_){return false}
+};
+BR.cat=function(x){return x.codigo?x.codigo+(x.catalogo?' ('+x.catalogo+')':''):'sin código'+(x.catalogo?' ('+x.catalogo+')':'')};
+BR.diff=function(a,b){
+  if(!a)return [];var D=[],f=function(x){return x==null?'':String(x)};
+  if(f(a.queja.codigo)!==f(b.queja.codigo)&&b.queja.codigo)D.push('código de queja '+(a.queja.codigo||'—')+' → '+b.queja.codigo);
+  if(f(a.causa.codigo)!==f(b.causa.codigo)&&b.causa.codigo)D.push('código de causa '+(a.causa.codigo||'—')+' → '+b.causa.codigo);
+  if(f(a.causa.texto)!==f(b.causa.texto)&&b.causa.texto)D.push('se reescribió la causa');
+  if(f(a.correccion.texto)!==f(b.correccion.texto)&&b.correccion.texto)D.push('se reescribió la corrección');
+  if(f(a.operacion.codigo)!==f(b.operacion.codigo)&&b.operacion.codigo)D.push('operación '+(a.operacion.codigo||'—')+' → '+b.operacion.codigo);
+  if(Number(a.horas)!==Number(b.horas)&&b.horas)D.push('horas '+a.horas+' → '+b.horas);
+  var pa=a.partes.map(function(p){return p.no}),pb=b.partes.map(function(p){return p.no});
+  var quit=pa.filter(function(n){return pb.indexOf(n)<0}),agr=pb.filter(function(n){return pa.indexOf(n)<0});
+  if(quit.length)D.push('piezas quitadas '+quit.join(', '));if(agr.length)D.push('piezas agregadas '+agr.join(', '));
+  var ea=a.evidencia.archivos.map(function(x){return x.nombre}),nuevos=b.evidencia.archivos.filter(function(x){return ea.indexOf(x.nombre)<0});
+  if(nuevos.length)D.push('evidencia agregada: '+nuevos.map(function(x){return x.tipo+' '+x.nombre}).join(', '));
+  return D;
+};
+BR.lecciones=function(row,sn,res,cb,regla){
+  var L=[],ok=res==='aceptada',o=sn.operacion,pz=sn.partes.map(function(p){return p.no}).filter(Boolean),ctx={sistema:sn.sistema};
+  if(o.codigo)ctx.operacion=o.codigo;if(sn.partes[0]&&sn.partes[0].d&&!/^Parte \d/.test(sn.partes[0].d)&&!/^Partes según/i.test(sn.partes[0].d))ctx.pieza=sn.partes[0].d.slice(0,60);
+  var combo='queja '+BR.cat(sn.queja)+(sn.queja.texto?' "'+BR.scrub(sn.queja.texto).slice(0,160)+'"':'')+', causa '+BR.cat(sn.causa)+(sn.causa.texto?' "'+BR.scrub(sn.causa.texto).slice(0,200)+'"':'')+', corrección '+(sn.correccion.codigo?sn.correccion.codigo+' ':'')+(sn.correccion.texto?'"'+BR.scrub(sn.correccion.texto).slice(0,160)+'"':'sin texto')+', operación '+(o.codigo||'—')+(o.descripcion?' ('+BR.scrub(o.descripcion)+')':'')+(sn.horas?' con '+sn.horas+' h':'')+(pz.length?' y pieza'+(pz.length>1?'s ':' ')+pz.join(', '):'');
+  var nota='Queja '+(sn.queja.codigo||'—')+' + causa '+(sn.causa.codigo||'—')+' + corrección "'+BR.scrub(sn.correccion.texto).slice(0,80)+'"; operación '+(o.codigo||'—')+(sn.horas?' ('+sn.horas+' h)':'')+(pz.length?'; pieza '+pz.join(', '):'');
+  var ef=ok?{nota_codigos:nota.slice(0,300)}:{nota_codigos:('No repetir: '+(sn.motivo_planta||'planta la rechazó')+' — '+nota).slice(0,300),riesgo:'alto'};
+  if(ok){if(sn.horas>0)ef.horas=sn.horas;if(sn.partes.length)ef.piezas_agregar=sn.partes.slice(0,6).map(function(p){return {no:p.no.slice(0,30),d:p.d.slice(0,80),q:p.q}})}
+  L.push({tipo:ok?'codigo':'error',texto:('En '+sn.sistema+': '+combo+' → planta la '+(ok?'ACEPTÓ':'RECHAZÓ')+(!ok&&sn.motivo_planta?': "'+sn.motivo_planta.slice(0,300)+'"':'')+'.').slice(0,900),contexto:ctx,efecto:ef});
+  /* rechazada y ahora aceptada: lo que cambió es lo que funcionó */
+  var D=ok&&cb&&cb.estado==='rechazada'?BR.diff(cb.snap,sn):[];
+  if(D.length)L.push({tipo:'acierto',texto:('En '+sn.sistema+(o.codigo?' (operación '+o.codigo+')':'')+': una PREA rechazada'+(cb.snap&&cb.snap.motivo_planta?' por "'+cb.snap.motivo_planta.slice(0,200)+'"':'')+' se aceptó después de corregir: '+D.join('; ')+'.').slice(0,900),contexto:ctx,efecto:{nota_codigos:('Para que la acepten: '+D.join('; ')).slice(0,300)}});
+  var E=sn.evidencia;
+  if(E.archivos.length||E.hechos){
+    var tipos=E.archivos.map(function(a){return a.tipo}).filter(function(v,i,a){return a.indexOf(v)===i}),hechos=E.hechos?' La evidencia probó: '+E.hechos.slice(0,350):'';
+    L.push({tipo:ok?'acierto':'error',texto:('En '+sn.sistema+(o.codigo?' (operación '+o.codigo+')':'')+': con esta evidencia planta '+(ok?'aceptó':'rechazó')+' la PREA — '+(E.archivos.length?E.archivos.length+' archivo(s): '+tipos.join(', ')+'.':'sin archivos registrados.')+hechos).slice(0,900),contexto:ctx,efecto:{nota_codigos:(ok?'Adjuntar: ':'Faltó o no bastó: ')+(tipos.join(', ')||'evidencia del diagnóstico')+(E.hechos?'. '+E.hechos.slice(0,120):'')}});
+  }
+  return L;
+};
+BR.resumen=function(sn,out){
+  var P=[];if(sn.queja.codigo)P.push('queja <b>'+BR.E(sn.queja.codigo)+'</b>');if(sn.causa.codigo)P.push('causa <b>'+BR.E(sn.causa.codigo)+'</b>');
+  if(sn.operacion.codigo)P.push('operación <b>'+BR.E(sn.operacion.codigo)+'</b>'+(sn.horas?' · <b>'+BR.E(sn.horas)+' h</b>':''));
+  if(sn.partes.length)P.push('pieza'+(sn.partes.length>1?'s':'')+' <b>'+sn.partes.slice(0,4).map(function(p){return BR.E(p.no)}).join(', ')+'</b>');
+  if(sn.evidencia.archivos.length)P.push('evidencia: <b>'+sn.evidencia.archivos.length+'</b> archivo'+(sn.evidencia.archivos.length>1?'s':''));
+  return P;
+};
+BR.aprender=async function(id,res){
+  if(!SB.c||!SB.entered||(res!=='aceptada'&&res!=='rechazada')||BR.busy[id])return null;
+  BR.busy[id]=true;
+  try{
+    var g=await SB.c.from('expedientes').select('*').eq('id',id).single();
+    if(g.error||!g.data)return null;
+    var row=g.data,form=row.prea_form||null,cb=row.cerebro||{};
+    var ev=await BR.evidencia(row,form),sn=BR.snapshot(row,form,ev),ref=BR.ref(sn,res);
+    if(cb.estado===res&&cb.lec===ref)return null;              /* nada nuevo que aprender */
+    var out={regla:row.rule_id||cb.regla||null,kind:null,n:null,aviso:[]},reglaOk=cb.reglas===res;
+    /* 1) la regla: se crea o refuerza (aceptada) / baja su confianza (rechazada), una sola vez por PREA */
+    if(!reglaOk){
+      if(await BR.yaEnsenada(form,res)){reglaOk=true;out.aviso.push('el administrador ya había enseñado esta PREA: la regla no se cuenta otra vez')}
+      else if(res==='aceptada'){var rec=BR.rec(row,sn);if(rec){var lr=RS.learn(rec);out.regla=lr.rule.id;out.kind=lr.kind;out.n=lr.rule.n;reglaOk=true}else out.aviso.push('no se pudo formar la regla: faltan queja, operación u horas')}
+      else{var rl=BR.reglaDe(row,sn);if(rl){RS.reject(rl.id);out.regla=rl.id;out.kind='rechazo';reglaOk=true}else out.aviso.push('no hay una regla para penalizar; quedó como lección')}
+    }
+    /* 2) las lecciones: combinación exacta de códigos, horas, piezas y evidencia, y lo que cambió tras un rechazo */
+    var L=BR.lecciones(row,sn,res,cb,out.regla),ins=null;
+    if(L.length){
+      var rows=L.map(function(l){return {rule_id:out.regla||null,tipo:l.tipo,texto:l.texto,vehiculo:sn.vehiculo||null,origen:'asesor',expediente_id:row.id,contexto:l.contexto||null,efecto:l.efecto||null}});
+      ins=await SB.c.from('reglas_lecciones').insert(rows);if(ins.error){SB.fail(ins.error);ins=null}
+    }
+    var P=BR.resumen(sn,out);
+    var info={estado:res,reglas:reglaOk?res:(cb.reglas||null),lec:ins||!L.length?ref:(cb.lec||null),regla:out.regla,reglaKind:out.kind,n:out.n,lecciones:ins?L.length:0,snap:sn,
+      resumen:P,aviso:out.aviso,at:new Date().toISOString()};
+    var up={cerebro:info};if(!row.rule_id&&out.regla&&out.kind!=='rechazo')up.rule_id=out.regla;
+    var u=await SB.c.from('expedientes').update(up).eq('id',id);if(u.error)SB.fail(u.error);
+    if(XD.cur&&String(XD.cur.id)===String(id)){XD.cur.cerebro=info;if(up.rule_id)XD.cur.rule_id=up.rule_id;XD.brainDraw(true)}
+    try{LS.learnNow()}catch(_){}
+    return info;
+  }catch(e){console.warn('[Cerebro]',e&&e.message||e);return null}
+  finally{BR.busy[id]=false}
+};
+/* aprendizaje hecho a mano (botones "Fue aceptada / rechazada"): solo se marca para no contarlo otra vez */
+BR.marcar=async function(id,res){
+  try{
+    var g=await SB.c.from('expedientes').select('cerebro').eq('id',id).single();
+    var cb=Object.assign({},g.data&&g.data.cerebro||{},{estado:res,reglas:res,at:new Date().toISOString()});
+    await SB.c.from('expedientes').update({cerebro:cb}).eq('id',id);
+  }catch(_){}
+};
+/* lo que planta respondió en el formulario manda: aceptada → estado y aprendizaje; rechazada → ver planCheck */
+BR.sync=async function(id,form,soloSiFalta){
+  if(!SB.c||!SB.entered||!form||!/acept|aprob/i.test(String(form.estatus||'')))return;
+  var g=await SB.c.from('expedientes').select('id,status,cerebro').eq('id',id).single();
+  if(g.error||!g.data)return;
+  if(soloSiFalta&&g.data.cerebro&&g.data.cerebro.estado==='aceptada')return;
+  if(g.data.status!=='aceptada'){
+    var pl=XD.planta(form),upd={status:'aceptada'};
+    if(pl&&pl.comentario)upd.comentario_fabricante=String(pl.comentario).slice(0,1500);
+    var su=await SB.c.from('expedientes').update(upd).eq('id',id);if(su.error){SB.fail(su.error);return}
+    if(XD.cur&&String(XD.cur.id)===String(id))XD.cur.status='aceptada';
+  }
+  await BR.aprender(id,'aceptada');
+};
+/* después de leer el formulario de planta */
+XD.afterForm=function(id,form,alAbrir){
+  if(!form)return;
+  var est=String(form.estatus||'');
+  if(/acept|aprob/i.test(est))BR.sync(id,form,alAbrir);
+  else if(XD.REJ.test(est)){
+    XD.planCheck(id,form);
+    /* una PREA ya rechazada que el cerebro aún no ha aprendido (p. ej. cargada antes de esta función) */
+    if(alAbrir&&/rechaz/i.test(est)&&XD.cur&&String(XD.cur.id)===String(id)&&!XD.cur.cerebro&&XD.cur.status==='rechazada')BR.aprender(id,'rechazada');
+  }
+};
+XD.brainDraw=function(flash){
+  var el=$('#xdBrain'),x=XD.cur;if(!el||!x)return;
+  var c=x.cerebro;if(!c||!c.resumen||!c.resumen.length){el.hidden=true;el.innerHTML='';return}
+  var est=c.estado==='aceptada'?'aceptada':'rechazada';
+  var rg=c.regla?(c.reglaKind==='creada'?'Creó la regla <b>'+BR.E(c.regla)+'</b>':c.reglaKind==='rechazo'?'Bajó la confianza de la regla <b>'+BR.E(c.regla)+'</b>':'Reforzó la regla <b>'+BR.E(c.regla)+'</b>'+(c.n?' ('+BR.E(c.n)+' PREAs aceptadas)':'')):'';
+  el.hidden=false;el.className='xb'+(flash?' xf-new':'');
+  el.innerHTML='<h3>El cerebro aprendió de esta PREA ('+est+')</h3><div class="xb-l">'+c.resumen.map(function(t){return '<span class="xb-c">'+t+'</span>'}).join('')+'</div>'+
+    '<p>'+[rg,c.lecciones?c.lecciones+' lección'+(c.lecciones>1?'es':'')+' guardada'+(c.lecciones>1?'s':''):'',(c.aviso||[]).map(esc).join('; ')].filter(Boolean).join(' · ')+'</p>';
+};
+XD.brainApply=function(row){
+  var x=XD.cur;if(!x||String(row.id)!==String(x.id))return;
+  if(JSON.stringify(x.cerebro||null)===JSON.stringify(row.cerebro||null))return;
+  x.cerebro=row.cerebro;XD.brainDraw(true);
+};
 XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k,f)})};
 document.addEventListener('click',function(e){
   var t=e.target;if(!t.closest)return;
@@ -5971,7 +6169,7 @@ SB.enter=async function(user){
       if(p.table==='cartera'){if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
-      if(p.table==='expedientes'){AD.loadExp();if(S.view==='inicio')HM.load();if(p.new&&XD.cur&&String(p.new.id)===String(XD.cur.id)){if(p.new.prea_form)XD.formApply(p.new);if(p.new.plan_correccion)XD.planApply(p.new)}return}
+      if(p.table==='expedientes'){AD.loadExp();if(S.view==='inicio')HM.load();if(p.new&&XD.cur&&String(p.new.id)===String(XD.cur.id)){if(p.new.prea_form)XD.formApply(p.new);if(p.new.plan_correccion)XD.planApply(p.new);if(p.new.cerebro)XD.brainApply(p.new)}return}
       if(p.table==='activity')return;
       if(p.table==='reglas_lecciones'){LS.onNew(p);return}
       if(p.table==='aprendizaje_eventos'){LS.refresh();return}
@@ -7142,7 +7340,9 @@ IMP.one=async function(file){
     if(!(N(d.mano_obra)>0))d.mano_obra=N(form.total_mano_obra);
     if(!(N(d.horas)>0))d.horas=N(form.tiempo)||d.horas;
     if(!(d.operacion&&d.operacion.code)&&form.operacion)d.operacion={code:String(form.operacion),desc:(d.operacion&&d.operacion.desc)||''};
-    if(!(Array.isArray(d.piezas)&&d.piezas.length)&&N(form.total_partes)>0)d.piezas=[{no:String(form.numeros_parte||''),d:'Partes según la PREA',q:1,pr:N(form.total_partes)}];
+    var nums=String(form.numeros_parte||'').split(/[,;\s]+/).filter(function(z){return /\d/.test(z)});
+    if(!(Array.isArray(d.piezas)&&d.piezas.length)&&(N(form.total_partes)>0||nums.length))d.piezas=nums.length>1?nums.map(function(z){return {no:z,d:'Parte '+z,q:1,pr:0}}):[{no:nums[0]||'',d:'Partes según la PREA',q:1,pr:N(form.total_partes)}];
+    if(!(N(d.total)>0))d.total=N(form.total_antes_impuestos)||d.total;
   }
   var row=IMP.row(d,file.name),now=new Date().toISOString();
   /* repetida = misma orden y mismo número de PREA de planta (una orden puede tener más de una PREA) */
@@ -7157,7 +7357,7 @@ IMP.one=async function(file){
     var up=await SB.c.from('expedientes').update(upd0).eq('id',hit.id);
     if(up.error)throw up.error;
     var st1=await IMP.store(hit.id,file,true);
-    XD.planCheck(hit.id,upd0.prea_form);   /* ¿cambió la respuesta de planta? */
+    XD.afterForm(hit.id,upd0.prea_form);   /* ¿cambió la respuesta de planta? */
     return {upd:row.folio,id:hit.id,stored:st1};
   }
   if(form){row.prea_form=form;row.prea_form_at=now;row.prea_form_src=file.name}
@@ -7167,7 +7367,7 @@ IMP.one=async function(file){
   var ins=await SB.c.from('expedientes').insert(row);
   if(ins.error)throw ins.error;
   if(finalSt!=='borrador'){var us=await SB.c.from('expedientes').update({status:finalSt}).eq('id',row.id);if(us.error){SB.fail(us.error);row.status='borrador'}else row.status=finalSt}
-  if(form)XD.planCheck(row.id,form);   /* si planta la rechazó o devolvió, el agente arma el plan */
+  if(form)XD.afterForm(row.id,form);   /* estado según planta, plan si la rechazó y lo que aprende el cerebro */
   var st=await IMP.store(row.id,file,!!form);
   return {ok:row.folio,estado:row.status,id:row.id,stored:st,form:!!form};
 };
