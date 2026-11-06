@@ -1847,6 +1847,24 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .xb-c{font-size:12px;padding:2px 9px;border-radius:999px;background:#fff;border:1px solid #cfe9d6}.xb-c b{font-weight:600}
 .xb p{margin:4px 0;color:var(--muted);font-size:12.5px}
 .xf-empty-card{padding:18px 20px;font-size:13px;color:var(--muted)}
+/* Cartera: detalle de una orden (chat con el Agente de Cobros + factura + transacción de planta) */
+.ca-row{cursor:pointer}.ca-row:hover{background:var(--hover)}.ca-row:focus-visible{outline:2px solid var(--fg);outline-offset:-2px}
+.cc-sum{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}.cc-sum .cc-k{border:1px solid var(--card-line);background:var(--card);border-radius:12px;padding:8px 14px;min-width:120px}
+.cc-sum .cc-k span{display:block;font-size:11.5px;color:var(--muted)}.cc-sum .cc-k b{font:600 15px var(--f-ui)}
+.cc-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:16px;align-items:start}
+.cc-docs{display:flex;flex-direction:column;gap:16px;min-width:0}
+.cc-chat{border:1px solid var(--card-line);border-radius:16px;background:var(--card);display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.cc-chat>h3{margin:0;padding:12px 18px;border-bottom:1px solid var(--card-line);font:600 15px var(--f-ui)}
+.cc-msgs{height:min(56vh,520px);overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.cc-m{max-width:92%;font-size:13.5px;line-height:1.5;padding:9px 13px;border-radius:14px;word-break:break-word}
+.cc-m.u{align-self:flex-end;background:var(--send-on);color:var(--send-fg)}.cc-m.a{align-self:flex-start;background:var(--surface);border:1px solid var(--card-line)}
+.cc-m.a p{margin:4px 0}.cc-m.a ol,.cc-m.a ul{margin:4px 0;padding-left:20px}.cc-m.t{opacity:.6}
+.cc-chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 18px 10px}.cc-chips button{border:1px solid var(--card-line);background:var(--surface);color:var(--fg);font:12.5px var(--f-ui);padding:5px 11px;border-radius:999px;cursor:pointer}
+.cc-chips button:hover{background:var(--hover)}
+.cc-form{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--card-line)}
+.cc-form input{flex:1;min-width:0;height:42px;padding:0 14px;border:1px solid var(--card-line);border-radius:12px;background:var(--card);color:var(--fg);font:14px var(--f-ui);outline:none}
+.cc-form button{height:42px;padding:0 18px;border:0;border-radius:12px;background:var(--send-on);color:var(--send-fg);font:500 14px var(--f-ui);cursor:pointer}.cc-form button[disabled]{opacity:.55;cursor:progress}
+@media (max-width:900px){.cc-grid{grid-template-columns:1fr}}
 @media (max-width:700px){.xf-r{grid-template-columns:1fr;gap:0}.xf-l{text-align:left}}
 .gt-row .go.alt{background:var(--card);color:var(--fg);border:1px solid var(--card-line)}
 .gt-row .go.alt:hover{background:var(--hover)}.gt-row .go[disabled]{opacity:.55;cursor:progress}
@@ -3795,10 +3813,9 @@ CAR.render=function(){
   var stl={por_facturar:'Por facturar',facturada:'Facturada',vencida:'Vencida',pagada:'Pagada'};
   $('#caList').innerHTML=list.map(function(x){
     var e=x.expedientes||{},st=CAR.state(x),d=CAR.days(x),btn='';
-    if(x.estado==='por_facturar')btn='<button class="bt" type="button" data-a="fact">Registrar factura</button>';
-    else if(x.estado==='facturada')btn='<button class="bt pri" type="button" data-a="pago">Registrar pago</button>';
+    if(x.estado==='facturada')btn='<button class="bt pri" type="button" data-a="pago">Registrar pago</button>';
     var sub=st==='pagada'?'pagada '+SB.dayLbl(x.pagada_at||x.updated_at)+(x.monto_pagado!=null?' · planta pagó '+EX.money(x.monto_pagado)+(x.labor_pagada!=null?' (mano de obra '+EX.money(x.labor_pagada)+', piezas '+EX.money(x.piezas_pagadas)+')':' ('+Math.round(100*x.monto_pagado/Math.max(1,x.monto))+'%)'):'')+(x.estimado!=null?' · estimado '+EX.money(x.estimado):'')+(x.referencia?' · ref. '+esc(x.referencia):''):st==='por_facturar'?'aceptada hace '+d+' d':'factura '+esc(x.factura||'s/n')+' · hace '+d+' d';
-    return '<div class="ca-row" data-id="'+ea(x.expediente_id)+'"><div><b>'+esc(e.folio||'')+'</b><small>'+esc(e.sys||'')+'</small></div>'+
+    return '<div class="ca-row" role="button" tabindex="0" aria-label="Abrir la orden '+ea(e.folio||'')+'" data-id="'+ea(x.expediente_id)+'"><div><b>'+esc(e.folio||'')+'</b><small>'+esc(e.sys||'')+'</small></div>'+
       '<div class="q"><span title="'+ea(e.queja||'')+'">'+esc(e.queja||'')+'</span><small>'+sub+(admin&&x.profiles?' · '+esc(x.profiles.name):'')+'</small></div>'+
       '<div class="ca-h"><b>'+EX.money(x.monto)+'</b></div><div><span class="ca-st '+st+'">'+stl[st]+'</span> '+btn+'</div></div>';
   }).join('');
@@ -3835,9 +3852,135 @@ CAR.act=async function(id,a){
 };
 document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('#caBar [data-f]');if(f){CAR.f=f.dataset.f;CAR.render();return}
-  var b=e.target.closest&&e.target.closest('#caList [data-a]');if(b)CAR.act(b.closest('.ca-row').dataset.id,b.dataset.a);
+  var b=e.target.closest&&e.target.closest('#caList [data-a]');if(b){CAR.act(b.closest('.ca-row').dataset.id,b.dataset.a);return}
+  var rw=e.target.closest&&e.target.closest('#caList .ca-row');if(rw&&rw.dataset.id)CAR.open(rw.dataset.id);
+});
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  var rw=e.target.classList&&e.target.classList.contains('ca-row')?e.target:null;if(rw&&rw.dataset.id){e.preventDefault();CAR.open(rw.dataset.id)}
 });
 $('#caQ').addEventListener('input',function(){CAR.q=this.value;CAR.render()});
+/* ══ Cartera: detalle de una orden ═══════════════════════════
+   Al dar clic en una orden: chat con el Agente de Cobros de ESA orden (la estimación, el IVA, el porcentaje que
+   paga planta…) y dos apartados: la factura y la transacción que pagó planta. Al subirlos, el cerebro los lee y
+   los asienta en Cartera (factura → facturada; transacción → pagada) y el agente lo comenta en el chat. */
+var CC={msgs:[],conv:null,busy:false,car:null,exp:null,ord:''};
+CAR.open=async function(id){
+  if(!SB.c||!SB.entered)return;
+  var g=await SB.c.from('expedientes').select('*').eq('id',id).single();
+  if(g.error||!g.data){SB.fail(g.error||'sin datos');toast('No pude abrir esa orden');return}
+  var x=g.data,el=$('#exDoc');
+  XD.cur=x;XD.mode='cartera';
+  CC.exp=x;CC.car=CAR.rows.filter(function(r){return r.expediente_id===id})[0]||null;CC.msgs=[];CC.conv=null;CC.busy=false;CC.ord=x.wo||x.folio||'';
+  el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Cartera</button>'+
+    '<div><h2>'+esc(x.wo||x.folio||'Orden')+'</h2><p>'+esc([x.queja,x.sys,x.folio&&x.wo&&x.folio!==x.wo?'PREA '+x.folio:''].filter(Boolean).join(' · '))+'</p></div></div>'+
+    '<div class="cc-sum" id="ccSum"></div>'+
+    '<div class="cc-grid"><section class="cc-chat" aria-label="Chat con el Agente de Cobros"><h3>Agente de Cobros · '+esc(CC.ord)+'</h3><div class="cc-msgs" id="ccMsgs" aria-live="polite"></div>'+
+    '<div class="cc-chips" id="ccChips"></div><form class="cc-form" id="ccForm"><input id="ccIn" autocomplete="off" placeholder="Pregunta por la estimación, el IVA o lo que paga planta…" aria-label="Mensaje para el Agente de Cobros"><button type="submit" id="ccGo">Enviar</button></form></section>'+
+    '<div class="cc-docs">'+XD.secHtml(['factura','Factura'])+XD.secHtml(['planta','Transacción de planta'])+'</div></div></div>';
+  $('#viewCar').hidden=true;el.hidden=false;el.scrollTop=0;
+  XD.load(id,'factura');XD.load(id,'planta');
+  CC.sum();CC.init();
+};
+CC.sum=function(){
+  var x=CC.car,e=CC.exp||{},el=$('#ccSum');if(!el)return;
+  var K=function(l,v){return '<div class="cc-k"><span>'+l+'</span><b>'+v+'</b></div>'},st={por_facturar:'Por facturar',facturada:'Facturada',vencida:'Vencida',pagada:'Pagada'};
+  if(!x){el.innerHTML=K('Reclamado',EX.money(Number(e.labor||0)+Number(e.parts_total||0)));return}
+  el.innerHTML=K('Estado',st[CAR.state(x)]||'')+K('Reclamado (antes de IVA)',EX.money(x.monto))+(x.estimado!=null?K('Estimado por el agente',EX.money(x.estimado)):'')+
+    (x.factura?K('Factura',esc(x.factura)):'')+(x.monto_pagado!=null?K('Planta pagó',EX.money(x.monto_pagado)):'');
+};
+CC.reloadCar=async function(){
+  if(!XD.cur)return null;
+  var id=XD.cur.id,r=await SB.c.from('cartera').select('*,expedientes(folio,queja,sys,op,labor,parts_total),profiles(name)').eq('expediente_id',id).maybeSingle();
+  if(r.error||!r.data)return CC.car;
+  CC.car=r.data;
+  var i=CAR.rows.findIndex(function(z){return z.expediente_id===id});if(i>=0)CAR.rows[i]=r.data;
+  return r.data;
+};
+CC.refresh=async function(){if(XD.mode!=='cartera')return;await CC.reloadCar();CC.sum()};
+/* la estimación: lo mismo que calcula el Agente de Cobros en su chat, sin los pasos en pantalla */
+CC.estimar=async function(){
+  var car=CC.car,ex=CC.exp;if(!car||!ex||car.estado==='pagada')return null;
+  var lc=Number(ex.labor||0),pc=Number(ex.parts_total||0),claim=r2(lc+pc);
+  try{await CB.get()}catch(_){return null}
+  var b=CB.pick({op:ex.op,sys:ex.sys});
+  var c={prea:ex.folio,wo:ex.wo,vehicle:ex.vehicle,km:ex.km,id:ex.id,sys:ex.sys,op:ex.op,opd:ex.opd,queja:ex.queja,claim:claim,lc:lc,pc:pc,basis:b,estado:car.estado,factura:car.factura};
+  if(b){
+    var cl=function(z){return Math.min(1.2,Math.max(0,z))},rl=cl(b.rl!=null?b.rl:b.rp),rp=cl(b.rp!=null?b.rp:b.rl);
+    c.rl=rl;c.rp=rp;c.estL=r2(lc*rl);c.estP=r2(pc*rp);c.est=r2(c.estL+c.estP);c.ratio=claim>0?c.est/claim:0;
+    c.lo=r2(claim*Math.max(0,b.rmin));c.hi=r2(claim*Math.min(1.2,b.rmax));c.iva=r2(c.est*0.16);c.total=r2(c.est+c.iva);c.conf=CB.conf(b);
+    var u=await SB.c.from('cartera').update({estimado:c.est,estimado_at:new Date().toISOString()}).eq('expediente_id',ex.id);
+    if(!u.error&&CC.car){CC.car.estimado=c.est;CC.sum()}
+  }
+  return c;
+};
+CC.render=function(typing){
+  var box=$('#ccMsgs');if(!box)return;
+  box.innerHTML=CC.msgs.map(function(m){return m.role==='user'?'<div class="cc-m u">'+esc(m.content)+'</div>':'<div class="cc-m a">'+md(m.content,false)+'</div>'}).join('')+(typing?'<div class="cc-m a t">El agente está pensando…</div>':'');
+  box.scrollTop=box.scrollHeight;
+  var ch=$('#ccChips');if(ch)ch.innerHTML=CC.msgs.length&&!typing?['¿Cuánto va a pagar planta?','¿Por qué ese porcentaje?','¿Cuánto es con IVA?','¿Qué le falta a esta orden?'].map(function(q){return '<button type="button" data-ccq="'+ea(q)+'">'+esc(q)+'</button>'}).join(''):'';
+};
+CC.persist=async function(){
+  if(!CC.conv)return;
+  var r=await SB.c.from('conversations').update({messages:CC.msgs.slice(-40)}).eq('id',CC.conv);
+  if(r.error)SB.fail(r.error);
+};
+/* cada orden tiene su conversación del Agente de Cobros (la misma que aparece en su historial) */
+CC.init=async function(){
+  var ord=CC.ord,ex=CC.exp;CC.render(true);
+  try{
+    var f=await SB.c.from('conversations').select('id,messages').eq('agent','cobros').eq('orden',ord).limit(1);
+    if(!f.error&&f.data&&f.data[0]){CC.conv=f.data[0].id;CC.msgs=Array.isArray(f.data[0].messages)?f.data[0].messages.slice():[]}
+    else{
+      var id=crypto.randomUUID(),ins=await SB.c.from('conversations').insert({id:id,agent:'cobros',title:ord,text:'Orden '+ord+' (Cobros). Estimación y pago de la PREA',orden:ord});
+      if(ins.error)SB.fail(ins.error);else{CC.conv=id;try{SB.loadHist();GP.load()}catch(_){}}
+    }
+    if(!XD.cur||XD.cur.id!==ex.id)return;
+    if(!CC.msgs.length){
+      var car=CC.car,t;
+      if(car&&car.estado==='pagada'){
+        var pag=car.monto_pagado!=null?Number(car.monto_pagado):null,rec=Number(car.monto);
+        t='Planta ya pagó esta orden'+(pag!=null?': **'+money(pag)+'** antes de IVA sobre '+money(rec)+' reclamados (≈ '+Math.round(100*pag/Math.max(1,rec))+'%).':'.')+(car.estimado!=null&&pag!=null?'\n\nYo había estimado **'+money(Number(car.estimado))+'**, una diferencia de '+Math.round(Math.abs(Number(car.estimado)-pag)/Math.max(1,pag)*100)+'%. De este pago aprende el Agente de Cobros.':'');
+      }else{
+        var c=await CC.estimar();
+        t=c?finalCB0(c):'No pude calcular la estimación ahora. Pregúntame de nuevo en un momento.';
+        if(car&&car.estado==='por_facturar')t+='\n\nCuando factures, sube la **factura** aquí a la derecha y la registro en Cartera; y cuando planta pague, sube la **transacción de planta**.';
+      }
+      CC.msgs.push({role:'assistant',content:t});CC.persist();
+    }
+    CC.render();
+  }catch(e){SB.fail(e);CC.msgs.push({role:'assistant',content:'No pude cargar esta conversación: '+TR.errTxt(e)});CC.render()}
+};
+CC.send=async function(text){
+  text=String(text||'').trim();if(!text||CC.busy||!XD.cur||XD.mode!=='cartera')return;
+  CC.busy=true;var go=$('#ccGo');if(go)go.disabled=true;
+  CC.msgs.push({role:'user',content:text.slice(0,2000)});CC.render(true);
+  var reply;
+  try{
+    var r=await SB.ai({mode:'garantias_chat',agente:'cobros',conversation_id:CC.conv||null,orden:CC.ord,folio:CC.exp.folio,messages:CC.msgs.slice(-14),ahora:MI.nowInfo()});
+    reply=(r&&r.text)||'No tengo una respuesta para eso.';
+  }catch(e){reply='No pude consultar al agente ahora: '+TR.errTxt(e)}
+  CC.msgs.push({role:'assistant',content:reply.slice(0,3000)});
+  CC.busy=false;if(go)go.disabled=false;
+  if(XD.mode==='cartera'&&XD.cur&&XD.cur.id===CC.exp.id)CC.render();
+  CC.persist();
+};
+/* el cerebro leyó la factura o la transacción: Cartera ya cambió y el agente lo comenta */
+CC.docLeido=async function(k,r){
+  if(k!=='factura'&&k!=='planta')return;
+  var car=await CC.reloadCar();CC.sum();
+  var ok=(r&&r.aplicado&&r.aplicado.length)?r.aplicado.join(' · '):'';
+  var t=k==='factura'?'Leí la **factura**'+(ok?': '+ok+'.':'.'):'Leí la **transacción de planta**'+(ok?': '+ok+'.':'.');
+  if(k==='planta'&&car&&car.estado==='pagada'){
+    var pag=Number(car.monto_pagado||0),rec=Number(car.monto||0);
+    if(pag>0)t+=' Planta pagó **'+money(pag)+'** antes de IVA sobre '+money(rec)+' reclamados (≈ '+Math.round(100*pag/Math.max(1,rec))+'%).'+(car.estimado!=null?' Yo había estimado **'+money(Number(car.estimado))+'**'+(Math.abs(Number(car.estimado)-pag)<=pag*0.05?': muy cerca.':' (diferencia de '+Math.round(Math.abs(Number(car.estimado)-pag)/pag*100)+'%).'):'');
+  }
+  if(k==='factura'&&car&&car.estado==='facturada')t+=' Ya quedó como facturada en Cartera.';
+  CC.msgs.push({role:'assistant',content:t});CC.persist();
+  if(XD.mode==='cartera')CC.render();
+};
+document.addEventListener('submit',function(e){if(e.target&&e.target.id==='ccForm'){e.preventDefault();var i=$('#ccIn');var v=i.value;i.value='';CC.send(v)}});
+document.addEventListener('click',function(e){var q=e.target.closest&&e.target.closest('[data-ccq]');if(q)CC.send(q.dataset.ccq)});
 /* ---- Pagos históricos de planta: arranque del Agente de Cobros ---- */
 var PH={template:'folio,sistema,operacion,mano_obra_reclamada,piezas_reclamadas,mano_obra_pagada,piezas_pagadas,fecha\nPREA-100342,Frenos,OP-FR-011,1900,3200,1900,2700,2026-08-14\n'};
 PH.num=function(v){var n=parseFloat(String(v==null?'':v).replace(/[$,\s]/g,''));return isNaN(n)?null:n};
@@ -5459,7 +5602,7 @@ XD.rowHtml=function(o){
     (o.ok?'<span class="xd-tick">✓</span>':'')+'</div>'};
 XD.open=function(id){
   var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x){toast('No encontré ese expediente');return}
-  XD.cur=x;var el=$('#exDoc');
+  XD.cur=x;XD.mode='exp';var el=$('#exDoc');
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div></div>'+
     '<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section>'+'<div class="xd-grid">'+XD.DOCS.map(function(d){
@@ -5474,7 +5617,7 @@ XD.open=function(id){
   XD.qLoad(x.id);
   XD.formInit(x);
 };
-XD.close=function(){if(!XD.cur)return;$('#exDoc').hidden=true;$('#viewExp').hidden=false;XD.cur=null};
+XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera';$('#exDoc').hidden=true;$(car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;if(car)CAR.load()};
 XD.sec=function(k){return $('#exDoc .xd-sec[data-k="'+k+'"]')};
 /* lo ya subido */
 XD.load=async function(id,k){
@@ -5582,6 +5725,7 @@ XD.learn=async function(k,file,meta,runId,intento){
       again(r.run_id,'se aplicó parte ('+ok+'), pero falló: '+r.pendiente.join(', ')+'.');return;
     }
     meta.textContent=base+' · ✓ '+ok;
+    if(XD.mode==='cartera')CC.docLeido(k,r);
     if(r&&r.lecciones){try{LS.learnNow()}catch(_){}}
   }catch(e){
     var m=String((e&&e.message)||e),rid=(e&&e.run_id)||runId||null;
@@ -6026,6 +6170,13 @@ XD.brainApply=function(row){
   if(JSON.stringify(x.cerebro||null)===JSON.stringify(row.cerebro||null))return;
   x.cerebro=row.cerebro;XD.brainDraw(true);
 };
+XD.secHtml=function(d){
+  return '<section class="xd-sec" data-k="'+d[0]+'"><h3>'+esc(d[1])+'</h3>'+
+    '<div class="xd-zone" tabindex="0" role="button" aria-label="Subir '+ea(d[1])+'"><span class="xd-icon" aria-hidden="true">'+
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
+    '<span class="xd-say"><b>Arrastra un archivo aquí</b><span>o haz clic · hasta '+XD.MAX+' MB</span></span>'+
+    '<input type="file" multiple hidden></div><div class="xd-list"></div></section>';
+};
 XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k,f)})};
 document.addEventListener('click',function(e){
   var t=e.target;if(!t.closest)return;
@@ -6166,7 +6317,7 @@ SB.enter=async function(user){
     MI.loadAgenda().then(MI.startTimer);
     showView(MR.is()?'m_res':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
-      if(p.table==='cartera'){if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
+      if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
       if(p.table==='expedientes'){AD.loadExp();if(S.view==='inicio')HM.load();if(p.new&&XD.cur&&String(p.new.id)===String(XD.cur.id)){if(p.new.prea_form)XD.formApply(p.new);if(p.new.plan_correccion)XD.planApply(p.new);if(p.new.cerebro)XD.brainApply(p.new)}return}
