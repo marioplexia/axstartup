@@ -5427,7 +5427,7 @@ $('#exQ').addEventListener('input',function(){EX.q=this.value;EX.render()});
    archivos van a Supabase Storage, bucket "expedientes-docs", en la ruta
    <expediente>/<tipo>/<archivo>. */
 var XD={cur:null,B:'expedientes-docs',MAX:20,
-  DOCS:[['contrato','Contrato firmado'],['piezas','Piezas'],['evidencia','Evidencia de la PREA, campaña o servicio'],['factura','Factura'],['planta','Transacción de planta']]};
+  DOCS:[['contrato','Contrato firmado'],['actualizacion','Actualización de PREA'],['piezas','Piezas'],['evidencia','Evidencia de la PREA, campaña o servicio'],['factura','Factura'],['planta','Transacción de planta']]};
 XD.fmt=function(b){return b>=1e6?(b/1e6).toFixed(1)+' MB':Math.max(1,Math.round(b/1e3))+' KB'};
 XD.ext=function(n){var m=/\.([a-z0-9]{1,4})$/i.exec(n);return m?m[1].toUpperCase():'ARCH'};
 XD.rowHtml=function(o){
@@ -5485,8 +5485,7 @@ XD.send=async function(k,file){
     return;
   }
   bar.style.transform='scaleX(1)';meta.textContent=XD.fmt(file.size)+' · Subido';
-  XD.learn(k,file,meta);
-  if(k==='evidencia')XD.formRead(x.id,file,file.name,path);
+  if(k==='actualizacion')XD.formRead(x.id,file,file.name,path,meta);else XD.learn(k,file,meta);
   setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>');
     var nm=row.querySelector('.xd-name');nm.outerHTML='<button type="button" class="xd-name" data-xdopen="'+ea(path)+'">'+esc(file.name)+'</button>'},350);
 };
@@ -5620,8 +5619,8 @@ XD.formDiff=function(a,b){
 XD.formDraw=function(ch){
   var el=$('#xdForm'),x=XD.cur;if(!el||!x)return;
   var f=x.prea_form;
-  var head='<div class="xf-h"><h3>Ver Pre-Autorización</h3><span class="xf-st2" id="xdFormSt"></span><button class="xf-btn" type="button" id="xdFormBtn" data-xfread>Actualizar con la última evidencia</button></div>';
-  el.innerHTML=head+(f?XD.formHtml(f,ch):'<div class="xf-empty-card">Aún no hay formulario. Sube la PREA que te dio planta (PDF o captura) en <b>Evidencia de la PREA</b> y se llena sola; si subes otra evidencia después, el formulario se actualiza.</div>');
+  var head='<div class="xf-h"><h3>Ver Pre-Autorización</h3><span class="xf-st2" id="xdFormSt"></span><button class="xf-btn" type="button" id="xdFormBtn" data-xfread>Actualizar con la última actualización</button></div>';
+  el.innerHTML=head+(f?XD.formHtml(f,ch):'<div class="xf-empty-card">Aún no hay formulario. Sube la pantalla «Ver Pre-Autorización» que te dio planta (PDF o captura) en <b>Actualización de PREA</b> y se llena sola; cada vez que subas una actualización nueva, el formulario cambia.</div>');
   XD.fSay(f&&x.prea_form_src?'Leído de '+x.prea_form_src+(x.prea_form_at?' · '+new Date(x.prea_form_at).toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''):'');
 };
 XD.formApply=function(row){
@@ -5643,54 +5642,57 @@ XD.formMerge=function(old,nw){
   return o;
 };
 /* lee UNA evidencia; devuelve true si era el formulario */
-XD.formRead=function(id,file,name,path){
-  XD.fq=XD.fq.then(function(){return XD.formRead1(id,file,name,path)}).catch(function(){});
+XD.formRead=function(id,file,name,path,meta){
+  XD.fq=XD.fq.then(function(){return XD.formRead1(id,file,name,path,meta)}).catch(function(){});
   return XD.fq;
 };
-XD.formRead1=async function(id,file,name,path){
+XD.formRead1=async function(id,file,name,path,meta){
   if(!SB.c||!SB.entered)return false;
   var mine=function(){return XD.cur&&String(XD.cur.id)===String(id)};
-  if(!XD.fOk(name,file.type))return false;
-  if(mine()){XD.fSay('Leyendo la evidencia «'+name+'»…');XD.fBusy(true)}
+  var base=meta?XD.fmt(file.size)+' · Subido':'',row=function(t,bad){if(meta){meta.className='xd-meta'+(bad?' err':'');meta.textContent=base+' · '+t}};
+  if(!XD.fOk(name,file.type)){row('solo leo PDF o imágenes del formulario',true);return false}
+  row('leyendo el formulario…');
+  if(mine()){XD.fSay('Leyendo «'+name+'»…');XD.fBusy(true)}
   try{
     var pf=await TR.prep(file);
     var r=await SB.ai({file:pf},'formulario'),d=r&&r.datos;
     if(!d)throw new Error('bad_output');
     try{localStorage.setItem(XD.fKey(path||name),'1')}catch(_){}
-    if(d.es_formulario===false){if(mine())XD.fSay('«'+name+'» no es el formulario de la PREA; se conserva el que ya está.');return false}
+    if(d.es_formulario===false){row('no es el formulario «Ver Pre-Autorización» de planta; no cambié nada',true);if(mine())XD.fSay('«'+name+'» no es el formulario de la PREA; se conserva el que ya está.');return false}
     var cur=mine()?XD.cur:null,old=cur?cur.prea_form:null;
     if(!cur){var g=await SB.c.from('expedientes').select('prea_form').eq('id',id).single();old=g.data&&g.data.prea_form}
     var merged=XD.formMerge(old,d),now=new Date().toISOString();
     var u=await SB.c.from('expedientes').update({prea_form:merged,prea_form_at:now,prea_form_src:name}).eq('id',id).select('id,prea_form,prea_form_at,prea_form_src').single();
     if(u.error)throw u.error;
     if(mine())XD.formApply(u.data);
+    row('✓ formulario actualizado');
     return true;
-  }catch(e){if(mine())XD.fSay('No pude leer la evidencia: '+TR.errTxt(e),true);return false}
+  }catch(e){row('no pude leerlo ('+TR.errTxt(e)+')',true);if(mine())XD.fSay('No pude leer el formulario: '+TR.errTxt(e),true);return false}
   finally{if(mine())XD.fBusy(false)}
 };
-/* al abrir el expediente (o con el botón): revisa las evidencias y lee la más reciente que sea el formulario */
+/* al abrir el expediente (o con el botón): revisa lo subido en Actualización de PREA y lee lo más reciente que sea el formulario */
 XD.formInit=async function(x,force){
   XD.formDraw();
   if(!SB.c)return;
   try{
-    var r=await SB.c.storage.from(XD.B).list(x.id+'/evidencia',{limit:100,sortBy:{column:'created_at',order:'desc'}});
+    var r=await SB.c.storage.from(XD.B).list(x.id+'/actualizacion',{limit:100,sortBy:{column:'created_at',order:'desc'}});
     if(r.error||!XD.cur||XD.cur.id!==x.id)return;
     var at=x.prea_form_at?new Date(x.prea_form_at).getTime():0;
     var C=(r.data||[]).filter(function(f){
       if(!f.name||f.name==='.emptyFolderPlaceholder'||!XD.fOk(f.name,f.metadata&&f.metadata.mimetype))return false;
       if(force)return true;
-      var path=x.id+'/evidencia/'+f.name,seen=false;try{seen=!!localStorage.getItem(XD.fKey(path))}catch(_){}
+      var path=x.id+'/actualizacion/'+f.name,seen=false;try{seen=!!localStorage.getItem(XD.fKey(path))}catch(_){}
       return !seen&&(!x.prea_form||new Date(f.created_at||0).getTime()>at);
     }).slice(0,3);
-    if(!C.length){if(force)XD.fSay('No hay evidencias en PDF o imagen para leer.',true);return}
+    if(!C.length){if(force)XD.fSay('Aún no has subido nada en Actualización de PREA.',true);return}
     for(var i=0;i<C.length;i++){
       if(!XD.cur||XD.cur.id!==x.id)return;
-      var path2=x.id+'/evidencia/'+C[i].name,dl=await SB.c.storage.from(XD.B).download(path2);
+      var path2=x.id+'/actualizacion/'+C[i].name,dl=await SB.c.storage.from(XD.B).download(path2);
       if(dl.error||!dl.data)continue;
       var nm=C[i].name.replace(/^\d+_/,''),file=new File([dl.data],nm,{type:(C[i].metadata&&C[i].metadata.mimetype)||dl.data.type||''});
       if(await XD.formRead(x.id,file,nm,path2))break;
     }
-  }catch(e){XD.fSay('No pude revisar las evidencias: '+TR.errTxt(e),true)}
+  }catch(e){XD.fSay('No pude revisar las actualizaciones: '+TR.errTxt(e),true)}
 };
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-xfread]');if(b&&XD.cur)XD.formInit(XD.cur,true)});
 XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k,f)})};
