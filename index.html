@@ -1807,8 +1807,9 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 @keyframes gt-in{from{opacity:0;translate:0 10px}}
 .stage[data-gate="on"] #composer,.stage[data-gate="on"] #chips{display:none}
 .gt-hint{margin:0;font-size:13px;color:var(--muted);text-align:center}
-.gt-up{background:none;border:0;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px}
-.gt-up u{text-underline-offset:3px}.gt-up:hover{color:inherit}.gt-up[disabled]{opacity:.55;cursor:progress}
+.gt-row .go.alt{background:var(--card);color:var(--fg);border:1px solid var(--card-line)}
+.gt-row .go.alt:hover{background:var(--hover)}.gt-row .go[disabled]{opacity:.55;cursor:progress}
+#gtOrig .gt-row .go{flex:1;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;text-align:center}
 .gt-upst{margin:0;font-size:13px;color:var(--muted);text-align:center;max-width:440px;min-height:0}.gt-upst:empty{display:none}.gt-upst.bad{color:#c0392b}
 .gt-ord{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:360px}
 .gt-tipo{display:inline-flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--card-line);font:500 13px var(--f-ui)}
@@ -1917,9 +1918,13 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
             <div class="gt-row"><input id="gtIn" autocomplete="off" placeholder="Número de orden, ej. GA4043" aria-label="Número de orden"><button class="go" type="submit">Continuar</button></div>
             <p class="gt-err" id="gtErr" role="alert"></p>
           </form>
-          <button type="button" class="gt-up" id="gtUp">¿Ya tienes una PREA en planta? <u>Súbela en PDF</u></button>
-          <input type="file" id="gtUpIn" accept="application/pdf,image/*" multiple hidden>
-          <p class="gt-upst" id="gtUpSt" role="status" aria-live="polite"></p>
+          <div class="gt-ord" id="gtOrig" hidden>
+            <span class="gt-tipo"><span>PREA</span><button type="button" id="gtOrigBack" aria-label="Cambiar tipo">Cambiar</button></span>
+            <div class="gt-row"><button class="go" type="button" id="gtNew">Nueva</button><button class="go alt" type="button" id="gtUp">Ya existe · subir PDF</button></div>
+            <p class="gt-hint">Si ya la tienes avanzada en planta, sube su PDF y la agrego a tu tablero</p>
+            <input type="file" id="gtUpIn" accept="application/pdf,image/*" multiple hidden>
+            <p class="gt-upst" id="gtUpSt" role="status" aria-live="polite"></p>
+          </div>
         </div>
         <div class="composer rise d1" id="composer">
           <div class="c-head">
@@ -6754,7 +6759,7 @@ GATE.measure=function(){
   var w=$('#crtSay').offsetWidth+1;if(w<=1)return;
   $('#crt').style.setProperty('--pill-w',(18+8+w+34)+'px');
 };
-GATE.menu=function(){$('#gtMenu').hidden=false;$('#gtOrd').hidden=true;GATE.measure();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(GATE.measure)};
+GATE.menu=function(){$('#gtMenu').hidden=false;$('#gtOrd').hidden=true;$('#gtOrig').hidden=true;if(typeof IMP!=='undefined')IMP.say('');GATE.measure();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(GATE.measure)};
 GATE.press=function(){
   var st=$('#crt');st.dataset.sink='true';clearTimeout(GATE.beat);
   /* 60ms handoff against a 160ms sink: the spread begins while the press is still running */
@@ -6763,10 +6768,14 @@ GATE.press=function(){
 GATE.pick=function(tipo){
   GATE.set(false);GATE.tipo=tipo;
   setTimeout(function(){
-    $('#gtMenu').hidden=true;$('#gtOrd').hidden=false;$('#gtTipo').textContent=tipo;$('#gtErr').textContent='';
+    $('#gtMenu').hidden=true;$('#gtTipo').textContent=tipo;$('#gtErr').textContent='';
+    /* una PREA puede ser nueva o una que el asesor ya tiene avanzada en planta */
+    if(tipo==='PREA'){$('#gtOrd').hidden=true;$('#gtOrig').hidden=false;IMP.say('');$('#gtNew').focus();return}
+    $('#gtOrig').hidden=true;$('#gtOrd').hidden=false;
     var i=$('#gtIn');i.value='';i.removeAttribute('aria-invalid');i.focus();
   },gStill?0:200);
 };
+GATE.nueva=function(){$('#gtOrig').hidden=true;$('#gtOrd').hidden=false;var i=$('#gtIn');i.value='';i.removeAttribute('aria-invalid');$('#gtErr').textContent='';i.focus()};
 GATE.fix=function(t){return String(t||'').toUpperCase().replace(/\s+/g,'').replace(/^([A-Z]{1,3})(\d)/,'$1$2')};
 GATE.reset=function(){GATE.v=null;GATE.sync()};
 $('#crtPill').addEventListener('click',function(){if(!GATE.open)GATE.press()});
@@ -6850,6 +6859,8 @@ IMP.run=async function(files){
   if(ok.length){toast(ok.length===1?'PREA creada en tu tablero':ok.length+' PREAs creadas en tu tablero');EX.q=ok.length===1?ok[0].split(' ')[0]:'';$('#exQ').value=EX.q;EX.f='prea';showView('exp')}
 };
 $('#gtUp').addEventListener('click',function(){if(!IMP.busy)$('#gtUpIn').click()});
+$('#gtNew').addEventListener('click',GATE.nueva);
+$('#gtOrigBack').addEventListener('click',GATE.menu);
 $('#gtUpIn').addEventListener('change',function(){var f=[].slice.call(this.files);this.value='';IMP.run(f)});
 /* el primer mensaje lleva la orden y el tipo, para que el chat la guarde y el agente la conozca */
 GATE.pre=function(){return S.agent==='garantias'&&GATE.v&&!S.convId&&!GP.cur?'Orden '+GATE.v.orden+' ('+GATE.v.tipo+'). ':''};
