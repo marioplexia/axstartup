@@ -6972,19 +6972,53 @@ IMP.row=function(d,name){
     comentario_fabricante:(d.motivo_resolucion||coms.slice(-3).join(' | ')||'').slice(0,1500)||null,
     modificaciones:[prea&&orden&&prea!==orden?'PREA de planta: '+prea:'',d.errores_y_correcciones?String(d.errores_y_correcciones):''].filter(Boolean).join(' · ').slice(0,1500)||null};
 };
+IMP.num=function(x){var n=Number(String(x==null?'':x).replace(/[^\d.\-]/g,''));return isFinite(n)?n:0};
+/* guarda el PDF en el expediente: el formulario de planta va en "Actualización de PREA"; otra cosa, en "Evidencia" */
+IMP.store=async function(id,file,isForm){
+  var path=id+'/'+(isForm?'actualizacion':'evidencia')+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]+/g,'_');
+  try{
+    var u=await SB.c.storage.from(XD.B).upload(path,file,{contentType:file.type||undefined});
+    if(u.error)return false;
+    try{localStorage.setItem(XD.fKey(path),'1')}catch(_){}   /* ya está leído: no se vuelve a leer al abrir el expediente */
+    return true;
+  }catch(e){return false}
+};
 IMP.one=async function(file){
   var f=await TR.prep(file);
-  var r=await SB.ai({mode:'importar_prea',kind:'prea',file:f});
-  var d=r&&r.datos;if(!d)throw new Error('No pude leer '+file.name);
-  if(d.es_prea===false)throw new Error(file.name+': no parece una PREA'+(d.motivo_invalido?' ('+d.motivo_invalido+')':''));
-  var row=IMP.row(d,file.name);
+  /* una sola subida alimenta todo: la PREA del tablero y su formulario (el mismo PDF queda como Actualización de PREA) */
+  var rr=await Promise.all([SB.ai({mode:'importar_prea',kind:'prea',file:f}),SB.ai({file:f},'formulario').catch(function(){return null})]);
+  var d=rr[0]&&rr[0].datos,fd=rr[1]&&rr[1].datos,form=fd&&fd.es_formulario!==false?fd:null;
+  if(!d)throw new Error('No pude leer '+file.name);
+  if(d.es_prea===false&&!form)throw new Error(file.name+': no parece una PREA'+(d.motivo_invalido?' ('+d.motivo_invalido+')':''));
+  if(form){
+    delete form.es_formulario;delete form.motivo;
+    var N=IMP.num,km=N(form.odometro);
+    d.orden=form.orden_reparacion||d.orden;d.folio=form.id_preautorizacion||d.folio;d.vin=form.vin||d.vin;
+    d.vehiculo=Object.assign({},d.vehiculo&&typeof d.vehiculo==='object'?d.vehiculo:{},km>0?{km:km}:{});
+    var es=String(form.estatus||'');if(/acept|aprob/i.test(es))d.estado='aceptada';else if(/rechaz/i.test(es))d.estado='rechazada';
+    if(!(N(d.mano_obra)>0))d.mano_obra=N(form.total_mano_obra);
+    if(!(N(d.horas)>0))d.horas=N(form.tiempo)||d.horas;
+    if(!(d.operacion&&d.operacion.code)&&form.operacion)d.operacion={code:String(form.operacion),desc:(d.operacion&&d.operacion.desc)||''};
+    if(!(Array.isArray(d.piezas)&&d.piezas.length)&&N(form.total_partes)>0)d.piezas=[{no:String(form.numeros_parte||''),d:'Partes según la PREA',q:1,pr:N(form.total_partes)}];
+  }
+  var row=IMP.row(d,file.name),now=new Date().toISOString();
   /* repetida = misma orden y mismo número de PREA de planta (una orden puede tener más de una PREA) */
-  var prea=String(d.folio||'').trim(),ex=await SB.c.from('expedientes').select('id,modificaciones').eq('folio',row.folio).limit(20);
+  var prea=String(d.folio||'').trim(),ex=await SB.c.from('expedientes').select('id,modificaciones,prea_form').eq('folio',row.folio).limit(20);
   if(ex.error)throw ex.error;
-  if((ex.data||[]).some(function(x){return !prea||prea===row.folio||String(x.modificaciones||'').indexOf(prea)>=0}))return {dup:row.folio};
+  var hit=(ex.data||[]).filter(function(x){return !prea||prea===row.folio||String(x.modificaciones||'').indexOf(prea)>=0})[0];
+  if(hit){
+    /* ya estaba en el tablero: subir otra vez su PDF es una actualización de la PREA */
+    if(!form)return {dup:row.folio};
+    var up=await SB.c.from('expedientes').update({prea_form:XD.formMerge(hit.prea_form,form),prea_form_at:now,prea_form_src:file.name}).eq('id',hit.id);
+    if(up.error)throw up.error;
+    var st1=await IMP.store(hit.id,file,true);
+    return {upd:row.folio,id:hit.id,stored:st1};
+  }
+  if(form){row.prea_form=form;row.prea_form_at=now;row.prea_form_src=file.name}
   var ins=await SB.c.from('expedientes').insert(row);
   if(ins.error)throw ins.error;
-  return {ok:row.folio,estado:row.status};
+  var st=await IMP.store(row.id,file,!!form);
+  return {ok:row.folio,estado:row.status,id:row.id,stored:st,form:!!form};
 };
 IMP.run=async function(files){
   if(IMP.busy)return;
@@ -6992,19 +7026,31 @@ IMP.run=async function(files){
   if(!files.length){IMP.say('Elige un PDF o una imagen de la PREA',true);return}
   if(!SB.c||!SB.entered){IMP.say('Inicia sesión para subir tu PREA',true);return}
   IMP.busy=true;$('#gtUp').disabled=true;
-  var ok=[],dup=[],bad=[],lbl={aceptada:'aceptada',rechazada:'rechazada',borrador:'esperando respuesta'};
+  var ok=[],upd=[],dup=[],bad=[],ids=[],nost=0,nform=0,lbl={aceptada:'aceptada',rechazada:'rechazada',borrador:'esperando respuesta'};
   for(var i=0;i<files.length;i++){
     IMP.say('Leyendo '+files[i].name+(files.length>1?' ('+(i+1)+' de '+files.length+')':'')+'…');
-    try{var r=await IMP.one(files[i]);if(r.dup)dup.push(r.dup);else ok.push(r.ok+' ('+lbl[r.estado]+')')}
-    catch(e){bad.push(TR.errTxt(e))}
+    try{
+      var r=await IMP.one(files[i]);
+      if(r.dup)dup.push(r.dup);
+      else if(r.upd){upd.push(r.upd);ids.push(r.id)}
+      else{ok.push(r.ok+' ('+lbl[r.estado]+')');ids.push(r.id);if(r.form)nform++}
+      if(!r.dup&&!r.stored)nost++;
+    }catch(e){bad.push(TR.errTxt(e))}
   }
   IMP.busy=false;$('#gtUp').disabled=false;
   var msg=[];
-  if(ok.length)msg.push('Creé '+(ok.length===1?'la PREA ':'las PREAs ')+ok.join(', ')+'.');
+  if(ok.length)msg.push('Creé '+(ok.length===1?'la PREA ':'las PREAs ')+ok.join(', ')+(nform===ok.length?' con su formulario.':nform?'. Los que no eran el formulario de GM quedaron sin formulario; su PDF está en Evidencia.':', sin formulario: ese PDF no es la pantalla «Ver Pre-Autorización» de GM y quedó en Evidencia.'));
+  if(upd.length)msg.push('Actualicé la PREA '+upd.join(', ')+'.');
   if(dup.length)msg.push('Ya existía: '+dup.join(', ')+'.');
+  if(nost)msg.push('No pude guardar el PDF en el expediente: súbelo en Actualización de PREA.');
   if(bad.length)msg.push(bad.join(' '));
-  IMP.say(msg.join(' '),!ok.length&&!dup.length);
-  if(ok.length){toast(ok.length===1?'PREA creada en tu tablero':ok.length+' PREAs creadas en tu tablero');EX.q=ok.length===1?ok[0].split(' ')[0]:'';$('#exQ').value=EX.q;EX.f='prea';showView('exp')}
+  IMP.say(msg.join(' '),!ids.length&&!dup.length);
+  if(ids.length){
+    toast(ok.length&&!upd.length?(ok.length===1?'PREA creada en tu tablero':ok.length+' PREAs creadas en tu tablero'):'PREA actualizada');
+    EX.f='prea';EX.q='';$('#exQ').value='';showView('exp');
+    /* una sola PREA: se abre directo su expediente, con el formulario ya lleno */
+    if(ids.length===1){try{await EX.load();XD.open(ids[0])}catch(_){}}
+  }
 };
 $('#gtUp').addEventListener('click',function(){if(!IMP.busy)$('#gtUpIn').click()});
 $('#gtNew').addEventListener('click',GATE.nueva);
