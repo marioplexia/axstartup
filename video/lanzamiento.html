@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Ax AI Garantías · Lanzamiento</title>
+<style>
+:root{--cream:#f1ece3;--cream2:#e6dccb;--ink:#15171c;--blue:#1f4fd8;--blue2:#5f86ff;--red:#d23b2e;--green:#1f9d62;--mut:#6c6a64}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1280px;height:720px;overflow:hidden;background:#000;font-family:Inter,Arial,sans-serif;color:var(--ink)}
+#st{position:relative;width:1280px;height:720px;overflow:hidden}
+.sc{position:absolute;inset:0;opacity:0}
+.cream{background:radial-gradient(120% 120% at 70% 20%,#f6f2ea,var(--cream) 50%,var(--cream2))}
+.dark{background:radial-gradient(100% 100% at 50% 40%,#1b1f2a,#07080b);color:#fff}
+.a{opacity:0}
+.abs{position:absolute}
+.center{display:flex;align-items:center;justify-content:center;text-align:center}
+.big{font-size:84px;font-weight:800;letter-spacing:-2px;line-height:1}
+.h2{font-size:46px;font-weight:700;letter-spacing:-1px;line-height:1.1}
+.sub{font-size:24px;color:var(--mut)}
+.dark .sub{color:#aab3c7}
+.tag{position:absolute;right:28px;bottom:20px;font-size:13px;letter-spacing:2px;color:var(--mut);text-transform:uppercase}
+.dark .tag{color:#7a859c}
+/* news card */
+.nc{position:absolute;left:90px;right:90px;top:150px;height:420px;background:#fff;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.35);padding:44px 54px;display:flex;flex-direction:column;justify-content:space-between}
+.nc .bar{font-size:14px;font-weight:700;letter-spacing:3px;color:var(--blue);text-transform:uppercase}
+.nc .num{font-size:104px;font-weight:800;letter-spacing:-4px;color:var(--ink);line-height:1}
+.nc .hl{font-size:34px;font-weight:700;line-height:1.2;max-width:960px}
+.nc .src{font-size:14px;color:var(--mut)}
+.tile{position:absolute;width:150px;height:96px;background:#fff;border-radius:8px;opacity:0;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+/* PREA doc */
+.doc{position:absolute;width:430px;background:#fff;border-radius:14px;box-shadow:0 30px 70px rgba(0,0,0,.28);padding:26px 30px}
+.doc h4{font-size:12px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #eee;font-size:17px}
+.row b{font-weight:600}
+.row span{color:var(--mut)}
+.stamp{position:absolute;right:26px;top:22px;font-weight:800;letter-spacing:2px;font-size:15px;padding:6px 12px;border-radius:6px;border:2px solid}
+.hi{background:#ffe9e6;border-radius:6px;padding:2px 6px;color:var(--red);font-weight:700}
+.chip{display:inline-block;background:#eef2ff;color:var(--blue);border-radius:999px;padding:6px 14px;font-size:15px;font-weight:600;margin:4px 6px 0 0}
+.panel{position:absolute;top:0;bottom:0;width:50%;background:#0b0d12}
+.line{position:absolute;height:3px;background:var(--blue2);box-shadow:0 0 18px var(--blue2)}
+.brainn{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--blue2);box-shadow:0 0 16px var(--blue2);opacity:0}
+.logo{font-weight:800;letter-spacing:-1px}
+.logo i{font-style:normal;color:var(--blue)}
+</style></head><body><div id="st">
+
+<!-- 0-22 TITULARES -->
+<div class="sc dark" data-s="0" data-e="22.4" id="s1"></div>
+
+<!-- 22-27 PREGUNTA -->
+<div class="sc dark center" data-s="22" data-e="27.3">
+ <div style="width:1000px"><div class="big a" data-a="22.5" data-d=".8" style="font-size:70px">¿Cuánto de esto se pierde<br><span style="color:var(--blue2)">por papeleo?</span></div></div>
+</div>
+
+<!-- 27-40 CONTRASTE -->
+<div class="sc cream" data-s="27" data-e="40.3">
+ <div class="abs a" data-a="27.4" data-d=".7" style="left:90px;top:56px"><div class="h2">Dos garantías casi iguales.</div></div>
+ <div class="doc a" data-a="28.4" data-d=".8" style="left:100px;top:170px">
+  <div class="stamp" style="color:var(--green);border-color:var(--green)">PAGADA</div>
+  <h4>PREA · Ejemplo A</h4>
+  <div class="row"><span>Queja</span><b>Ruido en suspensión</b></div>
+  <div class="row"><span>Causa</span><b>Horquilla desgastada</b></div>
+  <div class="row"><span>Operación</span><b>4041510 · 0.3 h</b></div>
+  <div class="row"><span>Evidencia</span><b>3 fotos</b></div>
+  <div class="row" style="border:0"><span>Planta pagó</span><b class="a" style="color:var(--green)" data-count="4654" data-a="29.4" data-d="1.2" data-pre="$">$0</b></div>
+ </div>
+ <div class="doc a" data-a="30.4" data-d=".8" style="right:100px;top:170px">
+  <div class="stamp" style="color:var(--red);border-color:var(--red)">RECHAZADA</div>
+  <h4>PREA · Ejemplo B</h4>
+  <div class="row"><span>Queja</span><b>Ruido en suspensión</b></div>
+  <div class="row"><span>Causa</span><b class="hi">Código de causa distinto</b></div>
+  <div class="row"><span>Operación</span><b>4041510 · 0.3 h</b></div>
+  <div class="row"><span>Evidencia</span><b class="hi">Sin foto de la pieza</b></div>
+  <div class="row" style="border:0"><span>Planta pagó</span><b style="color:var(--red)">$0</b></div>
+ </div>
+ <div class="abs a center" data-a="34" data-d=".9" style="left:0;right:0;bottom:60px"><div class="sub" style="font-size:30px;color:var(--ink)">El mismo trabajo. Un detalle distinto.</div></div>
+ <div class="tag">Ilustrativo · datos de ejemplo</div>
+</div>
+
+<!-- 40-50 APERTURA Y NOMBRE -->
+<div class="sc cream center" data-s="40" data-e="50.3">
+ <div class="logo a" data-a="43.2" data-d="1" style="font-size:96px">Ax <i>AI</i> Garantías</div>
+ <div class="abs a center" data-a="45.2" data-d="1" style="left:0;right:0;top:440px"><div class="sub" style="font-size:30px">La garantía automotriz nativa de IA.</div></div>
+ <div class="panel" id="pl" style="left:0"></div><div class="panel" id="pr" style="right:0"></div>
+</div>
+
+<!-- 50-60 PDF LEIDO -->
+<div class="sc cream" data-s="50" data-e="60.3">
+ <div class="abs a" data-a="50.4" data-d=".6" style="left:80px;top:60px"><div class="h2">Sube el PDF.<br>La plataforma lo lee todo.</div></div>
+ <div class="doc a" data-a="51" data-d=".6" style="right:100px;top:90px;width:520px">
+  <h4>Formulario de preautorización · leído</h4>
+  <div class="row a" data-a="52.2" data-d=".4"><span>Queja</span><b>Ruido en suspensión</b></div>
+  <div class="row a" data-a="53" data-d=".4"><span>Código de queja</span><b>Q-014</b></div>
+  <div class="row a" data-a="53.8" data-d=".4"><span>Causa</span><b>Pieza desgastada</b></div>
+  <div class="row a" data-a="54.6" data-d=".4"><span>Código de causa</span><b>C-210</b></div>
+  <div class="row a" data-a="55.4" data-d=".4"><span>Operación de mano de obra</span><b>4041510</b></div>
+  <div class="row a" data-a="56.2" data-d=".4"><span>Tiempo</span><b>0.3 h</b></div>
+  <div class="row a" data-a="57" data-d=".4" style="border:0"><span>Parte</span><b>19391267</b></div>
+ </div>
+ <div class="abs a" data-a="58" data-d=".6" style="left:80px;top:400px"><span class="chip">Expediente creado</span><span class="chip">Conversación propia</span></div>
+ <div class="tag">Datos de ejemplo</div>
+</div>
+
+<!-- 60-70 RECHAZO -> PLAN -->
+<div class="sc cream" data-s="60" data-e="70.3">
+ <div class="abs a" data-a="60.4" data-d=".6" style="left:80px;top:60px"><div class="h2">Si se rechaza,<br>no empiezas de cero.</div></div>
+ <div class="doc a" data-a="61" data-d=".6" style="left:80px;top:300px;width:460px">
+  <div class="stamp" style="color:var(--red);border-color:var(--red)">RECHAZADA</div>
+  <h4>Motivo del rechazo</h4>
+  <div style="font-size:19px;line-height:1.35;margin-top:6px">Falta evidencia de la pieza y el código de causa no corresponde a la queja.</div>
+ </div>
+ <div class="doc a" data-a="63.2" data-d=".7" style="right:90px;top:110px;width:560px;border-top:5px solid var(--blue)">
+  <h4>Plan de corrección · conectado al cerebro</h4>
+  <div class="row a" data-a="64.2" data-d=".4"><b>1</b><span style="flex:1;margin-left:16px;color:var(--ink)">Usar causa C-210 (la que el cerebro ve en casos iguales)</span></div>
+  <div class="row a" data-a="65.2" data-d=".4"><b>2</b><span style="flex:1;margin-left:16px;color:var(--ink)">Subir foto de la pieza desgastada</span></div>
+  <div class="row a" data-a="66.2" data-d=".4"><b>3</b><span style="flex:1;margin-left:16px;color:var(--ink)">Reenviar la PREA actualizada</span></div>
+  <div style="margin-top:14px"><span class="chip a" data-a="67.4" data-d=".4">Aprendido de 12 PREAs aprobadas</span></div>
+ </div>
+ <div class="tag">Ilustrativo · datos de ejemplo</div>
+</div>
+
+<!-- 70-78 UN DATO -->
+<div class="sc dark center" data-s="70" data-e="78.3">
+ <div><div class="sub a" data-a="70.4" data-d=".5" style="letter-spacing:4px;text-transform:uppercase;font-size:18px">Operación de mano de obra</div>
+ <div class="big a" data-a="70.9" data-d=".7" style="font-size:150px;margin-top:10px">4041510</div>
+ <div class="h2 a" data-a="72.6" data-d=".7" style="margin-top:24px;color:var(--blue2)">0.3 h · parte 19391267</div>
+ <div class="sub a" data-a="74.6" data-d=".7" style="margin-top:26px">El cerebro aprende cada código exacto, cada tiempo, cada pieza.</div></div>
+</div>
+
+<!-- 78-86 COBROS -->
+<div class="sc cream" data-s="78" data-e="86.3">
+ <div class="abs a" data-a="78.4" data-d=".6" style="left:80px;top:60px"><div class="h2">Cada orden tiene su<br>agente de cobros.</div></div>
+ <div class="doc a" data-a="79" data-d=".6" style="left:80px;top:290px;width:520px">
+  <h4>Chat de cobros · orden GA4006</h4>
+  <div style="background:#eef2ff;border-radius:12px;padding:12px 16px;font-size:17px;margin-bottom:10px" class="a" data-a="79.8" data-d=".4">¿Cuánto va a pagar planta?</div>
+  <div style="background:#f6f6f4;border-radius:12px;padding:12px 16px;font-size:17px" class="a" data-a="81" data-d=".4">Estimado: <b>$4,654</b>, según tus últimos pagos de planta.</div>
+ </div>
+ <div class="doc a" data-a="82.2" data-d=".6" style="right:90px;top:200px;width:440px">
+  <h4>Documentos</h4>
+  <div class="row"><span>Factura</span><b style="color:var(--green)">Subida</b></div>
+  <div class="row" style="border:0"><span>Transacción de planta</span><b class="a" data-a="83.6" data-d=".4" style="color:var(--green)">Subida</b></div>
+  <div style="margin-top:12px"><span class="chip a" data-a="84.6" data-d=".4">Pagado = estimado</span></div>
+ </div>
+ <div class="tag">Datos de ejemplo</div>
+</div>
+
+<!-- 86-100 CEREBRO -->
+<div class="sc dark" data-s="86" data-e="100.3" id="s6">
+ <div class="abs center a" data-a="86.4" data-d=".7" style="left:0;right:0;top:50px"><div class="h2">Cada PREA, rechazo y pago<br><span style="color:var(--blue2)">enseñan al cerebro.</span></div></div>
+ <div class="abs center a" data-a="95" data-d=".8" style="left:0;right:0;bottom:80px;flex-direction:column"><div class="h2" style="font-size:40px">Autoaprende en tiempo real.</div><div class="h2" style="font-size:40px;margin-top:6px;color:var(--blue2)">Todo el tiempo.</div></div>
+ <div class="abs center a" data-a="91" data-d=".5" style="left:0;right:0;top:170px;gap:80px;font-size:26px;color:#aab3c7;font-weight:600"><span data-count="1" data-a="91" data-d="0.1" data-suf=" PREA">1 PREA</span></div>
+</div>
+
+<!-- 100-110 SIN PORTAL -->
+<div class="sc cream" data-s="100" data-e="110.3">
+ <div class="abs a" data-a="100.4" data-d=".6" style="left:80px;top:60px"><div class="h2">No toca el portal<br>del fabricante.</div></div>
+ <div class="doc a" data-a="101" data-d=".6" data-max=".35" style="left:90px;top:300px;width:330px;filter:grayscale(1)">
+  <h4>Portal del fabricante</h4><div style="font-size:42px;text-align:center">🔒</div>
+ </div>
+ <div class="abs a" data-a="103" data-d=".4" style="left:430px;top:380px;width:130px;border-top:3px dashed #b9b4a8"></div>
+ <div class="abs a center" data-a="103" data-d=".4" style="left:430px;top:340px;width:130px;color:var(--red);font-size:30px;font-weight:800">✕</div>
+ <div class="doc a" data-a="104" data-d=".6" style="right:90px;top:200px;width:560px">
+  <h4>Aprende de lo que ya tienes</h4>
+  <div class="row a" data-a="104.8" data-d=".4"><span>PREA en PDF</span><b style="color:var(--blue)">→ cerebro</b></div>
+  <div class="row a" data-a="105.6" data-d=".4"><span>Rechazo y evidencia</span><b style="color:var(--blue)">→ cerebro</b></div>
+  <div class="row a" data-a="106.4" data-d=".4" style="border:0"><span>Pago de planta</span><b style="color:var(--blue)">→ cerebro</b></div>
+ </div>
+ <div class="abs a center" data-a="107.8" data-d=".6" style="left:0;right:0;bottom:50px"><div class="sub" style="font-size:28px;color:var(--ink)">Sin accesos. Sin riesgo. Siempre aprendiendo.</div></div>
+</div>
+
+<!-- 110-120 VISION + CIERRE -->
+<div class="sc dark center" data-s="110" data-e="120" id="s8">
+ <svg class="abs a" data-a="110.3" data-d="1" width="520" height="520" viewBox="-130 -130 260 260" style="left:380px;top:20px;opacity:.9">
+  <circle r="110" fill="none" stroke="#2c3a66" stroke-width="1.5"/>
+  <ellipse rx="110" ry="40" fill="none" stroke="#2c3a66"/><ellipse rx="40" ry="110" fill="none" stroke="#2c3a66"/>
+  <circle cx="-62" cy="-10" r="5" fill="#5f86ff"/><circle cx="-62" cy="-10" r="12" fill="none" stroke="#5f86ff" opacity=".6"><animate attributeName="r" values="5;22" dur="1.6s" repeatCount="indefinite"/></circle>
+ </svg>
+ <div class="abs a" data-a="111.5" data-d=".7" style="left:0;right:0;top:80px;text-align:center"><div class="h2">De México al mundo.</div></div>
+ <div class="abs a" data-a="114.5" data-d=".8" style="left:0;right:0;top:300px;text-align:center"><div class="logo" style="font-size:86px;color:#fff">Ax <i style="color:var(--blue2)">AI</i> Garantías</div></div>
+ <div class="abs a" data-a="116.8" data-d=".6" style="left:0;right:0;top:450px;text-align:center"><div class="h2" style="font-size:36px">Agenda una demo</div><div class="sub" style="margin-top:12px">[correo / sitio de contacto]</div></div>
+</div>
+
+</div>
+<script>
+var NEWS=[
+ ["~$57.9 mil millones","Las automotrices pagaron casi $58 mil millones de dólares en garantías en 2024","Warranty Week · 2024"],
+ ["$12 mil millones","Volkswagen encabeza el gasto en garantías: $12 mil millones en reclamos","Warranty Week · 2024"],
+ ["$6.5 mil millones","Stellantis pagó $6.5 mil millones en reclamos de garantía","Warranty Week · 2024"],
+ ["$5,300 millones","GM pagó $5,300 millones en garantías en 2025, 19% más que el año anterior","Warranty Week · 10-K de GM 2025"],
+ ["$51 → $58 mil millones","El costo de la garantía sube: de $51 mil millones en 2023 a $58 mil millones en 2024","Warranty Week"],
+ ["$13 mil millones","Las reservas de garantía de GM superan los $13 mil millones de dólares","10-K de GM, FY2025"],
+ ["+$86.6 millones","AutoNation: la garantía le sumó $86.6 millones de dólares en ingresos en un año","10-K de AutoNation FY2025 · mismas tiendas"],
+ ["$2,355 millones","AutoNation: taller y refacciones generan $2,355 millones en utilidad bruta","10-K de AutoNation FY2025"],
+ ["+11%","Group 1 Automotive: el trabajo de garantía creció 11% en el cuarto trimestre","Wards Auto · T4 2025"],
+ ["60+ agencias","Grupo Andrade supera las 60 agencias en México","SDP Noticias"]
+];
+(function(){
+ var s1=document.getElementById('s1'),h='';
+ // mosaico de fondo
+ for(var i=0;i<30;i++){var x=(i%6)*215+20,y=Math.floor(i/6)*150+10;h+='<div class="tile" data-a="'+(i*0.7)+'" data-d="0.5" data-max=".18" style="left:'+x+'px;top:'+y+'px"></div>';}
+ NEWS.forEach(function(n,i){
+  var a=i*2.2;
+  h+='<div class="nc" data-s="'+a+'" data-e="'+(a+2.4)+'" data-sc="1"><div class="bar">Garantías al Día · Ilustrativo</div><div class="num">'+n[0]+'</div><div class="hl">'+n[1]+'</div><div class="src">Fuente: '+n[2]+'</div></div>';
+ });
+ s1.innerHTML=h;
+})();
+// brain
+(function(){
+ var s=document.getElementById('s6'),h='',N=60,i;
+ window.BR=[];
+ for(i=0;i<N;i++){var ang=i*2.399,r=40+Math.sqrt(i)*38;var x=640+Math.cos(ang)*r*1.5,y=385+Math.sin(ang)*r*.68;BR.push([x,y]);
+  h+='<div class="brainn" data-a="'+(87+i*0.13)+'" data-d=".3" style="left:'+x+'px;top:'+y+'px"></div>';}
+ for(i=1;i<N;i+=1){var j=Math.max(0,i-1-(i%4)),p=BR[i],q=BR[j];var dx=q[0]-p[0],dy=q[1]-p[1],L=Math.sqrt(dx*dx+dy*dy),A=Math.atan2(dy,dx)*180/Math.PI;
+  h+='<div class="line" data-a="'+(87.2+i*0.13)+'" data-d=".3" data-max=".5" style="left:'+(p[0]+6)+'px;top:'+(p[1]+6)+'px;width:'+L+'px;transform-origin:0 50%;transform:rotate('+A+'deg)"></div>';}
+ s.insertAdjacentHTML('beforeend',h);
+})();
+function cl(x,a,b){return Math.max(0,Math.min(1,(x-a)/(b-a)))}
+function ez(p){return 1-Math.pow(1-p,3)}
+window.setT=function(t){
+ document.querySelectorAll('.sc').forEach(function(e){
+  var s=+e.dataset.s,en=+e.dataset.e;
+  var o=(t>=s&&t<=en)?Math.min(cl(t,s,s+.35),1-cl(t,en-.35,en)):0;
+  e.style.opacity=o;e.style.visibility=o>0?'visible':'hidden';
+ });
+ document.querySelectorAll('.nc').forEach(function(e){
+  var s=+e.dataset.s,en=+e.dataset.e;
+  var p=cl(t,s,s+.4),q=cl(t,en-.35,en);
+  e.style.opacity=(t>=s&&t<=en)?Math.min(p,1-q):0;
+  e.style.transform='translateY('+((1-ez(p))*40)+'px) scale('+(1+q*.04)+')';
+ });
+ document.querySelectorAll('.a,.tile,.brainn,.line').forEach(function(e){
+  var a=+e.dataset.a,d=+e.dataset.d||.5,mx=e.dataset.max?+e.dataset.max:1;
+  var p=ez(cl(t,a,a+d));
+  e.style.opacity=p*mx;
+  if(!e.classList.contains('line')&&!e.classList.contains('brainn')&&!e.classList.contains('tile'))
+   e.style.transform=(e.dataset.base||'')+' translateY('+((1-p)*18)+'px)';
+  if(e.dataset.count){var v=Math.round(+e.dataset.count*p);e.textContent=(e.dataset.pre||'')+v.toLocaleString('en-US')+(e.dataset.suf||'')}
+ });
+ // paneles apertura
+ var pp=ez(cl(t,41.2,43));
+ document.getElementById('pl').style.transform='translateX('+(-pp*100)+'%)';
+ document.getElementById('pr').style.transform='translateX('+(pp*100)+'%)';
+ // contador cerebro
+ var c=document.querySelector('#s6 [data-count]');
+ var n=Math.round(1+499*ez(cl(t,91,95)));
+ c.textContent=n+(n===1?' PREA':' PREAs aprendidas · ilustrativo');
+};
+setT(0);
+</script></body></html>
