@@ -24,6 +24,17 @@ html,body{width:1280px;height:720px;overflow:hidden;background:#000;font-family:
 .nc .hl{font-size:34px;font-weight:700;line-height:1.2;max-width:960px}
 .nc .src{font-size:14px;color:var(--mut)}
 .tile{position:absolute;width:150px;height:96px;background:#fff;border-radius:8px;opacity:0;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+/* noticia sobre video */
+.nv{position:absolute;inset:0;opacity:0}
+.nv img{position:absolute;inset:0;width:1280px;height:720px;object-fit:cover}
+.nv .gr{position:absolute;inset:0;background:linear-gradient(to top,rgba(5,8,14,.92) 0%,rgba(5,8,14,.55) 38%,rgba(5,8,14,0) 65%),radial-gradient(120% 90% at 50% 50%,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%)}
+.nv .lt{position:absolute;left:70px;right:70px;bottom:64px;color:#fff}
+.nv .bar{display:inline-block;background:var(--blue);font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:6px 12px;border-radius:4px}
+.nv .num{font-size:96px;font-weight:800;letter-spacing:-3px;line-height:1.05;margin-top:12px}
+.nv .hl{font-size:30px;font-weight:600;line-height:1.25;max-width:900px;margin-top:6px;color:#e8edf8}
+.nv .src{font-size:14px;color:#9fabc4;margin-top:10px}
+.nv .gen{position:absolute;right:28px;top:22px;font-size:12px;letter-spacing:2px;color:#cfd6e6;text-transform:uppercase;opacity:.8}
+.grain{position:absolute;inset:0;pointer-events:none;mix-blend-mode:overlay;opacity:.22;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>")}
 /* PREA doc */
 .doc{position:absolute;width:430px;background:#fff;border-radius:14px;box-shadow:0 30px 70px rgba(0,0,0,.28);padding:26px 30px}
 .doc h4{font-size:12px;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:10px}
@@ -192,12 +203,11 @@ var NEWS=[
 ];
 (function(){
  var s1=document.getElementById('s1'),h='';
- // mosaico de fondo
- for(var i=0;i<30;i++){var x=(i%6)*215+20,y=Math.floor(i/6)*150+10;h+='<div class="tile" data-a="'+(i*0.7)+'" data-d="0.5" data-max=".18" style="left:'+x+'px;top:'+y+'px"></div>';}
  NEWS.forEach(function(n,i){
   var a=i*2.2;
-  h+='<div class="nc" data-s="'+a+'" data-e="'+(a+2.4)+'" data-sc="1"><div class="bar">Garantías al Día · Ilustrativo</div><div class="num">'+n[0]+'</div><div class="hl">'+n[1]+'</div><div class="src">Fuente: '+n[2]+'</div></div>';
+  h+='<div class="nv" data-s="'+a+'" data-e="'+(a+2.4)+'" data-i="'+i+'"><img alt=""><div class="gr"></div><div class="gen">Imagen generada por computadora</div><div class="lt"><span class="bar">Garantías al Día · Ilustrativo</span><div class="num">'+n[0]+'</div><div class="hl">'+n[1]+'</div><div class="src">Fuente: '+n[2]+'</div></div></div>';
  });
+ h+='<div class="grain"></div>';
  s1.innerHTML=h;
 })();
 // brain
@@ -218,11 +228,14 @@ window.setT=function(t){
   var o=(t>=s&&t<=en)?Math.min(cl(t,s,s+.35),1-cl(t,en-.35,en)):0;
   e.style.opacity=o;e.style.visibility=o>0?'visible':'hidden';
  });
- document.querySelectorAll('.nc').forEach(function(e){
-  var s=+e.dataset.s,en=+e.dataset.e;
-  var p=cl(t,s,s+.4),q=cl(t,en-.35,en);
-  e.style.opacity=(t>=s&&t<=en)?Math.min(p,1-q):0;
-  e.style.transform='translateY('+((1-ez(p))*40)+'px) scale('+(1+q*.04)+')';
+ var imgs=[];
+ document.querySelectorAll('.nv').forEach(function(e){
+  var s0=+e.dataset.s,en=+e.dataset.e,i=e.dataset.i;
+  var p=cl(t,s0,s0+.3),q=cl(t,en-.3,en),vis=(t>=s0&&t<=en);
+  e.style.opacity=vis?Math.min(p,1-q):0;
+  if(vis){var im=e.querySelector('img'),k=Math.min(62,Math.floor((t-s0)*24)),src='frames3d/clip'+i+'/f'+String(k).padStart(3,'0')+'.jpg';
+   if(im.getAttribute('src')!==src)im.setAttribute('src',src);imgs.push(im);
+   var lt=e.querySelector('.lt');lt.style.transform='translateY('+((1-ez(cl(t,s0+.15,s0+.7)))*24)+'px)';lt.style.opacity=ez(cl(t,s0+.15,s0+.7));}
  });
  document.querySelectorAll('.a,.tile,.brainn,.line').forEach(function(e){
   var a=+e.dataset.a,d=+e.dataset.d||.5,mx=e.dataset.max?+e.dataset.max:1;
@@ -240,6 +253,7 @@ window.setT=function(t){
  var c=document.querySelector('#s6 [data-count]');
  var n=Math.round(1+499*ez(cl(t,91,95)));
  c.textContent=n+(n===1?' PREA':' PREAs aprendidas · ilustrativo');
+ return Promise.all(imgs.map(function(im){return im.decode?im.decode().catch(function(){}):0}));
 };
 setT(0);
 </script></body></html>
