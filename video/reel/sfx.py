@@ -61,20 +61,13 @@ add(pop(),t0+1.9,0,0.9)
 # éxitos
 add(chime(1175),ab[('subir',1)]+5.3,0,0.6);add(chime(1175),ab[('cobros',2)]+0.6,0,0.6);add(chime(1320),ab[('rechazo',1)]+3.4,0,0.5)
 
-# --- sonido de escritura ---
-t0=ab[('subir',0)]
-typing(t0+0.5,31,0.8,0.058)
-def at(k,i,dl,n,g=0.5):typing(ab[(k,i)]+dl,n,g)
-at('intro',0,0.7,12)
-at('subir',1,0.6,6);at('subir',1,1.4,6);at('subir',1,2.2,6);at('subir',1,3.0,5);at('subir',1,3.8,6);at('subir',1,5.0,8)
-at('orden',0,0.0,10)
-at('rechazo',0,0.0,10);at('rechazo',0,1.3,18);at('rechazo',1,0.3,8);at('rechazo',1,3.2,22)
-at('cerebro',0,0.0,16);at('cerebro',1,0.0,10);at('cerebro',2,0.0,14)
-at('red',0,0.0,16);at('red',1,0.2,14);at('red',1,1.6,12);at('red',1,3.6,10);at('red',1,5.0,18);at('red',2,0.0,8)
-at('cobros',0,0.0,12);at('cobros',0,0.6,22);at('cobros',1,0.2,16);at('cobros',2,0.2,10)
-at('cobros',3,0.0,14);at('cobros',3,3.6,12)
-at('audit',0,0.0,16)
-at('cierre',0,0.0,14);at('cierre',0,1.2,14);at('cierre',0,2.4,14);at('cierre',1,0.5,12);at('cierre',1,1.0,18)
+# --- sonido de escritura: una ráfaga por cada texto que se escribe en pantalla ---
+EV=json.load(open('/tmp/claude-0/-home-user-axstartup/f1d3fc12-8082-577a-8eca-de5e3559109d/scratchpad/tyev.json'))
+for ev in EV:
+    keys=max(3,ev['n']//2);gap=2.0/ev['cps'];tt=ev['t']
+    for i in range(keys):
+        add(key(False),tt,float(rng.uniform(-.2,.2)),float(rng.uniform(.7,1.0)))
+        tt+=gap*float(rng.uniform(.8,1.3))
 # colchón (pad suave)
 t=np.arange(n)/SR
 pad=sum(np.sin(2*np.pi*f*t)*a for f,a in [(130.8,.5),(196,.35),(261.6,.3),(329.6,.2),(392,.12)])
