@@ -22,7 +22,7 @@ var CITY=[];
 function load(src){return new Promise(function(ok){var i=new Image();i.onload=function(){ok(i)};i.onerror=function(){ok(null)};i.src=src})}
 /* ---------- escena 1: fotos flotando + palabras ---------- */
 var N1=70,P1=[];for(var i=0;i<N1*2&&P1.length<N1;i++){var px=R(i)*W,py=R(i+50)*H;if(px>W*.18&&px<W*.74&&py>H*.36&&py<H*.6)continue;P1.push({x:px,y:py,z:.35+R(i+90)*.65,im:Math.floor(R(i+7)*64),g:R(i+3)<.35})}
-var WORDS=[[0,'Las garantías no se quedan quietas.'],[2,'Se aprueban.'],[3,'Se rechazan.'],[4,'Se pagan.'],[5,'Se auditan.']];
+var WORDS=[[0,'En todo el mundo…'],[2,'México.'],[3,'Estados Unidos.'],[4,'Japón.'],[5,'Brasil… y más.']];
 function s1(t){
  var k=1+t*.05;
  P1.forEach(function(p,i){var cx=W/2+(p.x-W/2)*k*(1+p.z*.15),cy=H/2+(p.y-H/2)*k*(1+p.z*.15),s=60+p.z*110,a=C(t,i*.012,i*.012+.4)*(.25+p.z*.75);
@@ -50,8 +50,8 @@ function s2(t){var lt=t-6.2;
  if(shrink>0.02)sphere(t,W/2,H/2,Rr*shrink*(.6+.4*form),lt*.7,squash,form);
  orbits(lt,C(lt,.6,1.4)*(1-C(lt,4.2,4.8)));
  var dot=C(lt,4.6,5.0);if(dot>0){x.fillStyle='#111';x.beginPath();x.arc(W/2,H/2,30*eo(dot),0,7);x.fill()}
- if(lt<2.8){T(typ('Y cada PREA',lt,1.0,24),W/2-560,H/2,38,{a:'left'});T(typ('deja una señal.',lt,1.9,24),W/2+380,H/2,38,{a:'left'})}
- else if(lt<4.4){var a=1-C(lt,4.1,4.4);T(typ('Tus datos no deberían',lt,2.9,26),W/2-620,H/2,38,{a:'left',al:a});T(typ('quedarse quietos tampoco.',lt,3.5,26),W/2+330,H/2,38,{a:'left',al:a})}
+ if(lt<2.8){T(typ('Un mercado global',lt,1.0,24),W/2-720,H/2,38,{a:'left'});T(typ('de garantías.',lt,1.9,24),W/2+380,H/2,38,{a:'left'})}
+ else if(lt<4.4){var a=1-C(lt,4.1,4.4);T(typ('Donde cada código',lt,2.9,26),W/2-700,H/2,38,{a:'left',al:a});T(typ('y cada pago cuentan.',lt,3.5,26),W/2+330,H/2,38,{a:'left',al:a})}
 }
 /* ---------- escena 3: presentamos ---------- */
 function s3(t){var lt=t-11.2;
