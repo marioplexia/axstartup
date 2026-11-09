@@ -22,12 +22,22 @@ def chime(f=880,d=0.9):
 def pop(d=0.12):
     x=np.arange(int(d*SR))/SR;return np.sin(2*np.pi*(500+800*np.exp(-x*40))*x)*np.exp(-x*30)*0.6
 
+import soundfile as _sf
+_kb,_ksr=_sf.read('/home/user/axstartup/video/reel/assets/teclado_iphone.wav')
+def _snips():
+    w=int(0.004*_ksr);e=np.sqrt(np.convolve(_kb**2,np.ones(w)/w,'same'));thr=e.max()*0.25;on=[];last=-1
+    for i in range(len(e)):
+        if e[i]>thr and (last<0 or i-last>0.05*_ksr):on.append(i);last=i
+    out=[]
+    for k,o in enumerate(on):
+        a=max(0,o-int(0.004*_ksr));nxt=on[k+1] if k+1<len(on) else len(_kb)
+        z=min(a+int(0.14*_ksr),nxt-int(0.01*_ksr))
+        if z-a<int(0.05*_ksr):continue
+        sn=_kb[a:z].copy();f=int(0.015*_ksr);sn[-f:]*=np.linspace(1,0,f);out.append(sn)
+    return out
+SN=_snips()
 def key(space=False):
-    d=0.05;x=np.arange(int(d*SR))/SR
-    f=(2250+rng.random()*160) if not space else 1650
-    body=np.sin(2*np.pi*f*x)*np.exp(-x*150)+0.45*np.sin(2*np.pi*f*1.52*x)*np.exp(-x*210)+0.2*np.sin(2*np.pi*f*2.3*x)*np.exp(-x*300)
-    click=rng.standard_normal(len(x))*np.exp(-x*900)*0.25
-    return (body+click)*0.5
+    sn=SN[int(rng.integers(len(SN)))];return sn*2.6
 def typing(t,nkeys,g=0.55,rate=0.11):
     tt=t
     for i in range(nkeys):
