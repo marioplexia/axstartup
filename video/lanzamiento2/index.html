@@ -141,13 +141,13 @@ function pixNum(s,cx,cy,scale,glitch,t){scale*=2;ox.clearRect(0,0,190,35);ox.fil
  x.imageSmoothingEnabled=false;var w=190*scale,h=35*scale;
  if(glitch>0){for(var r=0;r<35;r++){var sh=(R(r+Math.floor(t*20))-.5)*20*glitch;x.drawImage(off,0,r,190,1,cx-w/2+sh*scale,cy-h/2+r*scale,w,scale)}}else x.drawImage(off,cx-w/2,cy-h/2,w,h);x.imageSmoothingEnabled=true}
 function matrix(X,Y,w,h,col,t,seed){var s=10;for(var yy=0;yy<h;yy+=s)for(var xx=0;xx<w;xx+=s){var f=yy/h;var v=R(seed+xx*3.1+yy*7.7+Math.floor(t*6))*f*1.3;if(v<.15)continue;x.globalAlpha=Math.min(1,v);x.fillStyle=col;x.beginPath();x.arc(X+xx+s/2,Y+yy+s/2,s*.38,0,7);x.fill()}x.globalAlpha=1}
-var NUMS=[[31.9,'$57.9 mil M',['$57.9 mil millones','en garantías (2024)'],'#8a8a8a'],[34.0,'2,500+',['2,500+ agencias','en México'],'#3ef08a'],[36.6,'1.52 M',['1.52 millones','de autos nuevos (2025)'],'#e08a3e']];
+var NUMS=[[31.9,'1 error',['Una agencia','comete un error'],'#8a8a8a'],[34.0,'aprende',['El cerebro aprende','en tiempo real'],'#3ef08a'],[36.6,'protege',['Las demás agencias','quedan protegidas'],'#e08a3e']];
 function s10(t){var k=t<34?0:t<36.6?1:2,lt=t-NUMS[k][0];var g=Math.max(0,1-lt/.5);
- pixNum(NUMS[k][1],W/2,150,k==0?4.4:4.6,g,t);
+ pixNum(NUMS[k][1],W/2,155,k==0?4.0:3.6,g,t);
  var n=k+1,cw=[560,430,330][k],ch=[340,320,290][k],gap=18,tot=n*cw+(n-1)*gap,sx=W/2-tot/2;
  for(var i=0;i<n;i++){var a=i==k?eo(C(lt,.1,.5)):1;var X=sx+i*(cw+gap),Y=300+(1-a)*40;x.globalAlpha=a;x.fillStyle='#000';x.fillRect(X,Y,cw,ch);x.globalAlpha=1;matrix(X,Y+ch*.45,cw,ch*.55,NUMS[i][3],t,i*100);
   T(NUMS[i][2][0],X+28,Y+50,[44,36,30][k],{a:'left',c:'#fff',al:a});T(NUMS[i][2][1],X+28,Y+50+[50,42,36][k],[44,36,30][k],{a:'left',c:'#fff',al:a})}
- T('Fuentes: Warranty Week (2024) · AMDA · INEGI (2025)',W/2,1040,16,{c:'#aaa'})}
+ T('Aplica a las agencias que comparten su aprendizaje',W/2,1040,16,{c:'#aaa'})}
 /* ---------- escena 11: rejilla de puntos + filtros ---------- */
 function s11(t){var lt=t-38.6;var fall=io(C(lt,1.2,2.1));
  for(var r=0;r<8;r++)for(var q=0;q<26;q++){if(r>=3&&r<=4)continue;var X=q*76+38+(r%2)*0,Y=r*130+70;var sd=R(r*40+q);var gy=fall*(400+sd*700)*(r<3?-1:1),gx=fall*(sd-.5)*300;
