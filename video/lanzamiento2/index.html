@@ -80,9 +80,9 @@ function s5(t){var lt=t-17.9,z=1.08-lt*.02;cover(BG.fondo,W/2-W*z*1.3/2-200,H/2-
  var up=eo(C(lt,1.6,2.2)),by=H/2-60-up*230;
  frost(330,by,1260,120,60,BG.fondo,.25);
  x.strokeStyle='#fff';x.lineWidth=3;x.beginPath();x.arc(395,by+60,14,0,7);x.stroke();x.beginPath();x.moveTo(405,by+70);x.lineTo(416,by+81);x.stroke();
- var q='Encuentra PREAs rechazadas por falta de evidencia en suspensión,',q2='de los últimos 90 días, en todas las agencias del grupo.';
+ var q='Sube el PDF de la PREA GA4006',q2='y la plataforma lee todo el formulario.';
  T(typ(q,lt,.3,48),440,by+44,26,{a:'left',c:'#fff'});T(typ(q2,lt,.3+q.length/48,48),440,by+80,26,{a:'left',c:'#fff'});
- [['GA4006 · Ruido en suspensión','Rechazada · falta foto de la pieza'],['GA4011 · Golpeteo en suspensión','Rechazada · causa no corresponde'],['GA4019 · Ruido delantero','Rechazada · evidencia incompleta']].forEach(function(r,i){var a=eo(C(lt,2.2+i*.25,2.7+i*.25));if(!a)return;var Y=by+160+i*110+(1-a)*30;x.globalAlpha=a;frost(560,Y,820,92,20,BG.fondo,.3);x.globalAlpha=a;
+ [['Queja Q-014 · Ruido en suspensión','Leída del PDF'],['Causa C-210 · Pieza desgastada','Leída del PDF'],['Operación 4041510 · 0.3 h','Leída del PDF']].forEach(function(r,i){var a=eo(C(lt,2.2+i*.25,2.7+i*.25));if(!a)return;var Y=by+160+i*110+(1-a)*30;x.globalAlpha=a;frost(560,Y,820,92,20,BG.fondo,.3);x.globalAlpha=a;
   x.fillStyle='#111';rr(584,Y+20,52,52,12);x.fill();T('⚡',610,Y+47,24,{c:'#fff'});T(r[0],660,Y+34,24,{a:'left',c:'#fff',w:600,al:a});T(r[1],660,Y+64,19,{a:'left',c:'rgba(255,255,255,.85)',al:a});x.globalAlpha=1});
 }
 /* ---------- escena 6: flujo verde + tabla ---------- */
@@ -98,7 +98,7 @@ function s6(t){var lt=t-20.9;
  /* tabla */
  var TX=1900,TY=200;x.fillStyle='#fff';shadow(40,.10);rr(TX,TY,1260,700,24);x.fill();noShadow();x.strokeStyle='#eee';x.stroke();
  ['#ddd','#ddd','#ddd'].forEach(function(cc,i){x.fillStyle=cc;x.beginPath();x.arc(TX+34+i*24,TY+30,7,0,7);x.fill()});
- var hd=['Orden','Queja','Causa','Operación','Estado'],cx=[40,220,520,820,1040];hd.forEach(function(h,i){T(h,TX+cx[i],TY+90,18,{a:'left',c:'#9a9a9a'})});
+ T('Expedientes completos · listos para auditoría de planta',TX+130,TY+31,20,{a:'left',w:600});var hd=['Orden','Queja','Causa','Operación','Estado'],cx=[40,220,520,820,1040];hd.forEach(function(h,i){T(h,TX+cx[i],TY+90,18,{a:'left',c:'#9a9a9a'})});
  var rows=[['GA4006','Q-014 Ruido en suspensión','C-210 Pieza desgastada','4041510 · 0.3 h','Aprobada'],['GA4011','Q-014 Golpeteo','C-210 Pieza desgastada','4041510 · 0.3 h','Corregida'],['GA4019','Q-022 Ruido delantero','C-118 Holgura','4041620 · 0.5 h','En revisión'],['GA4023','Q-014 Ruido en suspensión','C-210 Pieza desgastada','4041510 · 0.3 h','Pagada'],['GA4030','Q-031 Vibración','C-305 Balanceo','4052010 · 0.4 h','Aprobada'],['GA4034','Q-014 Ruido en suspensión','C-210 Pieza desgastada','4041510 · 0.3 h','Aprobada']];
  rows.forEach(function(r,j){var a=C(lt,1.9+j*.22,2.3+j*.22);if(!a)return;var Y=TY+150+j*80;if(j==0){x.fillStyle='rgba(62,240,138,.12)';x.fillRect(TX+20,Y-30,1220,60)}
   r.forEach(function(v,i){T(v,TX+cx[i],Y,21,{a:'left',al:a,c:i==4?(v=='Pagada'||v=='Aprobada'?'#1f9d62':'#555'):'#222',w:i==0?600:400})})});
@@ -120,11 +120,11 @@ function s8(t){var lt=t-25.9,z=1.1+lt*.02;cover(BG.fondo,W/2-W*z/2,H/2-H*z/2,W*z
  [0,1,2].forEach(function(i){x.strokeStyle='#e3e3e3';x.lineWidth=2;rr(CX+36+i*72,CY+110,54,54,12);x.stroke()});
  var lines=[['Queja','Q-014 · Ruido en suspensión'],['Causa','C-210 · Pieza desgastada'],['Operación','4041510 · 0.3 h'],['Parte','19391267'],['Estimado de planta','$4,654']];
  lines.forEach(function(l,i){var Y=CY+220+i*96;T(l[0],CX+36,Y,17,{a:'left',c:'#999'});T(l[1],CX+36,Y+32,24,{a:'left'})});
- x.fillStyle='#3ef08a';x.beginPath();x.arc(CX+46,CY+720,9,0,7);x.fill();T('Planta pagó $4,654',CX+66,CY+720,24,{a:'left'});x.restore();
+ x.fillStyle='#3ef08a';x.beginPath();x.arc(CX+46,CY+720,9,0,7);x.fill();T('Plan: causa C-210 + foto de la pieza',CX+66,CY+720,24,{a:'left'});x.restore();
  function note(a,Y,t1,t2){if(a<=0)return;x.save();x.globalAlpha=a;var X=CX-40+(1-a)*0;shadow(40,.2);x.fillStyle='rgba(255,255,255,.96)';rr(X,Y+(1-a)*40,680,120,26);x.fill();noShadow();
   rr(X+26,Y+28+(1-a)*40,64,64,16);x.clip();cover(BG.logo,X+26,Y+28+(1-a)*40,64,64);x.restore();x.save();x.globalAlpha=a;T(t1,X+112,Y+48+(1-a)*40,28,{a:'left',w:700});T(t2,X+112,Y+84+(1-a)*40,20,{a:'left',c:'#888'});x.restore()}
- note(eo(C(lt,.4,.9))*(1-C(lt,1.6,2.0)),330,'PREA aprobada','Planta · Justo ahora');
- note(eo(C(lt,3.2,3.7)),760,'Sugerencia: usa la causa C-210','Aprendido de la Agencia A · Justo ahora');
+ note(eo(C(lt,.4,.9))*(1-C(lt,1.6,2.0)),330,'PREA rechazada','Falta foto de la pieza · Justo ahora');
+ note(eo(C(lt,3.2,3.7)),760,'Plan de corrección listo','Usa la causa C-210 y sube la foto · Justo ahora');
  T('Datos de ejemplo',40,1050,16,{a:'left',c:'rgba(255,255,255,.8)'});
 }
 /* ---------- escena 9: mapa de puntos de México ---------- */
@@ -152,7 +152,7 @@ function s10(t){var k=t<34?0:t<36.6?1:2,lt=t-NUMS[k][0];var g=Math.max(0,1-lt/.5
 function s11(t){var lt=t-38.6;var fall=io(C(lt,1.2,2.1));
  for(var r=0;r<8;r++)for(var q=0;q<26;q++){if(r>=3&&r<=4)continue;var X=q*76+38+(r%2)*0,Y=r*130+70;var sd=R(r*40+q);var gy=fall*(400+sd*700)*(r<3?-1:1),gx=fall*(sd-.5)*300;
   x.fillStyle=['#e6e6e6','#d4d4d4','#bdbdbd','#a8a8a8'][Math.floor(sd*4)];x.globalAlpha=1-fall*.6;x.beginPath();x.arc(X+gx,Y+gy,30,0,7);x.fill()}x.globalAlpha=1;
- var chips=['Queja: Ruido en suspensión','Estado: Rechazada','Periodo: 90 días','Agencias: todo el grupo'],cx=200-lt*60;
+ var chips=['Queja: Ruido en suspensión','Estado: Rechazada','Periodo: 90 días','Agencia B: comparte'],cx=200-lt*60;
  if(lt<2.2)chips.forEach(function(s,i){font(26,500);var w=x.measureText(s).width+80;x.globalAlpha=1-C(lt,1.6,2.1);x.strokeStyle='#ddd';x.lineWidth=2;x.fillStyle='#fff';rr(cx,H/2-38,w,76,38);x.fill();x.stroke();var p=s.split(': ');T(p[0]+': ',cx+30,H/2,26,{a:'left',al:x.globalAlpha});font(26,400);T(p[1],cx+30+x.measureText(p[0]+': ').width,H/2,26,{a:'left',c:'#1f9d62',al:x.globalAlpha});T('×',cx+w-26,H/2,24,{c:'#999',al:x.globalAlpha});x.globalAlpha=1;cx+=w+20});
  if(lt>=1.9){var d=Math.min(3,Math.floor((lt-1.9)/.2)+1);for(var i=0;i<d;i++){x.fillStyle='#333';x.beginPath();x.arc(W/2-260+i*40,H/2,15,0,7);x.fill()}
   var s=typ('Encuentra las que importan.',lt,2.5,26);T(s,W/2-130,H/2,34,{a:'left'})}}
@@ -162,7 +162,7 @@ function s12(t){var lt=t-42.6;for(var r=0;r<36;r++)for(var q=0;q<64;q++){var sd=
  T(typ('De datos',lt,.3,24),W/2-140,H/2-100,32,{a:'left',c:'#fff'});T(typ('que cambian...',lt,.7,24),W/2-140,H/2-58,32,{a:'left',c:'#fff'});
  x.strokeStyle='#fff';x.lineWidth=2;rr(W/2-140,H/2+70,90,44,22);x.stroke();T('→',W/2-95,H/2+92,24,{c:'#fff'})}
 /* ---------- escena 13: campo 3D + señales verdes ---------- */
-function s13(t){var lt=t-43.9;T(typ('A información',lt,.2,24),70,100,32,{a:'left'});T(typ('en la que confías.',lt,.9,24),70,145,32,{a:'left'});
+function s13(t){var lt=t-43.9;T(typ('Sin tocar el portal.',lt,.2,24),70,100,32,{a:'left'});T(typ('Aprende de lo que ya tienes.',lt,1.1,24),70,145,32,{a:'left'});
  x.strokeStyle='#222';x.lineWidth=2;rr(W-170,90,96,48,24);x.stroke();T('→',W-122,114,24);
  var cam=lt*30;
  for(var r=0;r<26;r++){var zz=r+1,py=420+Math.pow(r/26,1.6)*700,sc=.35+r/26*1.3;for(var q=-30;q<30;q++){var px=W/2+(q*70+((r%2)*35)-cam*0)*sc+(-lt*20*sc);if(px<-60||px>W+60)continue;var sd=R(r*97+q*13);x.fillStyle=['#efefef','#e3e3e3','#d6d6d6','#c9c9c9'][Math.floor(sd*4)];x.beginPath();x.ellipse(px,py,28*sc,14*sc,0,0,7);x.fill()}}
@@ -194,7 +194,8 @@ function lockup(cy,al){var w;font(40,700);x.letterSpacing='6px';w=x.measureText(
  x.save();x.globalAlpha=al;rr(sx,cy-35,70,70,17);x.clip();cover(BG.logo,sx,cy-35,70,70);x.restore();T('AX AI GARANTÍAS',sx+92,cy+2,40,{a:'left',w:700,ls:6,al:al})}
 function s17(t){var lt=t-58.6;var up=io(C(lt,1.0,1.6));lockup(H/2-up*70,eo(C(lt,0,.5)));
  if(lt>1.2){var a=C(lt,1.2,1.7);x.fillStyle='#e2e2e2';x.fillRect(W/2-330,H/2-10,660*a,1.5);x.fillRect(W/2-330,H/2+90,660*a,1.5);
-  var s='Nada cambia, excepto todo.';T(typ(s,lt,1.5,22),W/2,H/2+40,36)}}
+  var s='Nada cambia, excepto todo.';T(typ(s,lt,1.5,22),W/2,H/2+40,36)}
+ T(typ('De México al mundo.',lt,.1,20),W/2,H/2+170,26,{c:'#8a8a8a'})}
 /* ---------- línea de tiempo ---------- */
 var SC=[[0,6.2,s1],[6.2,11.2,s2],[11.2,14,s3],[14,17.9,s4],[17.9,20.9,s5],[20.9,24.9,s6],[24.9,25.9,s7],[25.9,30.9,s8],[30.9,31.9,s9],[31.9,38.6,s10],[38.6,42.6,s11],[42.6,43.9,s12],[43.9,48.6,s13],[48.6,53.4,s14],[53.4,55.6,s15],[55.6,58.6,s16],[58.6,63.7,s17]];
 window.TOTAL=63.7;
