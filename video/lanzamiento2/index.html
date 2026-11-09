@@ -17,6 +17,8 @@ function shadow(b,a,oy){x.shadowColor='rgba(0,0,0,'+(a==null?.14:a)+')';x.shadow
 function noShadow(){x.shadowColor='transparent';x.shadowBlur=0;x.shadowOffsetY=0}
 var IM=[],BG={};
 function cover(im,X,Y,w,h,al){if(!im||!im.width)return;var r=Math.max(w/im.width,h/im.height),sw=w/r,sh=h/r;x.globalAlpha=al==null?1:al;x.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,X,Y,w,h);x.globalAlpha=1}
+function coverAt(im,X,Y,w,h,fx){if(!im||!im.width)return;var r=Math.max(w/im.width,h/im.height),sw=w/r,sh=h/r;x.drawImage(im,(im.width-sw)*fx,(im.height-sh)/2,sw,sh,X,Y,w,h)}
+var CITY=[];
 function load(src){return new Promise(function(ok){var i=new Image();i.onload=function(){ok(i)};i.onerror=function(){ok(null)};i.src=src})}
 /* ---------- escena 1: fotos flotando + palabras ---------- */
 var N1=70,P1=[];for(var i=0;i<N1*2&&P1.length<N1;i++){var px=R(i)*W,py=R(i+50)*H;if(px>W*.18&&px<W*.74&&py>H*.36&&py<H*.6)continue;P1.push({x:px,y:py,z:.35+R(i+90)*.65,im:Math.floor(R(i+7)*64),g:R(i+3)<.35})}
@@ -69,7 +71,7 @@ function s4(t){var lt=t-14;
  T(typ('Inteligencia de garantías construida',lt,.2,32),W/2,250,44);T(typ('para las agencias que la cobran.',lt,1.4,32),W/2,310,44);
  var off=-lt*230-80;
  CAT.forEach(function(n,i){var X=off+i*560,Y=440+(i%2)*40-eo(C(lt,i*.12,i*.12+.7))*0+(1-eo(C(lt,.1+i*.1,.8+i*.1)))*200;
-  if(X<-600||X>W+40)return;x.save();shadow(30,.10);rr(X,Y,520,700,22);x.fillStyle='#eee';x.fill();noShadow();x.clip();cover(IM[(i*7+3)%64],X,Y,520,700);
+  if(X<-600||X>W+40)return;x.save();shadow(30,.10);rr(X,Y,520,700,22);x.fillStyle='#eee';x.fill();noShadow();x.clip();coverAt(CITY[i%4],X,Y,520,700,[.2,.8,.5][Math.floor(i/4)%3]);
   x.fillStyle='rgba(255,255,255,.82)';rr(X+18,Y+18,484,54,14);x.fill();T(n,X+40,Y+45,24,{a:'left',c:'#333'});T('→',X+478,Y+45,26,{a:'right',c:'#333'});x.restore()});
 }
 /* ---------- escena 5: búsqueda sobre foto ---------- */
@@ -200,6 +202,6 @@ window.setT=function(t){x.setTransform(1,0,0,1,0,0);x.fillStyle='#fff';x.fillRec
  for(var i=0;i<SC.length;i++){var s=SC[i];if(t>=s[0]&&t<s[1]){x.save();s[2](t);x.restore();var fi=C(t,s[0],s[0]+.18);if(i>0&&fi<1){x.fillStyle='rgba(255,255,255,'+(1-fi)+')';x.fillRect(0,0,W,H)}break}}
  if(t>62.4){x.fillStyle='rgba(28,28,28,'+C(t,62.4,63.3)*.92+')';x.fillRect(0,0,W,H)}};
 (async function(){var L=[];for(var i=0;i<64;i++)L.push(load('img/t'+i+'.jpg'));IM=await Promise.all(L);
- BG.logo=await load('img/logo.jpg');BG.ciudad=await load('img/ciudad.jpg');BG.fondo=await load('img/fondo.jpg');BG.agencia=await load('img/agencia.jpg');
+ BG.logo=await load('img/logo.jpg');for(var k=1;k<=4;k++)CITY.push(await load('img/city'+k+'.jpg'));BG.ciudad=await load('img/ciudad.jpg');BG.fondo=await load('img/fondo.jpg');BG.agencia=await load('img/agencia.jpg');
  await document.fonts.load('400 40px Inter');await document.fonts.load('700 40px Inter');setT(0);window.ready=true})();
 </script></body></html>
