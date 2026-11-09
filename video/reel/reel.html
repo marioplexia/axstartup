@@ -1,0 +1,79 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Ax AI Garantías · Reel</title>
+<style>
+:root{--blue:#1f4fd8;--blue2:#7b9bff;--ink:#12151c;--mut:#6c7487;--red:#e5483a;--green:#27b374}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:720px;height:1280px;overflow:hidden;background:#05070d;font-family:Inter,Arial,sans-serif;color:#fff}
+#st{position:relative;width:720px;height:1280px;overflow:hidden;background:radial-gradient(120% 70% at 70% 0%,#1b2f78 0%,#0b1020 55%,#05070d 100%)}
+.top{position:absolute;left:40px;right:40px;top:38px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:26px;letter-spacing:-.5px}
+.top i{font-style:normal;color:var(--blue2)}
+.pr{position:absolute;left:40px;right:40px;top:86px;height:5px;border-radius:3px;background:rgba(255,255,255,.14)}
+.pr b{display:block;height:100%;width:0;border-radius:3px;background:var(--blue2)}
+.sc{position:absolute;left:0;right:0;top:110px;height:920px;padding:0 40px;opacity:0;display:flex;flex-direction:column;justify-content:center}
+.k{font-size:22px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--blue2);margin-bottom:12px}
+.ttl{font-size:56px;font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:26px}
+.a{opacity:0}
+.card{background:#fff;color:var(--ink);border-radius:26px;padding:28px 30px;margin-bottom:18px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.card.d{background:rgba(255,255,255,.08);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.14)}
+.card h3{font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:6px}
+.card p{font-size:28px;line-height:1.3;color:#2c3242}.card.d p{color:#c8d2ee}
+.big{font-size:104px;font-weight:800;letter-spacing:-4px;line-height:1;color:var(--blue)}
+.d .big{color:var(--blue2)}
+.sm{font-size:26px;color:var(--mut);margin-top:6px}.d .sm{color:#aeb9d6}
+.row{display:flex;justify-content:space-between;font-size:30px;padding:12px 0;border-bottom:1px solid #eceef4}
+.row span{color:var(--mut)}.row b{font-weight:800}
+.chip{display:inline-block;background:#eaf0ff;color:var(--blue);border-radius:99px;padding:8px 20px;font-size:26px;font-weight:700;margin:6px 8px 0 0}
+.d .chip{background:rgba(123,155,255,.18);color:#bcd0ff}
+.stamp{display:inline-block;border:3px solid var(--red);color:var(--red);font-weight:800;font-size:26px;padding:4px 14px;border-radius:8px;letter-spacing:2px}
+.num{display:inline-flex;width:56px;height:56px;border-radius:50%;background:var(--blue);color:#fff;align-items:center;justify-content:center;font-weight:800;font-size:30px;flex:none}
+.st{display:flex;gap:20px;align-items:center;margin-bottom:22px;font-size:36px;font-weight:700;line-height:1.15}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.logo{font-weight:800;letter-spacing:-3px}.logo i{font-style:normal;color:var(--blue2)}
+table{width:100%;border-collapse:collapse;font-size:27px}td,th{padding:12px 8px;text-align:right;border-bottom:1px solid rgba(255,255,255,.14)}th{font-size:20px;letter-spacing:2px;color:#9fb0d6;text-transform:uppercase}td:first-child,th:first-child{text-align:left;font-weight:800}
+.ph{background:#fff4d6;color:#8a5a00;border-radius:6px;padding:0 8px}
+.cap{position:absolute;left:36px;right:36px;bottom:60px;height:210px;display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;background:rgba(8,12,24,.72);border:1px solid rgba(255,255,255,.14);border-radius:30px;padding:20px 28px;font-size:38px;font-weight:700;line-height:1.2;letter-spacing:-.5px}
+.vo{position:absolute;left:36px;bottom:30px;font-size:16px;color:#6f7a96;letter-spacing:2px}
+</style></head><body><div id="st">
+<div class="top"><span>Ax <i>AI</i> Garantías</span><span style="font-size:18px;color:#8e9bbd;font-weight:600">Para Grupo Fame</span></div>
+<div class="pr"><b id="pb"></b></div>
+<div id="scs"></div>
+<div class="cap" id="cap"></div>
+<div class="vo">DATOS DE EJEMPLO · ESCENARIOS ILUSTRATIVOS</div>
+</div>
+<script src="timeline.js"></script>
+<script>
+var V={};
+V.intro='<div style="text-align:center"><div class="logo a" data-si="0" style="font-size:118px;line-height:1">Ax <i>AI</i><br>Garantías</div><div class="ttl a" data-si="1" style="font-size:42px;margin-top:40px;color:#bcd0ff;letter-spacing:-1px">La capa de inteligencia de garantías<br>del mundo automotriz</div></div>';
+V.mision='<div class="k a" data-si="0">Misión y visión</div><div class="card a" data-si="0"><h3>Misión</h3><p>Que ninguna agencia pierda dinero de garantía por errores de papeleo.</p></div><div class="card a" data-si="1" style="border-top:8px solid var(--blue)"><h3>Visión</h3><p>Plataforma de garantías nativa de IA: de México a Latinoamérica y al mundo.</p></div><div class="a" data-si="2"><span class="chip">Tiempo real</span><span class="chip">Sin tocar el portal</span><span class="chip">La red mejora a todos</span><span class="chip">Resultados medibles</span></div>';
+V.problema='<div class="k a" data-si="0">El problema</div><div class="card d a" data-si="0"><div class="big" style="font-size:92px">~$57.9 mil M</div><div class="sm">USD en garantías pagados por fabricantes · 2024 · Warranty Week</div></div><div class="card d a" data-si="1"><div class="big" style="font-size:92px">$5,300 M</div><div class="sm">pagó GM en 2025 · +19 % · 10-K de GM</div></div><div class="g2"><div class="card d a" data-si="2"><div class="big" style="font-size:64px">2,500+</div><div class="sm">distribuidores · AMDA</div></div><div class="card d a" data-si="2"><div class="big" style="font-size:64px">1.52 M</div><div class="sm">vehículos vendidos 2025</div></div></div>';
+V.producto='<div class="k a" data-si="0">El producto</div><div class="card a" data-si="0"><div class="st" style="margin:0"><span class="num">1</span>Sube el PDF de la PREA → expediente creado</div></div><div class="card a" data-si="1" style="padding:18px 30px"><div class="row"><span>Código de queja</span><b>Q-014</b></div><div class="row"><span>Código de causa</span><b>C-210</b></div><div class="row"><span>Operación</span><b>4041510</b></div><div class="row" style="border:0"><span>Tiempo</span><b>0.3 h</b></div></div><div class="card a" data-si="2"><span class="stamp">RECHAZADA</span><p style="margin-top:12px"><b>Plan:</b> 1· usar causa C-210 · 2· foto de la pieza · 3· reenviar</p></div><div class="card d a" data-si="3"><p><b>Cobros:</b> estimado $4,654 → pagado $4,654</p><span class="chip">El cerebro aprende</span></div>';
+V.fame='<div class="k a" data-si="0">Qué buscamos con Grupo Fame</div><div class="g2"><div class="card d a" data-si="0" data-dl="0"><h3>1 · Capital</h3><p>Para producto y expansión</p></div><div class="card d a" data-si="0" data-dl="1.8"><h3>2 · Aliado</h3><p>Piloto en sus agencias</p></div><div class="card d a" data-si="0" data-dl="3.6"><h3>3 · Puerta</h3><p>A otros grupos y marcas</p></div><div class="card d a" data-si="0" data-dl="5.4"><h3>4 · Validación</h3><p>Resultados medidos</p></div></div>';
+V.estrategia='<div class="k a" data-si="0">Estrategia</div><div class="st a" data-si="0"><span class="num">1</span>Grupo ancla: Grupo Fame</div><div class="st a" data-si="1"><span class="num">2</span>Los ~70 grupos de México = 2,500+ agencias</div><div class="st a" data-si="2"><span class="num">3</span>Nativos de una marca</div>';
+V.byd='<div class="k a" data-si="0">Ejemplo: marca nativa</div><div class="card d a" data-si="0"><div class="big" style="font-size:80px">24 grupos<br>100+ puntos</div><div class="sm">BYD México · Expansión, mayo 2026</div></div><div class="card a" data-si="0" data-dl="3"><p>Una marca · un mismo formato · toda su red → el salto a LatAm sigue a la marca</p></div><div class="a" data-si="1"><span class="chip">Ejemplo ilustrativo, sin acuerdo con la marca</span></div>';
+V.modelo='<div class="k a" data-si="0">Modelo de negocio</div><div class="card d a" data-si="0"><div class="big" style="font-size:150px">$350</div><div class="sm">USD por agencia al mes · $4,200 al año</div></div><div class="card a" data-si="1"><div class="row"><span>100 agencias</span><b>$420 mil / año</b></div><div class="row" style="border:0"><span>1,250 agencias</span><b>$5.2 M / año</b></div></div><div class="card a" data-si="2" style="border-top:8px solid var(--blue)"><div class="big" style="font-size:80px">$10.5 M</div><div class="sm">2,500 agencias · techo de México</div></div>';
+V.mercado='<div class="k a" data-si="0">Mercado</div><div class="ttl a" data-si="0" style="font-size:50px">México es el inicio.<br>El techo es global.</div><div class="card d a" data-si="0" data-dl="4"><div class="big" style="font-size:90px">$71.4 M</div><div class="sm">EE. UU.: 16,990 distribuidores (NADA 2025) · techo teórico anual</div></div><div class="card d a" data-si="0" data-dl="10"><div class="big" style="font-size:90px">~92 M</div><div class="sm">vehículos nuevos vendidos en el mundo en 2025</div></div>';
+V.ruta='<div class="k a" data-si="0">Hoja de ruta</div><div class="st a" data-si="0" data-dl="1"><span class="num">1</span>Piloto con Grupo Fame</div><div class="st a" data-si="0" data-dl="3.5"><span class="num">2</span>Grupos de México</div><div class="st a" data-si="0" data-dl="6"><span class="num">3</span>Marca nativa</div><div class="st a" data-si="0" data-dl="8.5"><span class="num">4</span>Latinoamérica</div><div class="st a" data-si="0" data-dl="10.5"><span class="num">5</span>Global</div>';
+V.fases='<div class="k a" data-si="0">Fases de inversión</div><div class="card d a" data-si="0" data-dl="1"><table><tr><td>Pre-semilla</td><td>Piloto medido</td></tr><tr><td>Semilla</td><td>100 agencias · $420 mil</td></tr><tr><td>Serie A</td><td>625 · $2.6 M</td></tr><tr><td style="border:0">Serie B</td><td style="border:0">1,250+ · $5.2 M · LatAm</td></tr></table></div><div class="a" data-si="1"><span class="chip ph" style="background:#fff4d6;color:#8a5a00">Montos: por definir juntos</span></div>';
+V.valua='<div class="k a" data-si="0">Valuación hasta el exit</div><div class="card d a" data-si="0"><table><tr><th>Agencias</th><th>4×</th><th>8×</th></tr><tr><td>100</td><td>$1.7 M</td><td>$3.4 M</td></tr><tr><td>625</td><td>$10.5 M</td><td>$21 M</td></tr><tr><td>2,500</td><td>$42 M</td><td>$84 M</td></tr><tr><td style="border:0">5,000</td><td style="border:0">$84 M</td><td style="border:0">$168 M</td></tr></table></div><div class="a" data-si="1"><span class="chip">Escenarios ilustrativos, múltiplos supuestos</span></div>';
+V.riesgos='<div class="k a" data-si="0">Riesgos y mitigación</div><div class="card a" data-si="0" data-dl="0"><h3>Documentos sin subir</h3><p>Importación por PDF + agente guía</p></div><div class="card a" data-si="0" data-dl="3"><h3>Cambios de formato</h3><p>No depende del portal</p></div><div class="card a" data-si="0" data-dl="6"><h3>Errores de IA</h3><p>El asesor confirma y el cerebro aprende</p></div><div class="card a" data-si="0" data-dl="9"><h3>Privacidad</h3><p>Cada agencia decide si comparte</p></div>';
+V.cierre='<div class="k a" data-si="0">Siguiente paso</div><div class="st a" data-si="0" data-dl="0"><span class="num">✓</span>Piloto medido</div><div class="st a" data-si="0" data-dl="1.5"><span class="num">✓</span>Inversión pre-semilla</div><div class="st a" data-si="0" data-dl="3"><span class="num">✓</span>Alianza con otros grupos y marcas</div><div style="margin-top:40px;text-align:center" class="a" data-si="1"><div class="logo" style="font-size:80px;line-height:1">Ax <i>AI</i><br>Garantías</div><div style="font-size:34px;margin-top:20px;color:#bcd0ff">Que cada garantía se cobre completa.</div><div style="font-size:26px;margin-top:24px;color:#8e9bbd">[Nombre · correo · teléfono]</div></div>';
+var TOTAL=TL[TL.length-1].start+TL[TL.length-1].dur;
+var scs=document.getElementById('scs');
+TL.forEach(function(sc){var d=document.createElement('div');d.className='sc';d.id='sc_'+sc.id;d.innerHTML=V[sc.id]||'';scs.appendChild(d)});
+function cl(x,a,b){return Math.max(0,Math.min(1,(x-a)/(b-a)))}
+function ez(p){return 1-Math.pow(1-p,3)}
+window.setT=function(t){
+ document.getElementById('pb').style.width=(100*t/TOTAL)+'%';
+ var cap=document.getElementById('cap'),capT='',capO=0;
+ TL.forEach(function(sc){
+  var el=document.getElementById('sc_'+sc.id),rt=t-sc.start,vis=rt>=-0.01&&rt<=sc.dur;
+  el.style.opacity=vis?Math.min(cl(rt,0,.3),1-cl(rt,sc.dur-.3,sc.dur)):0;
+  if(!vis)return;
+  el.querySelectorAll('.a').forEach(function(e){
+   var si=+e.dataset.si||0,dl=+e.dataset.dl||0,seg=sc.segs[Math.min(si,sc.segs.length-1)];
+   var a=seg.st+dl,p=ez(cl(rt,a,a+.5));e.style.opacity=p;e.style.transform='translateY('+((1-p)*26)+'px)'});
+  sc.segs.forEach(function(g){if(rt>=g.st-.05&&rt<=g.st+g.dur+.25){capT=g.cap;capO=Math.min(cl(rt,g.st-.05,g.st+.2),1-cl(rt,g.st+g.dur,g.st+g.dur+.25))}});
+ });
+ if(capT)cap.textContent=capT;cap.style.opacity=capO;
+};
+setT(0);
+</script></body></html>
