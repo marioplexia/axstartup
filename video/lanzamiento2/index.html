@@ -175,10 +175,10 @@ function s13(t){var lt=t-43.9;T(typ('A información',lt,.2,24),70,100,32,{a:'lef
   shadow(12,.12);x.fillStyle='#fff';font(20,500);var w=x.measureText(p[3]).width+40;rr(p[0]-w/2+(i==1?-40:0),top-120,w,46,23);x.fill();noShadow();x.strokeStyle='#ddd';x.lineWidth=1.5;x.stroke();T(p[3],p[0]+(i==1?-40:0),top-97,20,{w:500,al:a})});
  T('Ejemplo ilustrativo',40,1050,16,{a:'left',c:'#999'})}
 /* ---------- escena 14: nube de verbos ---------- */
-var VB=['capturando','revisando','buscando','corrigiendo','reenviando','llamando','conciliando','facturando','verificando','auditando','persiguiendo','escaneando','archivando','comparando','investigando','cotizando','esperando','rastreando','validando','reclamando','anotando','preguntando','calculando','fotografiando','subiendo','recapturando','checando','firmando'];
+var VB=['$4,654','C-210','4041510','0.3 h','19391267','Q-014','pagado','reclamado','mano de obra','partes','manejo de partes','$126.00','$3,927.25','$785.45','estimado','aprobada','rechazada','corregida','planta','evidencia','operación','tiempo','factura','transacción','GA4006','causa','queja','pieza'];
 function s14(t){var lt=t-48.6;for(var r=0;r<12;r++)for(var q=0;q<8;q++){var i=r*8+q,sd=R(i+5);var X=q*250+60+(r%2)*90-lt*(10+sd*20),Y=110+r*78;if(Math.abs(Y-H/2)<60&&X>560&&X<1360)continue;
   var a=C(lt,sd*1.6,sd*1.6+.4)*(1-C(lt,3.8+sd*.6,4.4+sd*.6))*(.35+sd*.5);T(VB[i%VB.length],X,Y,26,{a:'left',c:'#8a8a8a',al:a})}
- T(typ('Para que pases menos tiempo..',lt,.6,22),W/2,H/2,48,{al:1-C(lt,4.4,4.8)})}
+ T(typ('Estima lo que pagará planta..',lt,.6,22),W/2,H/2,48,{al:1-C(lt,4.4,4.8)})}
 /* ---------- escena 15 ---------- */
 function s15(t){var lt=t-53.4;logoMark(W/2,430,46,eo(C(lt,0,.4)));x.fillStyle='#e2e2e2';x.fillRect(W/2-170,480,340*eo(C(lt,.1,.6)),1.5);
  var s1='Y más tiempo cobrando ',s2='lo que importa.',a=typ(s1+s2,lt,.4,26);font(36,400);var w1=x.measureText(s1).width;font(36,700);var w2=x.measureText(s2).width;var sx=W/2-(w1+w2)/2;
