@@ -1,26 +1,123 @@
 [
-{"id":"intro","s":[["Así funciona Ax Ei Ai Garantías, paso a paso.","Así funciona Ax AI Garantías"]]},
-{"id":"subir","s":[
- ["El asesor sube el pe de efe de la pre-a.","1 · Sube el PDF de la PREA"],
- ["La plataforma lee el formulario: queja, causa, códigos, operación, tiempo y piezas, y crea el expediente.","Lee queja, causa, códigos, operación, tiempo y piezas"]]},
-{"id":"orden","s":[["Cada orden tiene su propio expediente y su propio agente, con contrato, evidencia, factura y el pago de planta.","Un expediente y un agente por orden"]]},
-{"id":"rechazo","s":[
- ["Si la pre-a se rechaza, el agente entiende el motivo.","2 · Si se rechaza, entiende el motivo"],
- ["Y arma un plan de corrección con la causa que ya funcionó en casos iguales.","Plan de corrección con lo que ya funcionó"]]},
-{"id":"cerebro","s":[
- ["Y aquí está lo importante: el cerebro aprende de cada pre-a.","3 · El cerebro aprende de cada PREA"],
- ["De cada código de queja y de causa, cada operación, cada tiempo, cada pieza y cada evidencia.","Códigos · operación · tiempo · piezas · evidencia"],
- ["Aprende de lo aceptado, de lo rechazado y de lo pagado, en tiempo real, todo el tiempo.","Aprende en tiempo real, todo el tiempo"]]},
-{"id":"red","s":[
- ["Y no aprende solo. Lo que descubre una agencia, lo reciben las demás de la marca en tiempo real.","4 · Las agencias se ayudan en tiempo real"],
- ["Por ejemplo: la agencia A corrige un rechazo con la causa ce doscientos diez. Minutos después, la agencia B abre una pre-a igual, y el agente ya le sugiere esa causa.","Ejemplo: A corrige con C-210 → B recibe la sugerencia"],
- ["Cada agencia decide si comparte, o se mantiene protegida.","Cada agencia decide: Comparte o Protegida"]]},
-{"id":"cobros","s":[
- ["A la hora de cobrar, cada orden tiene su agente de cobros.","5 · Cobros: un agente por orden"],
- ["Subes la factura y la transacción de planta, y conversas sobre la estimación.","Factura · transacción de planta · estimación"],
- ["La plataforma compara lo estimado contra lo pagado, y también aprende de eso.","Estimado vs. pagado · y el cerebro aprende"]]},
-{"id":"audit","s":[["Y todos los expedientes quedan completos, listos para una auditoría de planta en cualquier momento.","Expedientes completos, listos para auditoría de planta"]]},
-{"id":"cierre","s":[
- ["Todo conectado, todo aprendiendo, sin tocar el portal del fabricante.","Todo conectado · todo aprendiendo · sin tocar el portal"],
- ["Ax Ei Ai Garantías. Que cada garantía se cobre completa.","Ax AI Garantías · Que cada garantía se cobre completa"]]}
+ {
+  "id": "intro",
+  "s": [
+   [
+    "Así funciona Ax Ei Ai Garantías, paso a paso.",
+    "Así funciona Ax AI Garantías"
+   ]
+  ]
+ },
+ {
+  "id": "subir",
+  "s": [
+   [
+    "El asesor sube el pe de efe de la pre-a.",
+    "1 · Sube el PDF de la PREA"
+   ],
+   [
+    "La plataforma lee el formulario: queja, causa, códigos, operación, tiempo y piezas, y crea el expediente.",
+    "Lee queja, causa, códigos, operación, tiempo y piezas"
+   ]
+  ]
+ },
+ {
+  "id": "orden",
+  "s": [
+   [
+    "Cada orden tiene su propio expediente y su propio agente.",
+    "Un expediente y un agente por orden"
+   ]
+  ]
+ },
+ {
+  "id": "rechazo",
+  "s": [
+   [
+    "Si la pre-a se rechaza, el agente entiende el motivo.",
+    "2 · Si se rechaza, entiende el motivo"
+   ],
+   [
+    "Y arma un plan de corrección con la causa que ya funcionó en casos iguales.",
+    "Plan de corrección con lo que ya funcionó"
+   ]
+  ]
+ },
+ {
+  "id": "cerebro",
+  "s": [
+   [
+    "Y aquí está lo importante: el cerebro aprende de cada pre-a.",
+    "3 · El cerebro aprende de cada PREA"
+   ],
+   [
+    "De cada código de queja y de causa, cada operación, cada tiempo, cada pieza y cada evidencia.",
+    "Códigos · operación · tiempo · piezas · evidencia"
+   ],
+   [
+    "Aprende de lo aceptado, de lo rechazado y de lo pagado, en tiempo real, todo el tiempo.",
+    "Aprende en tiempo real, todo el tiempo"
+   ]
+  ]
+ },
+ {
+  "id": "red",
+  "s": [
+   [
+    "Y no aprende solo. Lo que descubre una agencia, lo reciben las demás de la marca en tiempo real.",
+    "4 · Las agencias se ayudan en tiempo real"
+   ],
+   [
+    "Por ejemplo: la agencia A corrige un rechazo con la causa ce doscientos diez. Minutos después, la agencia B abre una pre-a igual, y el agente ya le sugiere esa causa.",
+    "Ejemplo: A corrige con C-210 → B recibe la sugerencia"
+   ],
+   [
+    "Cada agencia decide si comparte, o se mantiene protegida.",
+    "Cada agencia decide: Comparte o Protegida"
+   ]
+  ]
+ },
+ {
+  "id": "cobros",
+  "s": [
+   [
+    "A la hora de cobrar, cada orden tiene su agente de cobros.",
+    "5 · Cobros: un agente por orden"
+   ],
+   [
+    "Gracias al cerebro, sabes cuánto va a pagar planta por esas piezas, antes de hacer la factura.",
+    "Estimado de planta, antes de facturar"
+   ],
+   [
+    "Subes la factura y la transacción de planta, y se compara lo estimado contra lo pagado.",
+    "Factura · transacción · estimado vs. pagado"
+   ],
+   [
+    "Y cada pago enseña al cerebro: cada vez más, y más, y más. Con el tiempo, el producto se vuelve más fuerte.",
+    "Cada pago lo hace más fuerte, con el paso del tiempo"
+   ]
+  ]
+ },
+ {
+  "id": "audit",
+  "s": [
+   [
+    "Y los expedientes quedan completos, listos para auditoría de planta.",
+    "Expedientes completos, listos para auditoría de planta"
+   ]
+  ]
+ },
+ {
+  "id": "cierre",
+  "s": [
+   [
+    "Todo conectado, todo aprendiendo, sin tocar el portal del fabricante.",
+    "Todo conectado · todo aprendiendo · sin tocar el portal"
+   ],
+   [
+    "Ax Ei Ai Garantías. Que cada garantía se cobre completa.",
+    "Ax AI Garantías · Que cada garantía se cobre completa"
+   ]
+  ]
+ }
 ]
