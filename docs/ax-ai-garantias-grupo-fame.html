@@ -4,39 +4,39 @@
 @page{size:Letter;margin:0}
 :root{--ink:#14171f;--mut:#5d6575;--blue:#1f4fd8;--blue2:#5f86ff;--soft:#eef2ff;--line:#e3e7f0;--red:#d23b2e;--green:#1f9d62;--cream:#f6f3ec}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,Arial,sans-serif;color:var(--ink);font-size:11.5pt;line-height:1.5}
+body{font-family:Inter,Arial,sans-serif;color:var(--ink);font-size:14pt;line-height:1.5}
 .pg{width:8.5in;height:11in;position:relative;overflow:hidden;page-break-after:always;padding:.75in .8in}
 .pg:last-child{page-break-after:auto}
-.ft{position:absolute;left:.8in;right:.8in;bottom:.4in;display:flex;justify-content:space-between;font-size:8.5pt;color:var(--mut);border-top:1px solid var(--line);padding-top:8px}
-.k{font-size:9pt;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue)}
-h1{font-size:40pt;letter-spacing:-1.5px;line-height:1.05;font-weight:800}
-h2{font-size:24pt;letter-spacing:-.8px;line-height:1.15;font-weight:800;margin:6px 0 14px}
-h3{font-size:13pt;font-weight:700;margin-bottom:4px}
+.ft{position:absolute;left:.8in;right:.8in;bottom:.4in;display:flex;justify-content:space-between;font-size:10pt;color:var(--mut);border-top:1px solid var(--line);padding-top:8px}
+.k{font-size:11pt;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue)}
+h1{font-size:50pt;letter-spacing:-1.5px;line-height:1.05;font-weight:800}
+h2{font-size:32pt;letter-spacing:-.8px;line-height:1.15;font-weight:800;margin:6px 0 14px}
+h3{font-size:16pt;font-weight:700;margin-bottom:4px}
 p{color:#2c3240;margin-bottom:10px}
 .mut{color:var(--mut)}
 .cover{background:radial-gradient(120% 90% at 80% 0%,#2a4fb8,#0c1226 60%);color:#fff;padding:1in .9in}
 .cover p{color:#c8d2ee}
 .logo{font-size:17pt;font-weight:800;letter-spacing:-.5px}.logo i{font-style:normal;color:var(--blue2)}
 .grid{display:grid;gap:14px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
-.card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:#fff}
+.card{border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:#fff}
 .card.s{background:var(--soft);border-color:#d9e1ff}
 .n{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;align-items:center;justify-content:center;font-size:11pt;margin-bottom:8px}
 .step{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
 .step .n{flex:none;margin:2px 0 0}
-.step p{margin:0;font-size:10.5pt}
-.mock{border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:0 10px 30px rgba(20,30,60,.12);padding:14px 16px;font-size:9.5pt}
-.mock h4{font-size:7.5pt;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.step p{margin:0;font-size:12.5pt}
+.mock{border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:0 10px 30px rgba(20,30,60,.12);padding:18px 20px;font-size:12.5pt}
+.mock h4{font-size:9.5pt;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
 .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f1f5}.row span{color:var(--mut)}
-.chip{display:inline-block;background:var(--soft);color:var(--blue);border-radius:99px;padding:2px 10px;font-size:8.5pt;font-weight:600;margin:3px 4px 0 0}
-.st{float:right;font-size:7.5pt;font-weight:800;letter-spacing:1.5px;padding:2px 8px;border:1.5px solid;border-radius:5px}
+.chip{display:inline-block;background:var(--soft);color:var(--blue);border-radius:99px;padding:4px 12px;font-size:12.5pt;font-weight:600;margin:3px 4px 0 0}
+.st{float:right;font-size:9.5pt;font-weight:800;letter-spacing:1.5px;padding:2px 8px;border:1.5px solid;border-radius:5px}
 .hi{background:#ffe9e6;color:var(--red);font-weight:700;border-radius:4px;padding:0 4px}
 .flow{display:flex;align-items:center;gap:8px;margin:10px 0}
-.fb{flex:1;background:var(--soft);border:1px solid #d9e1ff;border-radius:10px;padding:10px;text-align:center;font-size:9.5pt;font-weight:600}
+.fb{flex:1;background:var(--soft);border:1px solid #d9e1ff;border-radius:10px;padding:12px 8px;text-align:center;font-size:11.5pt;font-weight:600}
 .ar{color:var(--blue);font-weight:800}
-.big{font-size:30pt;font-weight:800;color:var(--blue);letter-spacing:-1px;line-height:1}
+.big{font-size:38pt;font-weight:800;color:var(--blue);letter-spacing:-1px;line-height:1}
 ul{padding-left:18px}li{margin-bottom:5px;color:#2c3240}
-.note{font-size:8.5pt;color:var(--mut)}
-table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:8.5pt;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}
+.note{font-size:12.5pt;color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:12.5pt}th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:10pt;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}
 </style></head><body>
 
 <!-- 1 PORTADA -->
@@ -45,7 +45,7 @@ table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;p
  <div style="position:absolute;top:2.6in;left:.9in;right:.9in">
   <div class="k" style="color:#9db4ff">Propuesta para Grupo Fame</div>
   <h1 style="margin-top:14px">La garantía que<br>se cobra completa.</h1>
-  <p style="font-size:14pt;margin-top:22px;max-width:5.6in">Una plataforma que lee tus PREAs, corrige los rechazos, da seguimiento al cobro de cada orden y aprende de cada garantía, todo el tiempo.</p>
+  <p style="font-size:17pt;margin-top:22px;max-width:6in">Una plataforma que lee tus PREAs, corrige los rechazos, da seguimiento al cobro de cada orden y aprende de cada garantía, todo el tiempo.</p>
  </div>
  <div style="position:absolute;bottom:.9in;left:.9in;right:.9in;font-size:10pt;color:#9fb0d6">Documento informativo · Noviembre 2026</div>
 </section>
@@ -55,17 +55,17 @@ table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;p
  <div class="k">El reto</div>
  <h2>Cada garantía es dinero. Y los detalles del papeleo deciden si se cobra.</h2>
  <p>La garantía no se paga solo por hacer bien el trabajo: se paga si la PREA, los códigos y la evidencia están correctos. En una operación con varios asesores y agencias, los mismos errores se repiten y el conocimiento vive en la cabeza de cada persona.</p>
- <div class="grid g3" style="margin:18px 0">
-  <div class="card s"><h3>Rechazos repetidos</h3><p class="mut" style="font-size:10pt;margin:0">Un código de causa o una evidencia faltante tumba la PREA, y la siguiente se rechaza por lo mismo.</p></div>
-  <div class="card s"><h3>Doble captura</h3><p class="mut" style="font-size:10pt;margin:0">Los datos se capturan en el portal, en hojas de cálculo y en correos.</p></div>
-  <div class="card s"><h3>Cobros sin visibilidad</h3><p class="mut" style="font-size:10pt;margin:0">No se sabe cuánto va a pagar planta hasta que llega el pago.</p></div>
+ <div class="grid g3" style="margin:12px 0">
+  <div class="card s"><h3>Rechazos repetidos</h3><p class="mut" style="font-size:12.5pt;margin:0">Un código de causa o una evidencia faltante tumba la PREA, y la siguiente se rechaza por lo mismo.</p></div>
+  <div class="card s"><h3>Doble captura</h3><p class="mut" style="font-size:12.5pt;margin:0">Los datos se capturan en el portal, en hojas de cálculo y en correos.</p></div>
+  <div class="card s"><h3>Cobros sin visibilidad</h3><p class="mut" style="font-size:12.5pt;margin:0">No se sabe cuánto va a pagar planta hasta que llega el pago.</p></div>
  </div>
- <h3 style="margin-top:20px">El tamaño del problema en la industria</h3>
+ <h3 style="margin-top:10px">El tamaño del problema en la industria</h3>
  <div class="grid g2" style="margin-top:8px">
-  <div class="card"><div class="big">~$57.9 mil M</div><p class="mut" style="font-size:10pt;margin:6px 0 0">de dólares pagados en reclamos de garantía por los fabricantes de autos de pasajeros en 2024.<br><span class="note">Fuente: Warranty Week.</span></p></div>
-  <div class="card"><div class="big">$5,300 M</div><p class="mut" style="font-size:10pt;margin:6px 0 0">de dólares pagó GM en reclamos de garantía en 2025, 19 % más que en 2024.<br><span class="note">Fuente: Warranty Week y 10-K de GM 2025.</span></p></div>
+  <div class="card"><div class="big" style="font-size:30pt;white-space:nowrap">~$57.9 mil M</div><p class="mut" style="font-size:12pt;margin:6px 0 0">de dólares pagados en reclamos de garantía por los fabricantes de autos de pasajeros en 2024.<br><span class="note">Fuente: Warranty Week.</span></p></div>
+  <div class="card"><div class="big" style="font-size:30pt;white-space:nowrap">$5,300 M</div><p class="mut" style="font-size:12pt;margin:6px 0 0">de dólares pagó GM en reclamos de garantía en 2025, 19 % más que en 2024.<br><span class="note">Fuente: Warranty Week y 10-K de GM 2025.</span></p></div>
  </div>
- <p style="margin-top:16px;font-size:10.5pt">Para el distribuidor, la garantía es ingreso del taller: lo que importa es <b>cobrarla completa y rápido</b>.</p>
+ <p style="margin-top:10px;margin-bottom:0;font-size:12.5pt">Para el distribuidor, la garantía es ingreso del taller: lo que importa es <b>cobrarla completa y rápido</b>.</p>
  <div class="ft"><span>Ax AI Garantías</span><span>2</span></div>
 </section>
 
@@ -94,7 +94,7 @@ table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;p
    <div class="row" style="border:0"><span>Parte</span><b>19391267</b></div>
    <span class="chip">Expediente creado</span><span class="chip">Conversación propia</span></div>
   <div class="mock" style="border-top:4px solid var(--blue)"><span class="st" style="color:var(--red)">RECHAZADA</span><h4>Plan de corrección</h4>
-   <p style="font-size:9.5pt;margin-bottom:8px"><span class="hi">Falta evidencia de la pieza</span> y el código de causa no corresponde a la queja.</p>
+   <p style="font-size:12.5pt;margin-bottom:8px"><span class="hi">Falta evidencia de la pieza</span> y el código de causa no corresponde a la queja.</p>
    <div class="row"><b>1</b><span style="flex:1;margin-left:10px;color:var(--ink)">Usar la causa C-210, la que el cerebro ve en casos iguales</span></div>
    <div class="row"><b>2</b><span style="flex:1;margin-left:10px;color:var(--ink)">Subir foto de la pieza desgastada</span></div>
    <div class="row" style="border:0"><b>3</b><span style="flex:1;margin-left:10px;color:var(--ink)">Reenviar la PREA actualizada</span></div>
@@ -118,9 +118,9 @@ table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;p
 <section class="pg">
  <div class="k">El cerebro</div>
  <h2>Una plataforma que autoaprende, todo el tiempo.</h2>
- <p>Cada PREA, cada rechazo y cada pago le enseñan al cerebro. No hay que reentrenarlo ni configurarlo regla por regla: aprende mientras la agencia trabaja.</p>
+ <p>Cada PREA, cada rechazo y cada pago le enseñan al cerebro.</p>
  <div class="flow"><div class="fb">PREA<br><span class="mut" style="font-weight:400">aceptada o rechazada</span></div><div class="ar">→</div><div class="fb">Evidencia<br><span class="mut" style="font-weight:400">que subió el asesor</span></div><div class="ar">→</div><div class="fb">Pago de planta<br><span class="mut" style="font-weight:400">lo reclamado y lo pagado</span></div><div class="ar">→</div><div class="fb" style="background:var(--blue);color:#fff;border-color:var(--blue)">Cerebro</div></div>
- <h3 style="margin-top:18px">Qué aprende de cada PREA</h3>
+ <h3 style="margin-top:12px">Qué aprende de cada PREA</h3>
  <table>
   <tr><th style="width:2.1in">Elemento</th><th>Para qué sirve</th></tr>
   <tr><td><b>Código de queja y de causa</b></td><td>Sabe qué códigos exactos se usaron y cuáles se aprobaron o se rechazaron.</td></tr>
@@ -130,7 +130,7 @@ table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;p
   <tr><td><b>Evidencia</b></td><td>Aprende qué evidencia acompañó a las PREAs que sí se aprobaron.</td></tr>
   <tr><td><b>Rechazos</b></td><td>Guarda el motivo, para prevenirlo y para armar el plan de corrección.</td></tr>
  </table>
- <div class="card s" style="margin-top:18px"><h3>Sin tocar el portal del fabricante</h3><p style="margin:0;font-size:10.5pt">La plataforma <b>no se conecta al portal ni pide accesos o contraseñas</b>. Aprende de lo que la agencia ya tiene: las PREAs en PDF, los rechazos, la evidencia y las transacciones de pago de planta que el asesor sube.</p></div>
+ <div class="card s" style="margin-top:14px"><h3>Sin tocar el portal del fabricante</h3><p style="margin:0;font-size:12.5pt">La plataforma <b>no se conecta al portal ni pide accesos o contraseñas</b>. Aprende de lo que la agencia ya tiene: las PREAs en PDF, los rechazos, la evidencia y las transacciones de pago de planta que el asesor sube.</p></div>
  <div class="ft"><span>Ax AI Garantías</span><span>5</span></div>
 </section>
 
@@ -141,22 +141,31 @@ table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;p
  <p>Cuando una agencia del grupo resuelve una PREA, el cerebro lo aprende, y <b>las demás agencias de la misma marca lo reciben al instante</b>. Un rechazo que ocurre en una sucursal deja de repetirse en las otras.</p>
  <h3 style="margin-top:14px">El loop de IA</h3>
  <div class="flow"><div class="fb">Una agencia<br><span class="mut" style="font-weight:400">sube PREA, rechazo o pago</span></div><div class="ar">→</div><div class="fb">El cerebro aprende<br><span class="mut" style="font-weight:400">códigos, tiempos, evidencia</span></div><div class="ar">→</div><div class="fb">Se comparte<br><span class="mut" style="font-weight:400">con las agencias de la marca</span></div><div class="ar">→</div><div class="fb" style="background:var(--blue);color:#fff;border-color:var(--blue)">La siguiente PREA sale mejor</div></div>
- <p class="mut" style="font-size:10pt;margin-top:4px">El ciclo no se detiene: cada vuelta hace más preciso al agente en todas las agencias.</p>
+ <p class="mut" style="font-size:12pt;margin-top:4px">El ciclo no se detiene: cada vuelta hace más preciso al agente en todas las agencias.</p>
  <div class="grid g2" style="margin-top:16px">
   <div class="mock"><h4>Ejemplo ilustrativo</h4>
    <p style="margin-bottom:8px"><b>Agencia A</b> corrige un rechazo: la causa <b>C-210</b> con foto de la pieza fue aprobada.</p>
    <p style="margin-bottom:8px"><b>Agencia B</b>, minutos después, abre una PREA con la misma queja. El agente le sugiere desde el inicio <b>C-210</b> y la evidencia que se pidió.</p>
    <span class="chip">Aprendizaje compartido</span><span class="chip">Tiempo real</span></div>
-  <div class="card s"><h3>Cada agencia decide</h3><p style="font-size:10pt;margin:0">Cada agencia puede estar en modo <b>Comparte</b> o <b>Protegida</b>. Si está protegida, lo que aprende solo lo ven esa agencia y su marca. El administrador lo cambia cuando quiera.</p></div>
+  <div class="card s"><h3>Cada agencia decide</h3><p style="font-size:12.5pt;margin:0">Cada agencia puede estar en modo <b>Comparte</b> o <b>Protegida</b>. Si está protegida, lo que aprende solo lo ven esa agencia y su marca. El administrador lo cambia cuando quiera.</p></div>
  </div>
- <h3 style="margin-top:20px">Lo que esto significa para el grupo</h3>
- <ul>
-  <li><b>Un error se paga una sola vez.</b> Lo que una agencia ya descubrió, las demás no tienen que aprenderlo de nuevo.</li>
-  <li><b>Las agencias nuevas arrancan con la experiencia del grupo</b>, no desde cero.</li>
-  <li><b>El conocimiento queda en el grupo</b>, no en el asesor ni en la sucursal.</li>
-  <li><b>Cuantas más agencias participan, mejor funciona</b> para todas.</li>
- </ul>
  <div class="ft"><span>Ax AI Garantías</span><span>6</span></div>
+</section>
+
+<!-- 6b -->
+<section class="pg">
+ <div class="k">Para el grupo</div>
+ <h2>Lo que esto significa.</h2>
+  <ul style="font-size:14pt;line-height:1.5">
+  <li style="margin-bottom:12px"><b>Un error se paga una sola vez.</b> Lo que una agencia ya descubrió, las demás no tienen que aprenderlo de nuevo.</li>
+  <li style="margin-bottom:12px"><b>Las agencias nuevas arrancan con la experiencia del grupo</b>, no desde cero.</li>
+  <li style="margin-bottom:12px"><b>El conocimiento queda en el grupo</b>, no en el asesor ni en la sucursal.</li>
+  <li style="margin-bottom:12px"><b>Cuantas más agencias participan, mejor funciona</b> para todas.</li>
+ </ul>
+
+ <div class="card s" style="margin-top:26px"><h3>Expedientes completos, siempre disponibles para auditoría</h3><p style="margin:0 0 8px;font-size:12.5pt">Al usar la plataforma, el grupo conserva el <b>expediente completo de cada garantía</b>, listo para cuando planta audite, sin buscar papeles ni correos:</p><div><span class="chip">Contrato</span><span class="chip">Actualización de PREA</span><span class="chip">Piezas</span><span class="chip">Evidencia</span><span class="chip">Factura</span><span class="chip">Transacción de planta</span><span class="chip">Conversación de la orden</span></div><p style="margin:10px 0 0;font-size:12.5pt">Y esos mismos expedientes <b>alimentan al cerebro</b>: cada uno le enseña códigos, tiempos, piezas y evidencia, así que el archivo de auditoría también hace más inteligente a la plataforma.</p></div>
+
+ <div class="ft"><span>Ax AI Garantías</span><span>7</span></div>
 </section>
 
 <!-- 6 BENEFICIOS -->
@@ -164,17 +173,16 @@ table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;p
  <div class="k">Beneficios para Grupo Fame</div>
  <h2>Qué gana el grupo.</h2>
  <div class="grid g2">
-  <div class="card"><h3>Menos rechazos repetidos</h3><p class="mut" style="font-size:10pt;margin:0">El cerebro conoce los códigos y evidencias que funcionan y orienta al asesor antes de que la PREA se rechace de nuevo.</p></div>
-  <div class="card"><h3>Rechazos que se corrigen más rápido</h3><p class="mut" style="font-size:10pt;margin:0">Cada rechazo llega con un plan paso a paso, en vez de empezar de cero.</p></div>
-  <div class="card"><h3>Cero doble trabajo al arrancar</h3><p class="mut" style="font-size:10pt;margin:0">Las PREAs que los asesores ya traían avanzadas se cargan subiendo su PDF: el agente lee todo y crea el expediente.</p></div>
-  <div class="card"><h3>Visibilidad de cobro por orden</h3><p class="mut" style="font-size:10pt;margin:0">Estimación, factura y pago de planta en un solo lugar, con su chat de cobros.</p></div>
-  <div class="card"><h3>Conocimiento que se queda en el grupo</h3><p class="mut" style="font-size:10pt;margin:0">Lo que aprende el cerebro no se va con un asesor que cambia de agencia.</p></div>
-  <div class="card"><h3>Arranque sin integraciones</h3><p class="mut" style="font-size:10pt;margin:0">No depende del portal del fabricante ni de credenciales: no se rompe si el portal cambia.</p></div>
-  <div class="card"><h3>Listo para auditoría de planta</h3><p class="mut" style="font-size:10pt;margin:0">Cada garantía deja su expediente completo, disponible en cualquier momento.</p></div>
-  <div class="card"><h3>Las agencias se benefician entre sí</h3><p class="mut" style="font-size:10pt;margin:0">Lo que aprende una agencia de una marca lo reciben las demás en tiempo real, gracias a los loops de IA.</p></div>
+  <div class="card"><h3>Menos rechazos repetidos</h3><p class="mut" style="font-size:12.5pt;margin:0">El cerebro conoce los códigos y evidencias que funcionan y orienta al asesor antes de que la PREA se rechace de nuevo.</p></div>
+  <div class="card"><h3>Rechazos que se corrigen más rápido</h3><p class="mut" style="font-size:12.5pt;margin:0">Cada rechazo llega con un plan paso a paso, en vez de empezar de cero.</p></div>
+  <div class="card"><h3>Cero doble trabajo al arrancar</h3><p class="mut" style="font-size:12.5pt;margin:0">Las PREAs que los asesores ya traían avanzadas se cargan subiendo su PDF: el agente lee todo y crea el expediente.</p></div>
+  <div class="card"><h3>Visibilidad de cobro por orden</h3><p class="mut" style="font-size:12.5pt;margin:0">Estimación, factura y pago de planta en un solo lugar, con su chat de cobros.</p></div>
+  <div class="card"><h3>Conocimiento que se queda en el grupo</h3><p class="mut" style="font-size:12.5pt;margin:0">Lo que aprende el cerebro no se va con un asesor que cambia de agencia.</p></div>
+  <div class="card"><h3>Arranque sin integraciones</h3><p class="mut" style="font-size:12.5pt;margin:0">No depende del portal del fabricante ni de credenciales: no se rompe si el portal cambia.</p></div>
+  <div class="card"><h3>Listo para auditoría de planta</h3><p class="mut" style="font-size:12.5pt;margin:0">Cada garantía deja su expediente completo, disponible en cualquier momento.</p></div>
+  <div class="card"><h3>Las agencias se benefician entre sí</h3><p class="mut" style="font-size:12.5pt;margin:0">Lo que aprende una agencia de una marca lo reciben las demás en tiempo real, gracias a los loops de IA.</p></div>
  </div>
- <div class="card s" style="margin-top:18px"><h3>Expedientes completos, siempre disponibles para auditoría</h3><p style="margin:0 0 8px;font-size:10.5pt">Al usar la plataforma, el grupo conserva el <b>expediente completo de cada garantía</b>, listo para cuando planta audite, sin buscar papeles ni correos:</p><div><span class="chip">Contrato</span><span class="chip">Actualización de PREA</span><span class="chip">Piezas</span><span class="chip">Evidencia</span><span class="chip">Factura</span><span class="chip">Transacción de planta</span><span class="chip">Conversación de la orden</span></div><p style="margin:10px 0 0;font-size:10.5pt">Y esos mismos expedientes <b>alimentan al cerebro</b>: cada uno le enseña códigos, tiempos, piezas y evidencia, así que el archivo de auditoría también hace más inteligente a la plataforma.</p></div>
- <div class="ft"><span>Ax AI Garantías</span><span>7</span></div>
+  <div class="ft"><span>Ax AI Garantías</span><span>8</span></div>
 </section>
 
 <!-- 7 PILOTO -->
@@ -185,13 +193,19 @@ table{width:100%;border-collapse:collapse;font-size:10pt}th,td{text-align:left;p
  <div class="step"><div class="n">2</div><div><h3>Cargar las PREAs existentes</h3><p>Los asesores suben los PDFs de las PREAs que ya tienen; la plataforma crea sus expedientes.</p></div></div>
  <div class="step"><div class="n">3</div><div><h3>Trabajar con el agente</h3><p>Nuevas PREAs, planes de corrección y cobros por orden, con acompañamiento del equipo de Ax AI Garantías.</p></div></div>
  <div class="step" style="border:0"><div class="n">4</div><div><h3>Medir y decidir</h3><p>Revisamos juntos los indicadores y decidimos cómo extenderlo al resto del grupo.</p></div></div>
-  <div class="card s" style="margin-top:24px"><h3>Cómo lo medimos</h3><p style="margin:0;font-size:10.5pt">En el piloto compararíamos, antes y después y con las cifras reales de Grupo Fame: tasa de rechazo de PREAs, tiempo entre la PREA y el cobro, y diferencia entre lo estimado y lo pagado por planta. No prometemos cifras de antemano: las medimos con ustedes.</p></div>
- <div class="card s" style="margin-top:14px"><h3>Datos y seguridad</h3><p style="margin:0;font-size:10.5pt">Cada usuario accede por su cuenta y su rol. Los documentos de cada expediente se almacenan de forma privada y se controlan con políticas de acceso en la base de datos.</p></div>
- <div style="margin-top:32px;padding:26px;border-radius:14px;background:linear-gradient(135deg,#1f4fd8,#0c1226);color:#fff">
-  <div class="logo" style="font-size:20pt">Ax <i>AI</i> Garantías</div>
-  <p style="color:#c8d2ee;margin:8px 0 14px">Agenda una demo con tus propios casos.</p>
-  <p style="color:#fff;margin:0;font-size:10.5pt">[Nombre y cargo] · [correo] · [teléfono]</p>
+  <div class="card s" style="margin-top:24px"><h3>Cómo lo medimos</h3><p style="margin:0;font-size:12.5pt">En el piloto compararíamos, antes y después y con las cifras reales de Grupo Fame: tasa de rechazo de PREAs, tiempo entre la PREA y el cobro, y diferencia entre lo estimado y lo pagado por planta. No prometemos cifras de antemano: las medimos con ustedes.</p></div>
+ <div class="ft"><span>Ax AI Garantías</span><span>9</span></div>
+</section>
+
+<section class="pg">
+ <div class="k">Confianza y siguiente paso</div>
+ <h2>Datos protegidos. Listos para empezar.</h2>
+ <div class="card s" style="margin-top:10px"><h3>Datos y seguridad</h3><p style="margin:0;font-size:12.5pt">Cada usuario accede por su cuenta y su rol. Los documentos de cada expediente se almacenan de forma privada y se controlan con políticas de acceso en la base de datos.</p></div>
+ <div style="margin-top:36px;padding:34px;border-radius:14px;background:linear-gradient(135deg,#1f4fd8,#0c1226);color:#fff">
+  <div class="logo" style="font-size:26pt">Ax <i>AI</i> Garantías</div>
+  <p style="color:#c8d2ee;margin:10px 0 18px;font-size:16pt">Agenda una demo con tus propios casos.</p>
+  <p style="color:#fff;margin:0;font-size:14pt">[Nombre y cargo] · [correo] · [teléfono]</p>
  </div>
- <div class="ft"><span>Ax AI Garantías</span><span>8</span></div>
+ <div class="ft"><span>Ax AI Garantías</span><span>10</span></div>
 </section>
 </body></html>
