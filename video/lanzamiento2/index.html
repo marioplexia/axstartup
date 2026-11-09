@@ -188,7 +188,7 @@ function icon(k,X,Y,a){x.save();x.globalAlpha=a;x.strokeStyle='#222';x.lineWidth
  if(k==0){x.beginPath();x.arc(X,Y,16,0,7);x.stroke();x.beginPath();x.moveTo(X-16,Y);x.quadraticCurveTo(X,Y-8,X+16,Y);x.stroke();x.beginPath();x.moveTo(X-8,Y-14);x.quadraticCurveTo(X+6,Y,X-4,Y+15);x.stroke()}
  if(k==1){x.beginPath();x.moveTo(X+4,Y-18);x.lineTo(X-10,Y+2);x.lineTo(X+2,Y+2);x.lineTo(X-4,Y+18);x.lineTo(X+12,Y-4);x.lineTo(X,Y-4);x.closePath();x.stroke()}
  if(k==2){[-8,0,8].forEach(function(d){x.beginPath();x.moveTo(X-16,Y+d);x.lineTo(X,Y+d-8);x.lineTo(X+16,Y+d);x.lineTo(X,Y+d+8);x.closePath();x.stroke()})}x.restore()}
-function s16(t){var lt=t-55.6;['Sabe más.','Sé más eficiente.','Cobra a tiempo.'].forEach(function(s,i){var a=C(lt,i*.8,i*.8+.3);if(!a)return;var Y=H/2-80+i*80;icon(i,W/2-210,Y,a);T(typ(s,lt,i*.8+.1,26),W/2-160,Y,34,{a:'left'})})}
+function s16(t){var lt=t-55.6;['Aprende.','Se mejora.','Actúa en tiempo real.'].forEach(function(s,i){var a=C(lt,i*.8,i*.8+.3);if(!a)return;var Y=H/2-80+i*80;icon(i,W/2-210,Y,a);T(typ(s,lt,i*.8+.1,26),W/2-160,Y,34,{a:'left'})})}
 /* ---------- escena 17: cierre ---------- */
 function lockup(cy,al){var w;font(40,700);x.letterSpacing='6px';w=x.measureText('AX AI GARANTÍAS').width;x.letterSpacing='0px';var tot=70+22+w,sx=W/2-tot/2;
  x.save();x.globalAlpha=al;rr(sx,cy-35,70,70,17);x.clip();cover(BG.logo,sx,cy-35,70,70);x.restore();T('AX AI GARANTÍAS',sx+92,cy+2,40,{a:'left',w:700,ls:6,al:al})}
