@@ -1,0 +1,79 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Ax AI Garantías · Reel</title>
+<style>
+:root{--blue:#1f4fd8;--blue2:#7b9bff;--ink:#12151c;--mut:#6c7487;--red:#e5483a;--green:#27b374}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:720px;height:1280px;overflow:hidden;background:#05070d;font-family:Inter,Arial,sans-serif;color:#fff}
+#st{position:relative;width:720px;height:1280px;overflow:hidden;background:radial-gradient(120% 70% at 70% 0%,#1b2f78 0%,#0b1020 55%,#05070d 100%)}
+.top{position:absolute;left:40px;right:40px;top:38px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:26px;letter-spacing:-.5px}
+.top i{font-style:normal;color:var(--blue2)}
+.pr{position:absolute;left:40px;right:40px;top:86px;height:5px;border-radius:3px;background:rgba(255,255,255,.14)}
+.pr b{display:block;height:100%;width:0;border-radius:3px;background:var(--blue2)}
+.sc{position:absolute;left:0;right:0;top:110px;height:920px;padding:0 40px;opacity:0;display:flex;flex-direction:column;justify-content:center}
+.k{font-size:22px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--blue2);margin-bottom:12px}
+.ttl{font-size:56px;font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:26px}
+.a{opacity:0}
+.card{background:#fff;color:var(--ink);border-radius:26px;padding:28px 30px;margin-bottom:18px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.card.d{background:rgba(255,255,255,.08);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.14)}
+.card h3{font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:6px}
+.card p{font-size:28px;line-height:1.3;color:#2c3242}.card.d p{color:#c8d2ee}
+.big{font-size:104px;font-weight:800;letter-spacing:-4px;line-height:1;color:var(--blue)}
+.d .big{color:var(--blue2)}
+.sm{font-size:26px;color:var(--mut);margin-top:6px}.d .sm{color:#aeb9d6}
+.row{display:flex;justify-content:space-between;font-size:30px;padding:12px 0;border-bottom:1px solid #eceef4}
+.row span{color:var(--mut)}.row b{font-weight:800}
+.chip{display:inline-block;background:#eaf0ff;color:var(--blue);border-radius:99px;padding:8px 20px;font-size:26px;font-weight:700;margin:6px 8px 0 0}
+.d .chip{background:rgba(123,155,255,.18);color:#bcd0ff}
+.stamp{display:inline-block;border:3px solid var(--red);color:var(--red);font-weight:800;font-size:26px;padding:4px 14px;border-radius:8px;letter-spacing:2px}
+.num{display:inline-flex;width:56px;height:56px;border-radius:50%;background:var(--blue);color:#fff;align-items:center;justify-content:center;font-weight:800;font-size:30px;flex:none}
+.st{display:flex;gap:20px;align-items:center;margin-bottom:22px;font-size:36px;font-weight:700;line-height:1.15}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.logo{font-weight:800;letter-spacing:-3px}.logo i{font-style:normal;color:var(--blue2)}
+table{width:100%;border-collapse:collapse;font-size:27px}td,th{padding:12px 8px;text-align:right;border-bottom:1px solid rgba(255,255,255,.14)}th{font-size:20px;letter-spacing:2px;color:#9fb0d6;text-transform:uppercase}td:first-child,th:first-child{text-align:left;font-weight:800}
+.ph{background:#fff4d6;color:#8a5a00;border-radius:6px;padding:0 8px}
+.cap{position:absolute;left:36px;right:36px;bottom:60px;height:210px;display:flex;align-items:center;justify-content:center;text-align:center;opacity:0;background:rgba(8,12,24,.72);border:1px solid rgba(255,255,255,.14);border-radius:30px;padding:20px 28px;font-size:38px;font-weight:700;line-height:1.2;letter-spacing:-.5px}
+.vo{position:absolute;left:36px;bottom:30px;font-size:16px;color:#6f7a96;letter-spacing:2px}
+</style></head><body><div id="st">
+<div class="top"><span>Ax <i>AI</i> Garantías</span><span style="font-size:18px;color:#8e9bbd;font-weight:600">Para Grupo Fame</span></div>
+<div class="pr"><b id="pb"></b></div>
+<div id="scs"></div>
+<div class="cap" id="cap"></div>
+<div class="vo">DATOS DE EJEMPLO · ESCENARIOS ILUSTRATIVOS</div>
+</div>
+<script src="timeline_prod.js"></script>
+<script>
+var V={};
+function brainHtml(){var h='',N=34,P=[],i;for(i=0;i<N;i++){var ang=i*2.399,r=30+Math.sqrt(i)*40;P.push([320+Math.cos(ang)*r*1.15,210+Math.sin(ang)*r*.95])}
+ for(i=1;i<N;i++){var j=Math.max(0,i-1-(i%3)),p=P[i],q=P[j],dx=q[0]-p[0],dy=q[1]-p[1],L=Math.sqrt(dx*dx+dy*dy),A=Math.atan2(dy,dx)*180/Math.PI;
+  h+='<div class="a" data-si="0" data-dl="'+(i*0.12)+'" style="position:absolute;left:'+(p[0]+6)+'px;top:'+(p[1]+6)+'px;width:'+L+'px;height:3px;background:#5f86ff;box-shadow:0 0 12px #5f86ff;transform-origin:0 50%;rotate:'+A+'deg"></div>'}
+ for(i=0;i<N;i++)h+='<div class="a" data-si="0" data-dl="'+(i*0.12)+'" style="position:absolute;left:'+P[i][0]+'px;top:'+P[i][1]+'px;width:14px;height:14px;border-radius:50%;background:#9bb5ff;box-shadow:0 0 18px #7b9bff"></div>';
+ return '<div style="position:relative;height:420px;margin:0 0 14px">'+h+'</div>'}
+V.intro='<div style="text-align:center"><div class="k a" data-si="0">Así funciona</div><div class="logo a" data-si="0" style="font-size:118px;line-height:1">Ax <i>AI</i><br>Garantías</div><div class="ttl a" data-si="0" data-dl="1" style="font-size:42px;margin-top:40px;color:#bcd0ff;letter-spacing:-1px">Del PDF de la PREA<br>al pago, aprendiendo</div></div>';
+V.subir='<div class="k a" data-si="0">Paso 1</div><div class="card a" data-si="0"><div class="st" style="margin:0"><span class="num">PDF</span>PREA_ejemplo.pdf<br><span style="font-size:26px;font-weight:600;color:var(--mut)">leyendo el formulario…</span></div></div><div class="card a" data-si="1" style="padding:18px 30px"><div class="row"><span>Código de queja</span><b>Q-014</b></div><div class="row"><span>Código de causa</span><b>C-210</b></div><div class="row"><span>Operación</span><b>4041510</b></div><div class="row"><span>Tiempo</span><b>0.3 h</b></div><div class="row" style="border:0"><span>Parte</span><b>19391267</b></div></div><div class="a" data-si="1" data-dl="4"><span class="chip">Expediente creado</span></div>';
+V.orden='<div class="k a" data-si="0">Un expediente por orden</div><div class="card a" data-si="0"><h3>Orden GA4006</h3><p>Su propio expediente y su propio agente</p></div><div class="a" data-si="0" data-dl="2"><span class="chip">Contrato</span><span class="chip">Actualización de PREA</span><span class="chip">Piezas</span><span class="chip">Evidencia</span><span class="chip">Factura</span><span class="chip">Transacción de planta</span></div>';
+V.rechazo='<div class="k a" data-si="0">Paso 2 · Rechazo</div><div class="card a" data-si="0"><span class="stamp">RECHAZADA</span><p style="margin-top:12px">Falta evidencia de la pieza y la causa no corresponde a la queja.</p></div><div class="card a" data-si="1" style="border-top:8px solid var(--blue)"><h3>Plan de corrección</h3><p>1 · Usar la causa C-210, la que ya funcionó<br>2 · Subir foto de la pieza<br>3 · Reenviar la PREA</p></div><div class="a" data-si="1" data-dl="3"><span class="chip">Conectado al cerebro</span></div>';
+V.cerebro='<div class="k a" data-si="0">Paso 3 · El cerebro</div><div class="a" data-si="0">'+brainHtml()+'</div><div class="a" data-si="1"><span class="chip">Códigos de queja y causa</span><span class="chip">Operación</span><span class="chip">Tiempo</span><span class="chip">Piezas</span><span class="chip">Evidencia</span></div><div class="a" data-si="2"><div style="margin-top:20px"><span class="chip" style="background:rgba(39,179,116,.2);color:#7de0b0">Aceptado</span><span class="chip" style="background:rgba(229,72,58,.2);color:#ff9a90">Rechazado</span><span class="chip" style="background:rgba(123,155,255,.2);color:#bcd0ff">Pagado</span></div></div>';
+V.red='<div class="k a" data-si="0">Paso 4 · La red</div><div class="g2 a" data-si="0"><div class="card d" style="text-align:center;margin:0"><h3>Agencia A</h3></div><div class="card d" style="text-align:center;margin:0"><h3>Agencia B</h3></div></div><div class="a" data-si="0" data-dl="2" style="text-align:center;font-size:30px;color:#bcd0ff;margin:12px 0">⇄ tiempo real ⇄</div><div class="card a" data-si="1"><h3>Agencia A</h3><p>Corrige el rechazo con la causa <b>C-210</b></p></div><div class="card d a" data-si="1" data-dl="3.5" style="text-align:center"><span class="chip">Cerebro aprende C-210</span></div><div class="card a" data-si="1" data-dl="6" style="border-top:8px solid var(--blue)"><h3>Agencia B</h3><p>Abre una PREA igual → el agente sugiere <b>C-210</b></p></div><div class="a" data-si="2"><span class="chip">Comparte</span><span class="chip">Protegida</span></div>';
+V.cobros='<div class="k a" data-si="0">Paso 5 · Cobros</div><div class="card a" data-si="0"><h3>Chat de cobros · GA4006</h3><p style="background:#eef2ff;border-radius:16px;padding:12px 16px;margin-top:10px">¿Cuánto va a pagar planta?</p></div><div class="card a" data-si="1"><div class="row"><span>Factura</span><b style="color:var(--green)">Subida ✓</b></div><div class="row" style="border:0"><span>Transacción de planta</span><b style="color:var(--green)">Subida ✓</b></div></div><div class="card a" data-si="2" style="border-top:8px solid var(--blue)"><div class="row"><span>Estimado</span><b>$4,654</b></div><div class="row" style="border:0"><span>Pagado</span><b style="color:var(--green)">$4,654 ✓</b></div></div><div class="a" data-si="2" data-dl="3"><span class="chip">El cerebro aprende del pago</span></div>';
+V.audit='<div class="k a" data-si="0">Auditoría de planta</div><div class="card d a" data-si="0"><div class="big" style="font-size:80px">Expedientes<br>completos</div><div class="sm">Listos en cualquier momento</div></div><div class="a" data-si="0" data-dl="2"><span class="chip">Contrato</span><span class="chip">PREA</span><span class="chip">Evidencia</span><span class="chip">Factura</span><span class="chip">Pago de planta</span><span class="chip">Conversación</span></div>';
+V.cierre='<div class="k a" data-si="0">Todo conectado</div><div class="st a" data-si="0" data-dl="0"><span class="num">✓</span>Lee y crea el expediente</div><div class="st a" data-si="0" data-dl="1.5"><span class="num">✓</span>Aprende de cada PREA</div><div class="st a" data-si="0" data-dl="3"><span class="num">✓</span>La red se ayuda en tiempo real</div><div class="st a" data-si="0" data-dl="4.5"><span class="num">✓</span>Sin tocar el portal</div><div style="margin-top:30px;text-align:center" class="a" data-si="1"><div class="logo" style="font-size:80px;line-height:1">Ax <i>AI</i><br>Garantías</div><div style="font-size:34px;margin-top:20px;color:#bcd0ff">Que cada garantía se cobre completa.</div><div style="font-size:26px;margin-top:24px;color:#8e9bbd">[Nombre · correo · teléfono]</div></div>';
+var TOTAL=TL[TL.length-1].start+TL[TL.length-1].dur;
+var scs=document.getElementById('scs');
+TL.forEach(function(sc){var d=document.createElement('div');d.className='sc';d.id='sc_'+sc.id;d.innerHTML=V[sc.id]||'';scs.appendChild(d)});
+function cl(x,a,b){return Math.max(0,Math.min(1,(x-a)/(b-a)))}
+function ez(p){return 1-Math.pow(1-p,3)}
+window.setT=function(t){
+ document.getElementById('pb').style.width=(100*t/TOTAL)+'%';
+ var cap=document.getElementById('cap'),capT='',capO=0;
+ TL.forEach(function(sc){
+  var el=document.getElementById('sc_'+sc.id),rt=t-sc.start,vis=rt>=-0.01&&rt<=sc.dur;
+  el.style.opacity=vis?Math.min(cl(rt,0,.3),1-cl(rt,sc.dur-.3,sc.dur)):0;
+  if(!vis)return;
+  el.querySelectorAll('.a').forEach(function(e){
+   var si=+e.dataset.si||0,dl=+e.dataset.dl||0,seg=sc.segs[Math.min(si,sc.segs.length-1)];
+   var a=seg.st+dl,p=ez(cl(rt,a,a+.5));e.style.opacity=p;e.style.transform='translateY('+((1-p)*26)+'px)'});
+  sc.segs.forEach(function(g){if(rt>=g.st-.05&&rt<=g.st+g.dur+.25){capT=g.cap;capO=Math.min(cl(rt,g.st-.05,g.st+.2),1-cl(rt,g.st+g.dur,g.st+g.dur+.25))}});
+ });
+ if(capT)cap.textContent=capT;cap.style.opacity=capO;
+};
+setT(0);
+</script></body></html>
