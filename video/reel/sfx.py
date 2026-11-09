@@ -23,17 +23,17 @@ def pop(d=0.12):
     x=np.arange(int(d*SR))/SR;return np.sin(2*np.pi*(500+800*np.exp(-x*40))*x)*np.exp(-x*30)*0.6
 
 def key(space=False):
-    d=0.06;x=np.arange(int(d*SR))/SR
-    f=(1500+rng.random()*1200) if not space else 700
-    n=rng.standard_normal(len(x))*np.exp(-x*140)
-    th=np.sin(2*np.pi*(120+rng.random()*40)*x)*np.exp(-x*60)*0.7
-    return (lp(n,3)*0.9+np.sin(2*np.pi*f*x)*np.exp(-x*110)*0.35+th)*(0.55 if not space else 0.8)
-def typing(t,nkeys,g=0.55,rate=0.075):
+    d=0.05;x=np.arange(int(d*SR))/SR
+    f=(2250+rng.random()*160) if not space else 1650
+    body=np.sin(2*np.pi*f*x)*np.exp(-x*150)+0.45*np.sin(2*np.pi*f*1.52*x)*np.exp(-x*210)+0.2*np.sin(2*np.pi*f*2.3*x)*np.exp(-x*300)
+    click=rng.standard_normal(len(x))*np.exp(-x*900)*0.25
+    return (body+click)*0.5
+def typing(t,nkeys,g=0.55,rate=0.11):
     tt=t
     for i in range(nkeys):
-        sp=(i%7==6)
+        sp=(i%6==5)
         add(key(sp),tt,float(rng.uniform(-.25,.25)),g*float(rng.uniform(.6,1.0)))
-        tt+=rate*float(rng.uniform(.6,1.5))*(1.6 if sp else 1)
+        tt+=rate*float(rng.uniform(.7,1.35))*(1.4 if sp else 1)
 # escenas
 starts=[0]
 VIS=[('intro',0),('subir',0),('subir',1),('orden',0),('rechazo',0),('cerebro',0),('red',0),('cobros',0),('cobros',3),('audit',0),('cierre',0)]
@@ -53,7 +53,7 @@ add(chime(1175),ab[('subir',1)]+5.3,0,0.6);add(chime(1175),ab[('cobros',2)]+0.6,
 
 # --- sonido de escritura ---
 t0=ab[('subir',0)]
-typing(t0+0.5,31,0.8,0.033)
+typing(t0+0.5,31,0.8,0.058)
 def at(k,i,dl,n,g=0.5):typing(ab[(k,i)]+dl,n,g)
 at('intro',0,0.7,12)
 at('subir',1,0.6,6);at('subir',1,1.4,6);at('subir',1,2.2,6);at('subir',1,3.0,5);at('subir',1,3.8,6);at('subir',1,5.0,8)
