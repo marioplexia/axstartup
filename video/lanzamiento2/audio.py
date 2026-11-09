@@ -70,6 +70,51 @@ for j in range(6): add(pop(),22.8+j*.22,.18)
 for s in [31.9,34.0,36.6]: add(glitch(),s,.25)
 for s in [40.5,40.7,40.9]: add(pop(),s,.25)
 add(chime(1318.5),60.0,.45)
+
+# ===== efectos adicionales =====
+def tone(f,d,dec=6,shape='sin'):
+    x=ar(d);w=np.sin(2*np.pi*f*x) if shape=='sin' else np.sign(np.sin(2*np.pi*f*x))*.5
+    return w*np.exp(-x*dec)*np.minimum(x/.005,1)
+def bandnoise(d,lo=.02,hi=.2):
+    N=int(d*SR);s_=rng.standard_normal(N);return onepole(s_,hi)-onepole(s_,lo)
+# 1 esfera: brillo que sube, aspiración y blip
+x=ar(1.4);sh=sum(np.sin(2*np.pi*f*x*(1+.6*x/1.4))*a for f,a in [(880,.5),(1320,.35),(1760,.25),(2640,.15)])*np.sin(np.pi*x/1.4)**2*(.6+.4*np.sin(2*np.pi*9*x));add(sh,6.1,.12)
+rv=whoosh(.6);rv=rv*np.linspace(0,1,len(rv))**2;add(rv,10.45,.5)
+add(tone(1500,.08,40),11.05,.35)
+# 2 PDF: hoja que cae + barrido de escaneo
+pa=bandnoise(.25,.03,.3)*np.exp(-ar(.25)*18);add(pa,18.25,.55)
+N=int(1.0*SR);sc=np.zeros(N);st=0.0;al=np.linspace(.03,.35,N);nz=rng.standard_normal(N)
+for j in range(N):st+=al[j]*(nz[j]-st);sc[j]=st
+x=ar(1.0);sc=(sc*.6+np.sin(2*np.pi*(900+900*x)*x)*.15)*np.sin(np.pi*x)**2;add(sc,19.9,.3)
+# 3 rechazo (grave) y plan listo (sube)
+add(tone(330,.18,8,'sq'),26.3,.35);add(tone(247,.28,7,'sq'),26.47,.35)
+add(tone(659,.25,7),29.1,.4);add(tone(880,.45,5),29.25,.4)
+# 4 zumbido eléctrico de la línea verde
+x=ar(1.6);hm=(np.sin(2*np.pi*110*x)+.5*np.sin(2*np.pi*220*x)+.25*np.sign(np.sin(2*np.pi*55*x))+.3*bandnoise(1.6,.05,.4))*np.sin(np.pi*x/1.6)*(1+.3*np.sin(2*np.pi*12*x));add(hm,21.0,.08)
+# 5 golpe grave por tarjeta negra
+for t0 in [32.0,34.1,36.7]:
+    x=ar(.6);add(np.sin(2*np.pi*np.cumsum(55+40*np.exp(-x*20))/SR)*np.exp(-x*7),t0,.6)
+# 6 deslizamiento de tarjetas
+for t0 in [14.2,14.45,14.7,14.95,16.4]:add(whoosh(.35),t0,.12)
+# 7 gotas en el mapa
+for i,t0 in enumerate([31.05,31.17,31.29,31.41]):
+    x=ar(.25);add(np.sin(2*np.pi*(1200+300*i)*x*(1+2*np.exp(-x*30)))*np.exp(-x*22),t0,.25)
+# 8 clics de filtros + cascada de canicas
+for t0 in [38.7,38.85,39.0,39.15]:add(tone(2600,.03,120),t0,.25)
+for j in range(22):
+    t0=39.8+(j/22)**1.4*0.9+rng.uniform(0,.04);add(tone(900+rng.uniform(0,900),.09,45),t0,.18,float(rng.uniform(-.5,.5)))
+# 9 postes que suben + destello
+for t0 in [45.3,45.8,46.3]:
+    x=ar(.6);add(np.sin(2*np.pi*(300+500*x/.6)*x)*np.sin(np.pi*x/.6),t0,.18)
+    x=ar(.5);add(sum(np.sin(2*np.pi*f*x) for f in [2093,2637,3136])*np.exp(-x*9)/3,t0+.6,.2)
+# 10 murmullo de datos
+x=ar(4.8);mm=bandnoise(4.8,.06,.25)*.5*(np.sin(np.pi*x/4.8))
+for j in range(30):
+    t0=rng.uniform(0,4.6);i0=int(t0*SR);b=tone(rng.choice([1760,2093,2349,2637]),.06,50);mm[i0:i0+len(b)]+=b[:len(mm)-i0]*.25
+add(mm,48.6,.12)
+# 11 nota grave larga con eco en el cierre
+x=ar(4.5);bass=(np.sin(2*np.pi*55*x)+.5*np.sin(2*np.pi*110*x)+.2*np.sin(2*np.pi*165*x))*np.exp(-x*.9)*np.minimum(x/.05,1)
+for k_,dl in enumerate([0,.38,.76,1.14]):add(bass,58.6+dl,.35*(.55**k_))
 # teclado (muestras del archivo del usuario)
 kb,ks=sf.read(sys.argv[2])
 if kb.ndim>1: kb=kb.mean(1)
