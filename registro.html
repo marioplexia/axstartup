@@ -126,7 +126,7 @@ input:focus,select:focus{outline:none;border-color:var(--focus);box-shadow:0 0 0
           </div>
           <button class="go" id="go" type="submit">Crear cuenta</button>
         </form>
-        <p class="alt">¿Ya tienes cuenta? <a href="./" id="toLogin">Inicia sesión</a></p>
+        <p class="alt">¿Ya tienes cuenta? <a href="app" id="toLogin">Inicia sesión</a></p>
       </section>
 
       <section id="vOk" class="done" hidden>
@@ -134,7 +134,7 @@ input:focus,select:focus{outline:none;border-color:var(--focus);box-shadow:0 0 0
         <h2>¡Cuenta creada!</h2>
         <p class="sub" id="okSub">Tu perfil ya quedó guardado.</p>
         <ul class="steps" id="okSteps"></ul>
-        <a class="go link" id="enter" href="./">Entrar a Ax AI Garantías</a>
+        <a class="go link" id="enter" href="app">Entrar a Ax AI Garantías</a>
       </section>
     </div>
   </main>
@@ -148,7 +148,7 @@ var KEY='sb_publishable_XzONBrrwd2x76JCReSbcPQ_E1gEAP-4';
 var STORE='sb-fjmzzghptxkcoarymmzn-auth-token';   // misma clave que usa la app principal
 var $=function(s){return document.querySelector(s)};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
-var home=location.protocol==='file:'?'index.html':'./';
+var home=location.protocol==='file:'?'index.html':'app';
 $('#toLogin').href=home;$('#enter').href=home;
 
 /* ---------- red: fetch directo a Supabase (sin librerías) ---------- */
