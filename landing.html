@@ -15,9 +15,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231D4ED8'/%3E%3Cpath d='M9 23l7-14 7 14' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='16' cy='19' r='2' fill='white'/%3E%3C/svg%3E">
 <style>
-:root{--bg:#EFEFEF;--ink:#0A0A0A;--mut:#6F6F73;--soft:#9A9AA0;--line:#DCDCDE;--card:#fff;--blue:#1D4ED8;--sky:#4E9BD4;--ok:#16A34A;--warn:#EA580C;
- --grad:linear-gradient(180deg,#1b1e26 0%,#0c1630 22%,#0a2350 44%,#1a4f8f 66%,#5f9ccd 84%,#dfe9f1 100%);
- --gradcard:linear-gradient(180deg,#242832 0%,#0e1d3f 30%,#0d2a5c 55%,#2f6aa8 80%,#9cc4e4 100%)}
+:root{--bg:#F1F1F1;--ink:#0A0A0A;--mut:#6F6F73;--soft:#9A9AA0;--line:#DCDCDE;--card:#fff;--blue:#1D4ED8;--sky:#4E9BD4;--ok:#16A34A;--warn:#EA580C;
+ --edge:radial-gradient(130% 95% at 50% 42%,rgba(0,0,0,0) 52%,rgba(150,175,200,.42) 100%);
+ --grad:var(--edge),linear-gradient(180deg,#2e2e3a 0%,#0d1021 9%,#020d24 20%,#000c2d 32%,#031745 42%,#19305d 50%,#295f8e 58%,#2c7faf 66%,#5fb2dd 76%,#a4cee4 84%,#cadbe5 90%,#e9eaeb 96%,#f1f1f1 100%);
+ --gradcard:var(--edge),linear-gradient(180deg,#3a3b40 0%,#1d212b 12%,#0e1626 26%,#0b1730 40%,#13295a 54%,#1f4677 66%,#3f6d98 78%,#7c9bb7 90%,#aebdc8 100%);
+ --graduc:linear-gradient(180deg,#262d50 0%,#061647 16%,#0a2453 30%,#0e3263 42%,#1b4f7a 56%,#215f83 66%,#5a8caa 80%,#93b6cd 90%,#bcd5e7 100%);
+ --gradfin:var(--edge),linear-gradient(180deg,#00163f 0%,#022657 18%,#103e6c 32%,#1d577e 44%,#2d698c 54%,#6092ad 66%,#aac8db 82%,#d4e4ee 100%)}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;font-size:15px}
@@ -42,16 +45,19 @@ h3{font-size:clamp(24px,2.4vw,30px);letter-spacing:-.035em;line-height:1.12}
 .btn-light{background:#fff;color:var(--ink)}
 .btn-light:hover{box-shadow:0 8px 20px rgba(0,0,0,.08)}
 .btn .ar{font-size:16px;line-height:1}
-.duo{display:inline-flex;align-items:center;gap:3px}
-.duo .btn{border-radius:14px 6px 6px 14px;height:44px;padding:0 22px}
-.duo .sq{width:44px;height:44px;border-radius:6px 14px 14px 6px;display:grid;place-items:center;font-size:17px}
+.duo{display:inline-flex;align-items:center;gap:0;position:relative}
+.duo .btn{border-radius:12px;height:44px;padding:0 24px;position:relative;z-index:1}
+.duo .sq{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:17px;margin-left:12px;position:relative;z-index:1}
+.duo::after{content:"";position:absolute;top:50%;height:22px;width:20px;transform:translateY(-50%);right:36px;border-radius:4px;z-index:0}
+.duo.dark::after{background:var(--ink)}.duo.light::after{background:#fff}
+.duo:hover .btn,.duo:hover .sq{transform:none}
 .duo.dark .btn,.duo.dark .sq{background:var(--ink);color:#fff}
 .duo.light .btn,.duo.light .sq{background:#fff;color:var(--ink)}
 .btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .center .btns{justify-content:center}
 /* grano */
 .grain{position:relative;isolation:isolate}
-.grain::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;opacity:.16;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>")}
+.grain::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;opacity:.28;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>")}
 .grain>*{position:relative;z-index:2}
 /* navegación */
 .nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;width:calc(100% - 28px);max-width:560px;height:52px;background:rgba(12,12,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 7px 0 16px;box-shadow:0 8px 30px rgba(0,0,0,.16)}
@@ -144,7 +150,7 @@ h3{font-size:clamp(24px,2.4vw,30px);letter-spacing:-.035em;line-height:1.12}
 .probs p{color:var(--mut)}
 .note{margin-top:22px;font-size:12.5px;color:#9a9aa0}
 /* la diferencia */
-.diff{margin:0 14px;border-radius:44px;min-height:640px;display:grid;place-items:center;text-align:center;color:#fff;background:radial-gradient(70% 70% at 50% 45%,#16346a 0%,#0b1b3d 55%,#060d1f 100%);overflow:hidden;padding:120px 24px}
+.diff{margin:0 14px;border-radius:56px;min-height:680px;display:grid;place-items:center;text-align:center;color:#fff;background:radial-gradient(60% 55% at 50% 48%,rgba(40,90,160,.55) 0%,rgba(0,0,0,0) 70%),var(--edge),linear-gradient(180deg,#26272c 0%,#0b0f1c 22%,#030a1d 50%,#0a1d42 78%,#24466f 100%);overflow:hidden;padding:120px 24px}
 .diff h2{font-size:clamp(40px,5.4vw,72px)}
 .diff .duo{margin-top:30px}
 .bub{position:absolute;width:min(330px,82vw);text-align:left;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:#fff;border-radius:18px;padding:14px 16px;font-size:14px;line-height:1.45;animation:fl 8s ease-in-out infinite;box-shadow:0 20px 50px rgba(0,0,0,.3)}
@@ -161,16 +167,21 @@ h3{font-size:clamp(24px,2.4vw,30px);letter-spacing:-.035em;line-height:1.12}
 .how-steps h3{font-size:clamp(28px,3vw,38px);margin-bottom:18px}
 .how-steps p{max-width:340px;color:var(--mut)}
 .how-steps p b{color:var(--ink);font-weight:600}
-.stage{position:sticky;top:12vh;height:76vh;max-height:620px;border-radius:24px;background:var(--gradcard);overflow:hidden;color:#fff}
+.stage{position:sticky;top:12vh;height:76vh;max-height:620px;border-radius:26px;background:var(--gradcard);overflow:hidden;color:#fff}
 .scene{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 9%;opacity:0;transition:opacity .5s;pointer-events:none}
 .scene.on{opacity:1;pointer-events:auto}
 .scene .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#a9b4c8;margin-bottom:12px}
 .src{list-style:none;display:grid;gap:9px;max-width:330px}
-.src li{height:38px;border-radius:12px;background:#000;position:relative;overflow:hidden;display:flex;align-items:center;font-size:14.5px}
-.src li::before{content:"";position:absolute;inset:0;width:var(--p,0%);background:#4f97cf;transition:width 1.1s cubic-bezier(.4,0,.2,1)}
+.src li{height:38px;border-radius:11px 4px 4px 11px;background:#000;position:relative;display:flex;align-items:center;font-size:14.5px;margin-right:46px}
+.src li::before{content:"";position:absolute;inset:0;width:var(--p,0%);border-radius:inherit;background:#4a96cf;transition:width 1.1s cubic-bezier(.4,0,.2,1)}
+.src li::after{content:"";position:absolute;right:-46px;top:3px;width:32px;height:32px;border-radius:10px;background:#000;box-shadow:-10px 0 0 -6px #000}
+.src li .cap{position:absolute;right:-38px;top:11px;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.85);border-top-color:transparent;z-index:2;animation:spin 1s linear infinite}
+.src li.done .cap{animation:none;border:0;width:auto;height:auto;top:9px;right:-34px;font-size:13px}
+.src li.done .cap::before{content:"✓"}
+@keyframes spin{to{transform:rotate(360deg)}}
 .src li span{position:relative;padding:0 14px;display:flex;align-items:center;gap:10px}
 .src li span i{width:16px;height:16px;border-radius:5px;background:rgba(255,255,255,.85);display:inline-block}
-.src li em{position:relative;margin-left:auto;margin-right:12px;font-style:normal;font-size:13px;opacity:0;transition:opacity .3s}
+.src li em{display:none}
 .src li.done em{opacity:1}
 .appr{max-width:360px;background:#0a0a0c;border-radius:16px;padding:18px;font-size:14px}
 .appr .ln{height:6px;border-radius:4px;background:#26262b;margin-top:9px}
@@ -183,31 +194,40 @@ h3{font-size:clamp(24px,2.4vw,30px);letter-spacing:-.035em;line-height:1.12}
 .flowv div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:11px 14px;display:flex;justify-content:space-between;font-size:14px;opacity:.35;transition:opacity .4s,background .4s}
 .flowv div.on{opacity:1;background:rgba(79,151,207,.35)}
 /* piloto (garantía) */
-.guar{margin:0 14px;border-radius:44px;background:var(--grad);color:#fff;padding:120px 24px 130px;overflow:hidden}
+.guar{margin:0 14px;border-radius:80px 80px 80px 80px;background:var(--grad);color:#fff;padding:130px 24px 170px;overflow:hidden}
 .guar h2{font-size:clamp(38px,4.8vw,62px)}
 .guar .sub{color:#aab6cc}
 .glass3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1040px;margin:70px auto 0}
-.glass{border-radius:28px;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);min-height:300px;padding:22px;display:flex;flex-direction:column;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.glass{border-radius:36px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1.5px solid rgba(255,255,255,.28);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);min-height:330px;padding:24px 26px 28px;display:flex;flex-direction:column;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -20px 40px rgba(255,255,255,.04);text-align:left}
+.gv{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.gbox{width:96px;height:88px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center}
+.gchip{font-size:11px;color:#e6eef7;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.06);border-radius:999px;padding:3px 10px}
+.gcon{display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.07);border-radius:999px;padding:10px 14px}
+.gcon i{width:30px;height:30px;border-radius:50%;background:#fff;display:grid;place-items:center;color:#0b1730;font-style:normal;font-weight:700;font-size:12px}
+.gnote{width:88%;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);border-radius:14px;padding:9px 12px;font-size:12px;color:#fff}
+.gnote i{width:22px;height:22px;border-radius:6px;background:#fff;color:#0b1730;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700}
+.gcard{width:62%;height:64px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
 .glass .no{font-size:13px;color:#d6e2f2}
 .glass .vis{flex:1;display:grid;place-items:center}
 .glass .vis div{width:84px;height:84px;border-radius:22px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:30px}
-.glass h3{font-size:26px}
+.glass h3{font-size:clamp(24px,2.2vw,30px);line-height:1.12}
 .glass-d{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1040px;margin:22px auto 0;text-align:left}
 .glass-d p{font-size:14.5px;color:#c8d6e8;padding:0 6px}
 .glass-d b{color:#fff;font-weight:600}
 .guar .btns{margin-top:44px}
 /* casos de uso */
 .ucw{display:grid;grid-template-columns:1fr 1fr;min-height:640px;margin-top:56px}
-.uc-l{background:var(--grad);border-radius:0 28px 28px 0;display:flex;align-items:center;padding:60px 0 60px max(24px,calc((100vw - 1140px)/2 + 24px));overflow:hidden}
+.uc-l{background:var(--graduc);border-radius:0 28px 28px 0;display:flex;align-items:center;padding:60px 0 60px max(24px,calc((100vw - 1140px)/2 + 24px));overflow:hidden}
 .pills{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
 .pill{border:1.5px solid rgba(255,255,255,.55);color:#fff;border-radius:999px;padding:12px 24px;font-family:'Inter Tight',Inter,sans-serif;font-size:clamp(17px,1.7vw,22px);letter-spacing:-.02em;transition:background .3s,color .3s,border-color .3s;text-align:left}
 .pill:hover{border-color:#fff}
 .pill[aria-selected=true]{background:#fff;color:var(--ink);border-color:#fff}
-.uc-r{display:grid;place-items:center;padding:60px 24px;position:relative}
+.uc-r{display:grid;place-items:center;padding:60px 24px;position:relative;background:#DFDEE1}
 .stack{position:relative;width:min(400px,100%);height:440px}
 .ucard{position:absolute;inset:0;border-radius:26px;background:#0b0e1a;color:#fff;padding:22px;display:flex;flex-direction:column;box-shadow:0 30px 60px rgba(0,0,0,.25);transition:transform .5s,opacity .5s}
 .ucard.back{background:#fff;color:var(--ink);transform:translate(26px,26px) scale(.94);z-index:0;opacity:.95}
-.ucard.front{z-index:1}
+.ucard.front{z-index:1;animation:uin .6s cubic-bezier(.2,.7,.2,1)}
+@keyframes uin{from{opacity:0;transform:translate(-24px,8px) rotate(-1.5deg)}to{opacity:1;transform:none}}
 .ucard .k{font-size:11px;letter-spacing:.06em;color:#8d93a6;text-transform:uppercase}
 .ucard h3{font-size:24px;margin-top:8px}
 .ucard .fl{flex:1;position:relative;margin:12px 0;background-image:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1px);background-size:14px 14px;border-radius:14px}
@@ -254,11 +274,11 @@ form .btn{grid-column:1/-1;justify-content:center;height:48px}
 .q button[aria-expanded=true]+.a{grid-template-rows:1fr}
 .q button[aria-expanded=true]+.a>div{padding-bottom:20px}
 /* final */
-.final{margin:0 auto;max-width:1060px;border-radius:0 0 80px 80px;background:linear-gradient(180deg,#0c1630 0%,#0d2a5c 40%,#3d79b5 75%,#cfe1ef 100%);color:#fff;text-align:center;padding:120px 24px 110px;position:relative}
-.final::before{content:"";position:absolute;left:0;right:0;top:-60px;height:120px;border-radius:80px 80px 0 0;background:#0c1630;z-index:-1}
+.final{margin:0 auto;max-width:1180px;border-radius:72px;background:var(--gradfin);color:#fff;text-align:center;padding:150px 24px 190px;position:relative;overflow:hidden}
 .final h2{font-size:clamp(36px,4.6vw,58px)}
-.final .sub{color:#c9d6e8;margin:16px auto 0}
-.final .btns{margin-top:34px}
+.final .sub{color:#9fb6cf;margin:16px auto 0;font-size:14px}
+.final .tiny{display:block;font-size:12px;color:#c6d6e6;margin-top:8px}
+.final .btns{margin-top:34px;justify-content:center;align-items:flex-start}
 /* footer */
 footer{padding:80px 0 34px}
 .fgrid{display:grid;grid-template-columns:1.7fr repeat(4,auto);gap:44px}
@@ -286,7 +306,7 @@ footer{padding:80px 0 34px}
  .bub{position:relative;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;margin:14px auto 0;display:block}
  .diff{display:block}
  .glass{min-height:220px}
- .final{border-radius:36px;margin:0 14px}.final::before{display:none}
+ .final{border-radius:40px;margin:0 14px}
 }
 @media (max-width:640px){
  section{padding:80px 0}
@@ -422,7 +442,7 @@ footer{padding:80px 0 34px}
 <div style="padding:60px 0 0"><div class="final grain">
  <h2 data-i="fin.title"></h2>
  <p class="sub" data-i="fin.sub"></p>
- <div class="btns"><div class="duo dark"><a class="btn" href="#piloto" data-i="cta.pilot"></a><a class="sq" href="#piloto" aria-hidden="true" tabindex="-1">↗</a></div><a class="btn btn-light" href="#piloto" style="height:44px;border-radius:12px" data-i="cta.team"></a></div>
+ <div class="btns"><div class="duo dark"><a class="btn" href="#piloto" data-i="cta.pilot"></a><a class="sq" href="#piloto" aria-hidden="true" tabindex="-1">↗</a></div><span style="display:inline-flex;flex-direction:column;align-items:center"><a class="btn btn-light" href="#piloto" style="height:44px;border-radius:12px"><svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="40 14"/></svg><span data-i="cta.team"></span></a><span class="tiny" data-i="fin.tiny"></span></span></div>
 </div></div>
 </main>
 
@@ -473,7 +493,7 @@ es:{
  'sc.cap':'Reclamo · orden 4521','sc.capl':['Orden de reparación','Fotos de la pieza','Notas del técnico','Diagnóstico'],'sc.up':'Subido',
  'sc.val':'Revisión','sc.valt':'Reclamo 4521: falta la foto de la pieza dañada.','sc.valc':['Política GM','3 de 4 completos'],'sc.ready':'Listo para tu aprobación','sc.appr':'Aprobar',
  'sc.pay':'Seguimiento','sc.payl':[['Enviado','✓'],['En revisión','✓'],['Pagado','✓'],['Conciliado','…']],
- 'pil.k':'Piloto sin riesgo','pil.title':'Pruébalo en tus agencias antes de decidir.','pil.p':'Definimos juntos los criterios de éxito. Si el piloto no los cumple, no continúa.',
+ 'g.enc':'Cifrado y privado','g.con':'Conectado','g.note':'Criterios del piloto cumplidos','pil.k':'Piloto sin riesgo','pil.title':'Pruébalo en tus agencias antes de decidir.','pil.p':'Definimos juntos los criterios de éxito. Si el piloto no los cumple, no continúa.',
  'pil':[['Seguridad y privacidad','Los datos de tu grupo son tuyos','y nunca se comparten con otros grupos ni armadoras.','🔒'],['Sin cambiar tu proceso','Funciona sobre lo que ya usas.','Tus asesores siguen con el proceso de garantías que ya conocen.','⇄'],['Resultados medibles','Medido desde el primer día.','Rechazos, débitos, expedientes y días de cobro.','↗']],
  'uc.k':'Casos de uso','uc.title':'Para cada parte de la garantía','uc.lbl':'caso de uso',
  'uc':[['Validación de reclamos','Cada reclamo revisado contra la política de la marca antes de enviarse.',['Orden de reparación','Política de garantía','Evidencia','Listo para enviar'],'Validación'],['Expedientes listos para auditoría','Expedientes completos y ordenados antes de que llegue el auditor.',['Expediente','Revisión','Faltantes','Completo'],'Auditoría'],['Menos débitos y PREAs','Detecta a tiempo lo que provocaría un cargo de la armadora.',['Reclamo','Riesgo','Corrección','Sin débito'],'Débitos'],['Seguimiento de cobranza','Saber qué reclamo está pendiente, rechazado o pagado, por agencia.',['Enviado','En revisión','Pagado','Conciliado'],'Cobranza'],['Tablero para el grupo','El director de posventa ve el dinero en riesgo de todas sus agencias.',['Agencias','Indicadores','Alertas','Tablero'],'Grupo'],['Recuperación con proveedores','Datos de pieza, falla y lote para que la armadora cobre al proveedor responsable.',['Reclamos','Patrón de falla','Proveedor','Cobro'],'Proveedores']],
@@ -481,7 +501,7 @@ es:{
  'form.title':'Solicita un piloto','form.name':'Nombre','form.group':'Grupo o agencia','form.role':'Puesto','form.n':'Número de agencias','form.brands':'Marcas','form.mail':'Correo','form.msg':'Mensaje (opcional)','form.priv1':'Acepto el','form.priv2':'aviso de privacidad','form.send':'Enviar solicitud','form.thanks':'¡Gracias! Te contactamos en menos de 24 horas.','form.err':'Revisa los campos obligatorios y acepta el aviso de privacidad.','form.other':'Otra',
  'faq.title':'Preguntas frecuentes',
  'faq':[['¿Qué es Ax AI?','Una plataforma con IA que revisa y completa los reclamos de garantía antes de enviarlos a la armadora, para reducir rechazos, débitos y expedientes incompletos.'],['¿Tengo que cambiar el portal de la marca?','No. Ax AI trabaja sobre tu proceso actual; tus asesores siguen usando el portal de la armadora.'],['¿Con qué marcas funciona?','Empezamos con GM y Nissan, y vamos sumando marcas con cada grupo.'],['¿Qué pasa con nuestros datos?','Son de tu grupo. Se guardan separados y nunca se comparten con otros grupos ni con armadoras.'],['¿Cuánto tiempo toma arrancar?','Un piloto puede arrancar en días: capacitación corta con cada asesor y alta de las agencias.'],['¿Cuánto cuesta?','Depende del número de agencias. El piloto tiene condiciones especiales; escríbenos y te mandamos una propuesta.'],['¿Sirve también para armadoras?','Sí. Las armadoras reciben reclamos más limpios y datos para recuperar costos con proveedores.'],['¿Quién está detrás de Ax AI?','Un equipo que viene de las agencias y de la ingeniería de IA, empezando por su fundador, ex asesor de garantías.']],
- 'fin.title':'¿Listo para cobrar cada garantía?','fin.sub':'Prueba Ax AI en tus agencias.',
+ 'fin.title':'¿Listo para cobrar cada garantía?','fin.sub':'Prueba Ax AI en tus agencias.','fin.tiny':'Habla con el equipo de Ax AI',
  'ft.tag':'La infraestructura de garantías automotrices.','ft.prod':'Producto','ft.uc':'Casos de uso','ft.pilot':'Piloto','ft.co':'Empresa','ft.about':'Sobre nosotros','ft.contact':'Contacto','ft.com':'Comunidad','ft.privacy':'Aviso de privacidad','ft.terms':'Términos de uso','ft.copy':'© 2026 Ax AI. Todos los derechos reservados.'
 },
 en:{
@@ -512,7 +532,7 @@ en:{
  'sc.cap':'Claim · order 4521','sc.capl':['Repair order','Part photos','Technician notes','Diagnosis'],'sc.up':'Uploaded',
  'sc.val':'Review','sc.valt':'Claim 4521: the damaged-part photo is missing.','sc.valc':['GM policy','3 of 4 complete'],'sc.ready':'Ready for your approval','sc.appr':'Approve',
  'sc.pay':'Tracking','sc.payl':[['Submitted','✓'],['In review','✓'],['Paid','✓'],['Reconciled','…']],
- 'pil.k':'Risk-free pilot','pil.title':'Try it in your dealerships before you decide.','pil.p':'We define the success criteria together. If the pilot doesn’t meet them, it doesn’t continue.',
+ 'g.enc':'Encrypted & private','g.con':'Connected','g.note':'Pilot criteria met','pil.k':'Risk-free pilot','pil.title':'Try it in your dealerships before you decide.','pil.p':'We define the success criteria together. If the pilot doesn’t meet them, it doesn’t continue.',
  'pil':[['Security and privacy','Your group’s data is yours','and is never shared with other groups or automakers.','🔒'],['No process change','Works on what you already use.','Advisors keep the warranty process they already know.','⇄'],['Measurable results','Measured from day one.','Rejections, chargebacks, files and days to payment.','↗']],
  'uc.k':'Use cases','uc.title':'For every part of warranty','uc.lbl':'use case',
  'uc':[['Claim validation','Every claim checked against the brand policy before submission.',['Repair order','Warranty policy','Evidence','Ready to submit'],'Validation'],['Audit-ready files','Complete, organized files before the auditor arrives.',['File','Review','Missing items','Complete'],'Audit'],['Fewer chargebacks and PREAs','Catch early what would trigger an automaker charge.',['Claim','Risk','Correction','No chargeback'],'Chargebacks'],['Collections tracking','Know which claim is pending, rejected or paid, per dealership.',['Submitted','In review','Paid','Reconciled'],'Collections'],['Group dashboard','The fixed-ops director sees the money at risk across all dealerships.',['Dealerships','Metrics','Alerts','Dashboard'],'Group'],['Supplier recovery','Part, failure and batch data so the automaker can charge the responsible supplier.',['Claims','Failure pattern','Supplier','Recovery'],'Suppliers']],
@@ -520,7 +540,7 @@ en:{
  'form.title':'Request a pilot','form.name':'Name','form.group':'Group or dealership','form.role':'Role','form.n':'Number of dealerships','form.brands':'Brands','form.mail':'Email','form.msg':'Message (optional)','form.priv1':'I accept the','form.priv2':'privacy notice','form.send':'Send request','form.thanks':'Thank you! We’ll reach out within 24 hours.','form.err':'Please fill in the required fields and accept the privacy notice.','form.other':'Other',
  'faq.title':'FAQ',
  'faq':[['What is Ax AI?','An AI platform that reviews and completes warranty claims before they go to the automaker, to reduce rejections, chargebacks and incomplete files.'],['Do I have to change the brand portal?','No. Ax AI works on top of your current process; your advisors keep using the automaker’s portal.'],['Which brands does it support?','We’re starting with GM and Nissan and adding brands with each group.'],['What happens to our data?','It belongs to your group. It’s stored separately and never shared with other groups or automakers.'],['How long does it take to start?','A pilot can start in days: a short training with each advisor and dealership setup.'],['How much does it cost?','It depends on the number of dealerships. Pilots have special terms; write to us and we’ll send a proposal.'],['Does it work for automakers too?','Yes. Automakers get cleaner claims and data to recover costs from suppliers.'],['Who is behind Ax AI?','A team from dealerships and AI engineering, starting with its founder, a former warranty advisor.']],
- 'fin.title':'Ready to get paid on every warranty?','fin.sub':'Try Ax AI in your dealerships.',
+ 'fin.title':'Ready to get paid on every warranty?','fin.sub':'Try Ax AI in your dealerships.','fin.tiny':'Talk to the Ax AI team',
  'ft.tag':'The automotive warranty infrastructure.','ft.prod':'Product','ft.uc':'Use cases','ft.pilot':'Pilot','ft.co':'Company','ft.about':'About us','ft.contact':'Contact','ft.com':'Community','ft.privacy':'Privacy notice','ft.terms':'Terms of use','ft.copy':'© 2026 Ax AI. All rights reserved.'
 }};
 var lang='es';try{var sv=localStorage.getItem('axai-lang');if(sv==='en'||sv==='es')lang=sv}catch(e){}
@@ -565,7 +585,8 @@ function goStep(i,manual){
 function drawStatic(){
  $('strip').innerHTML='<b>'+esc(t('strip.k'))+'</b>'+t('strip').map(function(s){return '<span>'+esc(s)+'</span>'}).join('');
  $('prob').innerHTML=t('prob').map(function(p){return '<div class="rv in"><div class="disp">'+esc(p[0])+'</div><p>'+esc(p[1])+'</p></div>'}).join('');
- $('glass').innerHTML=t('pil').map(function(p,i){return '<div class="glass"><span class="no">0'+(i+1)+'</span><div class="vis"><div>'+p[3]+'</div></div><h3>'+esc(p[0])+'</h3></div>'}).join('');
+ var GV=['<div class="gbox"><svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="13" width="20" height="15" rx="4"/><path d="M8 13V8a5 5 0 0110 0v5"/></svg></div><span class="gchip">✓ '+esc(t('g.enc'))+'</span>','<div class="gcon"><i>Ax</i><i style="background:#d9e6f2">◎</i></div><span class="gchip">✓ '+esc(t('g.con'))+'</span>','<div class="gnote"><i>Ax</i><span>'+esc(t('g.note'))+'</span></div><div class="gcard"></div>'];
+ $('glass').innerHTML=t('pil').map(function(p,i){return '<div class="glass"><span class="no">0'+(i+1)+'</span><div class="gv">'+GV[i]+'</div><h3>'+esc(p[0])+'</h3></div>'}).join('');
  $('glassd').innerHTML=t('pil').map(function(p){return '<p><b>'+esc(p[1])+'</b> '+esc(p[2])+'</p>'}).join('');
  var brands=['Chevrolet/GM','Nissan','Volkswagen','Toyota',t('form.other')];
  var prev=[].map.call(document.querySelectorAll('#marcas input:checked'),function(e){return e.value});
@@ -574,8 +595,8 @@ function drawStatic(){
 
 /* cómo funciona: escenas */
 function scene(i){
- if(i===0)return '<div class="lbl">'+esc(t('sc.ag'))+'</div><ul class="src" data-anim="src">'+t('sc.agl').map(function(a){return '<li><span><i></i>'+esc(a)+'</span><em>'+esc(t('sc.conn'))+' ✓</em></li>'}).join('')+'</ul>';
- if(i===1)return '<div class="lbl">'+esc(t('sc.cap'))+'</div><ul class="src" data-anim="src">'+t('sc.capl').map(function(a){return '<li><span><i></i>'+esc(a)+'</span><em>'+esc(t('sc.up'))+' ✓</em></li>'}).join('')+'</ul>';
+ if(i===0)return '<div class="lbl">'+esc(t('sc.ag'))+'</div><ul class="src" data-anim="src">'+t('sc.agl').map(function(a){return '<li><span><i></i>'+esc(a)+'</span><b class="cap"></b></li>'}).join('')+'</ul>';
+ if(i===1)return '<div class="lbl">'+esc(t('sc.cap'))+'</div><ul class="src" data-anim="src">'+t('sc.capl').map(function(a){return '<li><span><i></i>'+esc(a)+'</span><b class="cap"></b></li>'}).join('')+'</ul>';
  if(i===2)return '<div class="lbl">'+esc(t('sc.val'))+'</div><div class="appr"><div>'+esc(t('sc.valt'))+'</div><div class="ln" style="width:90%"></div><div class="ln" style="width:70%"></div><div class="row">'+t('sc.valc').map(function(c){return '<span>'+esc(c)+'</span>'}).join('')+'</div></div><div class="appr-f"><span class="ok">'+esc(t('sc.ready'))+'</span><span class="duo dark"><span class="btn" style="height:38px;padding:0 18px;font-size:14px">'+esc(t('sc.appr'))+'</span><span class="sq" style="width:38px;height:38px">↗</span></span></div>';
  return '<div class="lbl">'+esc(t('sc.pay'))+'</div><div class="flowv" data-anim="flow">'+t('sc.payl').map(function(p){return '<div><span>'+esc(p[0])+'</span><span>'+esc(p[1])+'</span></div>'}).join('')+'</div>';
 }
