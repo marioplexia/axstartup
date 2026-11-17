@@ -333,6 +333,28 @@ h3{font-size:clamp(24px,2.4vw,30px);letter-spacing:-.035em;line-height:1.12}
 .ucard .chipk{background:#fff;color:#0b0e1a;border-radius:999px;font-size:11.5px;font-weight:600;padding:4px 10px;text-transform:uppercase}
 .ucard.t1 .chipk{background:#0b0e1a;color:#fff}
 .ucard .plus{width:28px;height:28px;border-radius:50%;border:1px solid currentColor;opacity:.5;display:grid;place-items:center}
+/* fundador + formulario */
+.fnd{display:grid;grid-template-columns:.95fr 1.05fr;gap:20px;align-items:stretch}
+.story{border-radius:28px;background:#0b0e1a;color:#fff;padding:40px;display:flex;flex-direction:column;justify-content:space-between;min-height:520px}
+.story h2{font-size:clamp(30px,3vw,40px)}
+.story p{color:#b9bfd0;font-size:16.5px;margin-top:22px;line-height:1.6}
+.sig{display:flex;align-items:center;gap:12px;margin-top:30px;font-size:14px}
+.sig i{width:42px;height:42px;border-radius:50%;background:var(--blue);display:grid;place-items:center;font-style:normal;font-weight:600}
+form{background:#fff;border-radius:28px;padding:34px;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
+form h3{grid-column:1/-1;margin-bottom:4px}
+label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:500;color:#3f3f46}
+input,select,textarea{font:inherit;font-size:15px;color:var(--ink);background:#F4F4F5;border:1px solid transparent;border-radius:12px;padding:11px 13px;width:100%;transition:border-color .2s,background .2s}
+input:focus,textarea:focus{background:#fff;border-color:#d4d4d8;outline:none}
+textarea{min-height:90px;resize:vertical}
+.full{grid-column:1/-1}
+.marcas{display:flex;flex-wrap:wrap;gap:8px}
+.marcas label{flex-direction:row;align-items:center;gap:8px;background:#F4F4F5;border-radius:999px;padding:8px 13px;font-weight:400;cursor:pointer;font-size:13.5px}
+.marcas input{width:auto}
+.priv{flex-direction:row;align-items:center;gap:10px;font-weight:400;font-size:13.5px}
+.priv input{width:17px;height:17px}
+.priv a{text-decoration:underline}
+form .btn{grid-column:1/-1;justify-content:center;height:48px}
+.thanks{grid-column:1/-1;text-align:center;padding:60px 0;font-family:'Inter Tight',Inter,sans-serif;font-size:26px;letter-spacing:-.03em}
 /* faq */
 .faqw{display:grid;grid-template-columns:.8fr 2fr;gap:40px}
 .faqw h2{font-size:clamp(40px,4.4vw,58px)}
