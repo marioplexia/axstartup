@@ -1,14 +1,20 @@
-/* ══ Harness de agentes · paso 1: ejecuciones, reintentos y reanudación ═════════
-   Lo comparten las funciones `documento` y `evidencia` (cada una lleva su copia en su paquete).
+/* ══ Harness de agentes · ejecuciones, reintentos y reanudación (v2) ═════════════
+   Copia canónica. Cada función de Supabase lleva su propia copia IDÉNTICA en su paquete
+   (el despliegue no comparte archivos entre funciones). Si se cambia aquí, hay que sincronizar las copias.
 
    · llamarIA / llamarHerramienta: llamadas a la IA con REINTENTOS solo para fallas transitorias
      (red, tiempo agotado, 429, 5xx) y espera creciente. Un 4xx de verdad no se reintenta.
+     Los errores traen `detalle` (el mensaje del proveedor) para poder mostrarlo.
    · Run: cada corrida queda en `agent_runs` con sus pasos. Lo ya hecho se guarda en `checkpoint`,
      así que reintentar con el mismo run_id REANUDA donde falló en lugar de empezar de cero
      (y sin volver a pagar la lectura de la IA si ya salió bien).
-   · La bitácora nunca rompe al agente: si no se puede escribir, la corrida sigue sin ella. */
+     `paso()` para trabajo reanudable; `anotar()` para solo dejar constancia (p. ej. cada herramienta de un chat).
+   · La bitácora nunca rompe al agente: si no se puede escribir, la corrida sigue sin ella.
+
+   v2: `detalle` en los errores, `anotar()` y `NIL_USER` (corridas del sistema, sin usuario). */
 
 export const MODEL = "claude-sonnet-5-5";
+export const NIL_USER = "00000000-0000-0000-0000-000000000000";
 export const clip = (s: unknown, n: number) => String(s ?? "").slice(0, n);
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -22,6 +28,7 @@ export async function llamarIA(payload: Record<string, unknown>, o: { intentos?:
   const max = o.intentos ?? 3;
   const t0 = Date.now();
   let status = 0;
+  let detalle = "";
   for (let i = 1; i <= max; i++) {
     const ctrl = new AbortController();
     const to = setTimeout(() => ctrl.abort(), o.timeoutMs ?? 45000);
@@ -38,18 +45,21 @@ export async function llamarIA(payload: Record<string, unknown>, o: { intentos?:
       status = r.status;
       const t = await r.text().catch(() => "");
       console.error("anthropic", status, "intento", i, t.slice(0, 300));
+      detalle = clip(t, 300);
+      try { const j = JSON.parse(t); detalle = clip((j.error && j.error.message) || t, 300); } catch { /* texto plano */ }
       const ra = Number(r.headers.get("retry-after"));
       if (status === 429 && ra > 0) espera = Math.min(8000, ra * 1000);
     } catch (e) {
+      detalle = "";
       console.error("anthropic fetch", "intento", i, String(e));
     } finally {
       clearTimeout(to);
     }
     /* sin más intentos, sin presupuesto de tiempo o un error que no se arregla reintentando */
-    if (!transitorio(status) || i === max || Date.now() - t0 > (o.presupuestoMs ?? 100000)) return { error: "upstream", status, intentos: i } as const;
+    if (!transitorio(status) || i === max || Date.now() - t0 > (o.presupuestoMs ?? 100000)) return { error: "upstream", status, intentos: i, detalle } as const;
     await sleep(espera + Math.random() * 300);
   }
-  return { error: "upstream", status, intentos: max } as const;
+  return { error: "upstream", status, intentos: max, detalle } as const;
 }
 
 /* este modelo no admite tool_choice forzado: la herramienta va en modo automático y, si el modelo
@@ -111,6 +121,12 @@ export class Run {
   }
 
   hecho(n: string) { return !!(this.checkpoint.hecho && this.checkpoint.hecho[n]); }
+
+  /* solo deja constancia en la bitácora (sin reintentar ni reanudar): por ejemplo cada herramienta que usa un chat */
+  anotar(nombre: string, estado: string, ms: number, extra: Record<string, unknown> = {}) {
+    this.steps.push({ n: nombre, estado, ms, ...extra });
+    if (this.steps.length > 60) this.steps.splice(0, this.steps.length - 60);
+  }
 
   /* un paso con nombre: se salta si ya estaba hecho (reanudación), se reintenta si falla y queda en la bitácora.
      Con `clave`, su resultado se guarda en el checkpoint y una reanudación lo devuelve sin repetir el trabajo. */

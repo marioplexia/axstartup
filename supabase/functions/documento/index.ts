@@ -3,7 +3,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { clip, llamarHerramienta, Run, UUID_RE } from "./harness.ts";
 
 /* Documentos del expediente → cerebro.
-   El asesor sube Contrato firmado, Piezas, Evidencia, Factura o Transacción de planta. Esta función LEE el
+   El asesor sube los documentos de las secciones del expediente que pide el manual de GM (orden de garantía, recepción, diagnóstico, evidencia, refacciones, destrucción y, según aplique, PRA, batería, facturas de partes, TAC, mantenimientos, M2 y envío a WPC) o los de cobranza (factura y transacción de planta). Esta función LEE el
    archivo (PDF, imagen o texto/XML), comprueba que es del tipo que se esperaba y lo APRENDE:
    - lecciones en reglas_lecciones (las que usa el agente en la siguiente PREA parecida),
    - la factura y el pago de planta se asientan en cartera (y su disparador crea el evento de aprendizaje de pagos),
@@ -21,11 +21,21 @@ const cors = {
 const json = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { ...cors, "Content-Type": "application/json" } });
 const MEDIA_OK = ["application/pdf", "image/png", "image/jpeg", "image/webp", "image/gif"];
 const MAX_B64 = 6_500_000;
+/* secciones del expediente según el Manual de Políticas y Procedimientos de Garantías GMM 2026 (4.1 a 4.4, 5, 7, 8, 10, 12, 15, 17) */
 const DOCS: Record<string, string> = {
-  contrato: "Contrato firmado",
-  piezas: "Piezas",
-  evidencia: "Evidencia de la PREA, campaña o servicio",
-  factura: "Factura",
+  contrato: "Orden de garantía firmada",
+  recepcion: "Recepción del vehículo (VIN, odómetro y toma panorámica)",
+  diagnostico: "Documentos de diagnóstico",
+  evidencia: "Evidencia de la condición y daños",
+  piezas: "Refacciones: pedido, salida y eSPOM",
+  destruccion: "Destrucción de partes (antes y después)",
+  bateria: "Batería 12V (tickets, etiqueta y póliza ACDelco)",
+  facturas_partes: "Facturas de TOT, NAR, No GM y Tipo B",
+  tac: "TAC / Check list",
+  mantenimiento: "Servicios de mantenimiento",
+  m2: "Formato M2 (daños de transporte)",
+  wpc: "Envío de material a WPC o proveedor",
+  factura: "Factura a planta",
   planta: "Transacción de planta",
 };
 const TIPOS = ["acierto", "error", "tiempo", "pieza", "codigo", "comentario", "riesgo", "patron"];
@@ -108,9 +118,18 @@ const TOOL = {
 };
 
 const GUIA: Record<string, string> = {
-  contrato: "CONTRATO FIRMADO: comprueba que está firmado y su fecha; extrae SOLO condiciones que afecten cobertura, costo o autorización. Aprende, si aplica, qué condiciones o autorizaciones suele pedir planta. Nada personal.",
-  piezas: "PIEZAS: extrae las piezas (número de parte, descripción, cantidad, precio) y fechas de pedido o llegada si aparecen. Aprende qué piezas intervienen realmente en esta reparación (tipo pieza, con contexto de sistema y operación) y cualquier retraso de llegada.",
-  evidencia: "EVIDENCIA DEL CASO: extrae los hechos que prueba (falla, diagnóstico, kilometraje, historial). Aprende qué evidencia demuestra bien este tipo de falla y cómo debe presentarse para que planta la acepte (tipo comentario o patron).",
+  contrato: "ORDEN DE GARANTÍA FIRMADA (Manual GM 4.1): comprueba que trae fecha de apertura (día/mes/año), VIN completo de 17 dígitos, kilometraje de ingreso, descripción de la condición reportada por el cliente y fecha y firma en la leyenda de conformidad; que no tenga datos llenados a mano, tachados ni correcciones; y la fecha de cierre si aparece. Si falta algo, dilo en el resumen como faltante del manual. Aprende, si aplica, qué falta con más frecuencia (tipo error o patron). Nada personal.",
+  recepcion: "RECEPCIÓN DEL VEHÍCULO (Manual GM 4.2): comprueba que se vean con claridad el VIN, el odómetro (y su lectura) y una toma panorámica del vehículo. Si falta alguno de los tres, indícalo en el resumen. Aprende qué tan seguido falta alguno (tipo error o patron).",
+  diagnostico: "DOCUMENTOS DE DIAGNÓSTICO (Manual GM 4.3): comprueba que sean cartas de diagnóstico, diagramas eléctricos o menús de síntomas CON notas escritas de las lecturas y resultados de cada prueba (voltaje, amperaje, resistencia, etc.); extrae DTC, número de documento seguido y resultados. Si no trae lecturas, dilo: planta lo considera diagnóstico sin soporte. Aprende qué diagnóstico respalda este tipo de falla (tipo comentario o patron, con contexto de sistema).",
+  piezas: "REFACCIONES: PEDIDO, SALIDA Y eSPOM (Manual GM 4.4 y 7): extrae las piezas (número de parte, descripción, cantidad, precio), fechas de pedido, salida o llegada, y si es captura de eSPOM la fecha y si la parte NO estaba disponible en CCA (justifica compra NAR o ensamble mayor). Las fechas deben caer dentro de la permanencia del vehículo (TPU). Aprende qué piezas intervienen realmente en esta reparación y cualquier retraso de llegada.",
+  evidencia: "EVIDENCIA DE LA CONDICIÓN Y DAÑOS (Manual GM 4.4): extrae los hechos que prueba (falla, daño, kilometraje, historial). Aprende qué evidencia demuestra bien este tipo de falla y cómo debe presentarse para que planta la acepte (tipo comentario o patron).",
+  destruccion: "DESTRUCCIÓN DE PARTES (Manual GM 17): comprueba que haya foto ANTES y DESPUÉS de la destrucción, que se vea la etiqueta de identificación de partes de garantía completa y que la destrucción impida reutilizar la parte (transmisión: carcasa perforada; motor: monoblock, cabeza y cárter perforados). Indica qué falta.",
+  bateria: "BATERÍA 12V (Manual GM 10.4 a 10.6): identifica si es ticket PDI, ticket de diagnóstico, etiqueta de la batería o póliza ACDelco; extrae del ticket fecha, BAC, VIN, CCA (norma SAE salvo EFB), tipo de batería, SOC/voltaje y resultado; revisa que la fecha caiga dentro de la permanencia y que el resultado indique reemplazo. Indica qué le falta para cumplir 10.6.",
+  facturas_partes: "FACTURAS DE TOT, NAR, NO GM O TIPO B (Manual GM 1.2, 7.1 a 7.3 y 8): identifica el tipo; extrae folio, fecha, subtotal sin IVA, conceptos, cantidad y VIN; revisa que la fecha caiga dentro de la permanencia del vehículo y que describa partes o trabajos y los 17 dígitos del VIN. Recuerda: NAR, No GM y a granel se cobran con 20 % de manejo; TOT con 10 % y tope de $1,500 ($10,000 en pintura) sin PRA.",
+  tac: "TAC / CHECK LIST (Manual GM 4.4): extrae el número de caso o actividad TAC, la recomendación técnica y el resultado. Aprende qué recomendó TAC para este tipo de falla (tipo comentario o patron).",
+  mantenimiento: "SERVICIOS DE MANTENIMIENTO (Manual GM 15): extrae fechas y kilometrajes de los servicios y revisa si hay omisión o desfase mayor a 1 mes o 1,000 km respecto al programa; si lo hay, indica que debe validarse que la falla no se relaciona con la omisión (tren motriz).",
+  m2: "FORMATO M2 (Manual GM 12): extrae el folio M2 y los códigos de daño (área, tipo y severidad) con su descripción. Se reclama como transacción ZTPT adjuntando el M2.",
+  wpc: "ENVÍO DE MATERIAL A WPC O PROVEEDOR (Manual GM 4.4 y 16): extrae número de guía, paquetería, fecha y partes enviadas, y la factura de envío si aparece.",
   factura: "FACTURA: extrae número o folio, fecha, subtotal, IVA y total, y el desglose de mano de obra y piezas si aparece (en un XML CFDI, de los conceptos). Aprende si el monto facturado concuerda con lo reclamado en la PREA.",
   planta: "TRANSACCIÓN DE PLANTA (pago): la pantalla «Ver Transacción» de Administración Global de Garantía (o un estado de cuenta o comprobante) con estado Aceptado o Pagado SÍ es el pago de planta y su TOTAL es lo que planta pagó: no pongas corresponde=false porque falte fecha de pago, referencia o folio de PREA. Mapeo: labor_pagada = Mano de Obra; piezas_pagadas = Partes + Manejo de Partes (sin impuestos); el impuesto aparte; total_pagado = total de la transacción; si el documento no muestra un recorte, lo reclamado es igual a lo pagado (labor_reclamada = labor_pagada y piezas_reclamadas = piezas_pagadas); referencia = número de transacción. Extrae también la fecha de pago si aparece, los recortes con sus motivos y los comentarios de planta. Aprende cuánto recortó planta y por qué en este contexto (tipo tiempo, error o riesgo, con efecto: horas o piezas a quitar, nota de redacción).",
 };
