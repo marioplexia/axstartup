@@ -6382,8 +6382,8 @@ SB.loadAdvisors=async function(){
   }
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
   if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;try{var au=await SB.c.auth.getUser();SB.email=au&&au.data&&au.data.user&&au.data.user.email||''}catch(_){}SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
-    me.gerente=me.role==='gerente';PV.nav(me.gerente);
-    MR.nav(!!me.marca);
+    me.gerente=me.role==='gerente';
+    MR.nav(!!me.marca);PV.nav(me.gerente);
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
@@ -6448,7 +6448,11 @@ function ctxToRec(c){
 /* ===== Tablero de posventa (gerente de posventa): todos los expedientes de su agencia ===== */
 var PV={rows:[],car:{},sec:{},q:'',as:'',st:'',inc:false,sort:'fecha',dir:-1,loading:false,t:0};
 PV.is=function(){return !!(SB.user&&SB.user.gerente)};
-PV.nav=function(on){$$('[data-pv-nav]').forEach(function(e){e.hidden=!on;e.style.display=on?'':'none'});var g=$('.grp[data-nm]');if(g)g.style.marginTop=on?'22px':'6px'};
+PV.nav=function(on){$$('[data-pv-nav]').forEach(function(e){e.hidden=!on;e.style.display=on?'':'none'});var g=$('.grp[data-nm]');if(g)g.style.marginTop=on?'22px':'6px';
+  /* el gerente no usa los agentes del asesor ni la bitácora: se ocultan de su menú */
+  PV.HIDE.forEach(function(v){var b=$('.nav[data-nm][data-view="'+v+'"]');if(b)b.style.display=on?'none':''});if(g)g.style.display=on?'none':'';
+  $$('.grp[data-nm]').forEach(function(x){if(x.textContent.trim()==='Administración')x.style.display=on?'none':''})};
+PV.HIDE=['agent','mi','bitacora','cobros','cartera'];
 PV.REQ=function(){return XD.DOCS.filter(function(d){return d[3]==='req'})};
 PV.load=async function(quiet){
   if(!SB.c||!SB.entered)return;
