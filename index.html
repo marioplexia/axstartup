@@ -6451,7 +6451,12 @@ PV.is=function(){return !!(SB.user&&SB.user.gerente)};
 PV.nav=function(on){$$('[data-pv-nav]').forEach(function(e){e.hidden=!on;e.style.display=on?'':'none'});var g=$('.grp[data-nm]');if(g)g.style.marginTop=on?'22px':'6px';
   /* el gerente no usa los agentes del asesor ni la bitácora: se ocultan de su menú */
   PV.HIDE.forEach(function(v){var b=$('.nav[data-nm][data-view="'+v+'"]');if(b)b.style.display=on?'none':''});if(g)g.style.display=on?'none':'';
-  $$('.grp[data-nm]').forEach(function(x){if(x.textContent.trim()==='Administración')x.style.display=on?'none':''})};
+  $$('.grp[data-nm]').forEach(function(x){if(x.textContent.trim()==='Administración')x.style.display=on?'none':''});
+  /* Inicio va hasta arriba del menú del gerente */
+  var ini=$('.nav[data-view="inicio"]'),top=$('.grp[data-pv-nav]');
+  if(ini&&top){if(!PV.iniHome)PV.iniHome=ini.previousElementSibling;
+    if(on)top.parentNode.insertBefore(ini,top);else if(PV.iniHome)PV.iniHome.after(ini);
+    ini.style.marginTop=on?'6px':'';top.style.marginTop=on?'22px':'6px'}};
 PV.HIDE=['agent','mi','bitacora','cobros','cartera'];
 PV.REQ=function(){return XD.DOCS.filter(function(d){return d[3]==='req'})};
 PV.load=async function(quiet){
