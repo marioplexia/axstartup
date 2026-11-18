@@ -66,3 +66,11 @@ subir y borrar solo a quien puede ver ese expediente.
 - Datos: función SQL `salud_agentes(p_horas)` (SECURITY INVOKER: respeta las políticas de `agent_runs`).
   Políticas: cada quien ve lo suyo; el administrador de agencia ve a su gente (`can_admin`); la marca ve todo, incluido el
   aprendizaje automático (usuario "sistema"), con la política `runs read marca`.
+
+# Manual oficial de GM (v6 de `manual`)
+
+- Tabla `manual_politicas`: el Manual de Políticas y Procedimientos de Garantías GMM 2026 cargado por sección (45 secciones, con
+  número y página). Solo lectura para usuarios con sesión. El texto es confidencial de GM: vive en la base de datos, no en el repo.
+- `buscar_politicas(texto, limite)`: búsqueda por relevancia. Migración en `supabase/migrations/20261118_manual_politicas_gm.sql`.
+- `manual` v6 (código ya en este repositorio): herramientas `buscar_politicas` y `ver_politica`, y `buscar_todo` incluye la
+  política oficial. El agente cita "Manual GM 2026, sección, pág." y da prioridad a la política oficial sobre lo aprendido.
