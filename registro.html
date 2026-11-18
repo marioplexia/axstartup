@@ -30,7 +30,8 @@ h2{margin:0 0 6px;font-size:28px;letter-spacing:-.025em}
 .field{margin:0 0 16px}
 label{display:block;margin:0 0 6px;font-size:13px;font-weight:600}
 .ctl{position:relative}
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seg button{padding:0 6px;line-height:1.2}@media (max-width:460px){.seg{grid-template-columns:1fr}}
 .seg button{height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 .seg button[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink);font-weight:600}
 input,select{width:100%;height:46px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;appearance:none;-webkit-appearance:none}
@@ -102,17 +103,19 @@ input:focus,select:focus{outline:none;border-color:var(--focus);box-shadow:0 0 0
           </div>
           <div class="field" id="fType">
             <label>Tipo de cuenta</label>
-            <div class="seg"><button type="button" data-t="asesor" aria-pressed="true">Asesor de garantías</button><button type="button" data-t="marca" aria-pressed="false">Administrador de marca</button></div>
+            <div class="seg"><button type="button" data-t="asesor" aria-pressed="true">Asesor de garantías</button><button type="button" data-t="gerente" aria-pressed="false">Gerente de posventa</button><button type="button" data-t="marca" aria-pressed="false">Administrador de marca</button></div>
           </div>
           <div id="marW" hidden>
             <div class="field" id="fBr"><label for="br">Marca</label><select id="br"><option value="">Cargando…</option></select><p class="hint"></p></div>
             <div class="field" id="fCode"><label for="code">Código de administrador</label><input id="code" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX"><p class="hint">Te lo da el administrador actual de la marca.</p></div>
           </div>
+          <div class="field" id="fGr" hidden><label for="gr">Grupo</label><select id="gr"><option value="">Cargando grupos…</option></select><p class="hint"></p></div>
           <div class="field" id="fAg">
             <label for="ag">Agencia</label>
             <select id="ag"><option value="">Cargando agencias…</option></select>
             <p class="hint"></p>
           </div>
+          <div class="field" id="fGcode" hidden><label for="gcode">Código de gerente del grupo</label><input id="gcode" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX"><p class="hint">Te lo da Ax AI o la dirección de tu grupo.</p></div>
           <div class="field" id="fPass">
             <label for="pass">Contraseña</label>
             <div class="ctl"><input id="pass" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres"><button class="eye" type="button" id="eye" aria-label="Mostrar contraseña">Mostrar</button></div>
@@ -167,10 +170,10 @@ function api(path,opt){
 function setSt(cls,txt,retry){var s=$('#st');s.className='status '+cls;s.innerHTML='<i></i><span>'+esc(txt)+'</span>'+(retry?'<button type="button" class="retry" id="rt">Reintentar</button>':'');if(retry)$('#rt').onclick=loadAg}
 function loadAg(){
   setSt('','Conectando…');$('#ag').innerHTML='<option value="">Cargando agencias…</option>';
-  api('/rest/v1/agencies?select=id,name,region,brand&order=region.asc,id.asc').then(function(r){
+  api('/rest/v1/grupos?select=id,nombre&order=nombre.asc').then(function(g){GR=(g.ok&&Array.isArray(g.data))?g.data:[];$('#gr').innerHTML='<option value="">Selecciona tu grupo</option>'+GR.map(function(x){return '<option value="'+x.id+'">'+esc(x.nombre)+'</option>'}).join('')}).catch(function(){});
+  api('/rest/v1/agencies?select=id,name,region,brand,grupo_id&order=region.asc,id.asc').then(function(r){
     if(!r.ok||!Array.isArray(r.data))throw Object.assign(new Error('http'),{res:r});
-    var sel=$('#ag');sel.innerHTML='<option value="">Selecciona tu agencia</option>';var g={};
-    r.data.forEach(function(a){if(!g[a.region]){var og=document.createElement('optgroup');og.label=a.region;sel.appendChild(og);g[a.region]=og}var o=document.createElement('option');o.value=a.id;o.textContent=a.name;g[a.region].appendChild(o)});
+    AGS=r.data;fillAg();
     var bs=[];r.data.forEach(function(a){if(a.brand&&bs.indexOf(a.brand)<0)bs.push(a.brand)});
     $('#br').innerHTML=bs.map(function(b){return '<option value="'+esc(b)+'">'+esc(b)+'</option>'}).join('')||'<option value="">Sin marcas</option>';
     setSt('ok','Conectado a Supabase · '+r.data.length+(r.data.length===1?' agencia':' agencias'));
@@ -186,19 +189,27 @@ function mark(id,msg){var f=$('#'+id);f.classList.toggle('bad',!!msg);var h=f.qu
 var EMAIL=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 function vName(){var v=$('#name').value.trim();return mark('fName',v.length<2?'Escribe tu nombre completo.':'')}
 function vEmail(){return mark('fEmail',EMAIL.test($('#email').value.trim())?'':'Escribe un correo válido.')}
-var ACCT='asesor';
+var ACCT='asesor',GR=[],AGS=[];
+/* agencias en el selector; para el gerente, solo las del grupo elegido */
+function fillAg(){
+  var sel=$('#ag'),cur=sel.value,gid=ACCT==='gerente'?Number($('#gr').value)||0:0,g={};
+  sel.innerHTML='<option value="">'+(ACCT==='gerente'&&!gid?'Primero elige tu grupo':'Selecciona tu agencia')+'</option>';
+  AGS.forEach(function(a){if(gid&&a.grupo_id!==gid)return;if(ACCT==='gerente'&&!gid)return;if(!g[a.region]){var og=document.createElement('optgroup');og.label=a.region;sel.appendChild(og);g[a.region]=og}var o=document.createElement('option');o.value=a.id;o.textContent=a.name;g[a.region].appendChild(o)});
+  sel.value=cur;if(sel.value!==cur)sel.value='';
+}
 function vAg(){return ACCT==='marca'?true:mark('fAg',$('#ag').value?'':'Selecciona tu agencia.')}
-function vCode(){return ACCT!=='marca'?true:mark('fCode',$('#code').value.trim()?'':'Escribe el código de administrador.')}
+function vCode(){if(ACCT==='gerente')return mark('fGcode',$('#gcode').value.trim()?'':'Escribe el código de gerente de tu grupo.');return ACCT!=='marca'?true:mark('fCode',$('#code').value.trim()?'':'Escribe el código de administrador.')}
+function vGr(){return ACCT!=='gerente'?true:mark('fGr',$('#gr').value?'':'Selecciona tu grupo.')}
 Array.prototype.slice.call(document.querySelectorAll('.seg button')).forEach(function(b){b.addEventListener('click',function(){
   ACCT=b.dataset.t;Array.prototype.slice.call(document.querySelectorAll('.seg button')).forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
-  $('#marW').hidden=ACCT!=='marca';$('#fAg').hidden=ACCT==='marca';
+  $('#marW').hidden=ACCT!=='marca';$('#fAg').hidden=ACCT==='marca';$('#fGr').hidden=$('#fGcode').hidden=ACCT!=='gerente';fillAg();
 })});
 function vPass(){var v=$('#pass').value;return mark('fPass',v.length<8?'La contraseña debe tener al menos 8 caracteres.':'')}
 function vPass2(){return mark('fPass2',$('#pass2').value===$('#pass').value&&$('#pass2').value?'':'Las contraseñas no coinciden.')}
 function score(v){var s=0;if(v.length>=8)s++;if(v.length>=12)s++;if(/[a-z]/.test(v)&&/[A-Z]/.test(v))s++;if(/\d/.test(v)&&/[^A-Za-z0-9]/.test(v)||(/\d/.test(v)&&/[A-Za-z]/.test(v)&&v.length>=10))s++;return Math.min(s,4)}
 $('#pass').addEventListener('input',function(){var s=score(this.value),c=['#c0392b','#e67e22','#e0a100','#1f8a4c'];$$('#meter i').forEach(function(i,k){i.style.background=k<s&&this.value?c[Math.max(0,s-1)]:''},this)});
 function $$(s){return Array.prototype.slice.call(document.querySelectorAll(s))}
-$('#name').addEventListener('blur',vName);$('#email').addEventListener('blur',vEmail);$('#ag').addEventListener('change',vAg);$('#pass').addEventListener('blur',vPass);$('#pass2').addEventListener('blur',vPass2);
+$('#name').addEventListener('blur',vName);$('#email').addEventListener('blur',vEmail);$('#ag').addEventListener('change',vAg);$('#gr').addEventListener('change',function(){vGr();fillAg()});$('#pass').addEventListener('blur',vPass);$('#pass2').addEventListener('blur',vPass2);
 $('#eye').addEventListener('click',function(){var p=$('#pass'),show=p.type==='password';p.type=$('#pass2').type=show?'text':'password';this.textContent=show?'Ocultar':'Mostrar';this.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña')});
 
 /* ---------- errores de Supabase Auth, en español ---------- */
@@ -218,7 +229,7 @@ function showErr(m){var a=$('#al');a.textContent=m;a.classList.toggle('on',!!m);
 var busy=false;
 $('#f').addEventListener('submit',function(e){
   e.preventDefault();if(busy)return;showErr('');
-  var ok=[vName(),vEmail(),vAg(),vCode(),vPass(),vPass2()].every(Boolean);
+  var ok=[vName(),vEmail(),vGr(),vAg(),vCode(),vPass(),vPass2()].every(Boolean);
   if(!ok){var bad=document.querySelector('.field.bad input,.field.bad select');if(bad)bad.focus();return}
   var name=$('#name').value.trim(),email=$('#email').value.trim().toLowerCase(),pass=$('#pass').value,ag=Number($('#ag').value);
   busy=true;var b=$('#go');b.disabled=true;b.innerHTML='<span class="spin"></span>Creando tu cuenta…';
@@ -226,6 +237,9 @@ $('#f').addEventListener('submit',function(e){
   if(ACCT==='marca'){
     meta={name:name,role_req:'marca',brand:$('#br').value,code:$('#code').value.trim()};
     pre=api('/rest/v1/rpc/check_marca_code',{method:'POST',body:{p_brand:meta.brand,p_code:meta.code}}).then(function(r){return r.ok&&r.data===true});
+  }else if(ACCT==='gerente'){
+    meta={name:name,agency_id:ag,role_req:'gerente',code:$('#gcode').value.trim()};
+    pre=api('/rest/v1/rpc/check_gerente_code',{method:'POST',body:{p_agency:ag,p_code:meta.code}}).then(function(r){return r.ok&&r.data===true});
   }
   pre.then(function(okc){
     if(!okc)throw Object.assign(new Error('code'),{code:true});
@@ -240,7 +254,7 @@ $('#f').addEventListener('submit',function(e){
   })
   .then(done)
   .catch(function(e){
-    if(e.code){showErr('Ese código de administrador no es correcto para esa marca.');return}
+    if(e.code){showErr(ACCT==='gerente'?'Ese código de gerente no es correcto para el grupo de esa agencia.':'Ese código de administrador no es correcto para esa marca.');return}
     showErr(e.net?(e.message==='timeout'?'Supabase tardó demasiado en responder. Revisa tu conexión e inténtalo de nuevo.':'No se pudo conectar con Supabase. Revisa tu red, tu VPN o desactiva el bloqueador de anuncios para este sitio.'):e.res?authErr(e.res):'Ocurrió un error inesperado: '+(e.message||e));
   })
   .then(function(){busy=false;b.disabled=false;b.textContent='Crear cuenta'});
@@ -270,7 +284,7 @@ function done(x){
   }
   var p=x.profile,u=x.session.user||{};
   L.innerHTML='<li><span class="c">✓</span><div><b>Usuario creado en Supabase</b><span>'+esc(u.email||'')+'</span></div></li>'+
-    (p?'<li><span class="c">✓</span><div><b>Perfil de asesor guardado</b><span>'+esc(p.name)+' · '+(p.role==='marca'?'administrador de marca':p.role==='admin'?'administrador':'asesor')+' · '+esc((p.agencies&&p.agencies.name)||'sin agencia')+'</span></div></li>'
+    (p?'<li><span class="c">✓</span><div><b>Perfil guardado</b><span>'+esc(p.name)+' · '+(p.role==='marca'?'administrador de marca':p.role==='admin'?'administrador':p.role==='gerente'?'gerente de posventa':'asesor')+' · '+esc((p.agencies&&p.agencies.name)||'sin agencia')+'</span></div></li>'
        :'<li><span class="c" style="background:#e0a100">!</span><div><b>Cuenta creada, perfil pendiente</b><span>Se completará al iniciar sesión.</span></div></li>')+
     '<li><span class="c">✓</span><div><b>Sesión iniciada</b><span>Ya puedes entrar a la aplicación.</span></div></li>';
   if(p&&(p.role==='admin'||p.role==='marca'))$('#okSub').textContent='Tu cuenta es de administrador.';
