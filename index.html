@@ -1282,7 +1282,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .kp.bad b{color:#b4372b}
 .xz{margin:16px 0 4px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);padding:16px 18px}
 .xz-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}.xz-h h3{margin:0;font-size:15px;font-weight:600}.xz-h p{margin:3px 0 0;font-size:12.5px;color:var(--muted);max-width:620px}
-.xz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.xz-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}@media (max-width:760px){.xz-grid{grid-template-columns:1fr}}
 .xz-box{border:1px solid var(--card-line);border-radius:12px;padding:12px 14px;background:var(--surface)}.xz-box h4{margin:0 0 8px;font-size:13.5px;font-weight:600}
 .xz-row{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--card-line)}.xz-row:first-of-type{border-top:0}
 .xz-row b{display:block;font-size:13px;font-weight:500}.xz-row span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
@@ -1293,6 +1293,10 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .xz-v{border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:8px}.xz-v b{display:block;font-weight:600}.xz-v span{font-size:12px;color:var(--muted)}.xz-v ul{margin:6px 0 0;padding-left:18px}.xz-v li{margin:2px 0;font-size:12.5px}
 .xz-v.ok{background:color-mix(in srgb,#1f8a4c 10%,transparent);color:#1a6e3e}.xz-v.bad{background:color-mix(in srgb,#b4372b 9%,transparent);color:#8f2a20}
 .xz-ck{display:grid;gap:5px}.xz-ck label{font-size:12.5px;display:flex;gap:7px;align-items:flex-start;cursor:pointer}.xz-ck input{margin-top:2px}
+.xz-wide{grid-column:1/-1}.xz-rv{max-height:420px;overflow:auto}
+.xd-rev{margin:2px 0 10px 46px;padding:8px 10px;border-radius:10px;font-size:12.5px;line-height:1.45}.xd-rev.ok{background:color-mix(in srgb,#1f8a4c 9%,transparent);color:#1a6e3e}.xd-rev.bad{background:color-mix(in srgb,#b4372b 7%,transparent)}
+.xd-rev b{font-weight:600}.xd-rev span{color:var(--muted)}.xd-rev ul{margin:6px 0 0;padding-left:16px}.xd-rev li{margin:3px 0}.xd-rev small{color:var(--muted)}
+.xd-rev em{font-style:normal;font-weight:600;font-size:11.5px;margin-right:4px}.xd-rev em.bad{color:#b4372b}.xd-rev em.warn{color:#b7791f}
 .xz-mut{font-size:12px;color:var(--muted);margin:6px 0}
 .pv-empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13.5px}
 @media (max-width:640px){.pv-tb td,.pv-tb th{padding:9px 10px}#pvQ{width:100%}#pvKpi .kp b{font-size:21px;overflow-wrap:anywhere}}
@@ -5828,6 +5832,8 @@ XD.learn=async function(k,file,meta,runId,intento){
       again(r.run_id,'se aplicó parte ('+ok+'), pero falló: '+r.pendiente.join(', ')+'.');return;
     }
     meta.textContent=base+' · ✓ '+ok;
+    XD.revShow(meta,r&&r.cumplimiento);
+    if(XD.cur&&XD.cur.id===x.id)XD.ctlLoad(x).catch(function(){});
     if(XD.mode==='cartera')CC.docLeido(k,r);
     if(r&&r.lecciones){try{LS.learnNow()}catch(_){}}
   }catch(e){
@@ -6474,6 +6480,7 @@ PZ.d=function(v){if(!v)return null;var s=String(v);var d=new Date(/^\d{4}-\d{2}-
 PZ.add=function(d,days){return new Date(d.getTime()+days*PZ.DAY)};
 PZ.f=function(d){return d?d.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}):''};
 PZ.left=function(due){var ms=due-Date.now(),h=Math.round(ms/36e5);if(Math.abs(h)<48)return (ms<0?'venció hace ':'faltan ')+Math.abs(h)+' h';var d=Math.round(ms/PZ.DAY);return ms<0?'venció hace '+(-d)+(d===-1?' día':' días'):'faltan '+d+(d===1?' día':' días')};
+PZ.hab=function(d,n){var r=new Date(d.getTime());while(n>0){r=PZ.add(r,1);var w=r.getDay();if(w!==0&&w!==6)n--}return r};
 PZ.acep=function(x){return PZ.d(x.transaccion_aceptada_at)||(x.status==='aceptada'?PZ.d(x.updated_at||x.created_at):null)};
 PZ.hasParts=function(x){return Array.isArray(x.parts)&&x.parts.length>0};
 /* sec: secciones con archivos {contrato:1,...} (si no se conoce, se omite el plazo de digitalización); car: fila de cartera */
@@ -6488,9 +6495,9 @@ PZ.list=function(x,sec,car){
   if(sec){var req=XD.DOCS.filter(function(d){return d[3]==='req'}),ok=req.filter(function(d){return sec[d[0]]}).length;
     it('dig','Digitalizar el expediente (15 días tras la entrega)','Manual GM 4.4',cierre,15,ok===req.length,'Completo: '+ok+' de '+req.length+' secciones',4)}
   var cob=PZ.d(x.gwm_cobrada_at)||(car&&(car.estado==='facturada'||car.estado==='pagada')?PZ.d(car.facturada_at||car.pagada_at):null);
-  if(x.status!=='rechazada')it('gwm','Cobrar la transacción en GWM (60 días tras el cierre)','Curso M5.07 y M5.08',cierre,60,!!cob,'Cobrada '+PZ.f(cob),10);
+  if(x.status!=='rechazada')it('gwm','Procesar la transacción en GWM (30 días tras el cierre; 60 desde la aprobación si hubo PRA)','Manual GM 5 y 5.1',cierre,30,!!cob,'Cobrada '+PZ.f(cob),7);
   var pr=PZ.d(x.pra_rechazada_at);
-  if(pr)it('pra','Completar la PRA rechazada (72 h)','Curso M5.03',pr,3,!!x.pra_corregida_at,'Corregida '+PZ.f(PZ.d(x.pra_corregida_at)),1);
+  if(pr)it('pra','Completar la PRA rechazada (72 horas hábiles)','Manual GM 9',pr,(PZ.hab(pr,3)-pr)/PZ.DAY,!!x.pra_corregida_at,'Corregida '+PZ.f(PZ.d(x.pra_corregida_at)),1);
   var wl=PZ.d(x.wpc_etiqueta_at);
   if(wl)it('wpc','Enviar la pieza al WPC (15 días tras imprimir la etiqueta)','Curso M6.06 y M6.07',wl,15,!!x.wpc_enviada_at,'Enviada '+PZ.f(PZ.d(x.wpc_enviada_at)),5);
   var db=PZ.d(x.debito_at);
@@ -6515,7 +6522,7 @@ PZ.jornada=function(desde){var j=PZ.jornadas(desde,1)[0],m=function(x){return x.
 /* ¿lleva PRA? (Curso Administración de Garantías M2.16, M5.02, M5.06 y M5.09) */
 var PRA={};
 PRA.TM=/motor|transmis|eje|diferencial|caja de transfer|tren motriz/i;
-PRA.Q=[['pintura','Reparación de pintura mayor a $10,000 antes de IVA'],['tot','TOT autorizado mayor a $1,500'],['tot_no','TOT no autorizado o no descrito en el manual'],['tiempo','Tiempo adicional no publicado en SI'],['canal','Vehículo de un canal diferente'],['nar_tm','Parte de tren motriz comprada por proceso NAR'],['nogm','Parte No GM (mercado independiente)'],['ev','Batería de propulsión o alto voltaje (EV)'],['politica','Política de garantía (fuera de la garantía regular)'],['bateria_sub','Reemplazo subsecuente de batería (2.º o más)'],['turista','Reembolso de reparación en el extranjero (turista)'],['especial','Caso especial: Buyback, Goodwill o movilidad']];
+PRA.Q=[['pintura','Reparación de pintura mayor a $10,000 antes de IVA'],['tot','TOT autorizado mayor a $1,500 (pintura: $10,000)'],['tot_no','TOT no autorizado o no descrito en el manual'],['tiempo','Tiempo adicional no publicado en SI'],['canal','Vehículo de un canal diferente'],['nar_tm','Parte de tren motriz comprada por proceso NAR'],['nogm','Parte No GM (mercado independiente)'],['ev','Batería de propulsión o alto voltaje (EV)'],['politica','Política de garantía (fuera de la garantía regular)'],['bateria_sub','Reemplazo subsecuente de batería (2.º o más)'],['turista','Reembolso de reparación en el extranjero (turista)'],['especial','Caso especial: Buyback, Goodwill o movilidad'],['transporte','Evento de transporte fuera de la tabla de escenarios (M2)']];
 PRA.auto=function(x,prev){
   var R=[],tm=PRA.TM.test([x.sys,x.op,x.opd].join(' '));
   if(tm&&Number(x.km)>0&&Number(x.km)<5000)R.push('Vehículo de nuevo lanzamiento con menos de 5,000 km y falla en tren motriz');
@@ -6542,14 +6549,27 @@ PRA.note=function(ctx){
 };
 
 /* ---- tarjeta en el expediente ---- */
+XD.REVST={no_cumple:['No cumple','bad'],no_se_puede_ver:['No se ve','warn'],cumple:['Cumple','ok'],no_aplica:['No aplica','']};
+XD.revShow=function(meta,C){
+  var row=meta&&meta.closest&&meta.closest('.xd-row');if(!row)return;
+  var old=row.nextElementSibling;if(old&&old.classList.contains('xd-rev'))old.remove();
+  if(!Array.isArray(C)||!C.length)return;
+  var mal=C.filter(function(c){return c.estado==='no_cumple'||c.estado==='no_se_puede_ver'}),bien=C.filter(function(c){return c.estado==='cumple'}).length;
+  var d=document.createElement('div');d.className='xd-rev '+(mal.length?'bad':'ok');
+  d.innerHTML='<b>'+(mal.length?'Revisión contra el manual: '+mal.length+(mal.length===1?' punto por corregir':' puntos por corregir'):'Cumple con el manual de GM')+'</b>'+(bien?'<span> · '+bien+(bien===1?' regla cumplida':' reglas cumplidas')+'</span>':'')+
+    (mal.length?'<ul>'+mal.map(function(c){return '<li><em class="'+XD.REVST[c.estado][1]+'">'+XD.REVST[c.estado][0]+'</em> '+esc(c.tema)+(c.nota?': '+esc(c.nota):'')+' <small>('+esc(c.regla)+' · '+esc(c.fuente)+')</small></li>'}).join('')+'</ul>':'');
+  row.parentNode.insertBefore(d,row.nextSibling);
+};
 XD.ctlLoad=async function(x){
   var box=$('#xdCtl');if(!box||!SB.c)return;
   var r=await Promise.all([SB.c.rpc('expediente_secciones',{p_ids:[x.id]}),
     x.vin?SB.c.from('expedientes').select('id,folio,sys,op,parts,created_at').eq('vin',x.vin).neq('id',x.id).order('created_at',{ascending:false}).limit(20):Promise.resolve({data:[]}),
-    SB.c.from('cartera').select('estado,facturada_at,pagada_at').eq('expediente_id',x.id).maybeSingle()]);
+    SB.c.from('cartera').select('estado,facturada_at,pagada_at').eq('expediente_id',x.id).maybeSingle(),
+    x.folio?SB.c.from('entrenamiento_docs').select('file_name,resultado,datos,created_at').eq('kind','expediente').eq('folio',x.folio).order('created_at',{ascending:false}).limit(80):Promise.resolve({data:[]})]);
   if(!XD.cur||XD.cur.id!==x.id)return;
   var sec={};(r[0].data||[]).forEach(function(s){if(String(s.expediente_id)===String(x.id))sec[s.seccion]=s.archivos});
-  XD.ctl={sec:sec,prev:(r[1].data||[]).filter(function(o){return String(o.id)!==String(x.id)}),car:r[2].data||null};XD.ctlRender(x);
+  var rev=[];(r[3].data||[]).forEach(function(d){var C=d.datos&&d.datos.cumplimiento;if(Array.isArray(C))C.forEach(function(c){rev.push(Object.assign({archivo:d.file_name,seccion:d.resultado},c))})});
+  XD.ctl={sec:sec,prev:(r[1].data||[]).filter(function(o){return String(o.id)!==String(x.id)}),car:r[2].data||null,rev:rev};XD.ctlRender(x);
 };
 XD.F=[['orden_apertura','Apertura de la orden','date'],['orden_cierre','Cierre de la orden (entrega)','date'],['transaccion_aceptada_at','Transacción aceptada en GWM','date'],['gwm_cobrada_at','Cobrada en GWM','date'],['pra_rechazada_at','PRA rechazada','datetime-local'],['pra_corregida_at','PRA corregida','datetime-local'],['wpc_etiqueta_at','Etiqueta WPC impresa','date'],['wpc_enviada_at','Pieza enviada al WPC','date'],['debito_at','Débito aplicado','date'],['debito_resuelto_at','Débito atendido','date'],['partes_destruidas_at','Partes destruidas','date']];
 XD.ctlRender=function(x){
@@ -6560,7 +6580,14 @@ XD.ctlRender=function(x){
     '<div class="xz-grid"><div class="xz-box"><h4>Plazos</h4>'+(L.length?L.map(function(i){return '<div class="xz-row"><i class="xz-dot '+i.st+'"></i><div><b>'+esc(i.label)+'</b><span>'+esc(i.txt)+' · '+esc(i.ref)+'</span></div></div>'}).join(''):'<p class="xz-mut">Sin plazos activos.</p>')+
     '<details class="xz-f"'+(x.orden_cierre?'':' open')+'><summary>Fechas del expediente</summary><div class="xz-fg">'+XD.F.map(function(f){return '<label><span>'+f[1]+'</span><input type="'+f[2]+'" data-xzf="'+f[0]+'" value="'+ea(val(f))+'"></label>'}).join('')+'</div></details></div>'+
     '<div class="xz-box"><h4>¿Lleva PRA?</h4><div class="xz-v '+(R.length?'bad':'ok')+'">'+(R.length?'<b>Requiere preautorización antes de reparar</b><ul>'+R.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ul>':'<b>No requiere PRA</b><span>La agencia es auto-autorizable para lo demás (Curso M5.06)</span>')+'</div>'+
-    '<p class="xz-mut">Marca lo que aplique a esta reparación (el reingreso del mismo VIN y los km se revisan solos):</p><div class="xz-ck">'+PRA.Q.map(function(q){return '<label><input type="checkbox" data-xzc="'+q[0]+'"'+(c[q[0]]?' checked':'')+'> '+esc(q[1])+'</label>'}).join('')+'</div></div></div>';
+    '<p class="xz-mut">Marca lo que aplique a esta reparación (el reingreso del mismo VIN y los km se revisan solos):</p><div class="xz-ck">'+PRA.Q.map(function(q){return '<label><input type="checkbox" data-xzc="'+q[0]+'"'+(c[q[0]]?' checked':'')+'> '+esc(q[1])+'</label>'}).join('')+'</div></div>'+XD.revBox(C.rev||[])+'</div>';
+};
+XD.revBox=function(rev){
+  var nom=function(k){return (XD.DOCS.filter(function(d){return d[0]===k})[0]||[0,k])[1]};
+  var mal=rev.filter(function(c){return c.estado==='no_cumple'||c.estado==='no_se_puede_ver'}),ok=rev.filter(function(c){return c.estado==='cumple'}).length;
+  return '<div class="xz-box xz-wide"><h4>Revisión contra el manual de GM</h4>'+(!rev.length?'<p class="xz-mut">Cada documento que subas se revisa regla por regla contra el Manual de Políticas y Procedimientos 2026 y el curso Administración de Garantías 2026. Aquí aparecerá lo que hay que corregir antes de que GM lo debite.</p>':
+    '<div class="xz-v '+(mal.length?'bad':'ok')+'"><b>'+(mal.length?mal.length+(mal.length===1?' punto por corregir':' puntos por corregir'):'Todo lo revisado cumple con el manual')+'</b><span>'+(function(){var nd=rev.map(function(c){return c.archivo}).filter(function(v,i,a){return a.indexOf(v)===i}).length;return ok+(ok===1?' regla cumplida':' reglas cumplidas')+' en '+nd+(nd===1?' documento':' documentos')})()+'</span></div>'+
+    (mal.length?'<div class="xz-rv">'+mal.map(function(c){return '<div class="xz-row"><i class="xz-dot '+(c.estado==='no_cumple'?'bad':'warn')+'"></i><div><b>'+esc(nom(c.seccion))+' · '+esc(c.tema)+'</b><span>'+esc(c.nota||XD.REVST[c.estado][0])+'</span><span>'+esc(c.regla)+' · '+esc(c.fuente)+(c.consecuencia?' · si no se corrige: '+esc(c.consecuencia):'')+' · '+esc(c.archivo)+'</span></div></div>'}).join('')+'</div>':''))+'</div>';
 };
 XD.ctlSave=async function(patch){
   var x=XD.cur;if(!x)return;Object.assign(x,patch);XD.ctlRender(x);
@@ -6586,6 +6613,7 @@ XD.pdf=async function(x,btn){
   if(!x.orden_apertura||!x.orden_cierre)avisos.push('Faltan las fechas de apertura y cierre de la orden: no se puede comprobar que los documentos estén dentro de la permanencia.');
   try{var lc=await SB.c.from('entrenamiento_docs').select('file_name,resultado,resumen').eq('kind','expediente').eq('folio',x.folio).limit(60);
     (lc.data||[]).forEach(function(d){if(/fuera de (la )?permanencia|fuera del (periodo|tiempo)|fuera de (las )?fechas|no coincide|falta|faltan|ilegible|sin firma|a mano|tachad/i.test(d.resumen||''))avisos.push((XD.DOCS.filter(function(k){return k[0]===d.resultado})[0]||[0,d.resultado])[1]+' · '+d.file_name+': '+String(d.resumen).slice(0,220))})}catch(_){}
+  (C.rev||[]).forEach(function(c){if(c.estado==='no_cumple')avisos.push(c.tema+(c.nota?': '+c.nota:'')+' ('+c.regla+', '+c.fuente+')')});
   if((falta.length||avisos.length)&&!confirm('Antes de armar el expediente:\n\n'+(falta.length?'Faltan secciones obligatorias: '+falta.join(', ')+'.\n\n':'')+(avisos.length?'Avisos del cerebro:\n• '+avisos.slice(0,6).join('\n• ')+'\n\n':'')+'¿Armar el PDF de todos modos?'))return;
   var t0=btn.textContent;btn.disabled=true;btn.textContent='Armando el PDF…';
   try{

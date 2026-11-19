@@ -4,7 +4,7 @@ import { clip, llamarHerramienta, Run, UUID_RE } from "./harness.ts";
 
 /* Documentos del expediente → cerebro.
    El asesor sube los documentos de las secciones del expediente que pide el manual de GM (orden de garantía, recepción, diagnóstico, evidencia, refacciones, destrucción y, según aplique, PRA, batería, facturas de partes, TAC, mantenimientos, M2 y envío a WPC) o los de cobranza (factura y transacción de planta). Esta función LEE el
-   archivo (PDF, imagen o texto/XML), comprueba que es del tipo que se esperaba y lo APRENDE:
+   archivo (PDF, imagen o texto/XML), comprueba que es del tipo que se esperaba, lo REVISA contra las reglas del manual de GM y lo APRENDE:
    - lecciones en reglas_lecciones (las que usa el agente en la siguiente PREA parecida),
    - la factura y el pago de planta se asientan en cartera (y su disparador crea el evento de aprendizaje de pagos),
    - lo leído queda en entrenamiento_docs (kind 'expediente') para que el agente lo encuentre con buscar_todo.
@@ -76,7 +76,7 @@ function limpiaEfecto(e: any) {
 const PIEZA = { type: "object", properties: { no: { type: "string" }, d: { type: "string" }, q: { type: "number" }, pr: { type: "number", description: "precio unitario, 0 si no aparece" } }, required: ["d"] };
 const TOOL = {
   name: "registrar_documento",
-  description: "Lo leído de un documento del expediente y lo que el cerebro debe aprender de él",
+  description: "Lo leído de un documento del expediente, su revisión contra el manual de GM y lo que el cerebro debe aprender de él",
   input_schema: {
     type: "object",
     properties: {
@@ -97,6 +97,19 @@ const TOOL = {
       piezas: { type: "array", items: PIEZA },
       contrato: { type: "object", properties: { firmado: { type: "boolean" }, fecha: { type: "string" }, fecha_apertura: { type: "string", description: "AAAA-MM-DD: fecha de apertura de la orden de garantía" }, fecha_cierre: { type: "string", description: "AAAA-MM-DD: fecha de cierre/entrega con firma de conformidad, si aparece" }, condiciones: { type: "string", description: "solo condiciones que afecten cobertura, costo o autorización; nada personal" } } },
       evidencia: { type: "object", properties: { hechos: { type: "string" }, diagnostico: { type: "string" } } },
+      cumplimiento: {
+        type: "array",
+        description: "Revisión del documento contra CADA regla de <reglas_del_manual> que aplique a este documento (una entrada por regla, con su id tal cual).",
+        items: {
+          type: "object",
+          properties: {
+            regla: { type: "string", description: "id de la regla, ej. OG-01" },
+            estado: { type: "string", enum: ["cumple", "no_cumple", "no_aplica", "no_se_puede_ver"] },
+            nota: { type: "string", description: "qué viste o qué falta, en una frase; sin datos personales" },
+          },
+          required: ["regla", "estado"],
+        },
+      },
       lecciones: {
         type: "array",
         description: "Lecciones accionables (máx. 5) para que el agente ayude mejor en la siguiente PREA parecida. Sin nombres, VIN, folios ni datos personales.",
@@ -139,6 +152,7 @@ Recibes UN documento del expediente de una PREA, campaña o servicio, y el tipo 
 Reglas:
 - Primero comprueba que el documento ES del tipo indicado y que se lee. Si no (por ejemplo, subieron una foto donde debía ir la factura, o está ilegible), pon corresponde=false y explica el motivo; no inventes nada. Excepción: la pantalla «Ver Transacción» de GM con estado Aceptado SÍ es una Transacción de planta válida.
 - No inventes: si un dato no aparece, déjalo vacío. Importes en pesos mexicanos, sin símbolo.
+- Revisa el documento contra las reglas de <reglas_del_manual> (vienen del Manual de Políticas y Procedimientos de Garantías GMM 2026 y del curso Administración de Garantías 2026): llena «cumplimiento» con cada regla que aplique a este tipo de documento y di si cumple, no cumple, no aplica o no se puede ver. Sé estricto como un auditor de GM: si un dato obligatorio no se ve, es no_cumple o no_se_puede_ver, nunca cumple. Si una regla no se cumple, menciónalo en el resumen y aprende de ello como lección tipo error (con la regla y su fuente).
 - Si el documento tiene fecha y el expediente trae orden_apertura y orden_cierre, compárala: si cae fuera de la permanencia del vehículo escribe en el resumen «fuera de la permanencia» (GM debita los soportes con fechas fuera de la apertura y el cierre de la orden).
 - Cada auto es distinto: pon "contexto" (modelo, años, km, sistema, operación, pieza) en las lecciones cuando dependan de ello. Lo que cambie cómo armar la siguiente PREA va en "efecto".
 - Escribe en términos generales: NUNCA incluyas nombres de clientes, VIN, folios, órdenes, teléfonos, correos ni datos personales.
@@ -176,12 +190,14 @@ Deno.serve(async (req) => {
   const rule = e.rule_id ? (await sb.from("agency_rules").select("id,sys,op,opd,h,n,rej").eq("id", e.rule_id).maybeSingle()).data : null;
   const ocultar = [e.cliente];
   const bac = (await sb.from("profiles").select("agencies(bac)").eq("id", e.user_id).maybeSingle()).data?.agencies?.bac || null;
+  const reglas = ((await sb.from("manual_reglas").select("id,tema,regla,como_verificar,consecuencia,fuente,pagina").in("seccion_expediente", [tipo, "general"]).order("orden")).data || []);
   const veh = [e.vehicle && !/\(ejemplo\)/i.test(e.vehicle) ? e.vehicle : "", e.km ? Number(e.km).toLocaleString("es-MX") + " km" : ""].filter(Boolean).join(" · ");
 
   /* paso 1 · LEER (la IA, con reintentos; su resultado queda guardado para reanudar sin repetirlo) */
   const ctx = {
     tipo_de_documento_esperado: DOCS[tipo],
     pregunta: GUIA[tipo],
+    reglas_del_manual: reglas.map((r: any) => ({ id: r.id, tema: r.tema, regla: r.regla, verificar: r.como_verificar, si_no_cumple: r.consecuencia, fuente: r.fuente + ", pág. " + r.pagina })),
     orden: { wo: e.wo, orden_apertura: e.orden_apertura, orden_cierre: e.orden_cierre, km: e.km, vin_ultimos_8: e.vin ? String(e.vin).slice(-8) : null, bac_agencia: bac },
     expediente: { sistema: e.sys, operacion: e.op, operacion_desc: e.opd, horas: e.hours, mano_obra_reclamada: e.labor, piezas_reclamadas: e.parts_total, piezas: (Array.isArray(e.parts) ? e.parts : []).slice(0, 12), codigos: e.codes, estado: e.status, vehiculo: veh, texto_del_caso: scrub(e.queja, ocultar, 600), comentario_de_planta: scrub(e.comentario_fabricante, ocultar) },
     cartera: car ? { estado: car.estado, monto: car.monto, estimado: car.estimado, pagado: car.monto_pagado } : null,
@@ -189,7 +205,7 @@ Deno.serve(async (req) => {
   };
   const lee = await run.paso<any>("leer", async () => {
     const r: any = await llamarHerramienta({
-      max_tokens: 3500,
+      max_tokens: 5000,
       system: SYSTEM,
       messages: [{ role: "user", content: [bloque, { type: "text", text: "<expediente>\n" + JSON.stringify(ctx) + "\n</expediente>\nLee el documento y regístralo." }] }],
       tools: [TOOL],
@@ -207,6 +223,11 @@ Deno.serve(async (req) => {
     await run.cerrar(true, { corresponde: false });
     return json({ corresponde: false, motivo: scrub(d.motivo || "No parece ser " + DOCS[tipo], ocultar, 300), run_id: run.id });
   }
+
+  /* la revisión contra el manual: solo reglas conocidas, con su fuente */
+  const RID = new Map(reglas.map((r: any) => [r.id, r]));
+  const cumple = (Array.isArray(d.cumplimiento) ? d.cumplimiento : []).filter((c: any) => RID.has(String(c.regla)) && ["cumple", "no_cumple", "no_aplica", "no_se_puede_ver"].includes(c.estado)).slice(0, 40)
+    .map((c: any) => { const r: any = RID.get(String(c.regla)); return { regla: r.id, tema: r.tema, estado: c.estado, nota: scrub(c.nota, ocultar, 240), fuente: r.fuente + ", pág. " + r.pagina, consecuencia: r.consecuencia }; });
 
   /* paso 2 · CARTERA: la factura y el pago de planta (su disparador crea el evento de aprendizaje de pagos) */
   const pc = await run.paso<string[]>("cartera", async () => {
@@ -278,6 +299,7 @@ Deno.serve(async (req) => {
     if (d.planta) datos.planta = { fecha_pago: d.planta.fecha_pago, labor_reclamada: money(d.planta.labor_reclamada), piezas_reclamadas: money(d.planta.piezas_reclamadas), labor_pagada: money(d.planta.labor_pagada), piezas_pagadas: money(d.planta.piezas_pagadas), total_pagado: money(d.planta.total_pagado), recortes: (Array.isArray(d.planta.recortes) ? d.planta.recortes : []).slice(0, 8).map((x: any) => ({ concepto: scrub(x.concepto, ocultar, 120), motivo: scrub(x.motivo, ocultar, 200) })), comentarios: scrub(d.planta.comentarios, ocultar, 500) };
     if (Array.isArray(d.piezas) && d.piezas.length) datos.piezas = d.piezas.slice(0, 20).map((x: any) => ({ no: clip(x.no, 30), d: clip(x.d, 80), q: Math.max(1, Number(x.q) || 1), pr: money(x.pr) ?? 0 }));
     if (d.contrato) datos.contrato = { firmado: !!d.contrato.firmado, fecha: clip(d.contrato.fecha, 20), condiciones: scrub(d.contrato.condiciones, ocultar, 500) };
+    if (cumple.length) datos.cumplimiento = cumple;
     if (d.evidencia) datos.evidencia = { hechos: scrub(d.evidencia.hechos, ocultar, 600), diagnostico: scrub(d.evidencia.diagnostico, ocultar, 600) };
     const textos = pl.ok && pl.valor ? pl.valor.textos : [];
     const busqueda = norm([DOCS[tipo], tipo, nombre.replace(/\.[a-z0-9]{2,4}$/i, "").replace(/[_-]+/g, " "), e.sys, e.op, e.opd, resumen, JSON.stringify(datos), textos.join(" ")].join(" ")).slice(0, 6000);
@@ -296,5 +318,5 @@ Deno.serve(async (req) => {
   ];
   const ok = run.fallo.length === 0;
   await run.cerrar(ok, { corresponde: true, lecciones: pl.valor ? pl.valor.n : 0, pendiente: run.fallo }, ok ? undefined : "pasos pendientes: " + run.fallo.join(", "));
-  return json({ corresponde: true, resumen, lecciones: pl.valor ? pl.valor.n : 0, textos: pl.valor ? pl.valor.textos : [], aplicado, pendiente: run.fallo, reanudada: run.reanudada, run_id: run.id });
+  return json({ corresponde: true, resumen, cumplimiento: cumple, lecciones: pl.valor ? pl.valor.n : 0, textos: pl.valor ? pl.valor.textos : [], aplicado, pendiente: run.fallo, reanudada: run.reanudada, run_id: run.id });
 });
