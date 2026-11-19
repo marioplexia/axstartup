@@ -1278,6 +1278,22 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .pv-st.bad{color:#b4372b;border-color:color-mix(in srgb,#b4372b 35%,transparent);background:color-mix(in srgb,#b4372b 8%,transparent)}
 .pv-st.wait{color:#b7791f;border-color:color-mix(in srgb,#b7791f 35%,transparent);background:color-mix(in srgb,#b7791f 9%,transparent)}
 .pv-cm{display:inline-flex;align-items:center;gap:8px}.pv-cm i{display:inline-flex;gap:2px}.pv-cm i u{width:7px;height:14px;border-radius:2px;background:var(--card-line);text-decoration:none}.pv-cm i u.on{background:#1f8a4c}.pv-cm.part i u.on{background:#c58a1a}.pv-cm small{font-size:12px;color:var(--muted)}
+.pv-note{margin:0 16px 10px;font-size:12.5px;line-height:1.5;color:var(--muted)}
+.kp.bad b{color:#b4372b}
+.xz{margin:16px 0 4px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);padding:16px 18px}
+.xz-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}.xz-h h3{margin:0;font-size:15px;font-weight:600}.xz-h p{margin:3px 0 0;font-size:12.5px;color:var(--muted);max-width:620px}
+.xz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.xz-box{border:1px solid var(--card-line);border-radius:12px;padding:12px 14px;background:var(--surface)}.xz-box h4{margin:0 0 8px;font-size:13.5px;font-weight:600}
+.xz-row{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--card-line)}.xz-row:first-of-type{border-top:0}
+.xz-row b{display:block;font-size:13px;font-weight:500}.xz-row span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.xz-dot{flex:none;width:10px;height:10px;border-radius:50%;margin-top:4px;background:#9aa0a6}.xz-dot.ok,.xz-dot.done{background:#1f8a4c}.xz-dot.warn{background:#c58a1a}.xz-dot.bad{background:#b4372b}.xz-dot.na{background:transparent;border:2px solid #9aa0a6;width:8px;height:8px}
+.xz-f{margin-top:8px}.xz-f summary{cursor:pointer;font-size:12.5px;font-weight:500;color:var(--fg)}
+.xz-fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-top:10px}.xz-fg label span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.xz-fg input{width:100%;box-sizing:border-box;height:30px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:12.5px;padding:0 6px}
+.xz-v{border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:8px}.xz-v b{display:block;font-weight:600}.xz-v span{font-size:12px;color:var(--muted)}.xz-v ul{margin:6px 0 0;padding-left:18px}.xz-v li{margin:2px 0;font-size:12.5px}
+.xz-v.ok{background:color-mix(in srgb,#1f8a4c 10%,transparent);color:#1a6e3e}.xz-v.bad{background:color-mix(in srgb,#b4372b 9%,transparent);color:#8f2a20}
+.xz-ck{display:grid;gap:5px}.xz-ck label{font-size:12.5px;display:flex;gap:7px;align-items:flex-start;cursor:pointer}.xz-ck input{margin-top:2px}
+.xz-mut{font-size:12px;color:var(--muted);margin:6px 0}
 .pv-empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13.5px}
 @media (max-width:640px){.pv-tb td,.pv-tb th{padding:9px 10px}#pvQ{width:100%}#pvKpi .kp b{font-size:21px;overflow-wrap:anywhere}}
 .ad-ch{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
@@ -2106,6 +2122,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
           <button class="bt" type="button" id="pvCsv">Exportar CSV</button>
         </div>
         <div class="ad-card pv-card"><div class="pv-ch"><h3>Por asesor</h3><span id="pvAsN"></span></div><div class="pv-scroll" id="pvAsT"></div></div>
+        <div class="ad-card pv-card" id="pvDes"></div>
         <div class="ad-card pv-card"><div class="pv-ch"><h3>Expedientes</h3><span id="pvN"></span></div><div class="pv-scroll" id="pvT"></div></div>
       </div>
     </section>
@@ -4132,7 +4149,7 @@ HM.load=async function(){
   try{
     var q=function(t,sel,ord){return SB.c.from(t).select(sel).order(ord,{ascending:false}).limit(2000)};
     var r=await Promise.all([
-      q('expedientes','id,user_id,folio,wo,cliente,sys,status,parts_total,labor,created_at,updated_at,profiles(name)','updated_at'),
+      q('expedientes','id,user_id,folio,wo,cliente,sys,status,parts,parts_total,labor,created_at,updated_at,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,profiles(name)','updated_at'),
       q('piezas_pedido','id,expediente_id,user_id,pieza,cantidad,estado,eta,created_at,expedientes(folio,wo,cliente)','created_at'),
       q('campanas','*','created_at'),
       q('cartera','expediente_id,user_id,estado,monto,facturada_at,pagada_at,monto_pagado,created_at','created_at')]);
@@ -4204,6 +4221,11 @@ HM.actions=function(){
   var E=HM.exp(),now=Date.now(),L=[];
   var add=function(n,t,go){if(n>0)L.push({n:n,t:t,go:go})};
   add(E.filter(function(x){return x.status==='borrador'}).length,'PREAs esperan la respuesta del fabricante: márcalas como aceptadas o rechazadas','exp');
+  var carOf={};(HM.d.car||[]).forEach(function(c){carOf[c.expediente_id]=c});
+  var PZE=E.map(function(x){return PZ.list(x,null,carOf[x.id])});
+  add(PZE.filter(function(L){return L.some(function(i){return i.st==='bad'&&i.k!=='des'})}).length,'expedientes con un plazo del manual de GM vencido (cobro en GWM, PRA, WPC o débito)',PV.is()?'pv':'exp');
+  add(PZE.filter(function(L){return L.some(function(i){return i.st==='warn'&&i.k!=='des'})&&!L.some(function(i){return i.st==='bad'&&i.k!=='des'})}).length,'expedientes con un plazo del manual por vencer',PV.is()?'pv':'exp');
+  add(PZE.filter(function(L){return L.some(function(i){return i.k==='des'&&i.st!=='ok'&&i.st!=='done'})}).length,'expedientes con partes listas para destruir (jornada '+PZ.jornada(new Date())+')',PV.is()?'pv':'exp');
   var C=HM.mine(HM.d.car);
   add(C.filter(function(x){return x.estado==='por_facturar'}).length,'PREAs aceptadas por facturar','cartera');
   add(C.filter(function(x){return x.estado==='facturada'&&x.facturada_at&&(now-new Date(x.facturada_at))/DAYMS>CAR.PLAZO}).length,'facturas vencidas por cobrar','cartera');
@@ -5689,11 +5711,12 @@ XD.open=function(id){
   XD.cur=x;XD.mode='exp';var el=$('#exDoc');
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div></div>'+
-    '<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
+    '<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
   XD.qLoad(x.id);
+  XD.ctl=null;XD.ctlLoad(x).catch(function(e){console.warn('[control GM]',e)});
   XD.formInit(x);
 };
 XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera',pv=XD.from==='pv';$('#exDoc').hidden=true;$(pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true)};
@@ -6445,6 +6468,164 @@ function ctxToRec(c){
   return {ruleId:c.ruleId||null,sys:c.matched?c.sys:'Por clasificar',q:c.matched?k.q:['NUEVA',(t.length>60?t.slice(0,57).replace(/\s+\S*$/,'')+'…':t).toUpperCase()],c:k.c,r:k.r,op:c.op,opd:c.opd,h:c.h,parts:c.parts,kwText:t,src:'asesor',advisor:SB.user?SB.user.name:'asesor'};
 }
 
+/* ===== Control del manual GM: plazos (semáforo), ¿lleva PRA?, destrucción de partes y expediente para auditoría ===== */
+var PZ={DAY:864e5};
+PZ.d=function(v){if(!v)return null;var s=String(v);var d=new Date(/^\d{4}-\d{2}-\d{2}$/.test(s)?s+'T12:00:00':s);return isNaN(d)?null:d};
+PZ.add=function(d,days){return new Date(d.getTime()+days*PZ.DAY)};
+PZ.f=function(d){return d?d.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'}):''};
+PZ.left=function(due){var ms=due-Date.now(),h=Math.round(ms/36e5);if(Math.abs(h)<48)return (ms<0?'venció hace ':'faltan ')+Math.abs(h)+' h';var d=Math.round(ms/PZ.DAY);return ms<0?'venció hace '+(-d)+(d===-1?' día':' días'):'faltan '+d+(d===1?' día':' días')};
+PZ.acep=function(x){return PZ.d(x.transaccion_aceptada_at)||(x.status==='aceptada'?PZ.d(x.updated_at||x.created_at):null)};
+PZ.hasParts=function(x){return Array.isArray(x.parts)&&x.parts.length>0};
+/* sec: secciones con archivos {contrato:1,...} (si no se conoce, se omite el plazo de digitalización); car: fila de cartera */
+PZ.list=function(x,sec,car){
+  var L=[],now=Date.now(),cierre=PZ.d(x.orden_cierre);
+  var it=function(k,label,ref,start,days,done,doneTxt,warnDays){
+    if(done){L.push({k:k,label:label,ref:ref,st:'done',txt:doneTxt});return}
+    if(!start){L.push({k:k,label:label,ref:ref,st:'na',txt:'Captura la fecha de cierre de la orden'});return}
+    var due=PZ.add(start,days),rest=(due-now)/PZ.DAY;
+    L.push({k:k,label:label,ref:ref,due:due,st:rest<0?'bad':rest<=warnDays?'warn':'ok',txt:'Vence '+PZ.f(due)+' · '+PZ.left(due)});
+  };
+  if(sec){var req=XD.DOCS.filter(function(d){return d[3]==='req'}),ok=req.filter(function(d){return sec[d[0]]}).length;
+    it('dig','Digitalizar el expediente (15 días tras la entrega)','Manual GM 4.4',cierre,15,ok===req.length,'Completo: '+ok+' de '+req.length+' secciones',4)}
+  var cob=PZ.d(x.gwm_cobrada_at)||(car&&(car.estado==='facturada'||car.estado==='pagada')?PZ.d(car.facturada_at||car.pagada_at):null);
+  if(x.status!=='rechazada')it('gwm','Cobrar la transacción en GWM (60 días tras el cierre)','Curso M5.07 y M5.08',cierre,60,!!cob,'Cobrada '+PZ.f(cob),10);
+  var pr=PZ.d(x.pra_rechazada_at);
+  if(pr)it('pra','Completar la PRA rechazada (72 h)','Curso M5.03',pr,3,!!x.pra_corregida_at,'Corregida '+PZ.f(PZ.d(x.pra_corregida_at)),1);
+  var wl=PZ.d(x.wpc_etiqueta_at);
+  if(wl)it('wpc','Enviar la pieza al WPC (15 días tras imprimir la etiqueta)','Curso M6.06 y M6.07',wl,15,!!x.wpc_enviada_at,'Enviada '+PZ.f(PZ.d(x.wpc_enviada_at)),5);
+  var db=PZ.d(x.debito_at);
+  if(db)it('deb','Pedir la devolución de la parte debitada (5 días)','Curso M6.09',db,5,!!x.debito_resuelto_at,'Atendido '+PZ.f(PZ.d(x.debito_resuelto_at)),2);
+  var ac=PZ.acep(x);
+  if(ac&&PZ.hasParts(x)){
+    if(x.partes_destruidas_at)L.push({k:'des',label:'Destrucción de partes',ref:'Curso M3.10',st:'done',txt:'Destruidas '+PZ.f(PZ.d(x.partes_destruidas_at))});
+    else{var lib=PZ.add(ac,16),dd=(now-lib)/PZ.DAY;
+      L.push({k:'des',label:'Destrucción de partes (resguardo de 15 días)',ref:'Curso M3.08 y M3.10',due:lib,st:dd<0?'ok':dd>14?'bad':'warn',
+        txt:dd<0?'En resguardo hasta '+PZ.f(PZ.add(ac,15))+' (por si el WPC la pide)':'Lista para destruir desde '+PZ.f(lib)+' · próxima jornada '+PZ.jornada(new Date())});}
+  }
+  return L;
+};
+PZ.RANK={bad:4,warn:3,na:2,ok:1,done:0};
+PZ.worst=function(L){var w=null;L.forEach(function(i){if(!w||PZ.RANK[i.st]>PZ.RANK[w.st])w=i});return w};
+/* jornadas de destrucción: segunda (días 8 a 14) y cuarta semana (22 a 28) de cada mes */
+PZ.jornadas=function(desde,n){var out=[],d=new Date(desde.getFullYear(),desde.getMonth(),1);
+  while(out.length<n){[[8,14],[22,28]].forEach(function(r){var a=new Date(d.getFullYear(),d.getMonth(),r[0]),b=new Date(d.getFullYear(),d.getMonth(),r[1],23,59);if(b>=desde&&out.length<n)out.push([a,b])});d=new Date(d.getFullYear(),d.getMonth()+1,1)}
+  return out};
+PZ.jornada=function(desde){var j=PZ.jornadas(desde,1)[0],m=function(x){return x.toLocaleDateString('es-MX',{day:'numeric',month:'short'})};return j[0]<=desde?'esta semana (hasta '+m(j[1])+')':m(j[0])+' al '+m(j[1])};
+
+/* ¿lleva PRA? (Curso Administración de Garantías M2.16, M5.02, M5.06 y M5.09) */
+var PRA={};
+PRA.TM=/motor|transmis|eje|diferencial|caja de transfer|tren motriz/i;
+PRA.Q=[['pintura','Reparación de pintura mayor a $10,000 antes de IVA'],['tot','TOT autorizado mayor a $1,500'],['tot_no','TOT no autorizado o no descrito en el manual'],['tiempo','Tiempo adicional no publicado en SI'],['canal','Vehículo de un canal diferente'],['nar_tm','Parte de tren motriz comprada por proceso NAR'],['nogm','Parte No GM (mercado independiente)'],['ev','Batería de propulsión o alto voltaje (EV)'],['politica','Política de garantía (fuera de la garantía regular)'],['bateria_sub','Reemplazo subsecuente de batería (2.º o más)'],['turista','Reembolso de reparación en el extranjero (turista)'],['especial','Caso especial: Buyback, Goodwill o movilidad']];
+PRA.auto=function(x,prev){
+  var R=[],tm=PRA.TM.test([x.sys,x.op,x.opd].join(' '));
+  if(tm&&Number(x.km)>0&&Number(x.km)<5000)R.push('Vehículo de nuevo lanzamiento con menos de 5,000 km y falla en tren motriz');
+  (prev||[]).length&&(function(){
+    var pn=(Array.isArray(x.parts)?x.parts:[]).map(function(p){return String(p.no||'').trim()}).filter(Boolean);
+    var rep=prev.filter(function(o){return (o.sys&&o.sys===x.sys)||(o.op&&o.op===x.op)||(Array.isArray(o.parts)&&o.parts.some(function(p){return pn.indexOf(String(p.no||'').trim())>=0}))});
+    if(rep.length)R.push((tm?'Trabajo repetido o reincidencia en tren motriz':'Trabajo repetido (misma queja, mismo código o misma parte)')+' · antes: '+rep.slice(0,3).map(function(o){return o.folio}).join(', '));
+  })();
+  return R;
+};
+PRA.result=function(x,prev){var c=x.pra_check||{},R=PRA.auto(x,prev);PRA.Q.forEach(function(q){if(c[q[0]])R.push(q[1])});return R};
+/* aviso para el chat del Agente de Garantías al armar la PREA (sin historial del VIN) */
+PRA.note=function(ctx){
+  var t=norm([ctx.rawText,ctx.queja,ctx.sys,ctx.opd].join(' ')),R=[];
+  var tm=PRA.TM.test([ctx.sys,ctx.opd,ctx.rawText].join(' '));
+  if(tm&&Number(ctx.km)>0&&Number(ctx.km)<5000)R.push('vehículo con menos de 5,000 km y falla en tren motriz');
+  if(/\b(pintura|hojalateria)\b/.test(t))R.push('si la pintura supera $10,000 antes de IVA');
+  if(/\btot\b|otro taller|cristal|escape|vestidura|cerradura|corte de llave/.test(t))R.push('si el TOT supera $1,500 o no está en el manual');
+  if(/\bno gm\b|mercado independiente|generica/.test(t))R.push('si usas una parte No GM');
+  if(/\bnar\b|oeconnection/.test(t)&&tm)R.push('si la parte de tren motriz se compra por NAR');
+  if(/reincid|repetid|otra vez|de nuevo|volvio|regreso/.test(t))R.push(tm?'por ser reincidencia en tren motriz':'por ser trabajo repetido');
+  if(/electric|alto voltaje|bateria de propulsion|\bev\b/.test(t))R.push('si es batería de propulsión o alto voltaje');
+  return R.length?'\n\n> **¿Lleva PRA?** Según el manual de GM pide preautorización antes de reparar: '+R.join('; ')+'. Revísalo también en el expediente, que busca reincidencias del VIN.':'';
+};
+
+/* ---- tarjeta en el expediente ---- */
+XD.ctlLoad=async function(x){
+  var box=$('#xdCtl');if(!box||!SB.c)return;
+  var r=await Promise.all([SB.c.rpc('expediente_secciones',{p_ids:[x.id]}),
+    x.vin?SB.c.from('expedientes').select('id,folio,sys,op,parts,created_at').eq('vin',x.vin).neq('id',x.id).order('created_at',{ascending:false}).limit(20):Promise.resolve({data:[]}),
+    SB.c.from('cartera').select('estado,facturada_at,pagada_at').eq('expediente_id',x.id).maybeSingle()]);
+  if(!XD.cur||XD.cur.id!==x.id)return;
+  var sec={};(r[0].data||[]).forEach(function(s){if(String(s.expediente_id)===String(x.id))sec[s.seccion]=s.archivos});
+  XD.ctl={sec:sec,prev:(r[1].data||[]).filter(function(o){return String(o.id)!==String(x.id)}),car:r[2].data||null};XD.ctlRender(x);
+};
+XD.F=[['orden_apertura','Apertura de la orden','date'],['orden_cierre','Cierre de la orden (entrega)','date'],['transaccion_aceptada_at','Transacción aceptada en GWM','date'],['gwm_cobrada_at','Cobrada en GWM','date'],['pra_rechazada_at','PRA rechazada','datetime-local'],['pra_corregida_at','PRA corregida','datetime-local'],['wpc_etiqueta_at','Etiqueta WPC impresa','date'],['wpc_enviada_at','Pieza enviada al WPC','date'],['debito_at','Débito aplicado','date'],['debito_resuelto_at','Débito atendido','date'],['partes_destruidas_at','Partes destruidas','date']];
+XD.ctlRender=function(x){
+  var box=$('#xdCtl');if(!box)return;var C=XD.ctl||{},L=PZ.list(x,C.sec,C.car),R=PRA.result(x,C.prev);
+  var val=function(f){var v=x[f[0]];if(!v)return '';return f[2]==='date'?String(v).slice(0,10):(function(d){var p=function(n){return ('0'+n).slice(-2)};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'T'+p(d.getHours())+':'+p(d.getMinutes())})(new Date(v))};
+  var c=x.pra_check||{};
+  box.innerHTML='<div class="xz-h"><div><h3>Control del manual GM</h3><p>Plazos, preautorización y destrucción de partes según el Manual de Políticas y Procedimientos y el curso Administración de Garantías 2026</p></div><button class="bt pri" type="button" data-xz="pdf">Armar expediente para auditoría (PDF)</button></div>'+
+    '<div class="xz-grid"><div class="xz-box"><h4>Plazos</h4>'+(L.length?L.map(function(i){return '<div class="xz-row"><i class="xz-dot '+i.st+'"></i><div><b>'+esc(i.label)+'</b><span>'+esc(i.txt)+' · '+esc(i.ref)+'</span></div></div>'}).join(''):'<p class="xz-mut">Sin plazos activos.</p>')+
+    '<details class="xz-f"'+(x.orden_cierre?'':' open')+'><summary>Fechas del expediente</summary><div class="xz-fg">'+XD.F.map(function(f){return '<label><span>'+f[1]+'</span><input type="'+f[2]+'" data-xzf="'+f[0]+'" value="'+ea(val(f))+'"></label>'}).join('')+'</div></details></div>'+
+    '<div class="xz-box"><h4>¿Lleva PRA?</h4><div class="xz-v '+(R.length?'bad':'ok')+'">'+(R.length?'<b>Requiere preautorización antes de reparar</b><ul>'+R.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ul>':'<b>No requiere PRA</b><span>La agencia es auto-autorizable para lo demás (Curso M5.06)</span>')+'</div>'+
+    '<p class="xz-mut">Marca lo que aplique a esta reparación (el reingreso del mismo VIN y los km se revisan solos):</p><div class="xz-ck">'+PRA.Q.map(function(q){return '<label><input type="checkbox" data-xzc="'+q[0]+'"'+(c[q[0]]?' checked':'')+'> '+esc(q[1])+'</label>'}).join('')+'</div></div></div>';
+};
+XD.ctlSave=async function(patch){
+  var x=XD.cur;if(!x)return;Object.assign(x,patch);XD.ctlRender(x);
+  var r=await SB.c.from('expedientes').update(patch).eq('id',x.id);if(r.error){SB.fail(r.error);toast('No se pudo guardar')}else toast('Guardado')
+};
+document.addEventListener('change',function(e){
+  var t=e.target;if(!XD.cur||!t.closest||!t.closest('#xdCtl'))return;
+  if(t.dataset.xzf){var f=t.dataset.xzf,o={};o[f]=t.value?(t.type==='date'?t.value:new Date(t.value).toISOString()):null;XD.ctlSave(o)}
+  else if(t.dataset.xzc){var c=Object.assign({},XD.cur.pra_check||{});if(t.checked)c[t.dataset.xzc]=true;else delete c[t.dataset.xzc];XD.ctlSave({pra_check:c})}
+});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-xz="pdf"]');if(b&&XD.cur)XD.pdf(XD.cur,b)});
+
+/* ---- expediente para auditoría: un PDF con todo, nombrado como pide GM (VEHÍCULO_VIN_O.R._COMPONENTE) ---- */
+XD.pdfLib=function(){if(window.PDFLib)return Promise.resolve(window.PDFLib);return new Promise(function(ok,ko){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';s.onload=function(){ok(window.PDFLib)};s.onerror=function(){ko(new Error('No se pudo cargar el generador de PDF'))};document.head.appendChild(s)})};
+XD.pdfName=function(x){
+  var cl=function(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().replace(/\(EJEMPLO\)/g,'').replace(/[^A-Z0-9]+/g,'-').replace(/^-+|-+$/g,'')};
+  var comp=(Array.isArray(x.parts)&&x.parts[0]&&x.parts[0].d)||x.opd||x.sys||'COMPONENTE';
+  return [cl(x.vehicle)||'VEHICULO',cl(x.vin)||'SIN-VIN',cl(x.wo)||'SIN-OR',cl(comp).slice(0,40)].join('_')+'.pdf';
+};
+XD.pdf=async function(x,btn){
+  var C=XD.ctl||{},sec=C.sec||{},req=XD.DOCS.filter(function(d){return d[3]==='req'});
+  var falta=req.filter(function(d){return !sec[d[0]]}).map(function(d){return d[1]}),avisos=[];
+  if(!x.orden_apertura||!x.orden_cierre)avisos.push('Faltan las fechas de apertura y cierre de la orden: no se puede comprobar que los documentos estén dentro de la permanencia.');
+  try{var lc=await SB.c.from('entrenamiento_docs').select('file_name,resultado,resumen').eq('kind','expediente').eq('folio',x.folio).limit(60);
+    (lc.data||[]).forEach(function(d){if(/fuera de (la )?permanencia|fuera del (periodo|tiempo)|fuera de (las )?fechas|no coincide|falta|faltan|ilegible|sin firma|a mano|tachad/i.test(d.resumen||''))avisos.push((XD.DOCS.filter(function(k){return k[0]===d.resultado})[0]||[0,d.resultado])[1]+' · '+d.file_name+': '+String(d.resumen).slice(0,220))})}catch(_){}
+  if((falta.length||avisos.length)&&!confirm('Antes de armar el expediente:\n\n'+(falta.length?'Faltan secciones obligatorias: '+falta.join(', ')+'.\n\n':'')+(avisos.length?'Avisos del cerebro:\n• '+avisos.slice(0,6).join('\n• ')+'\n\n':'')+'¿Armar el PDF de todos modos?'))return;
+  var t0=btn.textContent;btn.disabled=true;btn.textContent='Armando el PDF…';
+  try{
+    var P=await XD.pdfLib(),doc=await P.PDFDocument.create(),font=await doc.embedFont(P.StandardFonts.Helvetica),bold=await doc.embedFont(P.StandardFonts.HelveticaBold);
+    var W=612,H=792,safe=function(s){return String(s==null?'':s).replace(/[✓✔]/g,'OK').replace(/[·•]/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/[^\x20-\x7E\xA0-\xFF]/g,'')};
+    var pg=doc.addPage([W,H]),y=H-56;
+    var line=function(s,o){o=o||{};var f=o.b?bold:font,sz=o.s||10.5,words=safe(s).split(' '),cur='';
+      var out=function(t){if(y<60){pg=doc.addPage([W,H]);y=H-56}pg.drawText(t,{x:o.x||56,y:y,size:sz,font:f,color:o.c||P.rgb(.1,.1,.12)});y-=sz*1.45};
+      words.forEach(function(w){var n=cur?cur+' '+w:w;if(f.widthOfTextAtSize(n,sz)>W-112-(o.x?o.x-56:0)){out(cur);cur=w}else cur=n});if(cur)out(cur)};
+    line('Expediente de garantía',{b:1,s:20});y-=4;
+    line('Nombre del archivo: '+XD.pdfName(x),{s:9.5,c:P.rgb(.4,.4,.45)});y-=8;
+    [['Folio',x.folio],['Orden de reparación',x.wo],['VIN',x.vin],['Vehículo',x.vehicle],['Kilometraje',x.km?Number(x.km).toLocaleString('es-MX')+' km':''],['Sistema / operación',[x.sys,x.op,x.opd].filter(Boolean).join(' - ')],['Apertura de la orden',x.orden_apertura],['Cierre de la orden',x.orden_cierre],['Condición reportada',String(x.queja||'').slice(0,300)]].forEach(function(r){line(r[0]+': '+(r[1]||'-'))});
+    y-=10;line('Contenido según el manual de GM',{b:1,s:13});
+    var files=[];
+    for(var i=0;i<XD.DOCS.length;i++){var d=XD.DOCS[i],ls=await SB.c.storage.from(XD.B).list(x.id+'/'+d[0],{limit:100,sortBy:{column:'created_at',order:'asc'}}),L2=(ls.data||[]).filter(function(f){return f.name&&f.name!=='.emptyFolderPlaceholder'});
+      if(L2.length||d[3]==='req')line((L2.length?'[OK] ':'[FALTA] ')+d[1]+(L2.length?' ('+L2.length+(L2.length===1?' archivo':' archivos')+')':'')+(d[2]?' - '+d[2]:''),{s:10});
+      L2.forEach(function(f){files.push({sec:d[1],path:x.id+'/'+d[0]+'/'+f.name,name:f.name.replace(/^\d+_/,'')})})}
+    if(avisos.length){y-=8;line('Avisos',{b:1,s:13});avisos.forEach(function(a){line('- '+a,{s:9.5})})}
+    var omit=[];
+    for(var k=0;k<files.length;k++){var f=files[k];btn.textContent='Agregando '+(k+1)+' de '+files.length+'…';
+      var dl=await SB.c.storage.from(XD.B).download(f.path);if(dl.error||!dl.data){omit.push(f.name+' (no se pudo descargar)');continue}
+      var buf=new Uint8Array(await dl.data.arrayBuffer()),ext=(/\.([a-z0-9]+)$/i.exec(f.name)||[])[1];ext=(ext||'').toLowerCase();
+      try{
+        if(ext==='pdf'){var src=await P.PDFDocument.load(buf,{ignoreEncryption:true}),cp=await doc.copyPages(src,src.getPageIndices());cp.forEach(function(p){doc.addPage(p)})}
+        else if(/^(jpe?g|png|webp|gif)$/.test(ext)){
+          var img;if(/jpe?g/.test(ext))img=await doc.embedJpg(buf);else if(ext==='png')img=await doc.embedPng(buf);
+          else{var bm=await createImageBitmap(dl.data),cv=document.createElement('canvas');cv.width=bm.width;cv.height=bm.height;cv.getContext('2d').drawImage(bm,0,0);img=await doc.embedPng(await (await fetch(cv.toDataURL('image/png'))).arrayBuffer())}
+          var ip=doc.addPage([W,H]),sc=Math.min((W-72)/img.width,(H-110)/img.height,1);
+          ip.drawText(safe(f.sec+' - '+f.name).slice(0,95),{x:36,y:H-40,size:10,font:bold});
+          ip.drawImage(img,{x:(W-img.width*sc)/2,y:(H-60-img.height*sc)/2,width:img.width*sc,height:img.height*sc});
+        }else omit.push(f.name+' ('+(ext||'archivo')+': consérvalo en la carpeta electrónica)');
+      }catch(err){omit.push(f.name+' (no se pudo incluir)')}
+    }
+    if(omit.length){pg=doc.addPage([W,H]);y=H-56;line('Archivos que no entran en el PDF',{b:1,s:13});omit.forEach(function(o){line('- '+o,{s:10})})}
+    var bytes=await doc.save(),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));a.download=XD.pdfName(x);document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);toast('Expediente listo: '+XD.pdfName(x));
+  }catch(e){console.error(e);toast((e&&e.message)||'No se pudo armar el PDF')}
+  btn.disabled=false;btn.textContent=t0;
+};
+
 /* ===== Tablero de posventa (gerente de posventa): todos los expedientes de su agencia ===== */
 var PV={rows:[],car:{},sec:{},q:'',as:'',st:'',inc:false,sort:'fecha',dir:-1,loading:false,t:0};
 PV.is=function(){return !!(SB.user&&SB.user.gerente)};
@@ -6464,7 +6645,7 @@ PV.load=async function(quiet){
   if(quiet&&Date.now()-PV.t<1500)return;PV.t=Date.now();
   if(!quiet){PV.loading=true;PV.render()}
   var r=await Promise.all([
-    SB.c.from('expedientes').select('id,folio,wo,vin,user_id,sys,queja,status,parts_total,labor,vehicle,comentario_fabricante,created_at,updated_at,profiles(name)').order('created_at',{ascending:false}).limit(1000),
+    SB.c.from('expedientes').select('id,folio,wo,vin,user_id,sys,op,queja,status,parts,parts_total,labor,vehicle,km,comentario_fabricante,created_at,updated_at,orden_apertura,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,profiles(name)').order('created_at',{ascending:false}).limit(1000),
     SB.c.from('cartera').select('expediente_id,estado,monto,monto_pagado,facturada_at,pagada_at').limit(2000)]);
   PV.loading=false;
   if(r[0].error){SB.fail(r[0].error);PV.rows=[]}else PV.rows=r[0].data||[];
@@ -6481,6 +6662,7 @@ PV.amt=function(x){return Number(x.labor||0)+Number(x.parts_total||0)};
 PV.who=function(x){return (x.profiles&&x.profiles.name)||'Sin asesor'};
 PV.ST={borrador:['Esperando planta','wait'],aceptada:['Aceptada','ok'],rechazada:['Rechazada','bad']};
 PV.cob=function(x){var c=PV.car[x.id];if(!c)return '';if(c.estado==='pagada')return 'Pagada';if(c.estado==='facturada'){var d=c.facturada_at?Math.floor((Date.now()-new Date(c.facturada_at))/864e5):0;return d>(typeof CAR!=='undefined'&&CAR.PLAZO||30)?'Vencida · '+d+' días':'Facturada'}return 'Por facturar'};
+PV.pz=function(x){return PZ.list(x,PV.sec[x.id]||{},PV.car[x.id])};
 PV.days=function(x){return Math.max(0,Math.floor((Date.now()-new Date(x.created_at))/864e5))};
 PV.list=function(){
   var q=norm(PV.q);
@@ -6490,7 +6672,7 @@ PV.list=function(){
     if(PV.inc&&PV.comp(x).n===PV.comp(x).of)return false;
     if(q&&norm([x.folio,x.wo,x.vin,x.queja,x.sys,x.vehicle,PV.who(x)].join(' ')).indexOf(q)<0)return false;
     return true});
-  var k=PV.sort,d=PV.dir,val=function(x){return k==='folio'?String(x.folio||''):k==='asesor'?PV.who(x):k==='sys'?String(x.sys||''):k==='estado'?String(x.status||''):k==='monto'?PV.amt(x):k==='exp'?PV.comp(x).n:k==='cob'?PV.cob(x):k==='dias'?PV.days(x):String(x.created_at)};
+  var k=PV.sort,d=PV.dir,val=function(x){return k==='folio'?String(x.folio||''):k==='asesor'?PV.who(x):k==='sys'?String(x.sys||''):k==='estado'?String(x.status||''):k==='monto'?PV.amt(x):k==='exp'?PV.comp(x).n:k==='cob'?PV.cob(x):k==='pz'?PZ.RANK[(PZ.worst(PV.pz(x))||{st:'done'}).st]:k==='dias'?PV.days(x):String(x.created_at)};
   return L.sort(function(a,b){var A=val(a),B=val(b);return (A<B?-1:A>B?1:0)*d});
 };
 PV.render=function(){
@@ -6511,7 +6693,9 @@ PV.render=function(){
     K('Tasa de aceptación',tasa==null?'—':tasa+'%',acc.length+' aceptadas · '+rej.length+' rechazadas',tasa!=null&&tasa<80?'warn':'ok')+
     K('Monto aceptado',EX.money(acc.reduce(function(a,x){return a+PV.amt(x)},0)),'mano de obra + piezas')+
     K('Por cobrar a planta',EX.money(porCobrar),nc+' cuentas'+(venc?' · '+venc+' vencidas':''),venc?'warn':'')+
-    K('Expedientes completos',R.length?Math.round(comp*100/R.length)+'%':'—',comp+' de '+R.length+' con las 6 secciones del manual',R.length&&comp<R.length?'warn':'ok');
+    K('Expedientes completos',R.length?Math.round(comp*100/R.length)+'%':'—',comp+' de '+R.length+' con las 6 secciones del manual',R.length&&comp<R.length?'warn':'ok')+
+    (function(){var v=0,w=0;R.forEach(function(x){var L=PV.pz(x).filter(function(i){return i.k!=='des'});if(L.some(function(i){return i.st==='bad'}))v++;else if(L.some(function(i){return i.st==='warn'}))w++});return K('Plazos del manual',v?v+' vencidos':w?w+' por vencer':'Al día',v?'cobro GWM, digitalización, PRA, WPC o débito':w?'revisa la columna Plazos':'ningún plazo vencido',v?'bad':w?'warn':'ok')})();
+  PV.destRender();
   /* por asesor */
   var A={};R.forEach(function(x){var n=PV.who(x),o=A[n]||(A[n]={n:0,a:0,r:0,m:0,c:0});o.n++;if(x.status==='aceptada'){o.a++;o.m+=PV.amt(x)}if(x.status==='rechazada')o.r++;var cc=PV.comp(x);if(cc.n===cc.of)o.c++});
   var an=Object.keys(A).sort(function(a,b){return A[b].n-A[a].n});
@@ -6519,13 +6703,24 @@ PV.render=function(){
   $('#pvAsT').innerHTML=an.length?'<table class="pv-tb"><thead><tr><th>Asesor</th><th class="r">Expedientes</th><th class="r">Aceptadas</th><th class="r">Rechazadas</th><th class="r">Aceptación</th><th class="r">Monto aceptado</th><th class="r">Completos</th></tr></thead><tbody>'+
     an.map(function(n){var o=A[n],t=o.a+o.r?Math.round(o.a*100/(o.a+o.r))+'%':'—';return '<tr data-as="'+ea(n)+'" tabindex="0"><td><b>'+esc(n)+'</b></td><td class="r">'+o.n+'</td><td class="r">'+o.a+'</td><td class="r">'+o.r+'</td><td class="r">'+t+'</td><td class="r">'+EX.money(o.m)+'</td><td class="r">'+o.c+' de '+o.n+'</td></tr>'}).join('')+'</tbody></table>':'<div class="pv-empty">'+(PV.loading?'Cargando…':'Todavía no hay expedientes en la agencia.')+'</div>';
   /* expedientes */
-  var L=PV.list(),H=[['folio','Folio'],['orden','Orden'],['asesor','Asesor'],['sys','Sistema'],['estado','Estado'],['monto','Monto','r'],['exp','Expediente (manual GM)'],['cob','Cobranza'],['fecha','Fecha'],['dias','Días','r']];
+  var L=PV.list(),H=[['folio','Folio'],['orden','Orden'],['asesor','Asesor'],['sys','Sistema'],['estado','Estado'],['monto','Monto','r'],['exp','Expediente (manual GM)'],['pz','Plazos'],['cob','Cobranza'],['fecha','Fecha'],['dias','Días','r']];
   $('#pvN').textContent=L.length===R.length?R.length+' en total':L.length+' de '+R.length;
   $('#pvT').innerHTML=L.length?'<table class="pv-tb"><thead><tr>'+H.map(function(h){var on=PV.sort===h[0];return '<th'+(h[2]?' class="r"':'')+' data-sort="'+h[0]+'"'+(on?' aria-sort="'+(PV.dir>0?'ascending':'descending')+'"':'')+'>'+h[1]+'</th>'}).join('')+'</tr></thead><tbody>'+
     L.map(function(x){var st=PV.ST[x.status]||PV.ST.borrador,c=PV.comp(x),seg='';for(var i=0;i<c.of;i++)seg+='<u'+(i<c.n?' class="on"':'')+'></u>';
       return '<tr data-id="'+ea(x.id)+'" tabindex="0" title="'+ea(c.faltan.length?'Falta: '+c.faltan.join(', '):'Expediente completo según el manual')+'"><td><b>'+esc(x.folio||'—')+'</b></td><td>'+esc(x.wo||'—')+'</td><td>'+esc(PV.who(x))+'</td><td>'+esc(x.sys||'—')+'</td><td><span class="pv-st '+st[1]+'">'+st[0]+'</span></td><td class="r">'+EX.money(PV.amt(x))+'</td>'+
-        '<td><span class="pv-cm'+(c.n<c.of?' part':'')+'"><i aria-hidden="true">'+seg+'</i><small>'+c.n+'/'+c.of+'</small></span></td><td>'+esc(PV.cob(x)||'—')+'</td><td>'+new Date(x.created_at).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'2-digit'})+'</td><td class="r">'+PV.days(x)+'</td></tr>'}).join('')+'</tbody></table>'
+        '<td><span class="pv-cm'+(c.n<c.of?' part':'')+'"><i aria-hidden="true">'+seg+'</i><small>'+c.n+'/'+c.of+'</small></span></td><td>'+(function(){var w=PZ.worst(PV.pz(x));if(!w)return '<span class="pv-st">—</span>';var m={bad:['Vencido','bad'],warn:['Por vencer','wait'],na:['Sin fechas',''],ok:['En tiempo','ok'],done:['Al día','ok']}[w.st];return '<span class="pv-st '+m[1]+'" title="'+ea(w.label+': '+w.txt)+'">'+m[0]+'</span>'})()+'</td><td>'+esc(PV.cob(x)||'—')+'</td><td>'+new Date(x.created_at).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'2-digit'})+'</td><td class="r">'+PV.days(x)+'</td></tr>'}).join('')+'</tbody></table>'
     :'<div class="pv-empty">'+(PV.loading?'Cargando…':R.length?'Ningún expediente coincide con los filtros.':'Todavía no hay expedientes en la agencia.')+'</div>';
+};
+PV.destRender=function(){
+  var el=$('#pvDes');if(!el)return;var now=new Date();
+  var L=PV.rows.filter(function(x){return PZ.acep(x)&&PZ.hasParts(x)&&!x.partes_destruidas_at}).map(function(x){var ac=PZ.acep(x);return {x:x,ac:ac,lib:PZ.add(ac,16)}}).sort(function(a,b){return a.lib-b.lib});
+  var listas=L.filter(function(o){return o.lib<=now}),res=L.filter(function(o){return o.lib>now});
+  var J=PZ.jornadas(now,2).map(function(j){return j[0].toLocaleDateString('es-MX',{day:'numeric',month:'short'})+' al '+j[1].toLocaleDateString('es-MX',{day:'numeric',month:'short'})});
+  var row=function(o,lista){var p=o.x.parts.slice(0,3).map(function(q){return (q.q||1)+'× '+(q.d||q.no)}).join(', ')+(o.x.parts.length>3?' y '+(o.x.parts.length-3)+' más':'');
+    return '<tr data-id="'+ea(o.x.id)+'" tabindex="0"><td><b>'+esc(o.x.folio||'—')+'</b></td><td>'+esc(PV.who(o.x))+'</td><td class="q">'+esc(p)+'</td><td>'+PZ.f(o.ac)+'</td><td>'+(lista?'<span class="pv-st '+((now-o.lib)/PZ.DAY>14?'bad':'wait')+'">Destruir</span>':'<span class="pv-st">Resguardo hasta '+PZ.f(PZ.add(o.ac,15))+'</span>')+'</td><td><button class="bt" type="button" data-des="'+ea(o.x.id)+'">Marcar destruidas</button></td></tr>'};
+  el.innerHTML='<div class="pv-ch"><h3>Destrucción de partes</h3><span>Próximas jornadas: '+esc(J.join(' · '))+'</span></div>'+
+    '<p class="pv-note">Las partes se resguardan 15 días desde que GM acepta la transacción (por si el WPC las pide) y se destruyen en la segunda o cuarta semana del mes, en presencia del Gerente de Servicio, con fotos antes y después que muestren la etiqueta (Curso M3.08 y M3.10). Las baterías van al almacén de residuos peligrosos.</p>'+
+    (L.length?'<div class="pv-scroll"><table class="pv-tb"><thead><tr><th>Folio</th><th>Asesor</th><th>Partes</th><th>Aceptada</th><th>Estado</th><th></th></tr></thead><tbody>'+listas.map(function(o){return row(o,true)}).join('')+res.map(function(o){return row(o,false)}).join('')+'</tbody></table></div>':'<div class="pv-empty">No hay partes en resguardo pendientes de destruir.</div>');
 };
 PV.open=async function(id){
   var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];
@@ -6535,7 +6730,7 @@ PV.open=async function(id){
 };
 PV.csv=function(){
   var L=PV.list(),q=function(v){v=String(v==null?'':v);return /[",\n;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
-  var rows=[['Folio','Orden','Asesor','Sistema','Estado','Mano de obra','Piezas','Total','Secciones obligatorias','Faltan','Cobranza','Fecha','Días','Queja']].concat(L.map(function(x){var c=PV.comp(x);return [x.folio,x.wo,PV.who(x),x.sys,(PV.ST[x.status]||PV.ST.borrador)[0],Number(x.labor||0).toFixed(2),Number(x.parts_total||0).toFixed(2),PV.amt(x).toFixed(2),c.n+'/'+c.of,c.faltan.join(' | '),PV.cob(x),String(x.created_at).slice(0,10),PV.days(x),x.queja]}));
+  var rows=[['Folio','Orden','Asesor','Sistema','Estado','Mano de obra','Piezas','Total','Secciones obligatorias','Faltan','Plazos','Cobranza','Fecha','Días','Queja']].concat(L.map(function(x){var c=PV.comp(x);return [x.folio,x.wo,PV.who(x),x.sys,(PV.ST[x.status]||PV.ST.borrador)[0],Number(x.labor||0).toFixed(2),Number(x.parts_total||0).toFixed(2),PV.amt(x).toFixed(2),c.n+'/'+c.of,c.faltan.join(' | '),PV.pz(x).filter(function(i){return i.st==='bad'||i.st==='warn'}).map(function(i){return i.label+': '+i.txt}).join(' | '),PV.cob(x),String(x.created_at).slice(0,10),PV.days(x),x.queja]}));
   var blob=new Blob(['﻿'+rows.map(function(r){return r.map(q).join(',')}).join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='expedientes_'+(SB.agency||'agencia').replace(/[^\w]+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
 };
@@ -6548,6 +6743,7 @@ PV.csv=function(){
   $('#pvCsv').addEventListener('click',PV.csv);
   $('#pvAgent').addEventListener('click',function(){showView('posventa')});
   var act=function(e){
+    var dz=e.target.closest('[data-des]');if(dz){e.stopPropagation();if(!confirm('¿Confirmas que las partes de este expediente ya se destruyeron y tienes las fotos de antes y después?'))return;var id=dz.dataset.des,hoy=new Date().toISOString().slice(0,10);SB.c.from('expedientes').update({partes_destruidas_at:hoy}).eq('id',id).then(function(r){if(r.error){SB.fail(r.error);return}var x=PV.rows.filter(function(z){return z.id===id})[0];if(x)x.partes_destruidas_at=hoy;PV.render();toast('Partes marcadas como destruidas')});return}
     var th=e.target.closest('th[data-sort]');if(th){var k=th.dataset.sort;if(PV.sort===k)PV.dir=-PV.dir;else{PV.sort=k;PV.dir=k==='fecha'||k==='monto'||k==='dias'?-1:1}PV.render();return}
     var tr=e.target.closest('tr[data-id]');if(tr){PV.open(tr.dataset.id);return}
     var ta2=e.target.closest('tr[data-as]');if(ta2){PV.as=ta2.dataset.as;$('#pvAs').value=PV.as;PV.render();$('#pvT').scrollIntoView({behavior:'smooth',block:'start'})}
@@ -7303,7 +7499,7 @@ async function run(text,files){
   RS.note(ctx.matched);
   try{await LS.apply(ctx)}catch(_){}
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
-  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(evi?'\n\n> **Evidencia inspeccionada** ('+evi.archivos+(evi.archivos===1?' archivo':' archivos')+'): '+evi.resumen+(evi.inconsistencias.length?' **Ojo:** '+evi.inconsistencias.join('; '):''):'')+(brain?'\n\n### Lo que sabe el cerebro para tu PREA\n'+brain:'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
+  var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+PRA.note(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(evi?'\n\n> **Evidencia inspeccionada** ('+evi.archivos+(evi.archivos===1?' archivo':' archivos')+'): '+evi.resumen+(evi.inconsistencias.length?' **Ojo:** '+evi.inconsistencias.join('; '):''):'')+(brain?'\n\n### Lo que sabe el cerebro para tu PREA\n'+brain:'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
   if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;GP.nPrea++;GP.caseText=text;GP.remember(text,w._text);GP.suggest(w,[{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'¿Cuánto pagará planta?',q:'¿Cuánto crees que pagará planta por esto?'}])}
   finish(my);
 }
