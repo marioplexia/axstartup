@@ -1278,6 +1278,7 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .pv-st.bad{color:#b4372b;border-color:color-mix(in srgb,#b4372b 35%,transparent);background:color-mix(in srgb,#b4372b 8%,transparent)}
 .pv-st.wait{color:#b7791f;border-color:color-mix(in srgb,#b7791f 35%,transparent);background:color-mix(in srgb,#b7791f 9%,transparent)}
 .pv-cm{display:inline-flex;align-items:center;gap:8px}.pv-cm i{display:inline-flex;gap:2px}.pv-cm i u{width:7px;height:14px;border-radius:2px;background:var(--card-line);text-decoration:none}.pv-cm i u.on{background:#1f8a4c}.pv-cm.part i u.on{background:#c58a1a}.pv-cm small{font-size:12px;color:var(--muted)}
+#pvKpi,#grpBody>.ad-kpi{grid-template-columns:repeat(4,minmax(0,1fr))}@media (max-width:980px){#pvKpi,#grpBody>.ad-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .pv-note{margin:0 16px 10px;font-size:12.5px;line-height:1.5;color:var(--muted)}
 .kp.bad b{color:#b4372b}
 .xz{margin:16px 0 4px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);padding:16px 18px}
@@ -1297,6 +1298,11 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .xd-rev{margin:2px 0 10px 46px;padding:8px 10px;border-radius:10px;font-size:12.5px;line-height:1.45}.xd-rev.ok{background:color-mix(in srgb,#1f8a4c 9%,transparent);color:#1a6e3e}.xd-rev.bad{background:color-mix(in srgb,#b4372b 7%,transparent)}
 .xd-rev b{font-weight:600}.xd-rev span{color:var(--muted)}.xd-rev ul{margin:6px 0 0;padding-left:16px}.xd-rev li{margin:3px 0}.xd-rev small{color:var(--muted)}
 .xd-rev em{font-style:normal;font-weight:600;font-size:11.5px;margin-right:4px}.xd-rev em.bad{color:#b4372b}.xd-rev em.warn{color:#b7791f}
+.xz-deb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.xz-deb input{height:30px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:12.5px;padding:0 8px}.xz-deb input[type=number]{width:170px}.xz-deb input:not([type]){flex:1;min-width:200px}.xz-deb label.bt{display:inline-flex;align-items:center}
+.xz-dact{display:flex!important;gap:8px;align-items:center;margin-top:6px}.xz-dact select,.xz-dact input{height:28px;border:1px solid var(--card-line);border-radius:7px;background:var(--card);color:var(--fg);font:inherit;font-size:12px}.xz-dact input{width:110px}
+.red-r{padding:12px 16px;border-top:1px solid var(--card-line)}.red-r:first-child{border-top:0}.red-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.red-h b{font-size:13px}.red-h span{font-size:13px;font-weight:500}.red-h em{font-style:normal;font-size:12px;color:#b4372b;margin-left:auto}
+.red-r p{margin:4px 0;font-size:13px;line-height:1.5}.red-r small{font-size:12px;color:var(--muted);line-height:1.45;display:block}
+.kp.warn b{color:#b7791f}
 .xz-mut{font-size:12px;color:var(--muted);margin:6px 0}
 .pv-empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13.5px}
 @media (max-width:640px){.pv-tb td,.pv-tb th{padding:9px 10px}#pvQ{width:100%}#pvKpi .kp b{font-size:21px;overflow-wrap:anywhere}}
@@ -1949,6 +1955,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
       </div>
       <div class="sb-scroll">
         <div class="grp" data-pv-nav style="margin-top:6px" hidden>Posventa</div>
+        <button class="nav" data-pv-nav data-dir-nav data-view="grp" data-i="folderchart" hidden>Tablero de grupo</button>
         <button class="nav" data-pv-nav data-view="pv" data-i="chart" hidden>Tablero de posventa</button>
         <button class="nav" data-pv-nav data-view="posventa" data-i="chat" hidden>Agente de Posventa</button>
         <div class="grp" data-nm style="margin-top:6px">Agentes</div>
@@ -1959,6 +1966,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <button class="nav" data-nm data-view="bitacora" data-i="clip">Bitácora</button>
         <button class="nav" data-nm data-view="notas" data-i="note">Notas</button>
         <button class="nav" data-nm data-view="exp" data-i="folderopen">Expedientes</button>
+        <button class="nav" data-nm data-view="red" data-i="clip">Red de reglas</button>
         <button class="nav" data-nm data-view="cobros" data-i="dollar">Agente de Cobros</button>
         <button class="nav" data-nm data-view="cartera" data-i="wallet">Agente de Cartera</button>
         <div class="grp" data-mr-nav style="margin-top:6px" hidden>Marca</div>
@@ -2118,6 +2126,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         </div>
         <div class="ad-kpi" id="pvKpi"></div>
         <div class="ad-bar" id="pvBar">
+          <label hidden>Agencia <select id="pvAg"><option value="">Todas</option></select></label>
           <label>Asesor <select id="pvAs"><option value="">Todos</option></select></label>
           <label>Estado <select id="pvSt"><option value="">Todos</option><option value="borrador">Esperando planta</option><option value="aceptada">Aceptadas</option><option value="rechazada">Rechazadas</option></select></label>
           <label><input type="checkbox" id="pvInc"> Solo expedientes incompletos</label>
@@ -2126,8 +2135,22 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
           <button class="bt" type="button" id="pvCsv">Exportar CSV</button>
         </div>
         <div class="ad-card pv-card"><div class="pv-ch"><h3>Por asesor</h3><span id="pvAsN"></span></div><div class="pv-scroll" id="pvAsT"></div></div>
+        <div class="ad-card pv-card" id="pvDeb"></div>
         <div class="ad-card pv-card" id="pvDes"></div>
         <div class="ad-card pv-card"><div class="pv-ch"><h3>Expedientes</h3><span id="pvN"></span></div><div class="pv-scroll" id="pvT"></div></div>
+      </div>
+    </section>
+    <section class="admin" id="viewGrp" hidden>
+      <div class="ad-in">
+        <div class="ad-head"><div><h2>Tablero de grupo</h2><p id="grpSub">Todas las agencias del grupo</p></div></div>
+        <div id="grpBody"></div>
+      </div>
+    </section>
+    <section class="admin" id="viewRed" hidden>
+      <div class="ad-in">
+        <div class="ad-head"><div><h2>Red de reglas</h2><p id="redSub">Lo que la red aprendió de los manuales de GM y de cada débito real</p></div>
+          <input type="search" id="redQ" placeholder="Buscar regla, tema o sección" aria-label="Buscar reglas"></div>
+        <div id="redBody"></div>
       </div>
     </section>
     <section class="admin nt" id="viewNotas" hidden><div class="ad-in nt-in" id="ntBody"></div></section>
@@ -2330,17 +2353,19 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){if(!MI.due().length){toast('Sin avisos pendientes');return}showView('mi');MI.send('¿Qué tengo pendiente?')});
 
-var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa'};
+var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Red de reglas'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='pv'){crumb.textContent=VIEWS.pv;crumbSep.hidden=true;crumb2.hidden=true;PV.load()}
+  else if(id==='grp'){crumb.textContent=VIEWS.grp;crumbSep.hidden=true;crumb2.hidden=true;GRP.load()}
+  else if(id==='red'){crumb.textContent=VIEWS.red;crumbSep.hidden=true;crumb2.hidden=true;RED.load()}
   else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
   else if(id==='cfg'){crumb.textContent=VIEWS.cfg;crumbSep.hidden=true;crumb2.hidden=true;CFG.open()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
@@ -2355,7 +2380,7 @@ $('#expBtn').addEventListener('click',function(){showView('exp')});
    (la política "profiles update own" ya deja a cada quien editar su fila;
    el trigger profiles_guard impide tocar role y brand). */
 var CFG={};
-CFG.ROL={asesor:'Asesor de garantías',admin:'Administrador de agencia',marca:'Administrador de marca',gerente:'Gerente de posventa'};
+CFG.ROL={asesor:'Asesor de garantías',admin:'Administrador de agencia',marca:'Administrador de marca',gerente:'Gerente de posventa',director:'Director de grupo'};
 CFG.msg=function(id,t,bad){var m=$('#'+id);if(!m)return;m.textContent=t||'';m.className='cf-msg'+(t?(bad?' bad':' ok'):'')};
 CFG.theme=function(){try{return localStorage.getItem('ax_theme')||'auto'}catch(_){return 'auto'}};
 CFG.applyTheme=function(v){
@@ -4156,8 +4181,8 @@ HM.load=async function(){
       q('expedientes','id,user_id,folio,wo,cliente,sys,status,parts,parts_total,labor,created_at,updated_at,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,profiles(name)','updated_at'),
       q('piezas_pedido','id,expediente_id,user_id,pieza,cantidad,estado,eta,created_at,expedientes(folio,wo,cliente)','created_at'),
       q('campanas','*','created_at'),
-      q('cartera','expediente_id,user_id,estado,monto,facturada_at,pagada_at,monto_pagado,created_at','created_at')]);
-    r.forEach(function(x){if(x.error)throw x.error});
+      q('cartera','expediente_id,user_id,estado,monto,facturada_at,pagada_at,monto_pagado,created_at','created_at'),RED.load()]);
+    r.forEach(function(x){if(x&&x.error)throw x.error});
     HM.d={exp:r[0].data,pie:r[1].data,cam:r[2].data,car:r[3].data};HM.loaded=Date.now();
   }catch(e){SB.fail(e)}
   HM.loading=false;if(S.view==='inicio')HM.render();
@@ -4225,6 +4250,7 @@ HM.actions=function(){
   var E=HM.exp(),now=Date.now(),L=[];
   var add=function(n,t,go){if(n>0)L.push({n:n,t:t,go:go})};
   add(E.filter(function(x){return x.status==='borrador'}).length,'PREAs esperan la respuesta del fabricante: márcalas como aceptadas o rechazadas','exp');
+  add(RED.nuevas(14).length,'reglas nuevas que la red aprendió de débitos reales en otras agencias: el cerebro ya revisa tus expedientes con ellas','red');
   var carOf={};(HM.d.car||[]).forEach(function(c){carOf[c.expediente_id]=c});
   var PZE=E.map(function(x){return PZ.list(x,null,carOf[x.id])});
   add(PZE.filter(function(L){return L.some(function(i){return i.st==='bad'&&i.k!=='des'})}).length,'expedientes con un plazo del manual de GM vencido (cobro en GWM, PRA, WPC o débito)',PV.is()?'pv':'exp');
@@ -6411,8 +6437,9 @@ SB.loadAdvisors=async function(){
   }
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
   if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;try{var au=await SB.c.auth.getUser();SB.email=au&&au.data&&au.data.user&&au.data.user.email||''}catch(_){}SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
-    me.gerente=me.role==='gerente';
-    MR.nav(!!me.marca);PV.nav(me.gerente);
+    me.director=me.role==='director';me.gerente=me.role==='gerente'||me.director;
+    if(me.director){try{var gq=await SB.c.from('agencies').select('grupos(nombre)').eq('id',me.agency_id).maybeSingle();SB.grupo=gq.data&&gq.data.grupos&&gq.data.grupos.nombre||'Tu grupo'}catch(_){}}
+    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
@@ -6425,7 +6452,7 @@ SB.enter=async function(user){
     await SB.pull(true);
     SB.loadHist();GP.load();
     MI.loadAgenda().then(MI.startTimer);
-    showView(MR.is()?'m_res':PV.is()?'pv':'inicio');
+    showView(MR.is()?'m_res':SB.user&&SB.user.director?'grp':PV.is()?'pv':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
       if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
@@ -6565,11 +6592,12 @@ XD.ctlLoad=async function(x){
   var r=await Promise.all([SB.c.rpc('expediente_secciones',{p_ids:[x.id]}),
     x.vin?SB.c.from('expedientes').select('id,folio,sys,op,parts,created_at').eq('vin',x.vin).neq('id',x.id).order('created_at',{ascending:false}).limit(20):Promise.resolve({data:[]}),
     SB.c.from('cartera').select('estado,facturada_at,pagada_at').eq('expediente_id',x.id).maybeSingle(),
-    x.folio?SB.c.from('entrenamiento_docs').select('file_name,resultado,datos,created_at').eq('kind','expediente').eq('folio',x.folio).order('created_at',{ascending:false}).limit(80):Promise.resolve({data:[]})]);
+    x.folio?SB.c.from('entrenamiento_docs').select('file_name,resultado,datos,created_at').eq('kind','expediente').eq('folio',x.folio).order('created_at',{ascending:false}).limit(80):Promise.resolve({data:[]}),
+    SB.c.from('debitos').select('id,fecha,monto,motivo,estado,monto_revertido,regla_id,regla_nueva').eq('expediente_id',x.id).order('created_at',{ascending:false})]);
   if(!XD.cur||XD.cur.id!==x.id)return;
   var sec={};(r[0].data||[]).forEach(function(s){if(String(s.expediente_id)===String(x.id))sec[s.seccion]=s.archivos});
   var rev=[];(r[3].data||[]).forEach(function(d){var C=d.datos&&d.datos.cumplimiento;if(Array.isArray(C))C.forEach(function(c){rev.push(Object.assign({archivo:d.file_name,seccion:d.resultado},c))})});
-  XD.ctl={sec:sec,prev:(r[1].data||[]).filter(function(o){return String(o.id)!==String(x.id)}),car:r[2].data||null,rev:rev};XD.ctlRender(x);
+  XD.ctl={sec:sec,prev:(r[1].data||[]).filter(function(o){return String(o.id)!==String(x.id)}),car:r[2].data||null,rev:rev,deb:(r[4]&&r[4].data)||[]};XD.ctlRender(x);
 };
 XD.F=[['orden_apertura','Apertura de la orden','date'],['orden_cierre','Cierre de la orden (entrega)','date'],['transaccion_aceptada_at','Transacción aceptada en GWM','date'],['gwm_cobrada_at','Cobrada en GWM','date'],['pra_rechazada_at','PRA rechazada','datetime-local'],['pra_corregida_at','PRA corregida','datetime-local'],['wpc_etiqueta_at','Etiqueta WPC impresa','date'],['wpc_enviada_at','Pieza enviada al WPC','date'],['debito_at','Débito aplicado','date'],['debito_resuelto_at','Débito atendido','date'],['partes_destruidas_at','Partes destruidas','date']];
 XD.ctlRender=function(x){
@@ -6580,7 +6608,7 @@ XD.ctlRender=function(x){
     '<div class="xz-grid"><div class="xz-box"><h4>Plazos</h4>'+(L.length?L.map(function(i){return '<div class="xz-row"><i class="xz-dot '+i.st+'"></i><div><b>'+esc(i.label)+'</b><span>'+esc(i.txt)+' · '+esc(i.ref)+'</span></div></div>'}).join(''):'<p class="xz-mut">Sin plazos activos.</p>')+
     '<details class="xz-f"'+(x.orden_cierre?'':' open')+'><summary>Fechas del expediente</summary><div class="xz-fg">'+XD.F.map(function(f){return '<label><span>'+f[1]+'</span><input type="'+f[2]+'" data-xzf="'+f[0]+'" value="'+ea(val(f))+'"></label>'}).join('')+'</div></details></div>'+
     '<div class="xz-box"><h4>¿Lleva PRA?</h4><div class="xz-v '+(R.length?'bad':'ok')+'">'+(R.length?'<b>Requiere preautorización antes de reparar</b><ul>'+R.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ul>':'<b>No requiere PRA</b><span>La agencia es auto-autorizable para lo demás (Curso M5.06)</span>')+'</div>'+
-    '<p class="xz-mut">Marca lo que aplique a esta reparación (el reingreso del mismo VIN y los km se revisan solos):</p><div class="xz-ck">'+PRA.Q.map(function(q){return '<label><input type="checkbox" data-xzc="'+q[0]+'"'+(c[q[0]]?' checked':'')+'> '+esc(q[1])+'</label>'}).join('')+'</div></div>'+XD.revBox(C.rev||[])+'</div>';
+    '<p class="xz-mut">Marca lo que aplique a esta reparación (el reingreso del mismo VIN y los km se revisan solos):</p><div class="xz-ck">'+PRA.Q.map(function(q){return '<label><input type="checkbox" data-xzc="'+q[0]+'"'+(c[q[0]]?' checked':'')+'> '+esc(q[1])+'</label>'}).join('')+'</div></div>'+XD.revBox(C.rev||[])+DEB.box(x,C.deb)+'</div>';
 };
 XD.revBox=function(rev){
   var nom=function(k){return (XD.DOCS.filter(function(d){return d[0]===k})[0]||[0,k])[1]};
@@ -6654,6 +6682,95 @@ XD.pdf=async function(x,btn){
   btn.disabled=false;btn.textContent=t0;
 };
 
+/* ===== Débitos que se vuelven reglas para toda la red · dinero recuperado · tablero de grupo ===== */
+var DEB={ST:{debitado:['Debitado','bad'],en_controversia:['En controversia','wait'],revertido:['Revertido','ok'],aceptado:['Aceptado (perdido)','']}};
+DEB.mx=function(n){return '$'+Number(n||0).toLocaleString('es-MX',{maximumFractionDigits:0})};
+/* tarjeta en el expediente: registrar el débito de GM y su seguimiento */
+DEB.box=function(x,list){
+  var L=list||[];
+  return '<div class="xz-box xz-wide" id="xdDeb"><h4>Débitos de GM</h4>'+
+    (L.length?'<div class="xz-rv">'+L.map(function(d){var st=DEB.ST[d.estado]||DEB.ST.debitado;return '<div class="xz-row"><i class="xz-dot '+(st[1]==='ok'?'ok':st[1]==='wait'?'warn':'bad')+'"></i><div><b>'+DEB.mx(d.monto)+' · '+esc(d.motivo||'Débito')+'</b><span>'+(d.fecha?PZ.f(PZ.d(d.fecha))+' · ':'')+(d.regla_id?'Regla '+esc(d.regla_id)+(d.regla_nueva?' (nueva, ya protege a toda la red)':' (reforzada en la red)'):'')+'</span>'+
+      '<span class="xz-dact"><select data-debst="'+ea(d.id)+'">'+Object.keys(DEB.ST).map(function(k){return '<option value="'+k+'"'+(k===d.estado?' selected':'')+'>'+DEB.ST[k][0]+'</option>'}).join('')+'</select>'+(d.estado==='revertido'?' <label>Revertido $<input type="number" min="0" step="0.01" data-debrev="'+ea(d.id)+'" value="'+ea(d.monto_revertido||d.monto||0)+'"></label>':'')+'</span></div></div>'}).join('')+'</div>':'<p class="xz-mut">Si GM debita esta transacción, sube aquí la notificación (correo, pantalla de GWM o carta de auditoría). El cerebro encuentra la causa, la convierte en regla y desde ese momento revisa los expedientes de todas las agencias para que no vuelva a pasar.</p>')+
+    '<div class="xz-deb"><label class="bt" for="xdDebF">Subir notificación del débito</label><input type="file" id="xdDebF" accept=".pdf,image/*,.txt,.eml,.xml" hidden>'+
+    '<input type="number" id="xdDebM" min="0" step="0.01" placeholder="Monto debitado (opcional)"><input id="xdDebT" placeholder="O escribe el motivo que dio GM"><button class="bt pri" type="button" id="xdDebGo">Registrar débito</button></div><p class="xz-mut" id="xdDebMsg" role="status"></p></div>';
+};
+DEB.enviar=async function(){
+  var x=XD.cur;if(!x)return;var fi=$('#xdDebF'),file=fi&&fi.files&&fi.files[0],texto=($('#xdDebT').value||'').trim(),monto=$('#xdDebM').value,msg=$('#xdDebMsg'),btn=$('#xdDebGo');
+  if(!file&&!texto){msg.textContent='Sube la notificación o escribe el motivo del débito.';return}
+  btn.disabled=true;msg.textContent='El cerebro está leyendo el débito y buscando la regla…';
+  try{
+    var f=null;if(file){f=/\.(txt|eml|xml)$/i.test(file.name)?{name:file.name,text:await file.text()}:await TR.prep(file)}
+    var r=await SB.ai({expediente_id:x.id,file:f||undefined,texto:texto||undefined,monto:monto?Number(monto):undefined},'debito');
+    if(r&&r.es_debito===false){msg.textContent=r.motivo||'No parece un débito de GM.';btn.disabled=false;return}
+    var g=r.regla||{};
+    msg.innerHTML='<b>'+(g.nueva?'Regla nueva '+esc(g.id)+' para toda la red':'Se reforzó la regla '+esc(g.id))+'</b>: '+esc(g.tema||'')+'. '+esc(r.como_evitarlo||'')+(g.veces>1?' Ya van '+g.veces+' débitos por esta causa en '+g.agencias+(g.agencias===1?' agencia':' agencias')+'.':'');
+    XD.ctlLoad(x).catch(function(){});
+  }catch(e){SB.fail(e);msg.textContent='No se pudo registrar: '+TR.errTxt(e)}
+  btn.disabled=false;
+};
+document.addEventListener('click',function(e){if(e.target&&e.target.id==='xdDebGo')DEB.enviar()});
+document.addEventListener('change',function(e){
+  var t=e.target;if(!t.dataset)return;
+  if(t.id==='xdDebF'&&t.files[0]){var m=$('#xdDebMsg');if(m)m.textContent='Archivo: '+t.files[0].name}
+  if(t.dataset.debst){var p={estado:t.value};if(t.value==='revertido')p.revertido_at=new Date().toISOString().slice(0,10);
+    SB.c.from('debitos').update(p).eq('id',t.dataset.debst).then(function(r){if(r.error)SB.fail(r.error);else{toast('Guardado');if(XD.cur)XD.ctlLoad(XD.cur);if(S.view==='pv')PV.load(true);if(S.view==='grp')GRP.load()}})}
+  if(t.dataset.debrev){SB.c.from('debitos').update({monto_revertido:Number(t.value)||0}).eq('id',t.dataset.debrev).then(function(r){if(r.error)SB.fail(r.error);else toast('Monto revertido guardado')})}
+});
+
+/* ---- la red de reglas: lo que la red aprendió de débitos reales + el manual ---- */
+var RED={rows:[],q:'',f:'debito'};
+RED.SEC={general:'Todo el expediente',contrato:'Orden de garantía',recepcion:'Recepción',diagnostico:'Diagnóstico',evidencia:'Evidencia',piezas:'Refacciones y eSPOM',destruccion:'Destrucción',actualizacion:'PRA',bateria:'Batería 12V',facturas_partes:'Facturas TOT/NAR/No GM',tac:'TAC',mantenimiento:'Mantenimientos',m2:'Formato M2',wpc:'WPC',factura:'Factura a planta',planta:'Transacción de planta'};
+RED.load=async function(){
+  if(!SB.c||!SB.entered)return;
+  var r=await SB.c.from('manual_reglas').select('id,seccion_expediente,tema,regla,como_verificar,consecuencia,fuente,pagina,origen,veces,monto_debitado,agencias,ultima_vez,creada_at').order('orden');
+  if(r.error){SB.fail(r.error);return}RED.rows=r.data||[];RED.render();
+};
+RED.nuevas=function(dias){var lim=Date.now()-dias*PZ.DAY;return RED.rows.filter(function(r){return r.origen==='debito'&&r.ultima_vez&&new Date(r.ultima_vez)>=lim})};
+RED.render=function(){
+  var el=$('#redBody');if(!el)return;
+  var D=RED.rows.filter(function(r){return r.origen==='debito'}).sort(function(a,b){return new Date(b.ultima_vez||0)-new Date(a.ultima_vez||0)}),M=RED.rows.filter(function(r){return r.origen!=='debito'});
+  var q=norm(RED.q),L=(RED.f==='debito'?D:M).filter(function(r){return !q||norm([r.id,r.tema,r.regla,RED.SEC[r.seccion_expediente]].join(' ')).indexOf(q)>=0});
+  var tot=D.reduce(function(a,r){return a+Number(r.monto_debitado||0)},0),ag=D.reduce(function(a,r){return a+Number(r.agencias||0)},0);
+  $('#redSub').textContent=RED.rows.length+' reglas: '+M.length+' del manual de GM y '+D.length+' aprendidas de débitos reales'+(tot?' ('+DEB.mx(tot)+' debitados que ya no deben repetirse)':'');
+  el.innerHTML='<div class="ad-kpi"><div class="kp"><span>Reglas aprendidas de débitos</span><b>'+D.length+'</b><small>'+RED.nuevas(14).length+' en las últimas 2 semanas</small></div><div class="kp"><span>Débitos que las originaron</span><b>'+D.reduce(function(a,r){return a+Number(r.veces||0)},0)+'</b><small>'+ag+(ag===1?' agencia afectada':' casos por agencia')+'</small></div><div class="kp bad"><span>Monto debitado en la red</span><b>'+DEB.mx(tot)+'</b><small>la revisión de cada expediente ya los vigila</small></div><div class="kp"><span>Reglas del manual de GM</span><b>'+M.length+'</b><small>Manual 2026 y curso de garantías</small></div></div>'+
+    '<div class="ad-bar"><label>Ver <select id="redF"><option value="debito"'+(RED.f==='debito'?' selected':'')+'>Aprendidas de débitos</option><option value="manual"'+(RED.f==='manual'?' selected':'')+'>Del manual de GM</option></select></label><span class="sp"></span></div>'+
+    '<div class="ad-card">'+(L.length?L.map(function(r){return '<div class="red-r"><div class="red-h"><b>'+esc(r.id)+'</b><span>'+esc(RED.SEC[r.seccion_expediente]||r.seccion_expediente)+' · '+esc(r.tema)+'</span>'+(r.origen==='debito'?'<em>'+r.veces+(r.veces===1?' débito':' débitos')+' · '+r.agencias+(r.agencias===1?' agencia':' agencias')+' · '+DEB.mx(r.monto_debitado)+'</em>':'')+'</div><p>'+esc(r.regla)+'</p><small>Cómo se revisa: '+esc(r.como_verificar||'—')+' · Si no se cumple: '+esc(r.consecuencia||'—')+' · '+esc(r.fuente)+(r.pagina?', pág. '+r.pagina:'')+'</small></div>'}).join(''):'<div class="pv-empty">'+(RED.f==='debito'?'Todavía no hay débitos registrados. Cuando una agencia suba un débito de GM, aquí aparece la regla que protege a todas las demás.':'Sin resultados.')+'</div>')+'</div>';
+};
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='redF'){RED.f=e.target.value;RED.render()}});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='redQ'){RED.q=e.target.value;RED.render()}});
+
+/* ---- dinero recuperado (función dinero_recuperado: respeta lo que cada quien puede ver) ---- */
+var DR={rows:[]};
+DR.load=async function(){var r=await SB.c.rpc('dinero_recuperado',{p_desde:null});if(r.error){console.warn('[dinero recuperado]',r.error.message);DR.rows=[];return DR.rows}DR.rows=r.data||[];return DR.rows};
+DR.sum=function(rows,k){return (rows||DR.rows).reduce(function(a,x){return a+Number(x[k]||0)},0)};
+DR.kpi=function(rows){
+  var R=rows||DR.rows,prot=DR.sum(R,'monto_protegido'),rev=DR.sum(R,'monto_revertido'),deb=DR.sum(R,'monto_debitado');
+  return '<div class="kp ok"><span>Dinero recuperado</span><b>'+DEB.mx(prot+rev)+'</b><small>'+DEB.mx(prot)+' protegido antes de cobrar · '+DEB.mx(rev)+' de débitos revertidos</small></div>'+
+    '<div class="kp'+(deb?' bad':'')+'"><span>Débitos de GM</span><b>'+DEB.mx(deb)+'</b><small>'+(function(n,m){return n+(n===1?' débito':' débitos')+' · '+m+(m===1?' revertido':' revertidos')})(DR.sum(R,'debitos'),DR.sum(R,'revertidos'))+'</small></div>';
+};
+
+/* ---- director de grupo: todas las agencias comparadas ---- */
+var GRP={};
+GRP.load=async function(){
+  if(!SB.c||!SB.entered)return;$('#grpSub').textContent='Cargando las agencias del grupo…';
+  await Promise.all([DR.load(),PV.rows.length?Promise.resolve():PV.load(true),RED.rows.length?Promise.resolve():RED.load()]);
+  GRP.render();
+};
+GRP.render=function(){
+  var el=$('#grpBody');if(!el)return;
+  var A={};DR.rows.forEach(function(d){A[d.agency_id]={id:d.agency_id,name:d.agencia,dr:d,n:0,a:0,r:0,comp:0,venc:0,monto:0}});
+  PV.rows.forEach(function(x){var ag=x.profiles&&x.profiles.agency_id;if(ag==null)return;var o=A[ag]||(A[ag]={id:ag,name:(x.profiles.agencies&&x.profiles.agencies.name)||'Agencia '+ag,dr:{},n:0,a:0,r:0,comp:0,venc:0,monto:0});
+    o.n++;if(x.status==='aceptada'){o.a++;o.monto+=PV.amt(x)}if(x.status==='rechazada')o.r++;var c=PV.comp(x);if(c.n===c.of)o.comp++;if(PV.pz(x).some(function(i){return i.st==='bad'&&i.k!=='des'}))o.venc++});
+  var L=Object.keys(A).map(function(k){return A[k]}).sort(function(a,b){return (b.dr.monto_debitado||0)-(a.dr.monto_debitado||0)||b.n-a.n});
+  $('#grpSub').textContent=(SB.grupo||'Tu grupo')+' · '+L.length+(L.length===1?' agencia':' agencias')+' · '+PV.rows.length+' expedientes';
+  var nuevas=RED.nuevas(14);
+  el.innerHTML='<div class="ad-kpi">'+DR.kpi()+'<div class="kp"><span>Expedientes completos</span><b>'+(PV.rows.length?Math.round(L.reduce(function(a,o){return a+o.comp},0)*100/PV.rows.length)+'%':'—')+'</b><small>con las 6 secciones del manual</small></div><div class="kp'+(L.some(function(o){return o.venc})?' warn':' ok')+'"><span>Plazos vencidos</span><b>'+L.reduce(function(a,o){return a+o.venc},0)+'</b><small>cobro GWM, PRA, WPC o débito</small></div></div>'+
+    (nuevas.length?'<div class="ad-card pv-card"><div class="pv-ch"><h3>La red aprendió</h3><span>'+nuevas.length+(nuevas.length===1?' regla nueva':' reglas nuevas')+' de débitos en 2 semanas</span></div>'+nuevas.slice(0,4).map(function(r){return '<div class="red-r"><div class="red-h"><b>'+esc(r.id)+'</b><span>'+esc(RED.SEC[r.seccion_expediente]||'')+' · '+esc(r.tema)+'</span><em>'+r.veces+(r.veces===1?' débito':' débitos')+' · '+DEB.mx(r.monto_debitado)+'</em></div><p>'+esc(r.regla)+'</p></div>'}).join('')+'</div>':'')+
+    '<div class="ad-card pv-card"><div class="pv-ch"><h3>Agencias del grupo</h3><span>toca una para ver sus expedientes</span></div><div class="pv-scroll"><table class="pv-tb"><thead><tr><th>Agencia</th><th class="r">Expedientes</th><th class="r">Aceptación</th><th class="r">Monto aceptado</th><th class="r">Completos</th><th class="r">Plazos vencidos</th><th class="r">Débitos</th><th class="r">Recuperado</th></tr></thead><tbody>'+
+    (L.length?L.map(function(o){var t=o.a+o.r?Math.round(o.a*100/(o.a+o.r))+'%':'—',d=o.dr||{};return '<tr data-grpag="'+ea(o.id)+'" tabindex="0"><td><b>'+esc(o.name)+'</b></td><td class="r">'+o.n+'</td><td class="r">'+t+'</td><td class="r">'+EX.money(o.monto)+'</td><td class="r">'+o.comp+' de '+o.n+'</td><td class="r">'+(o.venc?'<span class="pv-st bad">'+o.venc+'</span>':'0')+'</td><td class="r">'+(d.debitos?d.debitos+' · '+DEB.mx(d.monto_debitado):'0')+'</td><td class="r"><b>'+DEB.mx(Number(d.monto_protegido||0)+Number(d.monto_revertido||0))+'</b></td></tr>'}).join(''):'<tr><td colspan="8" class="pv-empty">Todavía no hay expedientes en el grupo.</td></tr>')+'</tbody></table></div></div>';
+};
+document.addEventListener('click',function(e){var tr=e.target.closest&&e.target.closest('tr[data-grpag]');if(!tr)return;PV.ag=Number(tr.dataset.grpag);showView('pv')});
+
 /* ===== Tablero de posventa (gerente de posventa): todos los expedientes de su agencia ===== */
 var PV={rows:[],car:{},sec:{},q:'',as:'',st:'',inc:false,sort:'fecha',dir:-1,loading:false,t:0};
 PV.is=function(){return !!(SB.user&&SB.user.gerente)};
@@ -6673,8 +6790,11 @@ PV.load=async function(quiet){
   if(quiet&&Date.now()-PV.t<1500)return;PV.t=Date.now();
   if(!quiet){PV.loading=true;PV.render()}
   var r=await Promise.all([
-    SB.c.from('expedientes').select('id,folio,wo,vin,user_id,sys,op,queja,status,parts,parts_total,labor,vehicle,km,comentario_fabricante,created_at,updated_at,orden_apertura,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,profiles(name)').order('created_at',{ascending:false}).limit(1000),
-    SB.c.from('cartera').select('expediente_id,estado,monto,monto_pagado,facturada_at,pagada_at').limit(2000)]);
+    SB.c.from('expedientes').select('id,folio,wo,vin,user_id,sys,op,queja,status,parts,parts_total,labor,vehicle,km,comentario_fabricante,created_at,updated_at,orden_apertura,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,profiles(name,agency_id,agencies(name))').order('created_at',{ascending:false}).limit(1000),
+    SB.c.from('cartera').select('expediente_id,estado,monto,monto_pagado,facturada_at,pagada_at').limit(2000),
+    SB.c.from('debitos').select('id,agency_id,expediente_id,fecha,monto,motivo,estado,monto_revertido,regla_id,regla_nueva,expedientes(folio),profiles(name)').order('created_at',{ascending:false}).limit(300),
+    DR.load()]);
+  PV.deb=(r[2]&&r[2].data)||[];
   PV.loading=false;
   if(r[0].error){SB.fail(r[0].error);PV.rows=[]}else PV.rows=r[0].data||[];
   PV.car={};(r[1].data||[]).forEach(function(c){PV.car[c.expediente_id]=c});
@@ -6695,6 +6815,7 @@ PV.days=function(x){return Math.max(0,Math.floor((Date.now()-new Date(x.created_
 PV.list=function(){
   var q=norm(PV.q);
   var L=PV.rows.filter(function(x){
+    if(PV.ag&&!(x.profiles&&x.profiles.agency_id===PV.ag))return false;
     if(PV.as&&PV.who(x)!==PV.as)return false;
     if(PV.st&&(x.status||'borrador')!==PV.st)return false;
     if(PV.inc&&PV.comp(x).n===PV.comp(x).of)return false;
@@ -6705,7 +6826,8 @@ PV.list=function(){
 };
 PV.render=function(){
   if(!$('#viewPv'))return;
-  var R=PV.rows,ag=SB.agency||'tu agencia';
+  var R=PV.ag?PV.rows.filter(function(x){return x.profiles&&x.profiles.agency_id===PV.ag}):PV.rows,ag=PV.ag?((R[0]&&R[0].profiles.agencies&&R[0].profiles.agencies.name)||'la agencia'):SB.user&&SB.user.director?(SB.grupo||'tu grupo'):(SB.agency||'tu agencia');
+  var agSel=$('#pvAg');if(agSel){agSel.parentNode.hidden=!(SB.user&&SB.user.director);var ags={};PV.rows.forEach(function(x){var p=x.profiles||{};if(p.agency_id!=null)ags[p.agency_id]=(p.agencies&&p.agencies.name)||'Agencia '+p.agency_id});agSel.innerHTML='<option value="">Todas</option>'+Object.keys(ags).map(function(k){return '<option value="'+k+'"'+(Number(k)===PV.ag?' selected':'')+'>'+esc(ags[k])+'</option>'}).join('')}
   $('#pvSub').textContent=PV.loading?'Cargando los expedientes de '+ag+'…':'Todos los expedientes de '+ag+' · '+R.length+(R.length===1?' expediente':' expedientes');
   /* asesores en el filtro */
   var names={};R.forEach(function(x){names[PV.who(x)]=1});var sel=$('#pvAs'),cur=PV.as;
@@ -6717,13 +6839,14 @@ PV.render=function(){
   var comp=R.filter(function(x){var c=PV.comp(x);return c.n===c.of}).length;
   var mes=new Date();mes=new Date(mes.getFullYear(),mes.getMonth(),1);var nm=R.filter(function(x){return new Date(x.created_at)>=mes}).length;
   var K=function(l,v,sub,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+sub+'</small></div>'};
-  $('#pvKpi').innerHTML=K('Expedientes',R.length,nm+' este mes · '+wait+' esperando planta')+
+  var DRr=PV.ag?DR.rows.filter(function(d){return d.agency_id===PV.ag}):DR.rows;
+  $('#pvKpi').innerHTML=DR.kpi(DRr)+K('Expedientes',R.length,nm+' este mes · '+wait+' esperando planta')+
     K('Tasa de aceptación',tasa==null?'—':tasa+'%',acc.length+' aceptadas · '+rej.length+' rechazadas',tasa!=null&&tasa<80?'warn':'ok')+
     K('Monto aceptado',EX.money(acc.reduce(function(a,x){return a+PV.amt(x)},0)),'mano de obra + piezas')+
     K('Por cobrar a planta',EX.money(porCobrar),nc+' cuentas'+(venc?' · '+venc+' vencidas':''),venc?'warn':'')+
     K('Expedientes completos',R.length?Math.round(comp*100/R.length)+'%':'—',comp+' de '+R.length+' con las 6 secciones del manual',R.length&&comp<R.length?'warn':'ok')+
     (function(){var v=0,w=0;R.forEach(function(x){var L=PV.pz(x).filter(function(i){return i.k!=='des'});if(L.some(function(i){return i.st==='bad'}))v++;else if(L.some(function(i){return i.st==='warn'}))w++});return K('Plazos del manual',v?v+' vencidos':w?w+' por vencer':'Al día',v?'cobro GWM, digitalización, PRA, WPC o débito':w?'revisa la columna Plazos':'ningún plazo vencido',v?'bad':w?'warn':'ok')})();
-  PV.destRender();
+  PV.destRender();PV.debRender();
   /* por asesor */
   var A={};R.forEach(function(x){var n=PV.who(x),o=A[n]||(A[n]={n:0,a:0,r:0,m:0,c:0});o.n++;if(x.status==='aceptada'){o.a++;o.m+=PV.amt(x)}if(x.status==='rechazada')o.r++;var cc=PV.comp(x);if(cc.n===cc.of)o.c++});
   var an=Object.keys(A).sort(function(a,b){return A[b].n-A[a].n});
@@ -6738,6 +6861,12 @@ PV.render=function(){
       return '<tr data-id="'+ea(x.id)+'" tabindex="0" title="'+ea(c.faltan.length?'Falta: '+c.faltan.join(', '):'Expediente completo según el manual')+'"><td><b>'+esc(x.folio||'—')+'</b></td><td>'+esc(x.wo||'—')+'</td><td>'+esc(PV.who(x))+'</td><td>'+esc(x.sys||'—')+'</td><td><span class="pv-st '+st[1]+'">'+st[0]+'</span></td><td class="r">'+EX.money(PV.amt(x))+'</td>'+
         '<td><span class="pv-cm'+(c.n<c.of?' part':'')+'"><i aria-hidden="true">'+seg+'</i><small>'+c.n+'/'+c.of+'</small></span></td><td>'+(function(){var w=PZ.worst(PV.pz(x));if(!w)return '<span class="pv-st">—</span>';var m={bad:['Vencido','bad'],warn:['Por vencer','wait'],na:['Sin fechas',''],ok:['En tiempo','ok'],done:['Al día','ok']}[w.st];return '<span class="pv-st '+m[1]+'" title="'+ea(w.label+': '+w.txt)+'">'+m[0]+'</span>'})()+'</td><td>'+esc(PV.cob(x)||'—')+'</td><td>'+new Date(x.created_at).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'2-digit'})+'</td><td class="r">'+PV.days(x)+'</td></tr>'}).join('')+'</tbody></table>'
     :'<div class="pv-empty">'+(PV.loading?'Cargando…':R.length?'Ningún expediente coincide con los filtros.':'Todavía no hay expedientes en la agencia.')+'</div>';
+};
+PV.debRender=function(){
+  var el=$('#pvDeb');if(!el)return;var L=(PV.deb||[]).filter(function(d){return !PV.ag||d.agency_id===PV.ag});
+  el.innerHTML='<div class="pv-ch"><h3>Débitos de GM</h3><span>'+(L.length?L.length+(L.length===1?' débito':' débitos')+' · '+DEB.mx(L.reduce(function(a,d){return a+Number(d.monto||0)},0)):'sin débitos registrados')+'</span></div>'+
+    '<p class="pv-note">Cada débito que suba un asesor se convierte en una regla de la red: desde ese momento el cerebro revisa los expedientes de todas las agencias para que no vuelva a pasar. Marca aquí si se metió a controversia y cuánto se revirtió: eso suma al dinero recuperado.</p>'+
+    (L.length?'<div class="pv-scroll"><table class="pv-tb"><thead><tr><th>Fecha</th><th>Folio</th><th>Asesor</th><th>Motivo</th><th>Regla</th><th class="r">Monto</th><th>Estado</th><th class="r">Revertido</th></tr></thead><tbody>'+L.map(function(d){return '<tr><td>'+(d.fecha?PZ.f(PZ.d(d.fecha)):'—')+'</td><td><b>'+esc((d.expedientes&&d.expedientes.folio)||'—')+'</b></td><td>'+esc((d.profiles&&d.profiles.name)||'—')+'</td><td class="q" title="'+ea(d.motivo||'')+'">'+esc(d.motivo||'—')+'</td><td>'+esc(d.regla_id||'—')+(d.regla_nueva?' <span class="pv-st ok">nueva</span>':'')+'</td><td class="r">'+DEB.mx(d.monto)+'</td><td><select data-debst="'+ea(d.id)+'">'+Object.keys(DEB.ST).map(function(k){return '<option value="'+k+'"'+(k===d.estado?' selected':'')+'>'+DEB.ST[k][0]+'</option>'}).join('')+'</select></td><td class="r">'+(d.estado==='revertido'?'<input type="number" min="0" step="0.01" data-debrev="'+ea(d.id)+'" value="'+ea(d.monto_revertido||d.monto||0)+'" style="width:110px">':'—')+'</td></tr>'}).join('')+'</tbody></table></div>':'<div class="pv-empty">Sin débitos registrados. Se registran desde cada expediente, en «Control del manual GM».</div>');
 };
 PV.destRender=function(){
   var el=$('#pvDes');if(!el)return;var now=new Date();
@@ -6766,6 +6895,7 @@ PV.csv=function(){
   var deb;
   $('#pvQ').addEventListener('input',function(){clearTimeout(deb);var v=this.value;deb=setTimeout(function(){PV.q=v;PV.render()},120)});
   $('#pvAs').addEventListener('change',function(){PV.as=this.value;PV.render()});
+  $('#pvAg').addEventListener('change',function(){PV.ag=this.value?Number(this.value):null;PV.as='';PV.render()});
   $('#pvSt').addEventListener('change',function(){PV.st=this.value;PV.render()});
   $('#pvInc').addEventListener('change',function(){PV.inc=this.checked;PV.render()});
   $('#pvCsv').addEventListener('click',PV.csv);

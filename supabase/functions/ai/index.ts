@@ -83,7 +83,7 @@ const PREA_TOOL = {
 };
 
 /* ====================== Mi Agente: consulta de la plataforma + agenda ====================== */
-const TABLAS = ["expedientes", "cartera", "piezas_pedido", "campanas", "activity", "conversations", "agency_rules", "agency_log", "profiles", "agenda", "pagos_historicos", "agencies", "reglas_lecciones", "entrenamiento_docs"];
+const TABLAS = ["expedientes", "cartera", "piezas_pedido", "campanas", "activity", "conversations", "agency_rules", "agency_log", "profiles", "agenda", "pagos_historicos", "agencies", "reglas_lecciones", "entrenamiento_docs", "debitos", "manual_reglas"];
 const OPS = { eq: "eq", neq: "neq", gt: "gt", gte: "gte", lt: "lt", lte: "lte" };
 const COL_RE = /^[a-z_][a-z0-9_]*$/;
 const SEL_RE = /^[a-z0-9_,*().:!]+$/;
@@ -103,6 +103,8 @@ DATOS DE LA PLATAFORMA (tablas que puedes consultar con la herramienta "consulta
 - agency_rules: reglas que aprendió el agente (id, sys, q, c, r, op, opd, h, n=PREAs aceptadas, rej=rechazos, status).
 - profiles: asesores de la agencia (id, name, role). agencies: lista de agencias. pagos_historicos: pagos históricos de planta (solo admin). agency_log: bitácora de reglas.
 - agenda: notas, recordatorios y eventos del propio usuario.
+- debitos: débitos que GM aplicó (fecha, monto, motivo, seccion del expediente, regla_id, estado: debitado | en_controversia | revertido | aceptado, monto_revertido, agency_id, expediente_id).
+- manual_reglas: la red de reglas del cerebro (id, seccion_expediente, tema, regla, como_verificar, consecuencia, fuente; origen 'manual' del manual de GM u origen 'debito' aprendida de un débito real, con veces, agencias y monto_debitado). Cuando hables de un débito, di qué regla lo cubre y cómo evitarlo.
 Todo se limita automáticamente a lo que el usuario puede ver. Para "cuántas", "cuánto suman" o "por mes/sistema" usa "agregar", no cuentes filas a mano.
 
 MANUALES DE GM (herramienta "buscar_manual"): el cerebro aprendió el Manual de Políticas y Procedimientos de Garantías GMM 2026 y el manual del curso Administración de Garantías 2026 de la Universidad Corporativa GM. Para CUALQUIER duda de proceso, regla, plazo, cobertura, tipo de transacción, PRA, PQC, partes NAR/No GM, baterías, TOT, códigos de operación, expediente, auditoría, WPC, débitos, penalizaciones, tarifas o contactos de GM, búscalo ahí antes de contestar (puedes buscar varias veces con otras palabras) y cita la fuente con sección y página, por ejemplo "(Manual GM 2026, 5.1, pág. 18)" o "(Curso Administración de Garantías 2026, M4.02, pág. 69)". Si los dos manuales dicen algo distinto, dilo y da prioridad al Manual de Políticas y Procedimientos. No inventes reglas que no estén en los manuales.
@@ -589,13 +591,14 @@ async function conversarOrden(sb, body) {
 }
 
 /* ====================== Agente de Posventa: el gerente de posventa y toda su agencia ====================== */
-const POSVENTA_SYSTEM = `Eres el "Agente de Posventa" de Ax AI Garantías (agencias Chevrolet en México). Trabajas para el GERENTE DE POSVENTA de una agencia: él ve TODOS los expedientes de garantía de su agencia (de todos sus asesores), su cartera con planta, piezas y campañas.
+const POSVENTA_SYSTEM = `Eres el "Agente de Posventa" de Ax AI Garantías (agencias Chevrolet en México). Trabajas para el GERENTE DE POSVENTA de una agencia (o el DIRECTOR de un grupo de agencias): ve TODOS los expedientes de garantía de su agencia o de todas las agencias de su grupo (de todos sus asesores), su cartera con planta, piezas, campañas y los débitos de GM.
 
 TU TRABAJO: darle control de su departamento. Responde con datos reales de la plataforma:
 - Desempeño: cuántas PREAs hay, aceptadas, rechazadas y esperando a planta, tasa de aceptación, por asesor, por sistema y por mes ("agregar" con agrupar_por: 'user_id', 'sys', 'status' o 'mes:created_at'; los nombres de los asesores están en profiles).
 - Dinero: cuánto se aceptó (labor + parts_total), cuánto falta por facturar, facturado sin pagar y vencido (cartera: más de 30 días facturada sin pago), cuánto pagó planta.
 - Auditoría: qué expedientes están incompletos según el Manual de Políticas y Procedimientos de Garantías GM 2026 (herramienta "revisar_expedientes": las 6 secciones obligatorias son orden de garantía firmada, recepción del vehículo, documentos de diagnóstico, evidencia de la condición y daños, refacciones/eSPOM y destrucción de partes). Señala a qué asesor le toca completarlos.
 - Riesgos y prioridades: rechazos y sus motivos (comentario_fabricante), PREAs esperando planta hace mucho, cartera vencida, piezas sin llegar.
+- Débitos y red: tabla debitos (monto, motivo, estado, monto_revertido, regla_id, agency_id) y manual_reglas (las reglas aprendidas de débitos reales tienen origen 'debito', con veces, agencias y monto_debitado). El objetivo del producto es CERO DÉBITOS: explica qué regla cubre cada débito, qué agencias están expuestas y qué expedientes revisar. Dinero recuperado = expedientes corregidos antes de cobrar + débitos revertidos.
 - Reglas oficiales: para cualquier trámite, plazo, requisito, tarifa o penalización usa "buscar_manual" (busca en el Manual de Políticas y Procedimientos de Garantías GMM 2026 y en el manual del curso Administración de Garantías 2026) y cita la fuente con sección y página, por ejemplo "(Manual GM 2026, 4.4, pág. 12)" o "(Curso Administración de Garantías 2026, M6.09, pág. 118)".
 
 ESTILO: como un analista de confianza que le reporta al gerente: directo, con cifras concretas, en español de México, de tú. Primero la respuesta, luego lo que conviene hacer (máximo 3 acciones). Usa listas cortas solo cuando haya varios elementos; negritas solo para cifras clave; nunca tablas grandes. Montos en pesos mexicanos.
@@ -957,7 +960,7 @@ Deno.serve(async (req) => {
 
   if (body.mode === "posventa") {
     const { data: prof } = await sb.from("profiles").select("role").eq("id", u.user.id).single();
-    if (!prof || !["gerente", "admin", "marca"].includes(prof.role)) return respond({ error: "forbidden" }, 403);
+    if (!prof || !["gerente", "director", "admin", "marca"].includes(prof.role)) return respond({ error: "forbidden" }, 403);
     const r = await posventa(sb, body);
     return respond(r.body, r.status);
   }

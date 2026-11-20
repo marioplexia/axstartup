@@ -304,6 +304,10 @@ Deno.serve(async (req) => {
     const textos = pl.ok && pl.valor ? pl.valor.textos : [];
     const busqueda = norm([DOCS[tipo], tipo, nombre.replace(/\.[a-z0-9]{2,4}$/i, "").replace(/[_-]+/g, " "), e.sys, e.op, e.opd, resumen, JSON.stringify(datos), textos.join(" ")].join(" ")).slice(0, 6000);
     const adm = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    /* si antes este tipo de documento no cumplía el manual y ahora sí, se corrigió antes de cobrar: cuenta como dinero protegido */
+    const antes = (await adm.from("entrenamiento_docs").select("datos").eq("kind", "expediente").eq("folio", e.folio).eq("resultado", tipo).limit(20)).data || [];
+    const antesMal = antes.some((x: any) => Array.isArray(x.datos?.cumplimiento) && x.datos.cumplimiento.some((c: any) => c.estado === "no_cumple"));
+    if (antesMal && cumple.length && !cumple.some((c: any) => c.estado === "no_cumple")) datos.corregido = true;
     /* una sola lectura vigente por documento: subir otra vez reemplaza la anterior */
     await adm.from("entrenamiento_docs").delete().eq("kind", "expediente").eq("folio", e.folio).eq("file_name", nombre).eq("resultado", tipo);
     const ins = await adm.from("entrenamiento_docs").insert({ kind: "expediente", folio: e.folio, wo: e.wo, file_name: nombre, vehiculo: veh || null, sys: e.sys, op: e.op, resultado: tipo, resumen, lecciones: textos.join(" | ") || null, datos, busqueda, created_by: u.user.id });
