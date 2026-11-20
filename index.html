@@ -1327,6 +1327,12 @@ body.dueno #newChat,body.dueno #histTop,body.dueno #expBtn,body.dueno #gpShow{di
 .dn-form input[type=number]{width:140px}
 .dn-paste{padding:0 16px 12px}.dn-paste summary{cursor:pointer;font-size:12.5px;font-weight:500}
 .dn-paste textarea{width:100%;min-height:90px;margin:8px 0;border:1px solid var(--card-line);border-radius:8px;background:var(--bg);color:var(--fg);font:12px/1.5 ui-monospace,Menlo,monospace;padding:8px 10px;box-sizing:border-box}
+.dn-chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 12px;margin-bottom:2px}@media (max-width:640px){.dn-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}}
+.dn-chips button{flex:none;height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--card-line);background:var(--card);color:var(--fg);font:500 13px var(--f-ui);cursor:pointer;white-space:nowrap}
+.dn-chips button small{color:var(--muted);font-weight:400;margin-left:2px}.dn-chips button:hover{background:var(--hover)}
+.dn-chips button[aria-selected=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}.dn-chips button[aria-selected=true] small{color:inherit;opacity:.7}
+button.dn-mk{width:100%;border:0;border-top:1px solid var(--card-line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}button.dn-mk:hover{background:var(--hover)}
+.dn-otras{padding:12px 16px;border-top:1px solid var(--card-line);font-size:12.5px;color:var(--muted)}.dn-otras b{display:block;color:var(--fg);font-size:13px;font-weight:600;margin-bottom:4px}.dn-otras span{display:block;margin-top:2px}
 .dn-x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 6px}.dn-x:hover{color:#b4372b}
 @media (max-width:640px){.dn-hero{padding:20px 18px}.dn-hero h3{font-size:24px}.dn-bar{grid-template-columns:96px minmax(0,1fr) auto}.dn-form label{flex:1 1 100%}.dn-form select,.dn-form input,.dn-form input[type=number]{width:100%}}
 @media (max-width:640px){.pv-tb td,.pv-tb th{padding:9px 10px}#pvQ{width:100%}#pvKpi .kp b{font-size:21px;overflow-wrap:anywhere}}
@@ -6804,7 +6810,7 @@ GRP.render=function(){
 document.addEventListener('click',function(e){var tr=e.target.closest&&e.target.closest('tr[data-grpag]');if(!tr)return;PV.ag=Number(tr.dataset.grpag);showView('pv')});
 
 /* ===== Tablero del dueño del grupo: cuánto le salvó Ax AI, cuánto le costó y qué agencia anda mal ===== */
-var DN={hist:[],ags:[],ctr:null,mes:[],busy:false};
+var DN={hist:[],ags:[],ctr:null,mes:[],busy:false,sel:(function(){try{return localStorage.getItem('ax.dn.marca')||''}catch(_){return ''}})()};
 DN.is=function(){return !!(SB.user&&SB.user.dueno)};
 /* el dueño solo ve su tablero en el menú lateral */
 DN.nav=function(on){
@@ -6823,7 +6829,7 @@ DN.load=async function(){
       SB.c.rpc('dinero_recuperado',{p_desde:first}),
       SB.c.from('grupo_contrato').select('tarifa_agencia,pct_recuperado,inicio').maybeSingle(),
       SB.c.from('debitos_historicos').select('id,agency_id,mes,monto,cantidad').order('mes',{ascending:false}).limit(2000),
-      SB.grupoId?SB.c.from('agencies').select('id,name').eq('grupo_id',SB.grupoId).order('name'):Promise.resolve({data:[]}),
+      SB.grupoId?SB.c.from('agencies').select('id,name,brand,marca_grupo,marcas,tipo,city,estado').eq('grupo_id',SB.grupoId).order('name'):Promise.resolve({data:[]}),
       PV.load(true),DR.load()]);
     if(r[0].error)console.warn('[dueño mes]',r[0].error.message);
     if(r[2].error)console.warn('[dueño históricos]',r[2].error.message);
@@ -6837,72 +6843,112 @@ DN.inicio=function(){
   if(DN.ctr&&DN.ctr.inicio)return new Date(DN.ctr.inicio+'T12:00:00');
   var m=null;PV.rows.forEach(function(x){var d=new Date(x.created_at);if(!isNaN(d)&&(!m||d<m))m=d});return m||new Date();
 };
-DN.render=function(){
-  var el=$('#dnBody');if(!el)return;
-  var hoy=new Date(),ymHoy=DN.ym(hoy),mx=DEB.mx;
-  var salvMes=DR.sum(DN.mes,'monto_protegido')+DR.sum(DN.mes,'monto_revertido');
-  var salvTot=DR.sum(DR.rows,'monto_protegido')+DR.sum(DR.rows,'monto_revertido');
-  var nAg=DN.ags.length||DR.rows.length||1;
-  var c=DN.ctr||{},tar=c.tarifa_agencia!=null?Number(c.tarifa_agencia):null,pct=c.pct_recuperado!=null?Number(c.pct_recuperado):0;
-  $('#dnSub').textContent=(SB.grupo||'Tu grupo')+' · '+nAg+(nAg===1?' agencia':' agencias');
-  var costo=null,cl;
-  if(tar!=null){costo=nAg*tar+salvMes*pct/100;
-    var det=nAg+(nAg===1?' agencia':' agencias')+' × '+mx(tar)+(pct?' + '+pct+' % de lo salvado':'');
-    cl=salvMes>0&&costo>0?'Te costó <b>'+mx(costo)+'</b> ('+esc(det)+'). Por cada peso que pagaste recuperaste <b>$'+(salvMes/costo).toLocaleString('es-MX',{minimumFractionDigits:1,maximumFractionDigits:1})+'</b>.'
-      :'Te costó <b>'+mx(costo)+'</b> ('+esc(det)+'). Todavía no hay dinero salvado este mes.'}
-  else cl='El costo aparecerá aquí cuando Ax AI registre tu contrato.';
-  var hero='<div class="dn-hero"><span class="dn-k">Este mes · '+esc(DN.mesTxt(ymHoy))+'</span>'+
-    '<h3>Ax AI le salvó a tu grupo <b>'+mx(salvMes)+'</b></h3><p>'+cl+'</p>'+
-    '<small>Dinero salvado = reclamos que Ax AI corrigió antes de cobrarse + débitos que GM devolvió. Desde que empezaste: '+mx(salvTot)+'.</small></div>';
-
-  /* débitos: antes de Ax AI (lo que se cargó abajo) contra con Ax AI */
-  var ini=DN.inicio(),ymIni=DN.ym(ini);
-  var antes=DN.hist.filter(function(h){return !(DN.ctr&&DN.ctr.inicio)||String(h.mes).slice(0,7)<ymIni});
-  var mesesA={};antes.forEach(function(h){mesesA[String(h.mes).slice(0,7)]=1});var nmA=Object.keys(mesesA).length;
-  var promA=nmA?antes.reduce(function(a,h){return a+Number(h.monto||0)},0)/nmA:null;
-  var mesesCon=Math.max(1,(hoy-ini)/(30.44*864e5));
-  var debCon=DR.sum(DR.rows,'monto_debitado'),promC=debCon/mesesCon;
-  var debMes=DR.sum(DN.mes,'monto_debitado'),nDebMes=DR.sum(DN.mes,'debitos');
-  var cmp;
-  if(promA==null)cmp='<p class="dn-msg">Para comprobar cuánto bajaron tus débitos, carga abajo lo que GM te debitó cada mes <b>antes</b> de usar Ax AI.</p>';
-  else{var mxv=Math.max(promA,promC,1),dif=promA?Math.round((promA-promC)*100/promA):0;
-    cmp='<div class="dn-bar"><span>Antes de Ax AI</span><i style="width:'+(promA*100/mxv)+'%"></i><b>'+mx(promA)+' al mes</b></div>'+
-      '<div class="dn-bar"><span>Con Ax AI</span><i class="now" style="width:'+(promC*100/mxv)+'%"></i><b>'+mx(promC)+' al mes</b></div>'+
-      '<p class="dn-msg">'+(promC<=promA?'Tus débitos bajaron <b>'+dif+' %</b>: unos <b>'+mx(promA-promC)+'</b> menos al mes.':'Tus débitos subieron <b>'+(-dif)+' %</b>. Revisa qué agencias están en rojo.')+'</p>'}
-  var deb='<div class="ad-card"><div class="pv-ch"><h3>Débitos de GM: antes y con Ax AI</h3><span>'+(nmA?'base de '+nmA+(nmA===1?' mes':' meses'):'sin base todavía')+' · este mes: '+mx(debMes)+' en '+nDebMes+(nDebMes===1?' débito':' débitos')+'</span></div><div class="dn-cmp">'+cmp+'</div></div>';
-
-  /* semáforo por agencia */
-  var A={};var ag=function(id){return A[id]||(A[id]={id:id,deb:0,ndeb:0,venc:0,warn:0,rech:0,salv:0})};
+DN.TIPO={punto_venta:'Punto de venta',seminuevos:'Seminuevos',proximamente:'Próximamente'};
+DN.mk=function(a){return a.marca_grupo||a.brand||'Sin marca'};
+DN.taller=function(a){return !a.tipo||a.tipo==='agencia'};
+/* cada agencia con su semáforo del mes: rojo (débito o trámite vencido), amarillo (por vencer o rechazo), verde */
+DN.porAgencia=function(){
+  var hoy=new Date(),first=new Date(hoy.getFullYear(),hoy.getMonth(),1),A={};
+  var ag=function(id){return A[id]||(A[id]={id:id,deb:0,ndeb:0,venc:0,warn:0,rech:0,salv:0,n:0})};
   DN.ags.forEach(function(a){ag(a.id)});
   DN.mes.forEach(function(d){var o=ag(d.agency_id);o.deb=Number(d.monto_debitado||0);o.ndeb=Number(d.debitos||0);o.salv=Number(d.monto_protegido||0)+Number(d.monto_revertido||0)});
-  var first=new Date(hoy.getFullYear(),hoy.getMonth(),1);
-  PV.rows.forEach(function(x){var id=x.profiles&&x.profiles.agency_id;if(id==null)return;var o=ag(id),pz=PV.pz(x);
+  DR.rows.forEach(function(d){var o=ag(d.agency_id);if(Number(d.expedientes||0)||Number(d.debitos||0))o.usa=true});
+  PV.rows.forEach(function(x){var id=x.profiles&&x.profiles.agency_id;if(id==null)return;var o=ag(id),pz=PV.pz(x);o.n++;o.usa=true;
     if(pz.some(function(i){return i.st==='bad'&&i.k!=='des'}))o.venc++;else if(pz.some(function(i){return i.st==='warn'&&i.k!=='des'}))o.warn++;
     if(x.status==='rechazada'&&new Date(x.updated_at||x.created_at)>=first)o.rech++});
-  var L=Object.keys(A).map(function(k){var o=A[k],why=[];
-    if(o.ndeb)why.push(o.ndeb+(o.ndeb===1?' débito de GM':' débitos de GM')+' este mes ('+mx(o.deb)+')');
+  Object.keys(A).forEach(function(k){var o=A[k],why=[],a=DN.agById[o.id]||{};
+    if(o.ndeb)why.push(o.ndeb+(o.ndeb===1?' débito':' débitos')+' este mes ('+DEB.mx(o.deb)+')');
     if(o.venc)why.push(o.venc+(o.venc===1?' reclamo con plazo vencido':' reclamos con plazo vencido'));
     if(o.warn)why.push(o.warn+(o.warn===1?' reclamo con plazo por vencer':' reclamos con plazo por vencer'));
     if(o.rech)why.push(o.rech+(o.rech===1?' reclamo rechazado':' reclamos rechazados')+' este mes');
-    o.st=o.ndeb||o.venc?'bad':o.warn||o.rech?'warn':'ok';o.why=why.length?why.join(' · '):'Todo en orden';o.name=DN.agName(o.id);return o})
-    .sort(function(a,b){var r={bad:0,warn:1,ok:2};return r[a.st]-r[b.st]||b.deb-a.deb||a.name.localeCompare(b.name)});
-  var nb=L.filter(function(o){return o.st==='bad'}).length;
-  var sem='<div class="ad-card"><div class="pv-ch"><h3>Tus agencias</h3><span>'+(nb?nb+(nb===1?' en rojo':' en rojo'):'ninguna en rojo')+'</span></div>'+
-    (L.length?L.map(function(o){return '<div class="dn-ag"><i class="xz-dot '+o.st+'" aria-label="'+(o.st==='bad'?'Rojo':o.st==='warn'?'Amarillo':'Verde')+'"></i><div><b>'+esc(o.name)+'</b><span>'+esc(o.why)+'</span></div><em><b>'+mx(o.salv)+'</b>salvado este mes</em></div>'}).join(''):'<p class="pv-empty">Todavía no hay agencias con datos.</p>')+
-    '<p class="pv-note" style="margin-top:10px">Rojo: GM le debitó este mes o tiene trámites vencidos. Amarillo: trámites por vencer o reclamos rechazados. Verde: todo en orden.</p></div>';
-
-  /* captura de los débitos de antes (línea base) */
-  var opts=(DN.ags.length?DN.ags:L).map(function(a){return '<option value="'+ea(a.id)+'">'+esc(a.name||DN.agName(a.id))+'</option>'}).join('');
-  var prev=new Date(hoy.getFullYear(),hoy.getMonth()-1,1);
-  var rows=DN.hist.slice().sort(function(a,b){return DN.agName(a.agency_id).localeCompare(DN.agName(b.agency_id))||String(b.mes).localeCompare(String(a.mes))});
-  var base='<div class="ad-card"><div class="pv-ch"><h3>Débitos de antes de Ax AI</h3><span>'+DN.hist.length+(DN.hist.length===1?' captura':' capturas')+'</span></div>'+
-    '<p class="pv-note">Captura cuánto te debitó GM cada mes antes de usar Ax AI, idealmente de 6 a 12 meses por agencia. Es la base para comparar.</p>'+
-    '<div class="dn-form"><label><span>Agencia</span><select id="dnAg">'+opts+'</select></label><label><span>Mes</span><input id="dnMes" type="month" value="'+DN.ym(prev)+'" max="'+ymHoy+'"></label><label><span>Monto debitado (MXN)</span><input id="dnMonto" type="number" min="0" step="1" placeholder="0"></label><label><span>Número de débitos</span><input id="dnCant" type="number" min="0" step="1" placeholder="0" style="width:120px"></label><button class="bt pri" data-dnsave style="height:32px">Guardar</button></div>'+
-    '<details class="dn-paste"><summary>Pegar varios meses desde Excel</summary><textarea id="dnPaste" placeholder="Agencia&#9;Mes (AAAA-MM)&#9;Monto&#9;Número de débitos&#10;'+esc((DN.ags[0]&&DN.ags[0].name)||'Agencia')+'&#9;'+DN.ym(prev)+'&#9;18500&#9;3"></textarea><button class="bt" data-dnpaste>Cargar lo pegado</button> <span class="xz-mut" id="dnPasteMsg"></span></details>'+
-    (rows.length?'<div class="pv-scroll"><table class="pv-tb"><thead><tr><th>Agencia</th><th>Mes</th><th class="r">Monto</th><th class="r">Débitos</th><th></th></tr></thead><tbody>'+
-      rows.map(function(h){return '<tr><td>'+esc(DN.agName(h.agency_id))+'</td><td>'+esc(DN.mesTxt(String(h.mes).slice(0,7)))+'</td><td class="r">'+mx(h.monto)+'</td><td class="r">'+Number(h.cantidad||0)+'</td><td class="r"><button class="dn-x" data-dndel="'+ea(h.id)+'" aria-label="Borrar">×</button></td></tr>'}).join('')+'</tbody></table></div>':'')+'</div>';
-  el.innerHTML=hero+deb+sem+base;
+    o.st=!o.usa?'na':o.ndeb||o.venc?'bad':o.warn||o.rech?'warn':'ok';o.why=!o.usa?'Todavía no usa Ax AI':why.length?why.join(' · '):'Todo en orden';
+    o.name=a.name||DN.agName(o.id);o.mk=DN.mk(a);o.city=a.city||'';o.tipo=a.tipo||'agencia'});
+  return A;
 };
+DN.render=function(){
+  var el=$('#dnBody');if(!el)return;
+  var hoy=new Date(),ymHoy=DN.ym(hoy),mx=DEB.mx,sel=DN.sel||'';
+  DN.agById={};DN.ags.forEach(function(a){DN.agById[a.id]=a});
+  var A=DN.porAgencia();
+  /* qué agencias entran en la vista: todo el grupo o una marca */
+  var enVista=function(id){if(!sel)return true;var a=DN.agById[id];return !!a&&DN.mk(a)===sel};
+  var mes=DN.mes.filter(function(d){return enVista(d.agency_id)}),tot=DR.rows.filter(function(d){return enVista(d.agency_id)});
+  var talleres=DN.ags.filter(function(a){return DN.taller(a)&&enVista(a.id)});
+  var marcas={};DN.ags.forEach(function(a){var k=DN.mk(a);(marcas[k]||(marcas[k]=[])).push(a)});
+  var MK=Object.keys(marcas).sort(function(a,b){return marcas[b].length-marcas[a].length||a.localeCompare(b)});
+  if(sel&&!marcas[sel]){DN.sel=sel='';return DN.render()}
+  var nTall=DN.ags.filter(DN.taller).length;
+  $('#dnSub').textContent=(SB.grupo||'Tu grupo')+' · '+MK.length+(MK.length===1?' marca':' marcas')+' · '+nTall+(nTall===1?' agencia con taller':' agencias con taller')+(DN.ags.length>nTall?' y '+(DN.ags.length-nTall)+' tiendas sin taller':'');
+
+  /* selector de marca */
+  var chips='<div class="dn-chips" role="tablist" aria-label="Marca"><button role="tab" data-dnmk="" aria-selected="'+(!sel)+'">Todo el grupo</button>'+
+    MK.map(function(k){var n=marcas[k].filter(DN.taller).length;return '<button role="tab" data-dnmk="'+ea(k)+'" aria-selected="'+(sel===k)+'">'+esc(k)+' <small>'+n+'</small></button>'}).join('')+'</div>';
+
+  var salvMes=DR.sum(mes,'monto_protegido')+DR.sum(mes,'monto_revertido'),salvTot=DR.sum(tot,'monto_protegido')+DR.sum(tot,'monto_revertido');
+  var nAg=talleres.filter(function(a){return A[a.id]&&A[a.id].usa}).length;
+  var c=DN.ctr||{},tar=c.tarifa_agencia!=null?Number(c.tarifa_agencia):null,pct=c.pct_recuperado!=null?Number(c.pct_recuperado):0;
+  var quien=sel?'a '+esc(sel):'a tu grupo',cl;
+  if(tar!=null&&nAg){var costo=nAg*tar+salvMes*pct/100,det=nAg+(nAg===1?' agencia':' agencias')+' × '+mx(tar)+(pct?' + '+pct+' % de lo salvado':'');
+    cl=salvMes>0&&costo>0?'Te costó <b>'+mx(costo)+'</b> ('+esc(det)+'). Por cada peso que pagaste recuperaste <b>$'+(salvMes/costo).toLocaleString('es-MX',{minimumFractionDigits:1,maximumFractionDigits:1})+'</b>.'
+      :'Te costó <b>'+mx(costo)+'</b> ('+esc(det)+'). Todavía no hay dinero salvado este mes.'}
+  else cl=tar==null?'El costo aparecerá aquí cuando Ax AI registre tu contrato.':talleres.length?'Ninguna agencia'+(sel?' de '+esc(sel):'')+' usa Ax AI todavía.':'Esta marca no tiene agencias con taller de garantías.';
+  var hero='<div class="dn-hero"><span class="dn-k">Este mes · '+esc(DN.mesTxt(ymHoy))+(sel?' · '+esc(sel):'')+'</span>'+
+    '<h3>Ax AI le salvó '+quien+' <b>'+mx(salvMes)+'</b></h3><p>'+cl+'</p>'+
+    '<small>Dinero salvado = reclamos que Ax AI corrigió antes de cobrarse + débitos que la armadora devolvió. Desde que empezaste: '+mx(salvTot)+'.</small></div>';
+
+  /* débitos: antes de Ax AI contra con Ax AI */
+  var ini=DN.inicio(),ymIni=DN.ym(ini);
+  var antes=DN.hist.filter(function(h){return enVista(h.agency_id)&&(!(DN.ctr&&DN.ctr.inicio)||String(h.mes).slice(0,7)<ymIni)});
+  var mesesA={};antes.forEach(function(h){mesesA[String(h.mes).slice(0,7)]=1});var nmA=Object.keys(mesesA).length;
+  var promA=nmA?antes.reduce(function(a,h){return a+Number(h.monto||0)},0)/nmA:null;
+  var mesesCon=Math.max(1,(hoy-ini)/(30.44*864e5)),promC=DR.sum(tot,'monto_debitado')/mesesCon;
+  var debMes=DR.sum(mes,'monto_debitado'),nDebMes=DR.sum(mes,'debitos'),cmp;
+  if(promA==null)cmp='<p class="dn-msg">Para comprobar cuánto bajaron los débitos'+(sel?' de '+esc(sel):'')+', carga abajo lo que te debitaron cada mes <b>antes</b> de usar Ax AI.</p>';
+  else{var mxv=Math.max(promA,promC,1),dif=promA?Math.round((promA-promC)*100/promA):0;
+    cmp='<div class="dn-bar"><span>Antes de Ax AI</span><i style="width:'+(promA*100/mxv)+'%"></i><b>'+mx(promA)+' al mes</b></div>'+
+      '<div class="dn-bar"><span>Con Ax AI</span><i class="now" style="width:'+(promC*100/mxv)+'%"></i><b>'+mx(promC)+' al mes</b></div>'+
+      '<p class="dn-msg">'+(promC<=promA?'Los débitos bajaron <b>'+dif+' %</b>: unos <b>'+mx(promA-promC)+'</b> menos al mes.':'Los débitos subieron <b>'+(-dif)+' %</b>. Revisa qué agencias están en rojo.')+'</p>'}
+  var deb='<div class="ad-card"><div class="pv-ch"><h3>Débitos: antes y con Ax AI</h3><span>'+(nmA?'base de '+nmA+(nmA===1?' mes':' meses'):'sin base todavía')+' · este mes: '+mx(debMes)+' en '+nDebMes+(nDebMes===1?' débito':' débitos')+'</span></div><div class="dn-cmp">'+cmp+'</div></div>';
+
+  var ORD={bad:0,warn:1,ok:2,na:3},peor=function(L){var u=L.filter(function(o){return o.st!=='na'});return u.length?u.reduce(function(w,o){return ORD[o.st]<ORD[w]?o.st:w},'ok'):'na'};
+  var cuerpo;
+  if(!sel){
+    /* todo el grupo: una fila por marca, la peor primero */
+    var B=MK.map(function(k){var L=marcas[k].filter(DN.taller).map(function(a){return A[a.id]});
+      return {k:k,L:L,otras:marcas[k].length-L.length,st:L.length?peor(L):'na',rojo:L.filter(function(o){return o.st==='bad'}).length,amar:L.filter(function(o){return o.st==='warn'}).length,
+        salv:L.reduce(function(s,o){return s+o.salv},0),deb:L.reduce(function(s,o){return s+o.deb},0)}})
+      .sort(function(a,b){var r={bad:0,warn:1,ok:2,na:3};return r[a.st]-r[b.st]||b.deb-a.deb||b.L.length-a.L.length||a.k.localeCompare(b.k)});
+    var nb=B.filter(function(b){return b.st==='bad'}).length;
+    cuerpo='<div class="ad-card"><div class="pv-ch"><h3>Tus marcas</h3><span>'+(nb?nb+(nb===1?' marca con agencias en rojo':' marcas con agencias en rojo'):'ninguna en rojo')+' · toca una para ver sus agencias</span></div>'+
+      B.map(function(b){var est=[],u=b.L.filter(function(o){return o.usa}).length;if(b.rojo)est.push(b.rojo+' en rojo');if(b.amar)est.push(b.amar+' en amarillo');
+        var t=b.L.length?b.L.length+(b.L.length===1?' agencia':' agencias')+(u?(u<b.L.length?' · '+u+' en Ax AI':'')+(est.length?' · '+est.join(' · '):' · todas en verde'):(b.L.length===1?' · todavía no usa Ax AI':' · ninguna usa Ax AI todavía')):'Sin taller de garantías';
+        if(b.otras)t+=' · '+b.otras+(b.otras===1?' tienda sin taller':' tiendas sin taller');
+        return '<button class="dn-ag dn-mk" data-dnmk="'+ea(b.k)+'"><i class="xz-dot '+(b.st==='na'?'na':b.st)+'"></i><div><b>'+esc(b.k)+'</b><span>'+esc(t)+'</span></div><em><b>'+mx(b.salv)+'</b>salvado este mes'+(b.deb?' · '+mx(b.deb)+' debitado':'')+'</em></button>'}).join('')+
+      '<p class="pv-note" style="margin-top:10px">Rojo: le debitaron este mes o tiene trámites vencidos. Amarillo: trámites por vencer o reclamos rechazados. Verde: todo en orden. Gris: todavía no usa Ax AI.</p></div>';
+  }else{
+    var L=marcas[sel].filter(DN.taller).map(function(a){return A[a.id]}).sort(function(a,b){return ORD[a.st]-ORD[b.st]||b.deb-a.deb||a.name.localeCompare(b.name)});
+    var O=marcas[sel].filter(function(a){return !DN.taller(a)});
+    var nr=L.filter(function(o){return o.st==='bad'}).length;
+    cuerpo='<div class="ad-card"><div class="pv-ch"><h3>Agencias de '+esc(sel)+'</h3><span>'+L.length+(L.length===1?' agencia':' agencias')+' · '+(nr?nr+' en rojo':'ninguna en rojo')+'</span></div>'+
+      (L.length?L.map(function(o){return '<div class="dn-ag"><i class="xz-dot '+o.st+'" aria-label="'+(o.st==='bad'?'Rojo':o.st==='warn'?'Amarillo':o.st==='na'?'Sin usar Ax AI':'Verde')+'"></i><div><b>'+esc(o.name)+'</b><span>'+esc((o.city?o.city+' · ':'')+o.why)+'</span></div><em><b>'+mx(o.salv)+'</b>salvado este mes</em></div>'}).join(''):'<p class="pv-empty">Esta marca no tiene agencias con taller de garantías.</p>')+
+      (O.length?'<div class="dn-otras"><b>Sin taller de garantías</b>'+O.map(function(a){return '<span>'+esc(a.name)+' · '+esc(a.city||'')+' · '+esc(DN.TIPO[a.tipo]||a.tipo)+'</span>'}).join('')+'</div>':'')+
+      '<p class="pv-note" style="margin-top:10px">Rojo: le debitaron este mes o tiene trámites vencidos. Amarillo: trámites por vencer o reclamos rechazados. Verde: todo en orden. Gris: todavía no usa Ax AI.</p></div>';
+  }
+
+  /* captura de los débitos de antes (línea base), agencias agrupadas por marca */
+  var opts=MK.map(function(k){var L=marcas[k].filter(DN.taller);if(!L.length||(sel&&k!==sel))return '';return '<optgroup label="'+ea(k)+'">'+L.map(function(a){return '<option value="'+ea(a.id)+'">'+esc(a.name)+'</option>'}).join('')+'</optgroup>'}).join('')||
+    Object.keys(A).map(function(id){return '<option value="'+ea(id)+'">'+esc(A[id].name)+'</option>'}).join('');
+  var prev=new Date(hoy.getFullYear(),hoy.getMonth()-1,1),H=DN.hist.filter(function(h){return enVista(h.agency_id)});
+  var rows=H.slice().sort(function(a,b){var x=DN.agById[a.agency_id]||{},y=DN.agById[b.agency_id]||{};return DN.mk(x).localeCompare(DN.mk(y))||DN.agName(a.agency_id).localeCompare(DN.agName(b.agency_id))||String(b.mes).localeCompare(String(a.mes))});
+  var base='<div class="ad-card"><div class="pv-ch"><h3>Débitos de antes de Ax AI'+(sel?' · '+esc(sel):'')+'</h3><span>'+H.length+(H.length===1?' captura':' capturas')+'</span></div>'+
+    '<p class="pv-note">Captura cuánto le debitó la armadora a cada agencia, mes por mes, antes de usar Ax AI (idealmente de 6 a 12 meses). Es la base para comparar.</p>'+
+    '<div class="dn-form"><label><span>Agencia</span><select id="dnAg">'+opts+'</select></label><label><span>Mes</span><input id="dnMes" type="month" value="'+DN.ym(prev)+'" max="'+ymHoy+'"></label><label><span>Monto debitado (MXN)</span><input id="dnMonto" type="number" min="0" step="1" placeholder="0"></label><label><span>Número de débitos</span><input id="dnCant" type="number" min="0" step="1" placeholder="0" style="width:120px"></label><button class="bt pri" data-dnsave style="height:32px">Guardar</button></div>'+
+    '<details class="dn-paste"><summary>Pegar varios meses desde Excel</summary><textarea id="dnPaste" placeholder="Agencia&#9;Mes (AAAA-MM)&#9;Monto&#9;Número de débitos&#10;'+esc((talleres[0]&&talleres[0].name)||'Agencia')+'&#9;'+DN.ym(prev)+'&#9;18500&#9;3"></textarea><button class="bt" data-dnpaste>Cargar lo pegado</button> <span class="xz-mut" id="dnPasteMsg"></span></details>'+
+    (rows.length?'<div class="pv-scroll"><table class="pv-tb"><thead><tr><th>Marca</th><th>Agencia</th><th>Mes</th><th class="r">Monto</th><th class="r">Débitos</th><th></th></tr></thead><tbody>'+
+      rows.map(function(h){return '<tr><td>'+esc(DN.mk(DN.agById[h.agency_id]||{}))+'</td><td>'+esc(DN.agName(h.agency_id))+'</td><td>'+esc(DN.mesTxt(String(h.mes).slice(0,7)))+'</td><td class="r">'+mx(h.monto)+'</td><td class="r">'+Number(h.cantidad||0)+'</td><td class="r"><button class="dn-x" data-dndel="'+ea(h.id)+'" aria-label="Borrar">×</button></td></tr>'}).join('')+'</tbody></table></div>':'')+'</div>';
+  el.innerHTML=chips+hero+deb+cuerpo+base;
+};
+document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-dnmk]');if(!t||!$('#dnBody').contains(t))return;DN.sel=t.dataset.dnmk;try{localStorage.setItem('ax.dn.marca',DN.sel)}catch(_){}DN.render();var v=$('#viewDueno');if(v&&t.classList.contains('dn-mk'))v.scrollTop=0});
 DN.num=function(v){var n=Number(String(v==null?'':v).replace(/[$\s,]/g,''));return isFinite(n)&&n>=0?n:NaN};
 DN.mesDe=function(v){var t=String(v||'').trim(),m;if((m=/^(\d{4})[-\/](\d{1,2})/.exec(t)))return m[1]+'-'+m[2].padStart(2,'0');if((m=/^(\d{1,2})[-\/](\d{4})$/.exec(t)))return m[2]+'-'+m[1].padStart(2,'0');return null};
 DN.save=async function(list){
