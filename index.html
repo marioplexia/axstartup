@@ -1305,6 +1305,30 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .kp.warn b{color:#b7791f}
 .xz-mut{font-size:12px;color:var(--muted);margin:6px 0}
 .pv-empty{padding:28px 16px;text-align:center;color:var(--muted);font-size:13.5px}
+/* tablero del dueño */
+body.dueno #newChat,body.dueno #histTop,body.dueno #expBtn,body.dueno #gpShow{display:none!important}
+.dn-hero{border:1px solid var(--card-line);border-radius:16px;background:var(--card);padding:26px 26px 22px;margin-bottom:14px}
+.dn-k{font-size:12.5px;color:var(--muted)}
+.dn-hero h3{margin:6px 0 10px;font-family:var(--f-display);font-weight:500;font-size:30px;line-height:1.2;letter-spacing:-.02em}
+.dn-hero h3 b{color:#1f8a4c;font-weight:600;white-space:nowrap}
+.dn-hero p{margin:0 0 6px;font-size:16px;line-height:1.5}.dn-hero p b{font-weight:600;white-space:nowrap}
+.dn-hero small{display:block;font-size:12.5px;color:var(--faint);line-height:1.5;margin-top:10px}
+.dn-cmp{padding:6px 16px 16px}
+.dn-bar{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;align-items:center;margin:10px 0;font-size:13.5px}
+.dn-bar i{display:block;height:14px;border-radius:7px;background:#b4372b;min-width:3px}.dn-bar i.now{background:#1f8a4c}
+.dn-bar b{font-variant-numeric:tabular-nums;font-weight:600}
+.dn-msg{font-size:15px;margin:12px 0 0;line-height:1.5}.dn-msg b{font-weight:600}
+.dn-ag{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-top:1px solid var(--card-line)}
+.dn-ag .xz-dot{margin-top:5px;width:12px;height:12px}.dn-ag div{flex:1;min-width:0}.dn-ag div b{display:block;font-size:14px;font-weight:600}
+.dn-ag div span{display:block;font-size:13px;color:var(--muted);margin-top:2px}.dn-ag em{font-style:normal;font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}.dn-ag em b{display:block;color:var(--fg);font-size:14px;font-weight:600}
+.dn-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:4px 16px 12px}
+.dn-form label span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+.dn-form select,.dn-form input{height:32px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:13px;padding:0 8px;box-sizing:border-box}
+.dn-form input[type=number]{width:140px}
+.dn-paste{padding:0 16px 12px}.dn-paste summary{cursor:pointer;font-size:12.5px;font-weight:500}
+.dn-paste textarea{width:100%;min-height:90px;margin:8px 0;border:1px solid var(--card-line);border-radius:8px;background:var(--bg);color:var(--fg);font:12px/1.5 ui-monospace,Menlo,monospace;padding:8px 10px;box-sizing:border-box}
+.dn-x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 6px}.dn-x:hover{color:#b4372b}
+@media (max-width:640px){.dn-hero{padding:20px 18px}.dn-hero h3{font-size:24px}.dn-bar{grid-template-columns:96px minmax(0,1fr) auto}.dn-form label{flex:1 1 100%}.dn-form select,.dn-form input,.dn-form input[type=number]{width:100%}}
 @media (max-width:640px){.pv-tb td,.pv-tb th{padding:9px 10px}#pvQ{width:100%}#pvKpi .kp b{font-size:21px;overflow-wrap:anywhere}}
 .ad-ch{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
 .ad-ch h3{margin:0;font-size:14px;font-weight:600;margin-right:auto}
@@ -1954,6 +1978,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div class="sek-res menu" id="sekRes" role="menu" hidden></div>
       </div>
       <div class="sb-scroll">
+        <button class="nav" data-dueno-nav data-view="dueno" data-i="chart" hidden>Tablero del dueño</button>
         <div class="grp" data-pv-nav style="margin-top:6px" hidden>Posventa</div>
         <button class="nav" data-pv-nav data-dir-nav data-view="grp" data-i="folderchart" hidden>Tablero de grupo</button>
         <button class="nav" data-pv-nav data-view="pv" data-i="chart" hidden>Tablero de posventa</button>
@@ -2144,6 +2169,12 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
       <div class="ad-in">
         <div class="ad-head"><div><h2>Tablero de grupo</h2><p id="grpSub">Todas las agencias del grupo</p></div></div>
         <div id="grpBody"></div>
+      </div>
+    </section>
+    <section class="admin" id="viewDueno" hidden>
+      <div class="ad-in">
+        <div class="ad-head"><div><h2>Tablero del dueño</h2><p id="dnSub">Lo que Ax AI hace por tu grupo</p></div></div>
+        <div id="dnBody"></div>
       </div>
     </section>
     <section class="admin" id="viewRed" hidden>
@@ -2353,19 +2384,20 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){if(!MI.due().length){toast('Sin avisos pendientes');return}showView('mi');MI.send('¿Qué tengo pendiente?')});
 
-var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Red de reglas'};
+var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Red de reglas',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewDueno').hidden=id!=='dueno';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='pv'){crumb.textContent=VIEWS.pv;crumbSep.hidden=true;crumb2.hidden=true;PV.load()}
   else if(id==='grp'){crumb.textContent=VIEWS.grp;crumbSep.hidden=true;crumb2.hidden=true;GRP.load()}
   else if(id==='red'){crumb.textContent=VIEWS.red;crumbSep.hidden=true;crumb2.hidden=true;RED.load()}
+  else if(id==='dueno'){crumb.textContent=VIEWS.dueno;crumbSep.hidden=true;crumb2.hidden=true;DN.load()}
   else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
   else if(id==='cfg'){crumb.textContent=VIEWS.cfg;crumbSep.hidden=true;crumb2.hidden=true;CFG.open()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
@@ -6437,9 +6469,9 @@ SB.loadAdvisors=async function(){
   }
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
   if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;try{var au=await SB.c.auth.getUser();SB.email=au&&au.data&&au.data.user&&au.data.user.email||''}catch(_){}SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
-    me.director=me.role==='director';me.gerente=me.role==='gerente'||me.director;
-    if(me.director){try{var gq=await SB.c.from('agencies').select('grupos(nombre)').eq('id',me.agency_id).maybeSingle();SB.grupo=gq.data&&gq.data.grupos&&gq.data.grupos.nombre||'Tu grupo'}catch(_){}}
-    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});
+    me.dueno=me.role==='dueno';me.director=me.role==='director';me.gerente=me.role==='gerente'||me.director;
+    if(me.director||me.dueno){try{var gq=await SB.c.from('agencies').select('grupo_id,grupos(nombre)').eq('id',me.agency_id).maybeSingle();SB.grupoId=gq.data&&gq.data.grupo_id;SB.grupo=gq.data&&gq.data.grupos&&gq.data.grupos.nombre||'Tu grupo'}catch(_){}}
+    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
@@ -6452,7 +6484,7 @@ SB.enter=async function(user){
     await SB.pull(true);
     SB.loadHist();GP.load();
     MI.loadAgenda().then(MI.startTimer);
-    showView(MR.is()?'m_res':SB.user&&SB.user.director?'grp':PV.is()?'pv':'inicio');
+    showView(MR.is()?'m_res':DN.is()?'dueno':SB.user&&SB.user.director?'grp':PV.is()?'pv':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
       if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
@@ -6770,6 +6802,140 @@ GRP.render=function(){
     (L.length?L.map(function(o){var t=o.a+o.r?Math.round(o.a*100/(o.a+o.r))+'%':'—',d=o.dr||{};return '<tr data-grpag="'+ea(o.id)+'" tabindex="0"><td><b>'+esc(o.name)+'</b></td><td class="r">'+o.n+'</td><td class="r">'+t+'</td><td class="r">'+EX.money(o.monto)+'</td><td class="r">'+o.comp+' de '+o.n+'</td><td class="r">'+(o.venc?'<span class="pv-st bad">'+o.venc+'</span>':'0')+'</td><td class="r">'+(d.debitos?d.debitos+' · '+DEB.mx(d.monto_debitado):'0')+'</td><td class="r"><b>'+DEB.mx(Number(d.monto_protegido||0)+Number(d.monto_revertido||0))+'</b></td></tr>'}).join(''):'<tr><td colspan="8" class="pv-empty">Todavía no hay expedientes en el grupo.</td></tr>')+'</tbody></table></div></div>';
 };
 document.addEventListener('click',function(e){var tr=e.target.closest&&e.target.closest('tr[data-grpag]');if(!tr)return;PV.ag=Number(tr.dataset.grpag);showView('pv')});
+
+/* ===== Tablero del dueño del grupo: cuánto le salvó Ax AI, cuánto le costó y qué agencia anda mal ===== */
+var DN={hist:[],ags:[],ctr:null,mes:[],busy:false};
+DN.is=function(){return !!(SB.user&&SB.user.dueno)};
+/* el dueño solo ve su tablero en el menú lateral */
+DN.nav=function(on){
+  var b=$('[data-dueno-nav]');if(b){b.hidden=!on;b.style.display=on?'':'none'}
+  document.body.classList.toggle('dueno',!!on);if(!on)return;
+  $$('.sb-scroll > *').forEach(function(e){if(!e.hasAttribute('data-dueno-nav'))e.style.display='none'});
+};
+DN.ym=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+DN.mesTxt=function(ym){var p=String(ym).split('-');var d=new Date(Number(p[0]),Number(p[1])-1,15);var t=d.toLocaleDateString('es-MX',{month:'long',year:'numeric'});return t.charAt(0).toUpperCase()+t.slice(1)};
+DN.load=async function(){
+  if(!SB.c||!SB.entered||DN.busy)return;DN.busy=true;
+  $('#dnSub').textContent='Calculando…';
+  try{
+    var first=DN.ym(new Date())+'-01';
+    var r=await Promise.all([
+      SB.c.rpc('dinero_recuperado',{p_desde:first}),
+      SB.c.from('grupo_contrato').select('tarifa_agencia,pct_recuperado,inicio').maybeSingle(),
+      SB.c.from('debitos_historicos').select('id,agency_id,mes,monto,cantidad').order('mes',{ascending:false}).limit(2000),
+      SB.grupoId?SB.c.from('agencies').select('id,name').eq('grupo_id',SB.grupoId).order('name'):Promise.resolve({data:[]}),
+      PV.load(true),DR.load()]);
+    if(r[0].error)console.warn('[dueño mes]',r[0].error.message);
+    if(r[2].error)console.warn('[dueño históricos]',r[2].error.message);
+    DN.mes=r[0].data||[];DN.ctr=r[1].data||null;DN.hist=r[2].data||[];DN.ags=r[3].data||[];
+  }finally{DN.busy=false}
+  DN.render();
+};
+DN.agName=function(id){var a=DN.ags.filter(function(x){return x.id===id})[0];if(a)return a.name;var d=DR.rows.filter(function(x){return x.agency_id===id})[0];return d?d.agencia:'Agencia '+id};
+/* desde cuándo el grupo usa Ax AI: lo del contrato o, si no hay, el primer expediente */
+DN.inicio=function(){
+  if(DN.ctr&&DN.ctr.inicio)return new Date(DN.ctr.inicio+'T12:00:00');
+  var m=null;PV.rows.forEach(function(x){var d=new Date(x.created_at);if(!isNaN(d)&&(!m||d<m))m=d});return m||new Date();
+};
+DN.render=function(){
+  var el=$('#dnBody');if(!el)return;
+  var hoy=new Date(),ymHoy=DN.ym(hoy),mx=DEB.mx;
+  var salvMes=DR.sum(DN.mes,'monto_protegido')+DR.sum(DN.mes,'monto_revertido');
+  var salvTot=DR.sum(DR.rows,'monto_protegido')+DR.sum(DR.rows,'monto_revertido');
+  var nAg=DN.ags.length||DR.rows.length||1;
+  var c=DN.ctr||{},tar=c.tarifa_agencia!=null?Number(c.tarifa_agencia):null,pct=c.pct_recuperado!=null?Number(c.pct_recuperado):0;
+  $('#dnSub').textContent=(SB.grupo||'Tu grupo')+' · '+nAg+(nAg===1?' agencia':' agencias');
+  var costo=null,cl;
+  if(tar!=null){costo=nAg*tar+salvMes*pct/100;
+    var det=nAg+(nAg===1?' agencia':' agencias')+' × '+mx(tar)+(pct?' + '+pct+' % de lo salvado':'');
+    cl=salvMes>0&&costo>0?'Te costó <b>'+mx(costo)+'</b> ('+esc(det)+'). Por cada peso que pagaste recuperaste <b>$'+(salvMes/costo).toLocaleString('es-MX',{minimumFractionDigits:1,maximumFractionDigits:1})+'</b>.'
+      :'Te costó <b>'+mx(costo)+'</b> ('+esc(det)+'). Todavía no hay dinero salvado este mes.'}
+  else cl='El costo aparecerá aquí cuando Ax AI registre tu contrato.';
+  var hero='<div class="dn-hero"><span class="dn-k">Este mes · '+esc(DN.mesTxt(ymHoy))+'</span>'+
+    '<h3>Ax AI le salvó a tu grupo <b>'+mx(salvMes)+'</b></h3><p>'+cl+'</p>'+
+    '<small>Dinero salvado = reclamos que Ax AI corrigió antes de cobrarse + débitos que GM devolvió. Desde que empezaste: '+mx(salvTot)+'.</small></div>';
+
+  /* débitos: antes de Ax AI (lo que se cargó abajo) contra con Ax AI */
+  var ini=DN.inicio(),ymIni=DN.ym(ini);
+  var antes=DN.hist.filter(function(h){return !(DN.ctr&&DN.ctr.inicio)||String(h.mes).slice(0,7)<ymIni});
+  var mesesA={};antes.forEach(function(h){mesesA[String(h.mes).slice(0,7)]=1});var nmA=Object.keys(mesesA).length;
+  var promA=nmA?antes.reduce(function(a,h){return a+Number(h.monto||0)},0)/nmA:null;
+  var mesesCon=Math.max(1,(hoy-ini)/(30.44*864e5));
+  var debCon=DR.sum(DR.rows,'monto_debitado'),promC=debCon/mesesCon;
+  var debMes=DR.sum(DN.mes,'monto_debitado'),nDebMes=DR.sum(DN.mes,'debitos');
+  var cmp;
+  if(promA==null)cmp='<p class="dn-msg">Para comprobar cuánto bajaron tus débitos, carga abajo lo que GM te debitó cada mes <b>antes</b> de usar Ax AI.</p>';
+  else{var mxv=Math.max(promA,promC,1),dif=promA?Math.round((promA-promC)*100/promA):0;
+    cmp='<div class="dn-bar"><span>Antes de Ax AI</span><i style="width:'+(promA*100/mxv)+'%"></i><b>'+mx(promA)+' al mes</b></div>'+
+      '<div class="dn-bar"><span>Con Ax AI</span><i class="now" style="width:'+(promC*100/mxv)+'%"></i><b>'+mx(promC)+' al mes</b></div>'+
+      '<p class="dn-msg">'+(promC<=promA?'Tus débitos bajaron <b>'+dif+' %</b>: unos <b>'+mx(promA-promC)+'</b> menos al mes.':'Tus débitos subieron <b>'+(-dif)+' %</b>. Revisa qué agencias están en rojo.')+'</p>'}
+  var deb='<div class="ad-card"><div class="pv-ch"><h3>Débitos de GM: antes y con Ax AI</h3><span>'+(nmA?'base de '+nmA+(nmA===1?' mes':' meses'):'sin base todavía')+' · este mes: '+mx(debMes)+' en '+nDebMes+(nDebMes===1?' débito':' débitos')+'</span></div><div class="dn-cmp">'+cmp+'</div></div>';
+
+  /* semáforo por agencia */
+  var A={};var ag=function(id){return A[id]||(A[id]={id:id,deb:0,ndeb:0,venc:0,warn:0,rech:0,salv:0})};
+  DN.ags.forEach(function(a){ag(a.id)});
+  DN.mes.forEach(function(d){var o=ag(d.agency_id);o.deb=Number(d.monto_debitado||0);o.ndeb=Number(d.debitos||0);o.salv=Number(d.monto_protegido||0)+Number(d.monto_revertido||0)});
+  var first=new Date(hoy.getFullYear(),hoy.getMonth(),1);
+  PV.rows.forEach(function(x){var id=x.profiles&&x.profiles.agency_id;if(id==null)return;var o=ag(id),pz=PV.pz(x);
+    if(pz.some(function(i){return i.st==='bad'&&i.k!=='des'}))o.venc++;else if(pz.some(function(i){return i.st==='warn'&&i.k!=='des'}))o.warn++;
+    if(x.status==='rechazada'&&new Date(x.updated_at||x.created_at)>=first)o.rech++});
+  var L=Object.keys(A).map(function(k){var o=A[k],why=[];
+    if(o.ndeb)why.push(o.ndeb+(o.ndeb===1?' débito de GM':' débitos de GM')+' este mes ('+mx(o.deb)+')');
+    if(o.venc)why.push(o.venc+(o.venc===1?' reclamo con plazo vencido':' reclamos con plazo vencido'));
+    if(o.warn)why.push(o.warn+(o.warn===1?' reclamo con plazo por vencer':' reclamos con plazo por vencer'));
+    if(o.rech)why.push(o.rech+(o.rech===1?' reclamo rechazado':' reclamos rechazados')+' este mes');
+    o.st=o.ndeb||o.venc?'bad':o.warn||o.rech?'warn':'ok';o.why=why.length?why.join(' · '):'Todo en orden';o.name=DN.agName(o.id);return o})
+    .sort(function(a,b){var r={bad:0,warn:1,ok:2};return r[a.st]-r[b.st]||b.deb-a.deb||a.name.localeCompare(b.name)});
+  var nb=L.filter(function(o){return o.st==='bad'}).length;
+  var sem='<div class="ad-card"><div class="pv-ch"><h3>Tus agencias</h3><span>'+(nb?nb+(nb===1?' en rojo':' en rojo'):'ninguna en rojo')+'</span></div>'+
+    (L.length?L.map(function(o){return '<div class="dn-ag"><i class="xz-dot '+o.st+'" aria-label="'+(o.st==='bad'?'Rojo':o.st==='warn'?'Amarillo':'Verde')+'"></i><div><b>'+esc(o.name)+'</b><span>'+esc(o.why)+'</span></div><em><b>'+mx(o.salv)+'</b>salvado este mes</em></div>'}).join(''):'<p class="pv-empty">Todavía no hay agencias con datos.</p>')+
+    '<p class="pv-note" style="margin-top:10px">Rojo: GM le debitó este mes o tiene trámites vencidos. Amarillo: trámites por vencer o reclamos rechazados. Verde: todo en orden.</p></div>';
+
+  /* captura de los débitos de antes (línea base) */
+  var opts=(DN.ags.length?DN.ags:L).map(function(a){return '<option value="'+ea(a.id)+'">'+esc(a.name||DN.agName(a.id))+'</option>'}).join('');
+  var prev=new Date(hoy.getFullYear(),hoy.getMonth()-1,1);
+  var rows=DN.hist.slice().sort(function(a,b){return DN.agName(a.agency_id).localeCompare(DN.agName(b.agency_id))||String(b.mes).localeCompare(String(a.mes))});
+  var base='<div class="ad-card"><div class="pv-ch"><h3>Débitos de antes de Ax AI</h3><span>'+DN.hist.length+(DN.hist.length===1?' captura':' capturas')+'</span></div>'+
+    '<p class="pv-note">Captura cuánto te debitó GM cada mes antes de usar Ax AI, idealmente de 6 a 12 meses por agencia. Es la base para comparar.</p>'+
+    '<div class="dn-form"><label><span>Agencia</span><select id="dnAg">'+opts+'</select></label><label><span>Mes</span><input id="dnMes" type="month" value="'+DN.ym(prev)+'" max="'+ymHoy+'"></label><label><span>Monto debitado (MXN)</span><input id="dnMonto" type="number" min="0" step="1" placeholder="0"></label><label><span>Número de débitos</span><input id="dnCant" type="number" min="0" step="1" placeholder="0" style="width:120px"></label><button class="bt pri" data-dnsave style="height:32px">Guardar</button></div>'+
+    '<details class="dn-paste"><summary>Pegar varios meses desde Excel</summary><textarea id="dnPaste" placeholder="Agencia&#9;Mes (AAAA-MM)&#9;Monto&#9;Número de débitos&#10;'+esc((DN.ags[0]&&DN.ags[0].name)||'Agencia')+'&#9;'+DN.ym(prev)+'&#9;18500&#9;3"></textarea><button class="bt" data-dnpaste>Cargar lo pegado</button> <span class="xz-mut" id="dnPasteMsg"></span></details>'+
+    (rows.length?'<div class="pv-scroll"><table class="pv-tb"><thead><tr><th>Agencia</th><th>Mes</th><th class="r">Monto</th><th class="r">Débitos</th><th></th></tr></thead><tbody>'+
+      rows.map(function(h){return '<tr><td>'+esc(DN.agName(h.agency_id))+'</td><td>'+esc(DN.mesTxt(String(h.mes).slice(0,7)))+'</td><td class="r">'+mx(h.monto)+'</td><td class="r">'+Number(h.cantidad||0)+'</td><td class="r"><button class="dn-x" data-dndel="'+ea(h.id)+'" aria-label="Borrar">×</button></td></tr>'}).join('')+'</tbody></table></div>':'')+'</div>';
+  el.innerHTML=hero+deb+sem+base;
+};
+DN.num=function(v){var n=Number(String(v==null?'':v).replace(/[$\s,]/g,''));return isFinite(n)&&n>=0?n:NaN};
+DN.mesDe=function(v){var t=String(v||'').trim(),m;if((m=/^(\d{4})[-\/](\d{1,2})/.exec(t)))return m[1]+'-'+m[2].padStart(2,'0');if((m=/^(\d{1,2})[-\/](\d{4})$/.exec(t)))return m[2]+'-'+m[1].padStart(2,'0');return null};
+DN.save=async function(list){
+  var u={};list.forEach(function(x){u[x.agency_id+'|'+x.mes]=x});list=Object.keys(u).map(function(k){return u[k]}); /* un mes repetido: gana el último */
+  var r=await SB.c.from('debitos_historicos').upsert(list.map(function(x){return {agency_id:x.agency_id,mes:x.mes+'-01',monto:x.monto,cantidad:x.cantidad}}),{onConflict:'agency_id,mes'});
+  if(r.error){SB.fail(r.error);return false}return true;
+};
+document.addEventListener('click',async function(e){
+  var t=e.target.closest&&e.target.closest('[data-dnsave],[data-dndel],[data-dnpaste]');if(!t||!$('#dnBody').contains(t))return;
+  if(t.hasAttribute('data-dnsave')){
+    var ag=Number($('#dnAg').value),mes=DN.mesDe($('#dnMes').value),monto=DN.num($('#dnMonto').value),cant=$('#dnCant').value===''?0:DN.num($('#dnCant').value);
+    if(!ag||!mes||isNaN(monto)||isNaN(cant)){toast('Elige agencia y mes, y escribe el monto');return}
+    if(mes>=DN.ym(new Date())){toast('Ese mes todavía no termina');return}
+    t.disabled=true;var ok=await DN.save([{agency_id:ag,mes:mes,monto:monto,cantidad:Math.round(cant)}]);t.disabled=false;
+    if(ok){toast('Guardado');DN.load()}return}
+  if(t.hasAttribute('data-dndel')){
+    if(!confirm('¿Borrar este mes de la base?'))return;
+    var d=await SB.c.from('debitos_historicos').delete().eq('id',t.dataset.dndel);if(d.error)SB.fail(d.error);else DN.load();return}
+  if(t.hasAttribute('data-dnpaste')){
+    var ags=DN.ags,list=[],bad=[],norm=function(x){return String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim()};
+    $('#dnPaste').value.split(/\r?\n/).forEach(function(line,i){
+      if(!line.trim())return;var f=line.split(/\t|;/).map(function(x){return x.trim()});
+      var mes=DN.mesDe(f[1]);if(i===0&&!mes)return; /* encabezado */
+      var q=norm(f[0]),a=ags.filter(function(x){return String(x.id)===f[0]||norm(x.name)===q})[0]||ags.filter(function(x){return q&&norm(x.name).indexOf(q)>-1})[0];
+      var monto=DN.num(f[2]),cant=f[3]?DN.num(f[3]):0;
+      if(!a||!mes||isNaN(monto)||isNaN(cant)||mes>=DN.ym(new Date())){bad.push(i+1);return}
+      list.push({agency_id:a.id,mes:mes,monto:monto,cantidad:Math.round(cant)})});
+    var msg=$('#dnPasteMsg');
+    if(!list.length){msg.textContent='No encontré filas válidas. Usa: agencia, mes (AAAA-MM), monto y número de débitos, separados por tabulador o punto y coma.';return}
+    t.disabled=true;var ok2=await DN.save(list);t.disabled=false;
+    if(ok2){toast(list.length+(list.length===1?' mes cargado':' meses cargados')+(bad.length?' · revisa las líneas '+bad.join(', '):''));DN.load()}
+  }
+});
 
 /* ===== Tablero de posventa (gerente de posventa): todos los expedientes de su agencia ===== */
 var PV={rows:[],car:{},sec:{},q:'',as:'',st:'',inc:false,sort:'fecha',dir:-1,loading:false,t:0};
@@ -8308,10 +8474,10 @@ var SK=(function(){
   /* ── results ─────────────────────────────────────────────
      ADAPTED: the old Ctrl+K palette's list, now hanging from the
      field. Same sections, same filter, same icons. */
-  var ICON={notas:'note',cfg:'settings',agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'};
+  var ICON={dueno:'chart',notas:'note',cfg:'settings',agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'};
   function results(){
     var v=norm(field.value.trim());
-    list=Object.keys(VIEWS).filter(function(k){return k==='cfg'||(MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&norm(VIEWS[k]).indexOf(v)>-1});
+    list=Object.keys(VIEWS).filter(function(k){if(DN.is())return (k==='dueno'||k==='cfg')&&norm(VIEWS[k]).indexOf(v)>-1;return k==='cfg'||(MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&norm(VIEWS[k]).indexOf(v)>-1});
     if(sel>=list.length)sel=0;
     res.innerHTML='';
     if(!open){res.hidden=true;return}
