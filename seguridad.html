@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seguridad · Ax AI</title>
+<meta name="description" content="Cómo protege Ax AI los expedientes, documentos y datos de garantías de tu grupo: cifrado, información a demanda, agentes con límites y separación por agencia.">
+<meta name="theme-color" content="#EFEFEF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-180 -300 1482 1482'%3E%3Crect x='-180' y='-300' width='1482' height='1482' rx='300' fill='%23000'/%3E%3Cpath fill='%23fff' d='M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#F1F1F1;--ink:#0A0A0A;--mut:#6F6F73;--soft:#9A9AA0;--line:#DCDCDE;--card:#fff;--blue:#1D4ED8;
+ --edge:radial-gradient(130% 95% at 50% 42%,rgba(0,0,0,0) 52%,rgba(150,175,200,.42) 100%);
+ --gradcard:var(--edge),linear-gradient(180deg,#3a3b40 0%,#1d212b 12%,#0e1626 26%,#0b1730 40%,#13295a 54%,#1f4677 66%,#3f6d98 78%,#7c9bb7 90%,#aebdc8 100%);
+ --gradfin:var(--edge),linear-gradient(180deg,#00163f 0%,#022657 18%,#103e6c 32%,#1d577e 44%,#2d698c 54%,#6092ad 66%,#aac8db 82%,#d4e4ee 100%)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;font-size:15px}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:10px}
+.wrap{width:100%;max-width:1140px;margin:0 auto;padding:0 24px}
+section{padding:96px 0}
+h1,h2,h3{font-family:'Inter Tight',Inter,sans-serif;font-weight:500;letter-spacing:-.035em;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,6vw,76px)}
+h2{font-size:clamp(30px,4vw,50px)}
+h3{font-size:22px;letter-spacing:-.02em;line-height:1.15}
+.eyebrow{display:block;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:14px}
+.sub{color:var(--mut);font-size:17px;max-width:620px;line-height:1.6}
+.center{text-align:center}.center .sub{margin-left:auto;margin-right:auto}
+.btn{display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 22px;border-radius:999px;font-weight:500;font-size:15px;transition:transform .2s,box-shadow .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.btn-light{background:#fff;color:var(--ink)}.btn-light:hover{box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+/* menú */
+.nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;width:calc(100% - 28px);max-width:640px;height:52px;background:rgba(12,12,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.logo{display:flex;align-items:center;gap:8px;font-family:'Inter Tight',Inter,sans-serif;font-weight:500;font-size:17px;letter-spacing:-.03em}
+.logo svg{height:.95em;width:auto}
+.nav-r{display:flex;align-items:center;gap:4px}
+.nav-link{padding:8px 11px;border-radius:10px;font-size:13px;color:#c9c9cf;white-space:nowrap}.nav-link:hover{color:#fff}.nav-link[aria-current=page]{color:#fff}
+.nav .btn{height:36px;padding:0 14px;font-size:13px;background:#fff;color:#0a0a0a}
+.lang{display:flex;background:rgba(255,255,255,.08);border-radius:10px;padding:3px;margin-left:2px}
+.lang button{padding:5px 8px;border-radius:8px;font-size:11px;font-weight:600;color:#a1a1aa}
+.lang button[aria-pressed=true]{background:#fff;color:#0a0a0a}
+/* portada */
+.hero{padding:150px 0 40px;position:relative;overflow:hidden}
+.hero .sub{margin-top:22px}
+.hero .btns{margin-top:30px;justify-content:center}
+.shield{width:84px;height:84px;margin:0 auto 26px;border-radius:24px;background:var(--gradcard);display:grid;place-items:center;color:#fff;box-shadow:0 20px 40px rgba(16,35,77,.25)}
+.shield svg{width:38px;height:38px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:34px}
+.badges span{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;color:#3f3f46}
+.badges span::before{content:"";width:7px;height:7px;border-radius:50%;background:#22c55e}
+/* pilares */
+.pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:46px}
+.pil{border-radius:26px;background:var(--gradcard);color:#fff;padding:24px 22px 26px;min-height:340px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.pil .no{font-size:13px;color:#b9c8e6}
+.pil .ic{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;margin:22px 0 auto}
+.pil .ic svg{width:26px;height:26px}
+.pil h3{margin-top:28px}
+.pil p{margin-top:10px;font-size:14px;line-height:1.55;color:#dbe4f3}
+/* tablas */
+.blk{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.blk + .blk{margin-top:96px}
+.blk .sub{margin-top:16px;font-size:16px}
+.tbl{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.tbl .row{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:18px;padding:16px 22px;border-top:1px solid #ececee;font-size:14.5px}
+.tbl .row:first-child{border-top:0;background:#fafafa;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:12px 22px}
+.tbl .row b{font-weight:600}
+.tbl .row span{color:#3f3f46}
+.tbl .row .ok{display:inline-flex;align-items:center;gap:7px;color:#15803d;font-weight:600}
+.tbl .row .ok::before{content:"✓";display:grid;place-items:center;width:18px;height:18px;border-radius:6px;background:#dcfce7;font-size:11px}
+/* preguntas */
+.faqw{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.qa{border-top:1px solid var(--line)}
+.qa:last-child{border-bottom:1px solid var(--line)}
+.qa button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;text-align:left;font-size:17px;font-weight:500}
+.qa button i{font-style:normal;font-size:20px;color:var(--mut);transition:transform .25s}
+.qa[open] button i{transform:rotate(45deg)}
+.qa .a{display:none;padding:0 0 20px;color:var(--mut);font-size:15px;line-height:1.6;max-width:640px}
+.qa[open] .a{display:block}
+/* cierre */
+.fin{border-radius:56px;background:var(--gradfin);color:#fff;text-align:center;padding:110px 24px 130px;margin:0 14px}
+.fin h2{max-width:760px;margin:0 auto}
+.fin p{color:#d6e2f2;margin:18px auto 0;max-width:560px;font-size:17px}
+.fin .btns{justify-content:center;margin-top:30px}
+.fin .btn-ghost{background:#0a0a0a;color:#fff}
+footer{padding:70px 0 40px}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px}
+.fgrid h4{font-size:13px;font-weight:600;margin-bottom:12px}
+.fgrid a{display:block;color:var(--mut);font-size:14px;margin:6px 0}.fgrid a:hover{color:var(--ink)}
+.fgrid .bl{font-size:20px;letter-spacing:-.02em;line-height:1.35;color:var(--mut);max-width:340px}.fgrid .bl b{color:var(--ink);font-weight:500}
+.mark{display:flex;align-items:center;gap:18px;margin-top:64px;font-family:'Inter Tight',Inter,sans-serif;font-size:clamp(56px,9vw,120px);letter-spacing:-.06em;line-height:1}
+.mark svg{height:.62em;width:auto}
+.copy{margin-top:14px;color:#a1a1aa;font-size:12.5px}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media (max-width:980px){.pillars{grid-template-columns:1fr 1fr}.blk,.faqw{grid-template-columns:1fr;gap:28px}.fgrid{grid-template-columns:1fr 1fr}.fgrid>div:first-child{grid-column:1/-1}}
+@media (max-width:640px){
+ section{padding:64px 0}.wrap{padding:0 18px}
+ .nav{top:10px;width:calc(100% - 20px);height:48px;padding:0 6px 0 14px}
+ .nav .hide-m{display:none}
+ .hero{padding:110px 0 20px}
+ .hero .btns{flex-direction:column;align-items:stretch}.hero .btn{justify-content:center}
+ .pillars{grid-template-columns:1fr;gap:12px;margin-top:30px}
+ .pil{min-height:0;border-radius:22px}.pil .ic{margin:18px 0 0}.pil h3{margin-top:20px}
+ .blk + .blk{margin-top:64px}
+ .tbl .row{grid-template-columns:1fr;gap:4px;padding:14px 18px}
+ .tbl .row:first-child{display:none}
+ .fin{border-radius:32px;margin:0 10px;padding:72px 20px 88px}
+ .fin .btns{flex-direction:column;align-items:stretch}.fin .btn{justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Principal">
+ <a href="./" class="logo" aria-label="Ax AI, inicio"><svg viewBox="0 0 1122 883" aria-hidden="true"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg><span>Ax AI</span></a>
+ <div class="nav-r">
+  <a class="nav-link hide-m" href="./#como-funciona" data-i="nav.how"></a>
+  <a class="nav-link" href="seguridad" aria-current="page" data-i="nav.sec"></a>
+  <a class="nav-link hide-m" href="app" data-i="nav.login"></a>
+  <a class="btn hide-m" href="./#piloto" data-i="cta.pilot"></a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+ </div>
+</nav>
+
+<main>
+<section class="hero center"><div class="wrap">
+ <div class="shield" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
+ <span class="eyebrow" data-i="h.k"></span>
+ <h1 data-i="h.t"></h1>
+ <p class="sub" data-i="h.s"></p>
+ <div class="btns"><a class="btn btn-dark" href="./#piloto"><span data-i="cta.team"></span><span>→</span></a><a class="btn btn-light" href="#pilares"><span data-i="h.see"></span><span>↓</span></a></div>
+ <div class="badges" id="badges"></div>
+</div></section>
+
+<section id="pilares" style="padding-top:40px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="p.k"></span><h2 class="rv" data-i="p.t"></h2></div>
+ <div class="pillars" id="pillars"></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="blk rv"><div><span class="eyebrow" data-i="i.k"></span><h2 data-i="i.t"></h2><p class="sub" data-i="i.s"></p></div><div class="tbl" id="tInfra"></div></div>
+ <div class="blk rv"><div><span class="eyebrow" data-i="a.k"></span><h2 data-i="a.t"></h2><p class="sub" data-i="a.s"></p></div><div class="tbl" id="tAcc"></div></div>
+ <div class="blk rv"><div><span class="eyebrow" data-i="d.k"></span><h2 data-i="d.t"></h2><p class="sub" data-i="d.s"></p></div><div class="tbl" id="tData"></div></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap faqw">
+ <div><span class="eyebrow" data-i="f.k"></span><h2 class="rv" data-i="f.t"></h2></div>
+ <div id="faq"></div>
+</div></section>
+
+<div class="fin rv">
+ <h2 data-i="c.t"></h2>
+ <p data-i="c.s"></p>
+ <div class="btns"><a class="btn btn-light" href="./#piloto"><span data-i="cta.team"></span><span>→</span></a><a class="btn btn-ghost" href="app"><span data-i="c.app"></span><span>→</span></a></div>
+</div>
+</main>
+
+<footer><div class="wrap">
+ <div class="fgrid">
+  <div><p class="bl"><b>Ax AI ·</b> <span data-i="ft.tag"></span></p></div>
+  <div><h4 data-i="ft.prod"></h4><a href="./#como-funciona" data-i="nav.how"></a><a href="./#red" data-i="ft.red"></a><a href="seguridad" data-i="nav.sec"></a></div>
+  <div><h4 data-i="ft.co"></h4><a href="./#piloto" data-i="cta.pilot"></a><a href="app" data-i="nav.login"></a></div>
+  <div><h4>Legal</h4><a href="privacidad" data-i="ft.privacy"></a><a href="terminos" data-i="ft.terms"></a></div>
+ </div>
+ <div class="mark" aria-hidden="true"><svg viewBox="0 0 1122 883"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg>Ax AI</div>
+ <p class="copy" data-i="ft.copy"></p>
+</div></footer>
+
+<script>
+(function(){
+var IC={
+ lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/></svg>',
+ bolt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/><path d="M8.5 11h5M11 8.5v5"/></svg>',
+ gate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6l7-3z"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>',
+ split:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="7" height="7" rx="2"/><rect x="13.5" y="4" width="7" height="7" rx="2"/><rect x="3.5" y="14" width="7" height="7" rx="2"/><rect x="13.5" y="14" width="7" height="7" rx="2"/></svg>'};
+var T={
+es:{'nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.login':'Iniciar sesión','cta.pilot':'Solicita un piloto','cta.team':'Habla con el equipo',
+ 'h.k':'Seguridad','h.t':'Tus garantías, protegidas de punta a punta','h.s':'Ax AI trabaja con los expedientes, documentos y cobros de tu grupo. Así los cuidamos, en cada paso y en cada agencia.','h.see':'Ver cómo está construido',
+ badges:['Cifrado en reposo y en tránsito','Permisos aplicados en la base de datos','Tus datos no entrenan modelos','Sin contraseñas del portal de la armadora'],
+ 'p.k':'Los cuatro pilares','p.t':'Cómo está construido',
+ pil:[['lock','Cifrado de punta a punta','Datos cifrados en reposo (AES-256) y en tránsito (TLS). Ningún expediente viaja ni se guarda en texto plano.'],
+  ['bolt','Información a demanda','Cada agente consulta solo lo que la tarea necesita, en el momento en que lo necesita. Tu operación completa nunca se vuelca al modelo.'],
+  ['gate','Agentes con límites','Cada llamada a los agentes exige una sesión válida. Solo pueden leer tablas permitidas, con filtros validados y un número limitado de pasos.'],
+  ['split','Cada agencia, aparte','Los datos de cada agencia y de cada grupo viven separados, y los permisos se aplican en la base de datos. La red comparte reglas, nunca expedientes.']],
+ 'i.k':'Infraestructura','i.t':'Dónde corre Ax AI','i.s':'La plataforma corre en Render y guarda los datos en Supabase, con PostgreSQL administrado y almacenamiento privado para los documentos. Los modelos de lenguaje se usan por API con un proveedor empresarial cuyas condiciones comerciales excluyen entrenar con tus datos.',
+ infra:[['Componente','Detalle'],['Aplicación web','Render, solo por HTTPS'],['Base de datos','PostgreSQL administrado (Supabase)'],['Documentos del expediente','Almacenamiento privado; se abren solo con permiso'],['Modelos de lenguaje','Anthropic (Claude), por API'],['Entrenamiento con tus datos','ok:Excluido']],
+ 'a.k':'Controles de acceso','a.t':'Quién ve qué, y cómo queda registrado','a.s':'Cada persona entra con su propia cuenta y ve solo lo que le corresponde a su puesto. Las reglas de acceso viven en la base de datos, no solo en la pantalla.',
+ acc:[['Control','Detalle'],['Inicio de sesión','Cuenta personal con correo y contraseña'],['Roles y permisos','El asesor ve sus expedientes; el gerente, los de su agencia; el director y el dueño, los de su grupo'],['Altas con código','Los roles de gerente, director y dueño solo se activan con el código de su grupo'],['Registro de actividad','Cada corrida de los agentes queda registrada con sus pasos, fecha y resultado; cada expediente tiene su bitácora'],['Bajas','Quitamos el acceso en cuanto la agencia lo pide']],
+ 'd.k':'Tus datos, tus reglas','d.t':'Los expedientes son tuyos. Lo que aprende tu agencia, también','d.s':'Ax AI no se conecta al portal de la armadora ni pide sus contraseñas: trabaja con los documentos que tu equipo sube. Cada agencia decide si comparte lo que aprende con la red o lo guarda para sí.',
+ data:[['Tema','Detalle'],['Contraseñas del portal de la armadora','ok:No las pedimos ni las guardamos'],['Lo que se comparte con la red','Reglas y cifras agregadas; nunca clientes, VIN, montos ni expedientes de otra agencia'],['Modo Protegida','Lo que aprende tu agencia se queda en tu agencia'],['Manuales de la armadora','Se guardan en privado y solo los consultan los agentes'],['Si dejas Ax AI','Te entregamos tus datos y los borramos a solicitud']],
+ 'f.k':'Preguntas frecuentes','f.t':'Lo que preguntará tu equipo de seguridad',
+ faq:[['¿Los modelos se entrenan con mis datos?','No. Ax AI usa los modelos de Anthropic (Claude) por API, bajo condiciones comerciales que excluyen entrenar con los datos que enviamos. Lo que sí crece es la red de reglas de Ax AI, y solo con reglas y cifras agregadas.'],
+  ['¿Necesitan las contraseñas del portal de la armadora?','No. Ax AI no se conecta al portal ni guarda sus credenciales. Trabaja con los documentos que tu equipo ya tiene: la PREA, la orden, la evidencia y la transacción de planta.'],
+  ['¿Quién puede ver la actividad de los agentes?','Quien tiene permiso sobre ese expediente: el asesor, el gerente de su agencia y el director o dueño de su grupo. Cada corrida queda registrada con sus pasos, fecha y resultado.'],
+  ['¿Qué comparte mi agencia con las demás?','Solo reglas y cifras agregadas, por ejemplo: «la autorización debe llevar la firma del cliente» y cuántas veces se debitó por eso. Nunca nombres de clientes, VIN, montos ni expedientes. Si tu agencia está en modo Protegida, lo que aprende no sale de ella.'],
+  ['¿Qué pasa con mis datos si dejo de usar Ax AI?','Te entregamos tus expedientes y documentos, y los borramos a solicitud.']],
+ 'c.t':'¿Tu equipo de seguridad necesita revisar algo a detalle?','c.s':'Te compartimos la documentación y respondemos sus preguntas directamente.','c.app':'Ver la plataforma',
+ 'ft.tag':'La red de reglas que será la infraestructura de garantías de la industria.','ft.prod':'Producto','ft.red':'La red de Ax AI','ft.co':'Empresa','ft.privacy':'Aviso de privacidad','ft.terms':'Términos de uso','ft.copy':'© 2026 Ax AI. Todos los derechos reservados.'},
+en:{'nav.how':'How it works','nav.sec':'Security','nav.login':'Sign in','cta.pilot':'Request a pilot','cta.team':'Talk to the team',
+ 'h.k':'Security','h.t':'Your warranty claims, protected end to end','h.s':'Ax AI works with your group’s claim files, documents and collections. This is how we protect them, at every step and every dealership.','h.see':'See how it’s built',
+ badges:['Encrypted at rest and in transit','Permissions enforced in the database','Your data never trains models','No automaker portal passwords'],
+ 'p.k':'The four pillars','p.t':'How it’s built',
+ pil:[['lock','End-to-end encryption','Data encrypted at rest (AES-256) and in transit (TLS). No claim file travels or is stored in plain text.'],
+  ['bolt','Information on demand','Each agent reads only what the current task needs, at the moment it needs it. Your whole operation is never dumped into the model.'],
+  ['gate','Agents with limits','Every call to the agents requires a valid session. They can only read allowed tables, with validated filters and a limited number of steps.'],
+  ['split','Every dealership, separate','Each dealership’s and group’s data lives separately, and permissions are enforced in the database. The network shares rules, never claim files.']],
+ 'i.k':'Infrastructure','i.t':'Where Ax AI runs','i.s':'The platform runs on Render and stores data in Supabase, with managed PostgreSQL and private storage for documents. Language models are used via API from an enterprise provider whose commercial terms exclude training on your data.',
+ infra:[['Component','Detail'],['Web app','Render, HTTPS only'],['Database','Managed PostgreSQL (Supabase)'],['Claim file documents','Private storage; opened only with permission'],['Language models','Anthropic (Claude), via API'],['Training on your data','ok:Excluded']],
+ 'a.k':'Access controls','a.t':'Who sees what, and how it’s logged','a.s':'Everyone signs in with their own account and sees only what their role allows. Access rules live in the database, not just on the screen.',
+ acc:[['Control','Detail'],['Sign-in','Personal account with email and password'],['Roles and permissions','Advisors see their claim files; managers, their dealership’s; directors and owners, their group’s'],['Sign-up with a code','Manager, director and owner roles are only activated with their group’s code'],['Activity log','Every agent run is logged with its steps, date and result; every claim file has its own log'],['Offboarding','Access is removed as soon as the dealership asks']],
+ 'd.k':'Your data, your rules','d.t':'The claim files are yours. So is what your dealership learns','d.s':'Ax AI doesn’t connect to the automaker’s portal or ask for its passwords: it works with the documents your team uploads. Each dealership decides whether to share what it learns with the network or keep it to itself.',
+ data:[['Topic','Detail'],['Automaker portal passwords','ok:We never ask for or store them'],['What is shared with the network','Rules and aggregated figures; never customers, VINs, amounts or another dealership’s claim files'],['Protected mode','What your dealership learns stays in your dealership'],['Automaker manuals','Stored privately and only consulted by the agents'],['If you leave Ax AI','We hand over your data and delete it on request']],
+ 'f.k':'FAQs','f.t':'What your security team will ask',
+ faq:[['Are models trained on my data?','No. Ax AI uses Anthropic’s models (Claude) via API, under commercial terms that exclude training on the data we send. What does grow is the Ax AI rule network, and only with rules and aggregated figures.'],
+  ['Do you need the automaker portal passwords?','No. Ax AI doesn’t connect to the portal or store its credentials. It works with documents your team already has: the claim, the repair order, the evidence and the automaker’s transaction.'],
+  ['Who can see agent activity?','Whoever has permission over that claim file: the advisor, their dealership’s manager and their group’s director or owner. Every run is logged with its steps, date and result.'],
+  ['What does my dealership share with the others?','Only rules and aggregated figures, for example: “the authorization must carry the customer’s signature” and how many times it led to a chargeback. Never customer names, VINs, amounts or claim files. If your dealership is in Protected mode, what it learns stays there.'],
+  ['What happens to my data if I stop using Ax AI?','We hand over your claim files and documents, and delete them on request.']],
+ 'c.t':'Does your security team need to review something in detail?','c.s':'We’ll share the documentation and answer their questions directly.','c.app':'See the platform',
+ 'ft.tag':'The rule network that will become the industry’s warranty infrastructure.','ft.prod':'Product','ft.red':'The Ax AI network','ft.co':'Company','ft.privacy':'Privacy notice','ft.terms':'Terms of use','ft.copy':'© 2026 Ax AI. All rights reserved.'}};
+var lang='es';try{var sv=localStorage.getItem('axai-lang');if(sv==='en'||sv==='es')lang=sv}catch(e){}
+function t(k){return T[lang][k]}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function cell(v){return /^ok:/.test(v)?'<span class="ok">'+esc(v.slice(3))+'</span>':'<span>'+esc(v)+'</span>'}
+function table(id,rows){document.getElementById(id).innerHTML=rows.map(function(r,i){return '<div class="row" role="row">'+(i===0?'<span>'+esc(r[0])+'</span><span>'+esc(r[1])+'</span>':'<b>'+esc(r[0])+'</b>'+cell(r[1]))+'</div>'}).join('')}
+function render(){
+ document.documentElement.lang=lang;document.title=(lang==='en'?'Security':'Seguridad')+' · Ax AI';
+ document.querySelectorAll('[data-i]').forEach(function(e){var v=t(e.dataset.i);if(typeof v==='string')e.textContent=v});
+ document.querySelectorAll('.lang button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.lang===lang))});
+ document.getElementById('badges').innerHTML=t('badges').map(function(b){return '<span>'+esc(b)+'</span>'}).join('');
+ document.getElementById('pillars').innerHTML=t('pil').map(function(p,i){return '<div class="pil rv in"><span class="no">0'+(i+1)+'</span><div class="ic">'+IC[p[0]]+'</div><h3>'+esc(p[1])+'</h3><p>'+esc(p[2])+'</p></div>'}).join('');
+ table('tInfra',t('infra'));table('tAcc',t('acc'));table('tData',t('data'));
+ document.getElementById('faq').innerHTML=t('faq').map(function(q,i){return '<div class="qa"'+(i===0?' open':'')+'><button type="button" aria-expanded="'+(i===0)+'"><span>'+esc(q[0])+'</span><i aria-hidden="true">+</i></button><div class="a">'+esc(q[1])+'</div></div>'}).join('');
+ document.querySelectorAll('.qa button').forEach(function(b){b.onclick=function(){var q=b.parentNode,o=!q.hasAttribute('open');if(o)q.setAttribute('open','');else q.removeAttribute('open');b.setAttribute('aria-expanded',String(o))}});
+}
+document.querySelectorAll('.lang button').forEach(function(b){b.onclick=function(){lang=b.dataset.lang;try{localStorage.setItem('axai-lang',lang)}catch(e){}render()}});
+render();
+var io='IntersectionObserver' in window?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12}):null;
+document.querySelectorAll('.rv').forEach(function(e){if(io)io.observe(e);else e.classList.add('in')});
+})();
+</script>
+</body>
+</html>
