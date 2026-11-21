@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Precios · Ax AI</title>
+<meta name="description" content="Cómo cobra Ax AI: una tarifa por agencia más un porcentaje del dinero recuperado. Lo platicamos con tu grupo y armamos una propuesta con tus números.">
+<meta name="theme-color" content="#EFEFEF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-180 -300 1482 1482'%3E%3Crect x='-180' y='-300' width='1482' height='1482' rx='300' fill='%23000'/%3E%3Cpath fill='%23fff' d='M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#F1F1F1;--ink:#0A0A0A;--mut:#6F6F73;--soft:#9A9AA0;--line:#DCDCDE;--card:#fff;--blue:#1D4ED8;
+ --edge:radial-gradient(130% 95% at 50% 42%,rgba(0,0,0,0) 52%,rgba(150,175,200,.42) 100%);
+ --gradcard:var(--edge),linear-gradient(180deg,#3a3b40 0%,#1d212b 12%,#0e1626 26%,#0b1730 40%,#13295a 54%,#1f4677 66%,#3f6d98 78%,#7c9bb7 90%,#aebdc8 100%);
+ --gradfin:var(--edge),linear-gradient(180deg,#00163f 0%,#022657 18%,#103e6c 32%,#1d577e 44%,#2d698c 54%,#6092ad 66%,#aac8db 82%,#d4e4ee 100%)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;font-size:15px}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:10px}
+.wrap{width:100%;max-width:1140px;margin:0 auto;padding:0 24px}
+section{padding:96px 0}
+h1,h2,h3{font-family:'Inter Tight',Inter,sans-serif;font-weight:500;letter-spacing:-.035em;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,6vw,76px)}
+h2{font-size:clamp(30px,4vw,50px)}
+h3{font-size:22px;letter-spacing:-.02em;line-height:1.15}
+.eyebrow{display:block;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:14px}
+.sub{color:var(--mut);font-size:17px;max-width:620px;line-height:1.6}
+.center{text-align:center}.center .sub{margin-left:auto;margin-right:auto}
+.btn{display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 22px;border-radius:999px;font-weight:500;font-size:15px;transition:transform .2s,box-shadow .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.btn-light{background:#fff;color:var(--ink)}.btn-light:hover{box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+/* menú */
+.nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;width:calc(100% - 28px);max-width:780px;height:52px;background:rgba(12,12,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.logo{display:flex;align-items:center;gap:8px;white-space:nowrap;flex:none;font-family:'Inter Tight',Inter,sans-serif;font-weight:500;font-size:17px;letter-spacing:-.03em}
+.logo svg{height:.95em;width:auto}
+.nav-r{display:flex;align-items:center;gap:4px}
+.nav-link{padding:8px 11px;border-radius:10px;font-size:13px;color:#c9c9cf;white-space:nowrap}.nav-link:hover{color:#fff}.nav-link[aria-current=page]{color:#fff}
+.nav .btn{height:36px;padding:0 14px;font-size:13px;background:#fff;color:#0a0a0a}
+.lang{display:flex;background:rgba(255,255,255,.08);border-radius:10px;padding:3px;margin-left:2px}
+.lang button{padding:5px 8px;border-radius:8px;font-size:11px;font-weight:600;color:#a1a1aa}
+.lang button[aria-pressed=true]{background:#fff;color:#0a0a0a}
+/* portada */
+.hero{padding:150px 0 40px;position:relative;overflow:hidden}
+.hero .sub{margin-top:22px}
+.hero .btns{margin-top:30px;justify-content:center}
+.shield{width:84px;height:84px;margin:0 auto 26px;border-radius:24px;background:var(--gradcard);display:grid;place-items:center;color:#fff;box-shadow:0 20px 40px rgba(16,35,77,.25)}
+.shield svg{width:38px;height:38px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:34px}
+.badges span{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;color:#3f3f46}
+.badges span::before{content:"";width:7px;height:7px;border-radius:50%;background:#22c55e}
+/* pilares */
+.pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:46px}
+.pil{border-radius:26px;background:var(--gradcard);color:#fff;padding:24px 22px 26px;min-height:340px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.pil .no{font-size:13px;color:#b9c8e6}
+.pil .ic{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;margin:22px 0 auto}
+.pil .ic svg{width:26px;height:26px}
+.pil h3{margin-top:28px}
+.pil p{margin-top:10px;font-size:14px;line-height:1.55;color:#dbe4f3}
+/* tablas */
+.blk{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.blk + .blk{margin-top:96px}
+.blk .sub{margin-top:16px;font-size:16px}
+.tbl{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.tbl .row{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:18px;padding:16px 22px;border-top:1px solid #ececee;font-size:14.5px}
+.tbl .row:first-child{border-top:0;background:#fafafa;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:12px 22px}
+.tbl .row b{font-weight:600}
+.tbl .row span{color:#3f3f46}
+.tbl .row .ok{display:inline-flex;align-items:center;gap:7px;color:#15803d;font-weight:600}
+.tbl .row .ok::before{content:"✓";display:grid;place-items:center;width:18px;height:18px;border-radius:6px;background:#dcfce7;font-size:11px}
+/* preguntas */
+.faqw{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.qa{border-top:1px solid var(--line)}
+.qa:last-child{border-bottom:1px solid var(--line)}
+.qa button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;text-align:left;font-size:17px;font-weight:500}
+.qa button i{font-style:normal;font-size:20px;color:var(--mut);transition:transform .25s}
+.qa[open] button i{transform:rotate(45deg)}
+.qa .a{display:none;padding:0 0 20px;color:var(--mut);font-size:15px;line-height:1.6;max-width:640px}
+.qa[open] .a{display:block}
+/* cierre */
+.fin{border-radius:56px;background:var(--gradfin);color:#fff;text-align:center;padding:110px 24px 130px;margin:0 14px}
+.fin h2{max-width:760px;margin:0 auto}
+.fin p{color:#d6e2f2;margin:18px auto 0;max-width:560px;font-size:17px}
+.fin .btns{justify-content:center;margin-top:30px}
+.fin .btn-ghost{background:#0a0a0a;color:#fff}
+footer{padding:70px 0 40px}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px}
+.fgrid h4{font-size:13px;font-weight:600;margin-bottom:12px}
+.fgrid a{display:block;color:var(--mut);font-size:14px;margin:6px 0}.fgrid a:hover{color:var(--ink)}
+.fgrid .bl{font-size:20px;letter-spacing:-.02em;line-height:1.35;color:var(--mut);max-width:340px}.fgrid .bl b{color:var(--ink);font-weight:500}
+.mark{display:flex;align-items:center;gap:18px;margin-top:64px;font-family:'Inter Tight',Inter,sans-serif;font-size:clamp(56px,9vw,120px);letter-spacing:-.06em;line-height:1}
+.mark svg{height:.62em;width:auto}
+.copy{margin-top:14px;color:#a1a1aa;font-size:12.5px}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media (max-width:980px){.pillars{grid-template-columns:1fr 1fr}.blk,.faqw{grid-template-columns:1fr;gap:28px}.fgrid{grid-template-columns:1fr 1fr}.fgrid>div:first-child{grid-column:1/-1}}
+@media (max-width:640px){
+ section{padding:64px 0}.wrap{padding:0 18px}
+ .nav{top:10px;width:calc(100% - 20px);height:48px;padding:0 6px 0 14px}
+ .nav .hide-m{display:none}
+ .hero{padding:110px 0 20px}
+ .hero .btns{flex-direction:column;align-items:stretch}.hero .btn{justify-content:center}
+ .pillars{grid-template-columns:1fr;gap:12px;margin-top:30px}
+ .pil{min-height:0;border-radius:22px}.pil .ic{margin:18px 0 0}.pil h3{margin-top:20px}
+ .blk + .blk{margin-top:64px}
+ .tbl .row{grid-template-columns:1fr;gap:4px;padding:14px 18px}
+ .tbl .row:first-child{display:none}
+ .fin{border-radius:32px;margin:0 10px;padding:72px 20px 88px}
+ .fin .btns{flex-direction:column;align-items:stretch}.fin .btn{justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+/* precios */
+.formula{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:stretch;max-width:980px;margin:46px auto 0}
+.fx{border-radius:26px;background:var(--gradcard);color:#fff;padding:26px 26px 30px;display:flex;flex-direction:column}
+.fx .no{font-size:13px;color:#b9c8e6}.fx .ic{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;margin:22px 0 26px}.fx .ic svg{width:26px;height:26px}
+.fx p{margin-top:10px;font-size:15px;line-height:1.6;color:#dbe4f3}
+.plus{display:grid;place-items:center;font-family:'Inter Tight',Inter,sans-serif;font-size:44px;font-weight:300;color:var(--mut)}
+.fnote{max-width:680px;margin:20px auto 0;text-align:center;color:var(--mut);font-size:14px}
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:46px;align-items:stretch}
+.plan{background:#fff;border:1px solid var(--line);border-radius:26px;padding:26px;display:flex;flex-direction:column}
+.plan .tag{align-self:flex-start;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;background:#f1f1f3;color:#3f3f46;margin-bottom:22px}
+.plan h3{font-size:28px}.plan .who{display:block;margin-top:6px;font-size:14px;font-weight:500;color:var(--mut)}
+.plan p{margin-top:16px;font-size:15px;line-height:1.6;color:#3f3f46}
+.plan ul{list-style:none;margin:20px 0 26px;display:grid;gap:10px;font-size:14.5px}
+.plan li{display:flex;gap:10px;align-items:flex-start}.plan li::before{content:"✓";flex:none;display:grid;place-items:center;width:20px;height:20px;border-radius:7px;background:#e0e7ff;color:#1d4ed8;font-size:11px;font-weight:700;margin-top:1px}
+.plan .btn{margin-top:auto;justify-content:center}
+.plan.hl{background:var(--gradcard);color:#fff;border-color:transparent}.plan.hl .tag{background:rgba(255,255,255,.14);color:#fff}.plan.hl .who{color:#b9c8e6}.plan.hl p{color:#dbe4f3}.plan.hl li::before{background:rgba(255,255,255,.16);color:#fff}
+.tbl.inc .row{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}.tbl.inc .row:first-child{display:grid;background:none;font-size:14.5px;letter-spacing:0;text-transform:none;color:inherit;padding:16px 22px}
+.tbl.inc .row b::before{content:"✓";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:6px;background:#dcfce7;color:#15803d;font-size:11px;margin-right:9px;vertical-align:1px}
+.steps4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:46px}
+.st{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px}
+.st .n{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#0a0a0a;color:#fff;font-weight:600;font-size:14px;margin-bottom:18px}
+.st h3{font-size:19px}.st p{margin-top:8px;color:var(--mut);font-size:14px;line-height:1.55}
+@media (max-width:980px){.formula{grid-template-columns:1fr}.plus{font-size:34px}.plans{grid-template-columns:1fr}.steps4{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.steps4{grid-template-columns:1fr}.fx,.plan{border-radius:22px;padding:22px}.tbl.inc .row:first-child{display:grid}}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Principal">
+ <a href="./" class="logo" aria-label="Ax AI, inicio"><svg viewBox="0 0 1122 883" aria-hidden="true"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg><span>Ax AI</span></a>
+ <div class="nav-r">
+  <a class="nav-link hide-m" href="./#como-funciona" data-i="nav.how"></a>
+  <a class="nav-link hide-m" href="seguridad" data-i="nav.sec"></a>
+  <a class="nav-link" href="precios" aria-current="page" data-i="nav.price"></a>
+  <a class="nav-link hide-m" href="app" data-i="nav.login"></a>
+  <a class="btn hide-m" href="./#piloto" data-i="cta.pilot"></a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+ </div>
+</nav>
+
+<main>
+<section class="hero center"><div class="wrap">
+ <div class="shield" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5h16v11a2 2 0 01-2 2H6a2 2 0 01-2-2v-11z"/><path d="M8 7.5V6a4 4 0 018 0v1.5"/><path d="M9.5 13.5l2 2 3.5-3.5"/></svg></div>
+ <span class="eyebrow" data-i="h.k"></span>
+ <h1 data-i="h.t"></h1>
+ <p class="sub" data-i="h.s"></p>
+ <div class="btns"><a class="btn btn-dark" href="./#piloto"><span data-i="cta.talk"></span><span>→</span></a><a class="btn btn-light" href="#modelo"><span data-i="h.see"></span><span>↓</span></a></div>
+ <div class="badges" id="badges"></div>
+</div></section>
+
+<section id="modelo" style="padding-top:40px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="m.k"></span><h2 class="rv" data-i="m.t"></h2><p class="sub rv" style="margin-top:16px" data-i="m.s"></p></div>
+ <div class="formula rv">
+  <div class="fx"><span class="no">01</span><div class="ic" id="icA"></div><h3 data-i="m.a.t"></h3><p data-i="m.a.p"></p></div>
+  <div class="plus" aria-hidden="true">+</div>
+  <div class="fx"><span class="no">02</span><div class="ic" id="icB"></div><h3 data-i="m.b.t"></h3><p data-i="m.b.p"></p></div>
+ </div>
+ <p class="fnote rv" data-i="m.note"></p>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="pl.k"></span><h2 class="rv" data-i="pl.t"></h2></div>
+ <div class="plans" id="plans"></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="blk rv"><div><span class="eyebrow" data-i="in.k"></span><h2 data-i="in.t"></h2><p class="sub" data-i="in.s"></p></div><div class="tbl inc" id="incl"></div></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="pr.k"></span><h2 class="rv" data-i="pr.t"></h2></div>
+ <div class="steps4" id="steps4"></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap faqw">
+ <div><span class="eyebrow" data-i="f.k"></span><h2 class="rv" data-i="f.t"></h2></div>
+ <div id="faq"></div>
+</div></section>
+
+<div class="fin rv">
+ <h2 data-i="c.t"></h2>
+ <p data-i="c.s"></p>
+ <div class="btns"><a class="btn btn-light" href="./#piloto"><span data-i="cta.talk"></span><span>→</span></a><a class="btn btn-ghost" href="seguridad"><span data-i="c.sec"></span><span>→</span></a></div>
+</div>
+</main>
+
+<footer><div class="wrap">
+ <div class="fgrid">
+  <div><p class="bl"><b>Ax AI ·</b> <span data-i="ft.tag"></span></p></div>
+  <div><h4 data-i="ft.prod"></h4><a href="./#como-funciona" data-i="nav.how"></a><a href="./#red" data-i="ft.red"></a><a href="seguridad" data-i="nav.sec"></a><a href="precios" data-i="nav.price"></a></div>
+  <div><h4 data-i="ft.co"></h4><a href="./#piloto" data-i="cta.pilot"></a><a href="app" data-i="nav.login"></a></div>
+  <div><h4>Legal</h4><a href="privacidad" data-i="ft.privacy"></a><a href="terminos" data-i="ft.terms"></a></div>
+ </div>
+ <div class="mark" aria-hidden="true"><svg viewBox="0 0 1122 883"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg>Ax AI</div>
+ <p class="copy" data-i="ft.copy"></p>
+</div></footer>
+
+<script>
+(function(){
+var IC={
+ store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5L5.5 4h13L20 9.5"/><path d="M4 9.5h16v1a3 3 0 01-5.3 1.9A3 3 0 0112 13.5a3 3 0 01-2.7-1.1A3 3 0 014 10.5z"/><path d="M5.5 13v7h13v-7"/><path d="M10 20v-4h4v4"/></svg>',
+ up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-5 4 3 7-8"/><path d="M15 7h5v5"/></svg>'};
+var T={
+es:{'nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.price':'Precios','nav.login':'Iniciar sesión','cta.pilot':'Solicita un piloto','cta.talk':'Platiquemos con tu grupo',
+ 'h.k':'Precios','h.t':'Un precio a la medida de tu grupo','h.s':'No hay una lista de precios: cada grupo tiene distintas agencias, marcas y débitos. Lo platicamos contigo y armamos una propuesta con tus números.','h.see':'Ver cómo cobramos',
+ badges:['Tarifa por agencia, no por asesor','Ganamos más solo cuando tú recuperas más','Piloto con condiciones especiales','Sin cambiar tu proceso ni el portal'],
+ 'm.k':'Cómo cobramos','m.t':'Dos partes, alineadas con tu resultado','m.s':'El precio combina una tarifa por agencia con un porcentaje del dinero que Ax AI te ayuda a recuperar.',
+ 'm.a.t':'Tarifa por agencia','m.a.p':'Una cuota mensual por cada agencia conectada. Cubre la plataforma, los agentes, la red de reglas y el acompañamiento. Todos los asesores de la agencia entran.',
+ 'm.b.t':'Porcentaje del dinero recuperado','m.b.p':'Una parte de lo que Ax AI protege antes de cobrar y de los débitos que la armadora devuelve. Si no recuperas, esa parte no se cobra.',
+ 'm.note':'El dinero recuperado se mide en el Tablero del dueño, agencia por agencia: reclamos corregidos antes de cobrarse más débitos revertidos.',
+ 'pl.k':'Formas de empezar','pl.t':'Del piloto a todo el grupo',
+ plans:[['Piloto','Una o dos agencias','Probamos Ax AI en tus agencias con criterios de éxito que definimos juntos. Si no se cumplen, no continúa.',['Criterios de éxito acordados','Carga de tus PREAs y débitos de antes','Acompañamiento del equipo de Ax AI','Medición antes y después'],'Condiciones especiales'],
+  ['Grupo','Todas las agencias de tu grupo','La red completa: cada débito de una agencia se vuelve regla para todas y el dueño ve el dinero recuperado por marca.',['Todas tus marcas y agencias','Tablero del dueño y del director','Red de reglas entre agencias','Agente de posventa para cada gerente'],'Lo más elegido'],
+  ['Armadoras','Para marcas y su red de distribuidores','Ax AI integrado de forma nativa a la red de garantías y posventa de la marca.',['Reclamos más limpios desde la agencia','Datos de pieza, falla y proveedor','Reglas de la marca en toda la red','Integración a la medida'],'A la medida']],
+ 'pl.cta':'Hablemos',
+ 'in.k':'Qué incluye','in.t':'Todo lo que tu grupo necesita para llegar a cero débitos','in.s':'En cualquier forma de empezar, la plataforma viene completa.',
+ incl:[['Agente de Garantías','Arma la PREA desde la queja del cliente'],['Revisión contra las reglas','Cada documento del expediente contra el manual de la marca'],['Expediente completo','Listo para auditoría, con su PDF'],['Débitos que se vuelven reglas','La red protege a todas tus agencias'],['Plazos y semáforo','Cobro, PRA, WPC y destrucción de partes'],['Cobranza con planta','Lo estimado contra lo pagado'],['Tableros','Del asesor, del gerente, del director y del dueño'],['Seguridad','Cifrado, permisos por rol y registro de actividad']],
+ 'pr.k':'Cómo llegamos a tu propuesta','pr.t':'Cuatro pasos, con tus números',
+ steps:[['Platicamos','Conocemos tu grupo: agencias, marcas, asesores y cómo trabajan hoy las garantías.'],['Medimos tu punto de partida','Revisamos tus débitos y rechazos de los últimos 6 a 12 meses. Esa es la base para medir.'],['Te mandamos la propuesta','Tarifa por agencia y porcentaje del dinero recuperado, con los números de tu grupo.'],['Arrancamos el piloto','En días, no meses, y con criterios de éxito acordados.']],
+ 'f.k':'Preguntas frecuentes','f.t':'Lo que nos preguntan los grupos',
+ faq:[['¿Por qué no publican precios?','Porque cada grupo es distinto: número de agencias, marcas, volumen de garantías y débitos. Preferimos armar una propuesta con tus números a darte una tarifa genérica.'],
+  ['¿Cobran por usuario?','No. La tarifa es por agencia, así que todos sus asesores, gerentes y directivos pueden usar Ax AI.'],
+  ['¿Cómo se calcula el dinero recuperado?','Es lo que Ax AI protege antes de cobrar (reclamos que tenían algo mal y se corrigieron antes de enviarse) más los débitos que la armadora devuelve. Se ve en el Tablero del dueño, por agencia y por marca.'],
+  ['¿El piloto tiene costo?','El piloto tiene condiciones especiales. Lo definimos contigo junto con los criterios de éxito.'],
+  ['¿Qué necesito para recibir una propuesta?','Una llamada con el área de posventa y, si es posible, tus débitos de los últimos meses. Con eso armamos los números.']],
+ 'c.t':'Platiquemos los números de tu grupo','c.s':'Te mandamos una propuesta con tarifa por agencia y porcentaje del dinero recuperado. Te respondemos en menos de 24 horas.','c.sec':'Ver seguridad',
+ 'ft.tag':'La red de reglas que será la infraestructura de garantías de la industria.','ft.prod':'Producto','ft.red':'La red de Ax AI','ft.co':'Empresa','ft.privacy':'Aviso de privacidad','ft.terms':'Términos de uso','ft.copy':'© 2026 Ax AI. Todos los derechos reservados.'},
+en:{'nav.how':'How it works','nav.sec':'Security','nav.price':'Pricing','nav.login':'Sign in','cta.pilot':'Request a pilot','cta.talk':'Let’s talk with your group',
+ 'h.k':'Pricing','h.t':'Pricing built around your group','h.s':'There’s no price list: every group has different dealerships, brands and chargebacks. We talk it through with you and build a proposal with your numbers.','h.see':'See how we charge',
+ badges:['Per-dealership fee, not per advisor','We only earn more when you recover more','Pilot with special terms','No change to your process or the portal'],
+ 'm.k':'How we charge','m.t':'Two parts, aligned with your results','m.s':'Pricing combines a fee per dealership with a percentage of the money Ax AI helps you recover.',
+ 'm.a.t':'Fee per dealership','m.a.p':'A monthly fee for each connected dealership. It covers the platform, the agents, the rule network and onboarding support. Every advisor at the dealership is included.',
+ 'm.b.t':'Percentage of money recovered','m.b.p':'A share of what Ax AI protects before collection and of the chargebacks the automaker reverses. If you don’t recover, that part isn’t charged.',
+ 'm.note':'Money recovered is tracked in the Owner dashboard, dealership by dealership: claims fixed before collection plus reversed chargebacks.',
+ 'pl.k':'Ways to start','pl.t':'From a pilot to your whole group',
+ plans:[['Pilot','One or two dealerships','We try Ax AI at your dealerships with success criteria we define together. If they aren’t met, it doesn’t continue.',['Agreed success criteria','Upload of your claims and past chargebacks','Support from the Ax AI team','Before-and-after measurement'],'Special terms'],
+  ['Group','Every dealership in your group','The full network: a chargeback at one dealership becomes a rule for all, and the owner sees money recovered by brand.',['All your brands and dealerships','Owner and director dashboards','Rule network across dealerships','After-sales agent for every manager'],'Most chosen'],
+  ['Automakers','For brands and their dealer network','Ax AI integrated natively into the brand’s warranty and after-sales network.',['Cleaner claims from the dealership','Part, failure and supplier data','Brand rules across the network','Custom integration'],'Custom']],
+ 'pl.cta':'Let’s talk',
+ 'in.k':'What’s included','in.t':'Everything your group needs to reach zero chargebacks','in.s':'Whichever way you start, the platform comes complete.',
+ incl:[['Warranty agent','Builds the claim from the customer complaint'],['Rule checks','Every claim file document against the brand manual'],['Complete claim files','Audit-ready, with their PDF'],['Chargebacks become rules','The network protects all your dealerships'],['Deadlines and traffic light','Collection, pre-authorization, parts return and destruction'],['Collections with the automaker','Estimated vs. paid'],['Dashboards','For advisors, managers, directors and owners'],['Security','Encryption, role-based permissions and activity log']],
+ 'pr.k':'How we build your proposal','pr.t':'Four steps, with your numbers',
+ steps:[['We talk','We get to know your group: dealerships, brands, advisors and how warranty works today.'],['We measure your baseline','We review your chargebacks and rejections from the last 6 to 12 months. That’s the baseline.'],['We send the proposal','Per-dealership fee and percentage of money recovered, with your group’s numbers.'],['We start the pilot','In days, not months, with agreed success criteria.']],
+ 'f.k':'FAQs','f.t':'What groups ask us',
+ faq:[['Why don’t you publish prices?','Because every group is different: number of dealerships, brands, warranty volume and chargebacks. We’d rather build a proposal with your numbers than give you a generic rate.'],
+  ['Do you charge per user?','No. The fee is per dealership, so all its advisors, managers and executives can use Ax AI.'],
+  ['How is money recovered calculated?','It’s what Ax AI protects before collection (claims that had something wrong and were fixed before submission) plus chargebacks the automaker reverses. It shows in the Owner dashboard, by dealership and by brand.'],
+  ['Does the pilot cost anything?','The pilot has special terms. We define them with you, together with the success criteria.'],
+  ['What do I need to get a proposal?','A call with your after-sales team and, if possible, your chargebacks from recent months. With that we build the numbers.']],
+ 'c.t':'Let’s go over your group’s numbers','c.s':'We’ll send a proposal with a per-dealership fee and a percentage of money recovered. We reply within 24 hours.','c.sec':'See security',
+ 'ft.tag':'The rule network that will become the industry’s warranty infrastructure.','ft.prod':'Product','ft.red':'The Ax AI network','ft.co':'Company','ft.privacy':'Privacy notice','ft.terms':'Terms of use','ft.copy':'© 2026 Ax AI. All rights reserved.'}};
+var lang='es';try{var sv=localStorage.getItem('axai-lang');if(sv==='en'||sv==='es')lang=sv}catch(e){}
+function t(k){return T[lang][k]}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function render(){
+ document.documentElement.lang=lang;document.title=(lang==='en'?'Pricing':'Precios')+' · Ax AI';
+ document.querySelectorAll('[data-i]').forEach(function(e){var v=t(e.dataset.i);if(typeof v==='string')e.textContent=v});
+ document.querySelectorAll('.lang button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.lang===lang))});
+ document.getElementById('badges').innerHTML=t('badges').map(function(b){return '<span>'+esc(b)+'</span>'}).join('');
+ document.getElementById('icA').innerHTML=IC.store;document.getElementById('icB').innerHTML=IC.up;
+ document.getElementById('plans').innerHTML=t('plans').map(function(p,i){return '<div class="plan'+(i===1?' hl':'')+'"><span class="tag">'+esc(p[4])+'</span><h3>'+esc(p[0])+'</h3><b class="who">'+esc(p[1])+'</b><p>'+esc(p[2])+'</p><ul>'+p[3].map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul><a class="btn '+(i===1?'btn-light':'btn-dark')+'" href="./#piloto">'+esc(t('pl.cta'))+' <span>→</span></a></div>'}).join('');
+ document.getElementById('incl').innerHTML=t('incl').map(function(r){return '<div class="row"><b>'+esc(r[0])+'</b><span>'+esc(r[1])+'</span></div>'}).join('');
+ document.getElementById('steps4').innerHTML=t('steps').map(function(s,i){return '<div class="st"><span class="n">'+(i+1)+'</span><h3>'+esc(s[0])+'</h3><p>'+esc(s[1])+'</p></div>'}).join('');
+ document.getElementById('faq').innerHTML=t('faq').map(function(q,i){return '<div class="qa"'+(i===0?' open':'')+'><button type="button" aria-expanded="'+(i===0)+'"><span>'+esc(q[0])+'</span><i aria-hidden="true">+</i></button><div class="a">'+esc(q[1])+'</div></div>'}).join('');
+ document.querySelectorAll('.qa button').forEach(function(b){b.onclick=function(){var q=b.parentNode,o=!q.hasAttribute('open');if(o)q.setAttribute('open','');else q.removeAttribute('open');b.setAttribute('aria-expanded',String(o))}});
+}
+document.querySelectorAll('.lang button').forEach(function(b){b.onclick=function(){lang=b.dataset.lang;try{localStorage.setItem('axai-lang',lang)}catch(e){}render()}});
+render();
+var io='IntersectionObserver' in window?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12}):null;
+document.querySelectorAll('.rv').forEach(function(e){if(io)io.observe(e);else e.classList.add('in')});
+})();
+</script>
+</body>
+</html>

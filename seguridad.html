@@ -36,8 +36,8 @@ h3{font-size:22px;letter-spacing:-.02em;line-height:1.15}
 .btn-light{background:#fff;color:var(--ink)}.btn-light:hover{box-shadow:0 8px 20px rgba(0,0,0,.08)}
 .btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 /* menú */
-.nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;width:calc(100% - 28px);max-width:640px;height:52px;background:rgba(12,12,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
-.logo{display:flex;align-items:center;gap:8px;font-family:'Inter Tight',Inter,sans-serif;font-weight:500;font-size:17px;letter-spacing:-.03em}
+.nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;width:calc(100% - 28px);max-width:780px;height:52px;background:rgba(12,12,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.logo{display:flex;align-items:center;gap:8px;white-space:nowrap;flex:none;font-family:'Inter Tight',Inter,sans-serif;font-weight:500;font-size:17px;letter-spacing:-.03em}
 .logo svg{height:.95em;width:auto}
 .nav-r{display:flex;align-items:center;gap:4px}
 .nav-link{padding:8px 11px;border-radius:10px;font-size:13px;color:#c9c9cf;white-space:nowrap}.nav-link:hover{color:#fff}.nav-link[aria-current=page]{color:#fff}
@@ -122,6 +122,7 @@ footer{padding:70px 0 40px}
  <div class="nav-r">
   <a class="nav-link hide-m" href="./#como-funciona" data-i="nav.how"></a>
   <a class="nav-link" href="seguridad" aria-current="page" data-i="nav.sec"></a>
+  <a class="nav-link hide-m" href="precios" data-i="nav.price"></a>
   <a class="nav-link hide-m" href="app" data-i="nav.login"></a>
   <a class="btn hide-m" href="./#piloto" data-i="cta.pilot"></a>
   <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
@@ -164,7 +165,7 @@ footer{padding:70px 0 40px}
 <footer><div class="wrap">
  <div class="fgrid">
   <div><p class="bl"><b>Ax AI ·</b> <span data-i="ft.tag"></span></p></div>
-  <div><h4 data-i="ft.prod"></h4><a href="./#como-funciona" data-i="nav.how"></a><a href="./#red" data-i="ft.red"></a><a href="seguridad" data-i="nav.sec"></a></div>
+  <div><h4 data-i="ft.prod"></h4><a href="./#como-funciona" data-i="nav.how"></a><a href="./#red" data-i="ft.red"></a><a href="seguridad" data-i="nav.sec"></a><a href="precios" data-i="ft.price"></a></div>
   <div><h4 data-i="ft.co"></h4><a href="./#piloto" data-i="cta.pilot"></a><a href="app" data-i="nav.login"></a></div>
   <div><h4>Legal</h4><a href="privacidad" data-i="ft.privacy"></a><a href="terminos" data-i="ft.terms"></a></div>
  </div>
@@ -180,7 +181,7 @@ var IC={
  gate:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6l7-3z"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>',
  split:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="7" height="7" rx="2"/><rect x="13.5" y="4" width="7" height="7" rx="2"/><rect x="3.5" y="14" width="7" height="7" rx="2"/><rect x="13.5" y="14" width="7" height="7" rx="2"/></svg>'};
 var T={
-es:{'nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.login':'Iniciar sesión','cta.pilot':'Solicita un piloto','cta.team':'Habla con el equipo',
+es:{'nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.price':'Precios','nav.login':'Iniciar sesión','cta.pilot':'Solicita un piloto','cta.team':'Habla con el equipo',
  'h.k':'Seguridad','h.t':'Tus garantías, protegidas de punta a punta','h.s':'Ax AI trabaja con los expedientes, documentos y cobros de tu grupo. Así los cuidamos, en cada paso y en cada agencia.','h.see':'Ver cómo está construido',
  badges:['Cifrado en reposo y en tránsito','Permisos aplicados en la base de datos','Tus datos no entrenan modelos','Sin contraseñas del portal de la armadora'],
  'p.k':'Los cuatro pilares','p.t':'Cómo está construido',
@@ -201,8 +202,8 @@ es:{'nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.login':'Iniciar sesió
   ['¿Qué comparte mi agencia con las demás?','Solo reglas y cifras agregadas, por ejemplo: «la autorización debe llevar la firma del cliente» y cuántas veces se debitó por eso. Nunca nombres de clientes, VIN, montos ni expedientes. Si tu agencia está en modo Protegida, lo que aprende no sale de ella.'],
   ['¿Qué pasa con mis datos si dejo de usar Ax AI?','Te entregamos tus expedientes y documentos, y los borramos a solicitud.']],
  'c.t':'¿Tu equipo de seguridad necesita revisar algo a detalle?','c.s':'Te compartimos la documentación y respondemos sus preguntas directamente.','c.app':'Ver la plataforma',
- 'ft.tag':'La red de reglas que será la infraestructura de garantías de la industria.','ft.prod':'Producto','ft.red':'La red de Ax AI','ft.co':'Empresa','ft.privacy':'Aviso de privacidad','ft.terms':'Términos de uso','ft.copy':'© 2026 Ax AI. Todos los derechos reservados.'},
-en:{'nav.how':'How it works','nav.sec':'Security','nav.login':'Sign in','cta.pilot':'Request a pilot','cta.team':'Talk to the team',
+ 'ft.tag':'La red de reglas que será la infraestructura de garantías de la industria.','ft.prod':'Producto','ft.price':'Precios','ft.red':'La red de Ax AI','ft.co':'Empresa','ft.privacy':'Aviso de privacidad','ft.terms':'Términos de uso','ft.copy':'© 2026 Ax AI. Todos los derechos reservados.'},
+en:{'nav.how':'How it works','nav.sec':'Security','nav.price':'Pricing','nav.login':'Sign in','cta.pilot':'Request a pilot','cta.team':'Talk to the team',
  'h.k':'Security','h.t':'Your warranty claims, protected end to end','h.s':'Ax AI works with your group’s claim files, documents and collections. This is how we protect them, at every step and every dealership.','h.see':'See how it’s built',
  badges:['Encrypted at rest and in transit','Permissions enforced in the database','Your data never trains models','No automaker portal passwords'],
  'p.k':'The four pillars','p.t':'How it’s built',
@@ -223,7 +224,7 @@ en:{'nav.how':'How it works','nav.sec':'Security','nav.login':'Sign in','cta.pil
   ['What does my dealership share with the others?','Only rules and aggregated figures, for example: “the authorization must carry the customer’s signature” and how many times it led to a chargeback. Never customer names, VINs, amounts or claim files. If your dealership is in Protected mode, what it learns stays there.'],
   ['What happens to my data if I stop using Ax AI?','We hand over your claim files and documents, and delete them on request.']],
  'c.t':'Does your security team need to review something in detail?','c.s':'We’ll share the documentation and answer their questions directly.','c.app':'See the platform',
- 'ft.tag':'The rule network that will become the industry’s warranty infrastructure.','ft.prod':'Product','ft.red':'The Ax AI network','ft.co':'Company','ft.privacy':'Privacy notice','ft.terms':'Terms of use','ft.copy':'© 2026 Ax AI. All rights reserved.'}};
+ 'ft.tag':'The rule network that will become the industry’s warranty infrastructure.','ft.prod':'Product','ft.price':'Pricing','ft.red':'The Ax AI network','ft.co':'Company','ft.privacy':'Privacy notice','ft.terms':'Terms of use','ft.copy':'© 2026 Ax AI. All rights reserved.'}};
 var lang='es';try{var sv=localStorage.getItem('axai-lang');if(sv==='en'||sv==='es')lang=sv}catch(e){}
 function t(k){return T[lang][k]}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
