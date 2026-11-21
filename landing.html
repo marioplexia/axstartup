@@ -415,6 +415,44 @@ footer{padding:80px 0 34px}
  .story{padding:28px;min-height:auto}
  .hint{display:none}
 }
+/* celular: más compacto, títulos equilibrados y menos alto en las ilustraciones */
+@media (max-width:640px){
+ section{padding:56px 0}
+ .wrap{padding:0 18px}
+ h1,h2{text-wrap:balance}
+ .rot{font-size:min(.8em,6.6vw)}.rot span{white-space:nowrap}
+ h1{font-size:clamp(32px,9.4vw,38px);line-height:1.08}
+ h2{font-size:clamp(28px,8vw,34px);line-height:1.1}
+ .nav{top:10px;width:calc(100% - 20px);height:48px;padding:0 6px 0 14px}
+ .nav .nav-link[href="app"]{display:inline-flex;font-size:13px;padding:0 8px;white-space:nowrap}
+ .hero{padding:96px 0 36px}
+ .hero .eyebrow{font-size:11px}
+ .hero .sub{font-size:15px;line-height:1.55;margin-top:16px}
+ .hero .btns{flex-direction:column;align-items:stretch;gap:10px;margin-top:24px}
+ .hero .btn,.hero .btn-dark{width:100%;min-width:0;height:50px;justify-content:center}
+ .hero .tiny{font-size:13px}
+ .brands{justify-content:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-top:28px;max-width:100%}
+ .brands::-webkit-scrollbar{display:none}
+ .demo{border-radius:18px;min-height:0}
+ .chat{min-height:330px}.canvas{min-height:290px}
+ .steps{margin-top:18px}
+ .how-steps>div{padding:20px 0}
+ .how-steps .mini{height:380px;border-radius:18px;margin-top:16px}
+ .scene{padding:0 6%}
+ .how-steps .mini .morph,.how-steps .mini .morph.open .mbtn,.how-steps .mini .cw{height:310px}
+ .guar{margin:0 10px;border-radius:32px;padding:64px 18px 72px}
+ .glass3{margin-top:32px;gap:12px}
+ .glass{min-height:0;border-radius:24px;padding:18px 20px 22px}
+ .glass .vis{padding:10px 0}
+ .glass .vis div{width:56px;height:56px;border-radius:16px;font-size:22px}
+ .glass-d{gap:10px;margin-top:16px}
+ .uc-l{margin:0 10px;border-radius:24px;padding:22px 0}
+ .uc-r{margin:12px 10px 0;padding:32px 16px;border-radius:24px}
+ .stack{height:380px;width:min(340px,92%)}
+ .story{padding:24px;border-radius:22px}
+ .final{margin:0 10px;border-radius:32px;padding:80px 20px 96px}
+ .final .btns{flex-direction:column;align-items:center}
+}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
 </style>
 </head>
