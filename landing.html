@@ -167,6 +167,29 @@ h3{font-size:clamp(24px,2.4vw,30px);letter-spacing:-.035em;line-height:1.12}
 .step[aria-selected=true]{color:var(--ink)}
 .step em{font-style:normal;color:var(--soft);margin-right:6px}
 .demo-cta{margin-top:34px}
+.chat-h .who svg{height:14px;width:auto}
+.msgs{justify-content:flex-end;min-height:0}.demo{height:570px}.chat{min-height:0}.chat-h .who,.chat-h .muted{white-space:nowrap}.chat-h .con{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.m.a .av{background:#0b0b0d}.m.a .av svg{width:13px;height:auto;color:#fff}
+.m.a p{margin:0}.m.a .nt{margin-top:8px;color:var(--mut);font-size:13.5px}
+.chk li small{color:var(--mut);margin-left:2px}.chk li small::before{content:"· "}.chk .bad{color:#dc2626}.chk .b{color:var(--blue)}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.kv div{background:#fff;border:1px solid #e7e5e0;border-radius:10px;padding:8px 10px}.kv small{display:block;font-size:11.5px;color:var(--mut)}.kv b{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.canv-h{gap:12px}.dm-h{min-width:0}.dm-h span{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dmBrand{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);font-weight:500;line-height:1.3}#dmBrand i{width:8px;height:8px;border-radius:3px;display:inline-block}#dmBrand span{font-weight:400}
+.dm-pill{margin-left:auto;flex:none;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;white-space:nowrap;transition:background .3s,color .3s}
+.dm-pill.p{background:#f4f4f5;color:#52525b}.dm-pill.b{background:#e0e7ff;color:#1d4ed8}.dm-pill.w{background:#FFEDD5;color:#c2410c}.dm-pill.bad{background:#fee2e2;color:#b91c1c}.dm-pill.ok{background:#dcfce7;color:#15803d}
+.canvas{justify-content:flex-start;padding:40px 22px 18px}
+.dm-rows{display:flex;flex-direction:column;gap:8px}
+.dr{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:10px 12px;transition:opacity .45s,border-color .45s,box-shadow .45s;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.dr .dd{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;font-weight:700;background:#f4f4f5;color:#a1a1aa;transition:background .45s,color .45s}
+.dr div{min-width:0}.dr b{display:block;font-size:14px;font-weight:600}.dr small{display:block;color:var(--mut);font-size:12.5px}
+.dr .dt{margin-left:auto;flex:none;font-style:normal;font-size:11.5px;font-weight:600;border-radius:999px;padding:2px 8px;white-space:nowrap}.dr .dt:empty{display:none}
+.dr.p{opacity:.5}
+.dr.ok .dd,.dr.ok .dt{background:#dcfce7;color:#15803d}
+.dr.w .dd,.dr.w .dt{background:#FFEDD5;color:#c2410c}.dr.w{border-color:#fed7aa}
+.dr.bad .dd,.dr.bad .dt{background:#fee2e2;color:#b91c1c}.dr.bad{border-color:#fecaca}
+.dr.b .dd,.dr.b .dt{background:#e0e7ff;color:#1d4ed8}.dr.b{border-color:#c7d2fe;box-shadow:0 0 0 3px rgba(29,78,216,.08)}
+.dm-met{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:16px;padding-top:12px;border-top:1px dashed #d4d4d8}.dm-met span{font-size:13px;color:var(--mut)}.dm-met b{font-size:22px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.dm-ill{display:block;margin-top:8px;font-size:11.5px;color:#a1a1aa}
 /* franja */
 .strip{padding:30px 0 0}
 .strip .wrap{display:flex;align-items:center;gap:28px;flex-wrap:wrap;justify-content:center;font-size:14px;color:#7a7a80}
@@ -389,7 +412,7 @@ footer{padding:80px 0 34px}
 .rv{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1;transform:none}
 @media (max-width:980px){
- .demo{grid-template-columns:1fr}.chat{border-right:0;border-bottom:1px solid #e7e5e0;min-height:420px}.canvas{min-height:380px}
+ .demo{grid-template-columns:1fr;height:auto}.chat{border-right:0;border-bottom:1px solid #e7e5e0;min-height:0;height:480px}.canvas{min-height:380px}
  .two,.probs,.glass3,.glass-d,.fnd,.faqw{grid-template-columns:1fr}
  .how{grid-template-columns:1fr;gap:0}.stage{display:none}
  .how-steps>div{min-height:auto;opacity:1;padding:24px 0}
@@ -435,7 +458,7 @@ footer{padding:80px 0 34px}
  .brands{justify-content:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-top:28px;max-width:100%}
  .brands::-webkit-scrollbar{display:none}
  .demo{border-radius:18px;min-height:0}
- .chat{min-height:330px}.canvas{min-height:290px}
+ .demo{height:auto}.chat{height:470px;min-height:0}.chat-h .sep,.chat-h .muted{display:none}.chat-h .con{font-size:11px}.canvas{min-height:0;padding:34px 14px 14px}.dr{padding:9px 10px;gap:10px}.dr b{font-size:13.5px}.kv b{font-size:14px}.dm-pill{font-size:11px;padding:3px 8px}.m{font-size:14px}
  .steps{margin-top:18px}
  .how-steps>div{padding:20px 0}
  .how-steps .mini{height:380px;border-radius:18px;margin-top:16px}
@@ -479,13 +502,13 @@ footer{padding:80px 0 34px}
  <div class="brands rv"><div id="brands" role="group"></div></div>
  <div class="demo rv" aria-label="Demostración">
   <div class="chat">
-   <div class="chat-h"><span class="who"><svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1D4ED8"/><path d="M9 23l7-14 7 14" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>Ax AI</span><span class="sep"></span><span class="muted" data-i="demo.thread"></span><span class="con" data-i="demo.con"></span></div>
-   <div class="msgs" id="msgs"></div>
+   <div class="chat-h"><span class="who"><svg viewBox="0 0 1122 883" aria-hidden="true"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg>Ax AI</span><span class="sep"></span><span class="muted" id="dmThread"></span><span class="con" id="dmCon"></span></div>
+   <div class="msgs" id="msgs" aria-live="polite"></div>
    <div class="inp"><span class="pl">+</span><span data-i="demo.input"></span><span class="go">↑</span></div>
   </div>
   <div class="canvas-w">
-   <div class="canv-h"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="40 14"/></svg><div><small data-i="demo.canvas"></small><span data-i="demo.ctitle"></span></div></div>
-   <div class="canvas" id="canvas"></div>
+   <div class="canv-h"><div class="dm-h"><small id="dmBrand"></small><span id="dmTitle"></span></div><span class="dm-pill" id="dmPill"></span></div>
+   <div class="canvas" id="canvas"><span class="banner" data-i="demo.live"></span><div class="dm-rows" id="dmRows"></div><div class="dm-met" id="dmMet"><span></span><b></b></div><small class="dm-ill" data-i="demo.ill"></small></div>
   </div>
  </div>
  <div class="steps" role="tablist" id="steps"></div>
@@ -605,14 +628,8 @@ es:{
  'hero.eyebrow':'La infraestructura de garantías automotrices','hero.t1':'Deja de perder dinero en',
  'hero.rot':['rechazos','débitos','auditorías','expedientes incompletos'],
  'hero.sub':'La IA que elimina los débitos de garantías en grupos de agencias. Arma cada expediente completo y lo revisa contra las reglas de la armadora antes de enviarlo. Si a una agencia le debitan, la regla se actualiza y las demás ya no caen en lo mismo.',
- 'hero.tiny':'Te respondemos en menos de 24 horas','demo.brands':['Chevrolet','Nissan','Volkswagen','Toyota','Otra marca'],
- 'demo.thread':'Orden 4521','demo.con':'Política GM cargada','demo.canvas':'Expediente','demo.ctitle':'Reclamo · orden 4521','demo.live':'Ax AI está revisando el reclamo','demo.input':'Escribe a Ax AI…',
- 'demo.u1':'Revisa el reclamo de la orden 4521 antes de enviarlo a GM.','demo.a1':'Revisé el reclamo contra la política de garantía:',
- 'demo.chk':[['Orden de reparación','✓'],['Código de falla','✓'],['Firma del técnico','✓'],['Foto de la pieza dañada','falta ⚠']],
- 'demo.u2':'Ya subí la foto.','demo.a2':'Listo. El reclamo está completo y listo para enviarse.',
- 'demo.nodes':[['Orden de reparación 4521','Chevrolet · garantía de fábrica'],['Validación de política','Reglas de garantía GM'],['Evidencia','Fotos, firmas y diagnóstico'],['Listo para enviar','Riesgo de rechazo: bajo']],
- 'demo.miss':'Faltaba 1 foto','demo.done':'Completo','demo.hint':'Arrastra para mover',
- 'demo.steps':['Captura el reclamo','Valida contra la política','Completa lo que falta','Envía y da seguimiento'],
+ 'hero.tiny':'Te respondemos en menos de 24 horas',
+ 'demo.input':'Escribe a Ax AI…','demo.live':'Ax AI está trabajando','demo.ill':'Ejemplo ilustrativo con datos simulados',
  'strip.k':'Hecho para agencias','strip':['Hecho por un ex asesor de garantías','Diseñado primero para los procesos de GM y Nissan','Datos de cada grupo siempre separados'],
  'sides.title':'Una plataforma, dos lados de la garantía',
  'sides.a.t':'Para agencias y grupos','sides.a.p':'Cero débitos, dinero recuperado y control de garantías en todas sus agencias: cada expediente sale completo, queda listo para auditoría y el director de grupo ve en un solo tablero lo protegido, lo debitado y lo revertido por agencia.',
@@ -644,14 +661,8 @@ en:{
  'hero.eyebrow':'The automotive warranty infrastructure','hero.t1':'Stop losing money on',
  'hero.rot':['rejections','chargebacks','audits','incomplete files'],
  'hero.sub':'The AI that eliminates warranty chargebacks for dealer groups. It builds every claim file and checks it against the automaker’s rules before submission. When one dealership gets charged back, the rule updates and the others never fall for it again.',
- 'hero.tiny':'We reply within 24 hours','demo.brands':['Chevrolet','Nissan','Volkswagen','Toyota','Other brand'],
- 'demo.thread':'Order 4521','demo.con':'GM policy loaded','demo.canvas':'File','demo.ctitle':'Claim · order 4521','demo.live':'Ax AI is reviewing the claim','demo.input':'Message Ax AI…',
- 'demo.u1':'Review the claim for repair order 4521 before sending it to GM.','demo.a1':'I checked the claim against the warranty policy:',
- 'demo.chk':[['Repair order','✓'],['Failure code','✓'],['Technician signature','✓'],['Photo of the damaged part','missing ⚠']],
- 'demo.u2':'I just uploaded the photo.','demo.a2':'Done. The claim is complete and ready to submit.',
- 'demo.nodes':[['Repair order 4521','Chevrolet · factory warranty'],['Policy check','GM warranty rules'],['Evidence','Photos, signatures and diagnosis'],['Ready to submit','Rejection risk: low']],
- 'demo.miss':'1 photo missing','demo.done':'Complete','demo.hint':'Drag to move',
- 'demo.steps':['Capture the claim','Check against policy','Fill in what’s missing','Submit and follow up'],
+ 'hero.tiny':'We reply within 24 hours',
+ 'demo.input':'Message Ax AI…','demo.live':'Ax AI is working','demo.ill':'Illustrative example with simulated data',
  'strip.k':'Built for dealerships','strip':['Built by a former warranty advisor','Designed first for GM and Nissan processes','Each group’s data always kept separate'],
  'sides.title':'One platform, both sides of warranty',
  'sides.a.t':'For dealerships and groups','sides.a.p':'Zero chargebacks, money recovered and warranty control across every dealership: complete, audit-ready files and one dashboard where the group director sees what was protected, charged back and reversed per dealership.',
@@ -690,31 +701,146 @@ var RICON=['✕','$','⌕','▤'];
 function drawRot(){$('rot').innerHTML=t('hero.rot').map(function(x,i){return '<span aria-hidden="'+(i!==rotI)+'"><b class="ti" aria-hidden="true"><i>'+RICON[i]+'</i></b>'+esc(x)+'</span>'}).join('')}
 function startRot(){clearInterval(rotTimer);if(RM)return;rotTimer=setInterval(function(){rotI=(rotI+1)%t('hero.rot').length;document.querySelectorAll('#rot span').forEach(function(e,i){e.setAttribute('aria-hidden',i!==rotI)})},2400)}
 
-/* demo */
-var D={timer:null,brand:0};
-var BCOL=['#C9A227','#C3002F','#001E50','#EB0A1E','#71717A'];
+/* demo: un caso distinto de la plataforma por marca (ejemplos ilustrativos)
+   Cada caso tiene 4 pasos. m[i] = mensajes que aparecen en el paso i; rows = filas del panel con su estado en cada paso.
+   Estados: p (pendiente), ok, w (atención), bad (problema), b (en proceso). Las respuestas del agente:
+   t texto · li [[estado, texto, nota]] · kv [[etiqueta, valor]] · n nota. */
+var DSC={
+es:[
+ {b:'Chevrolet',col:'#C9A227',thread:'Orden 4521',con:'Reglas de Chevrolet cargadas',ag:'Agencia Centro',ctitle:'Expediente · orden 4521',
+  steps:['Pide la revisión','Revisa contra las reglas','Completa lo que falta','Listo para enviar'],
+  pill:[['Por revisar','p'],['2 cosas por corregir','w'],['Revisando cambios','b'],['Listo para enviar','ok']],
+  met:['Riesgo de débito',['—','Alto','Bajando','Bajo']],
+  rows:[['Orden de garantía firmada','Firma del cliente y del asesor',['p','ok','ok','ok']],['Recepción del vehículo','Kilometraje 32,418',['p','w','ok','ok'],['','No coincide','Corregido','']],['Diagnóstico y código de falla','Escaneo adjunto',['p','ok','ok','ok']],['Evidencia de la pieza','Fotos y video',['p','w','ok','ok'],['','Falta foto','Completo','']],['Refacciones','Pedido y salida de almacén',['p','ok','ok','ok']]],
+  m:[[{u:'Revisa el expediente de la orden 4521 antes de enviarlo.'}],
+     [{a:{t:'Revisé el expediente contra las reglas de la marca:',li:[['ok','Orden de garantía firmada'],['ok','Diagnóstico y código de falla'],['ok','Refacciones y salida de almacén'],['w','Foto de la pieza dañada','falta'],['w','Kilometraje de la recepción','no coincide']],n:'Así como está, tiene riesgo alto de débito.'}}],
+     [{u:'Ya subí la foto y corregí el kilometraje.'},{a:{t:'Lo leí: la foto muestra la pieza con su etiqueta y el kilometraje ya coincide con el diagnóstico.'}}],
+     [{a:{t:'Expediente completo. Listo para enviarse.',kv:[['Monto del reclamo','$14,820'],['Plazo para cobrar','faltan 24 días']]}}]]},
+ {b:'Nissan',col:'#C3002F',thread:'Reclamo N-7731',con:'Reglas de Nissan cargadas',ag:'Agencia Norte',ctitle:'Reclamo rechazado · N-7731',
+  steps:['Llega el rechazo','Encuentra la causa','Arma el plan','Reenviado y aceptado'],
+  pill:[['Rechazado','bad'],['Causa encontrada','w'],['Corrigiendo','b'],['Aceptado','ok']],
+  met:['Dinero en riesgo',['$9,350','$9,350','$9,350','$0']],
+  rows:[['Enviado a planta','12 de noviembre',['ok','ok','ok','ok']],['Rechazo de planta','Código de causa',['bad','bad','bad','ok'],['','','','Resuelto']],['Causa encontrada','No coincide con el escaneo',['p','ok','ok','ok']],['Plan de corrección','3 pasos',['p','p','b','ok']],['Aceptado por planta','',['p','p','p','ok']]],
+  m:[[{u:'Planta rechazó el reclamo N-7731. ¿Qué pasó?'}],
+     [{a:{t:'El código de causa no coincide con el diagnóstico: registraron falla del sensor, pero el escaneo muestra un problema de cableado.',n:'En la red hay 4 reclamos parecidos que se aceptaron con el código de cableado.'}}],
+     [{u:'Arma el plan para corregirlo.'},{a:{t:'Plan de corrección:',li:[['ok','Cambiar el código de causa a cableado'],['ok','Adjuntar el escaneo con fecha y hora'],['ok','Ajustar la mano de obra a 1.2 h']]}}],
+     [{a:{t:'Reclamo corregido y reenviado. Planta lo aceptó.',kv:[['Recuperado','$9,350'],['Tiempo','2 días, no 3 semanas']]}}]]},
+ {b:'Volkswagen',col:'#001E50',thread:'Débito D-0192',con:'Red de reglas activa',ag:'Agencia Sur',ctitle:'Débito de planta · reclamo V-2210',
+  steps:['Llega un débito','Se vuelve regla','Protege a las demás','Se pide la reversa'],
+  pill:[['Débito','bad'],['Regla nueva creada','b'],['Revisando la red','w'],['Red protegida','ok']],
+  met:['Débitos evitados en la red',['$0','$0','$25,200','$25,200']],
+  rows:[['Débito · $8,400','Falta firma del cliente',['bad','bad','bad','w'],['','','','En controversia']],['Regla nueva R-118','Firma del cliente en la autorización',['p','b','ok','ok']],['Agencia Norte','2 expedientes en riesgo',['p','p','w','ok'],['','','','Corregidos']],['Agencia Poniente','1 expediente en riesgo',['p','p','w','ok'],['','','','Corregido']],['Agencia Centro','Sin riesgo',['p','p','ok','ok']]],
+  m:[[{u:'Nos debitaron $8,400 del reclamo V-2210. Te subo la notificación.'}],
+     [{a:{t:'La leí. Motivo: la autorización de la reparación no tenía la firma del cliente.',n:'No había una regla para esto: creé la regla R-118 para todas las agencias del grupo.'}}],
+     [{u:'¿Alguna otra agencia está en riesgo?'},{a:{t:'Revisé 148 expedientes abiertos del grupo:',li:[['w','3 sin firma del cliente','Norte y Poniente'],['ok','145 cumplen']],n:'Ya avisé a sus asesores para que los corrijan antes de enviarlos.'}}],
+     [{a:{t:'Con la evidencia correcta podemos pedir que se revierta el débito.',kv:[['Débito en controversia','$8,400'],['Débitos evitados en la red','$25,200']]}}]]},
+ {b:'Toyota',col:'#EB0A1E',thread:'Cobranza de noviembre',con:'Pagos de planta al día',ag:'Agencia Centro',ctitle:'Cartera con planta',
+  steps:['Pregunta por el cobro','Revisa la cartera','Encuentra pagos incompletos','Aclaraciones listas'],
+  pill:[['Consultando','p'],['$412,300 por cobrar','b'],['2 pagos incompletos','w'],['Aclaraciones listas','ok']],
+  met:['Por recuperar',['—','$27,800','$32,860','$32,860']],
+  rows:[['Facturado en tiempo','$298,100',['p','ok','ok','ok']],['Por facturar','$86,400 · 9 reclamos',['p','w','w','b'],['','','','Recordatorio']],['Vencido (más de 30 días)','$27,800 · 4 reclamos',['p','bad','bad','b'],['','','','Aclaración']],['Pagado incompleto','$5,060 · 2 reclamos',['p','p','w','b'],['','','','Aclaración']]],
+  m:[[{u:'¿Cuánto nos debe planta este mes?'}],
+     [{a:{t:'Por cobrar: $412,300 en 37 reclamos.',li:[['ok','$298,100 facturados y en tiempo'],['w','$86,400 por facturar'],['bad','$27,800 vencidos (más de 30 días)']]}}],
+     [{u:'¿Lo que ya pagaron llegó completo?'},{a:{t:'Comparé lo estimado contra lo pagado: 2 reclamos se pagaron incompletos.',li:[['w','T-5521','faltan $1,940 de mano de obra'],['w','T-5604','falta 1 pieza: $3,120']]}}],
+     [{a:{t:'Te dejé listas las aclaraciones para planta y un recordatorio para el viernes.',kv:[['Por recuperar','$32,860'],['Reclamos por aclarar','6']]}}]]},
+ {b:'Otra marca',col:'#71717A',thread:'Semana 47',con:'Plazos de la marca cargados',ag:'Agencia Poniente',ctitle:'Plazos y auditoría',
+  steps:['Pregunta qué vence','Semáforo de plazos','Prepara la auditoría','Todo en tiempo'],
+  pill:[['Revisando','p'],['1 plazo por vencer','bad'],['Preparando auditoría','w'],['Todo en tiempo','ok']],
+  met:['Plazos en riesgo',['—','3','3','0']],
+  rows:[['R-3310 · cobro','Vence en 2 días',['p','bad','bad','ok'],['','','','Cobrado']],['R-3342 · digitalización','Vence en 4 días',['p','w','w','ok'],['','','','Completo']],['Destrucción de partes','6 piezas · jueves',['p','w','w','ok'],['','','','Con foto']],['Auditoría del lunes','54 expedientes',['p','p','w','ok'],['','','51 de 54','54 de 54']]],
+  m:[[{u:'¿Qué vence esta semana?'}],
+     [{a:{t:'Esto vence pronto:',li:[['bad','R-3310','cobrar en 2 días'],['w','R-3342','digitalizar en 4 días'],['w','6 piezas por destruir','el jueves']]}}],
+     [{u:'El lunes viene auditoría. ¿Estamos listos?'},{a:{t:'Revisé los 54 expedientes del periodo: 51 están completos.',li:[['w','3 sin foto de la destrucción de partes']],n:'Ya armé el PDF de auditoría de cada expediente.'}}],
+     [{a:{t:'Plazos al día y expedientes listos para el auditor.',kv:[['Expedientes completos','54 de 54'],['Plazos vencidos','0']]}}]]}
+],
+en:[
+ {b:'Chevrolet',col:'#C9A227',thread:'Order 4521',con:'Chevrolet rules loaded',ag:'Downtown dealership',ctitle:'Claim file · order 4521',
+  steps:['Ask for a review','Check against the rules','Fill in what’s missing','Ready to submit'],
+  pill:[['To review','p'],['2 things to fix','w'],['Checking changes','b'],['Ready to submit','ok']],
+  met:['Chargeback risk',['—','High','Dropping','Low']],
+  rows:[['Signed warranty order','Customer and advisor signatures',['p','ok','ok','ok']],['Vehicle check-in','Mileage 32,418',['p','w','ok','ok'],['','Mismatch','Fixed','']],['Diagnosis and failure code','Scan attached',['p','ok','ok','ok']],['Part evidence','Photos and video',['p','w','ok','ok'],['','Photo missing','Complete','']],['Parts','Order and stock release',['p','ok','ok','ok']]],
+  m:[[{u:'Review the file for order 4521 before we submit it.'}],
+     [{a:{t:'I checked the file against the brand’s rules:',li:[['ok','Signed warranty order'],['ok','Diagnosis and failure code'],['ok','Parts and stock release'],['w','Photo of the damaged part','missing'],['w','Check-in mileage','mismatch']],n:'As it stands, it has a high chargeback risk.'}}],
+     [{u:'I uploaded the photo and fixed the mileage.'},{a:{t:'Read it: the photo shows the part with its tag and the mileage now matches the diagnosis.'}}],
+     [{a:{t:'File complete. Ready to submit.',kv:[['Claim amount','$14,820'],['Time left to collect','24 days']]}}]]},
+ {b:'Nissan',col:'#C3002F',thread:'Claim N-7731',con:'Nissan rules loaded',ag:'North dealership',ctitle:'Rejected claim · N-7731',
+  steps:['Rejection arrives','Finds the cause','Builds the plan','Resubmitted and accepted'],
+  pill:[['Rejected','bad'],['Cause found','w'],['Fixing','b'],['Accepted','ok']],
+  met:['Money at risk',['$9,350','$9,350','$9,350','$0']],
+  rows:[['Sent to the automaker','November 12',['ok','ok','ok','ok']],['Automaker rejection','Cause code',['bad','bad','bad','ok'],['','','','Resolved']],['Cause found','Doesn’t match the scan',['p','ok','ok','ok']],['Correction plan','3 steps',['p','p','b','ok']],['Accepted by the automaker','',['p','p','p','ok']]],
+  m:[[{u:'The automaker rejected claim N-7731. What happened?'}],
+     [{a:{t:'The cause code doesn’t match the diagnosis: it says sensor failure, but the scan shows a wiring problem.',n:'The network has 4 similar claims that were accepted with the wiring code.'}}],
+     [{u:'Build the plan to fix it.'},{a:{t:'Correction plan:',li:[['ok','Change the cause code to wiring'],['ok','Attach the scan with date and time'],['ok','Adjust labor to 1.2 h']]}}],
+     [{a:{t:'Claim fixed and resubmitted. The automaker accepted it.',kv:[['Recovered','$9,350'],['Time','2 days, not 3 weeks']]}}]]},
+ {b:'Volkswagen',col:'#001E50',thread:'Chargeback D-0192',con:'Rule network active',ag:'South dealership',ctitle:'Automaker chargeback · claim V-2210',
+  steps:['A chargeback arrives','It becomes a rule','Protects the others','Reversal requested'],
+  pill:[['Chargeback','bad'],['New rule created','b'],['Checking the network','w'],['Network protected','ok']],
+  met:['Chargebacks avoided',['$0','$0','$25,200','$25,200']],
+  rows:[['Chargeback · $8,400','Missing customer signature',['bad','bad','bad','w'],['','','','Disputed']],['New rule R-118','Customer signature on authorization',['p','b','ok','ok']],['North dealership','2 files at risk',['p','p','w','ok'],['','','','Fixed']],['West dealership','1 file at risk',['p','p','w','ok'],['','','','Fixed']],['Downtown dealership','No risk',['p','p','ok','ok']]],
+  m:[[{u:'We were charged back $8,400 on claim V-2210. Here’s the notice.'}],
+     [{a:{t:'Read it. Reason: the repair authorization had no customer signature.',n:'There was no rule for this: I created rule R-118 for every dealership in the group.'}}],
+     [{u:'Is any other dealership at risk?'},{a:{t:'I checked 148 open files across the group:',li:[['w','3 missing the customer signature','North and West'],['ok','145 comply']],n:'Their advisors have been told to fix them before submitting.'}}],
+     [{a:{t:'With the right evidence we can ask for the chargeback to be reversed.',kv:[['Disputed chargeback','$8,400'],['Chargebacks avoided','$25,200']]}}]]},
+ {b:'Toyota',col:'#EB0A1E',thread:'November collections',con:'Automaker payments up to date',ag:'Downtown dealership',ctitle:'Receivables with the automaker',
+  steps:['Asks about payments','Checks receivables','Finds short payments','Follow-ups ready'],
+  pill:[['Checking','p'],['$412,300 receivable','b'],['2 short payments','w'],['Follow-ups ready','ok']],
+  met:['To recover',['—','$27,800','$32,860','$32,860']],
+  rows:[['Invoiced, on time','$298,100',['p','ok','ok','ok']],['To invoice','$86,400 · 9 claims',['p','w','w','b'],['','','','Reminder']],['Overdue (30+ days)','$27,800 · 4 claims',['p','bad','bad','b'],['','','','Follow-up']],['Short-paid','$5,060 · 2 claims',['p','p','w','b'],['','','','Follow-up']]],
+  m:[[{u:'How much does the automaker owe us this month?'}],
+     [{a:{t:'Receivable: $412,300 across 37 claims.',li:[['ok','$298,100 invoiced and on time'],['w','$86,400 still to invoice'],['bad','$27,800 overdue (30+ days)']]}}],
+     [{u:'Did what they paid arrive in full?'},{a:{t:'I compared estimated vs. paid: 2 claims were short-paid.',li:[['w','T-5521','$1,940 of labor missing'],['w','T-5604','1 part missing: $3,120']]}}],
+     [{a:{t:'Follow-ups for the automaker are ready, plus a reminder for Friday.',kv:[['To recover','$32,860'],['Claims to follow up','6']]}}]]},
+ {b:'Other brand',col:'#71717A',thread:'Week 47',con:'Brand deadlines loaded',ag:'West dealership',ctitle:'Deadlines and audit',
+  steps:['Asks what’s due','Deadline traffic light','Prepares the audit','All on time'],
+  pill:[['Checking','p'],['1 deadline close','bad'],['Preparing audit','w'],['All on time','ok']],
+  met:['Deadlines at risk',['—','3','3','0']],
+  rows:[['R-3310 · collection','Due in 2 days',['p','bad','bad','ok'],['','','','Collected']],['R-3342 · digitizing','Due in 4 days',['p','w','w','ok'],['','','','Complete']],['Parts destruction','6 parts · Thursday',['p','w','w','ok'],['','','','With photo']],['Monday’s audit','54 files',['p','p','w','ok'],['','','51 of 54','54 of 54']]],
+  m:[[{u:'What’s due this week?'}],
+     [{a:{t:'This is due soon:',li:[['bad','R-3310','collect in 2 days'],['w','R-3342','digitize in 4 days'],['w','6 parts to destroy','on Thursday']]}}],
+     [{u:'The audit is on Monday. Are we ready?'},{a:{t:'I checked the 54 files for the period: 51 are complete.',li:[['w','3 missing the parts destruction photo']],n:'The audit PDF for each file is ready.'}}],
+     [{a:{t:'Deadlines on track and files ready for the auditor.',kv:[['Complete files','54 of 54'],['Overdue deadlines','0']]}}]]}
+]};
+var D={timer:null,brand:0,step:-1};
+var BIRD='<svg viewBox="0 0 1122 883" aria-hidden="true"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg>';
+function dsc(){return DSC[lang][D.brand]}
 function drawDemo(){
- $('brands').innerHTML=t('demo.brands').map(function(b,i){return '<button type="button" aria-pressed="'+(i===D.brand)+'" data-b="'+i+'"><i style="background:'+BCOL[i]+'"></i>'+esc(b)+'</button>'}).join('');
- document.querySelectorAll('#brands button').forEach(function(b){b.onclick=function(){D.brand=+b.dataset.b;document.querySelectorAll('#brands button').forEach(function(x){x.setAttribute('aria-pressed',x===b)})}});
- var n=t('demo.nodes'),ic=['▤','✓','◉','➤'];
- $('canvas').innerHTML='<span class="banner">'+esc(t('demo.live'))+'</span>'+n.map(function(x,i){return (i?'<div class="vline"></div>':'')+'<div class="node" id="nd'+i+'"><span class="ic'+(i===1||i===3?' blue':'')+'">'+ic[i]+'</span><div><strong>'+esc(x[0])+(i===2?'<span class="tag w" id="evtag">'+esc(t('demo.miss'))+'</span>':'')+'</strong><small>'+esc(x[1])+'</small></div></div>'}).join('')+'<div class="ctrls"><span>⛶</span><span>+</span><span>−</span></div><div class="hint">✥ '+esc(t('demo.hint'))+'</div>';
- $('steps').innerHTML=t('demo.steps').map(function(s,i){return '<button class="step" role="tab" aria-selected="false" data-s="'+i+'"><i></i><em>'+(i+1)+'</em>'+esc(s)+'</button>'}).join('');
+ $('brands').innerHTML=DSC[lang].map(function(s,i){return '<button type="button" aria-pressed="'+(i===D.brand)+'" data-b="'+i+'"><i style="background:'+s.col+'"></i>'+esc(s.b)+'</button>'}).join('');
+ document.querySelectorAll('#brands button').forEach(function(b){b.onclick=function(){setBrand(+b.dataset.b)}});
+ var s=dsc();
+ $('dmThread').textContent=s.thread;$('dmCon').textContent=s.con;
+ $('dmBrand').innerHTML='<i style="background:'+s.col+'"></i>'+esc(s.b)+'<span>· '+esc(s.ag)+'</span>';
+ $('dmTitle').textContent=s.ctitle;$('dmMet').firstChild.textContent=s.met[0];
+ $('dmRows').innerHTML=s.rows.map(function(r,k){return '<div class="dr" id="dr'+k+'"><span class="dd"></span><div><b>'+esc(r[0])+'</b>'+(r[1]?'<small>'+esc(r[1])+'</small>':'')+'</div><em class="dt"></em></div>'}).join('');
+ $('steps').innerHTML=s.steps.map(function(x,i){return '<button class="step" role="tab" aria-selected="false" data-s="'+i+'"><i></i><em>'+(i+1)+'</em>'+esc(x)+'</button>'}).join('');
  document.querySelectorAll('.step').forEach(function(b){b.onclick=function(){goStep(+b.dataset.s,true)}});
+ D.step=-1;$('msgs').innerHTML='';
 }
-function msg(cls,html){var m=document.createElement('div');m.className='m '+cls;m.innerHTML=html;$('msgs').appendChild(m);requestAnimationFrame(function(){requestAnimationFrame(function(){m.classList.add('show')})});return m}
+function setBrand(i){D.brand=i;document.querySelectorAll('#brands button').forEach(function(x){x.setAttribute('aria-pressed',String(+x.dataset.b===i))});var bb=document.querySelector('#brands button[data-b="'+i+'"]');if(bb&&bb.scrollIntoView&&!RM){var p=bb.parentNode;p.scrollTo({left:bb.offsetLeft-p.clientWidth/2+bb.offsetWidth/2,behavior:'smooth'})}drawDemo();goStep(0,true)}
+var ICO={ok:'✓',w:'!',bad:'✕',b:'•',p:''};
+function agentHtml(a){
+ var h='<span class="av">'+BIRD+'</span><div><p>'+esc(a.t)+'</p>';
+ if(a.li)h+='<ul class="chk">'+a.li.map(function(l){return '<li><span class="'+l[0]+'">'+ICO[l[0]]+'</span><b>'+esc(l[1])+'</b>'+(l[2]?'<small>'+esc(l[2])+'</small>':'')+'</li>'}).join('')+'</ul>';
+ if(a.kv)h+='<div class="kv">'+a.kv.map(function(k){return '<div><small>'+esc(k[0])+'</small><b>'+esc(k[1])+'</b></div>'}).join('')+'</div>';
+ if(a.n)h+='<p class="nt">'+esc(a.n)+'</p>';
+ return h+'</div>';
+}
+function msg(cls,html,anim){var m=document.createElement('div');m.className='m '+cls;m.innerHTML=html;$('msgs').appendChild(m);
+ if(anim===false){m.classList.add('show');m.querySelectorAll('li').forEach(function(li){li.classList.add('on')})}
+ else{requestAnimationFrame(function(){requestAnimationFrame(function(){m.classList.add('show')})});m.querySelectorAll('li').forEach(function(li,k){if(RM)li.classList.add('on');else setTimeout(function(){li.classList.add('on')},350+k*320)})}
+ return m}
+function addStep(i,anim){var s=dsc(),ty=$('msgs').querySelector('.typing-m');if(ty)ty.remove();
+ s.m[i].forEach(function(x){if(x.u)msg('u',esc(x.u),anim);else msg('a',agentHtml(x.a),anim)});
+ var last=s.m[i][s.m[i].length-1];if(last.u&&i<s.m.length-1)msg('a typing-m','<span class="av">'+BIRD+'</span><span class="typing"><i></i><i></i><i></i></span>',anim)}
 function setStep(i,dur){document.querySelectorAll('.step').forEach(function(b,k){b.setAttribute('aria-selected',k===i);var bar=b.querySelector('i');bar.style.transition='none';bar.style.width=k<i?'100%':'0';if(k===i){if(RM)bar.style.width='100%';else requestAnimationFrame(function(){requestAnimationFrame(function(){bar.style.transition='width '+(dur/1000)+'s linear';bar.style.width='100%'})})}})}
 function goStep(i,manual){
- clearTimeout(D.timer);var dur=i===3?4400:3600;$('msgs').innerHTML='';setStep(i,dur);
- for(var k=0;k<4;k++)$('nd'+k).classList.toggle('on',k<=i);
- var tg=$('evtag');tg.className='tag '+(i>=3?'ok':'w');tg.textContent=i>=3?t('demo.done'):t('demo.miss');
- $('canvas').classList.toggle('live',i>=1&&i<3);
- var list='<ul class="chk">'+t('demo.chk').map(function(c,k){return '<li><span class="'+(k===3?'w':'ok')+'">'+(k===3?'!':'✓')+'</span><b>'+esc(c[0])+'</b>'+(k===3?' · '+esc(c[1]):'')+'</li>'}).join('')+'</ul>';
- msg('u',esc(t('demo.u1')));
- if(i>=1){var a=msg('a','<span class="av">A</span><div>'+esc(t('demo.a1'))+list+'</div>');a.querySelectorAll('li').forEach(function(li,k){if(RM||manual||i>1)li.classList.add('on');else setTimeout(function(){li.classList.add('on')},400+k*420)})}
- else msg('a','<span class="av">A</span><span class="typing"><i></i><i></i><i></i></span>');
- if(i>=2)msg('u',esc(t('demo.u2')));
- if(i>=3)msg('a','<span class="av">A</span><div>'+esc(t('demo.a2'))+'</div>');
- if(!RM)D.timer=setTimeout(function(){goStep((i+1)%4,false)},dur);
+ clearTimeout(D.timer);var s=dsc(),last=s.steps.length-1,dur=i===last?5200:4200;setStep(i,dur);
+ if(i===D.step+1&&!manual)addStep(i,true);else{$('msgs').innerHTML='';for(var k=0;k<=i;k++)addStep(k,k===i)}
+ D.step=i;
+ var pl=s.pill[i];$('dmPill').className='dm-pill '+pl[1];$('dmPill').textContent=pl[0];
+ $('dmMet').lastChild.textContent=s.met[1][i];
+ s.rows.forEach(function(r,k){var el=$('dr'+k);if(!el)return;var st=r[2][i];el.className='dr '+st;el.querySelector('.dd').textContent=ICO[st];var tg=r[3]&&r[3][i];el.querySelector('.dt').textContent=tg||''});
+ $('canvas').classList.toggle('live',i>0&&i<last);
+ if(!RM)D.timer=setTimeout(function(){if(i<last)goStep(i+1,false);else{D.brand=(D.brand+1)%DSC[lang].length;drawDemo();document.querySelectorAll('#brands button').forEach(function(x){x.setAttribute('aria-pressed',String(+x.dataset.b===D.brand))});goStep(0,false)}},dur);
 }
 
 /* franja, dos formas, problema */
