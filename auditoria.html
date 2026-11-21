@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auditoría · Ax AI</title>
+<meta name="description" content="Ax AI revisa cada expediente de garantía contra las reglas de la marca: secciones obligatorias, documentos, plazos y PDF de auditoría. Listos para la auditoría de la armadora, todos los días.">
+<meta name="theme-color" content="#EFEFEF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-180 -300 1482 1482'%3E%3Crect x='-180' y='-300' width='1482' height='1482' rx='300' fill='%23000'/%3E%3Cpath fill='%23fff' d='M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#F1F1F1;--ink:#0A0A0A;--mut:#6F6F73;--soft:#9A9AA0;--line:#DCDCDE;--card:#fff;--blue:#1D4ED8;
+ --edge:radial-gradient(130% 95% at 50% 42%,rgba(0,0,0,0) 52%,rgba(150,175,200,.42) 100%);
+ --gradcard:var(--edge),linear-gradient(180deg,#3a3b40 0%,#1d212b 12%,#0e1626 26%,#0b1730 40%,#13295a 54%,#1f4677 66%,#3f6d98 78%,#7c9bb7 90%,#aebdc8 100%);
+ --gradfin:var(--edge),linear-gradient(180deg,#00163f 0%,#022657 18%,#103e6c 32%,#1d577e 44%,#2d698c 54%,#6092ad 66%,#aac8db 82%,#d4e4ee 100%)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;font-size:15px}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:10px}
+.wrap{width:100%;max-width:1140px;margin:0 auto;padding:0 24px}
+section{padding:96px 0}
+h1,h2,h3{font-family:'Inter Tight',Inter,sans-serif;font-weight:500;letter-spacing:-.035em;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,6vw,76px)}
+h2{font-size:clamp(30px,4vw,50px)}
+h3{font-size:22px;letter-spacing:-.02em;line-height:1.15}
+.eyebrow{display:block;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:14px}
+.sub{color:var(--mut);font-size:17px;max-width:620px;line-height:1.6}
+.center{text-align:center}.center .sub{margin-left:auto;margin-right:auto}
+.btn{display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 22px;border-radius:999px;font-weight:500;font-size:15px;transition:transform .2s,box-shadow .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.btn-light{background:#fff;color:var(--ink)}.btn-light:hover{box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+/* menú */
+.nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;width:calc(100% - 28px);max-width:780px;height:52px;background:rgba(12,12,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.logo{display:flex;align-items:center;gap:8px;white-space:nowrap;flex:none;font-family:'Inter Tight',Inter,sans-serif;font-weight:500;font-size:17px;letter-spacing:-.03em}
+.logo svg{height:.95em;width:auto}
+.nav-r{display:flex;align-items:center;gap:4px}
+.nav-link{padding:8px 11px;border-radius:10px;font-size:13px;color:#c9c9cf;white-space:nowrap}.nav-link:hover{color:#fff}.nav-link[aria-current=page]{color:#fff}
+.nav .btn{height:36px;padding:0 14px;font-size:13px;background:#fff;color:#0a0a0a}
+.lang{display:flex;background:rgba(255,255,255,.08);border-radius:10px;padding:3px;margin-left:2px}
+.lang button{padding:5px 8px;border-radius:8px;font-size:11px;font-weight:600;color:#a1a1aa}
+.lang button[aria-pressed=true]{background:#fff;color:#0a0a0a}
+/* portada */
+.hero{padding:150px 0 40px;position:relative;overflow:hidden}
+.hero .sub{margin-top:22px}
+.hero .btns{margin-top:30px;justify-content:center}
+.shield{width:84px;height:84px;margin:0 auto 26px;border-radius:24px;background:var(--gradcard);display:grid;place-items:center;color:#fff;box-shadow:0 20px 40px rgba(16,35,77,.25)}
+.shield svg{width:38px;height:38px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:34px}
+.badges span{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;color:#3f3f46}
+.badges span::before{content:"";width:7px;height:7px;border-radius:50%;background:#22c55e}
+/* pilares */
+.pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:46px}
+.pil{border-radius:26px;background:var(--gradcard);color:#fff;padding:24px 22px 26px;min-height:340px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.pil .no{font-size:13px;color:#b9c8e6}
+.pil .ic{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;margin:22px 0 auto}
+.pil .ic svg{width:26px;height:26px}
+.pil h3{margin-top:28px}
+.pil p{margin-top:10px;font-size:14px;line-height:1.55;color:#dbe4f3}
+/* tablas */
+.blk{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.blk + .blk{margin-top:96px}
+.blk .sub{margin-top:16px;font-size:16px}
+.tbl{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.tbl .row{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:18px;padding:16px 22px;border-top:1px solid #ececee;font-size:14.5px}
+.tbl .row:first-child{border-top:0;background:#fafafa;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:12px 22px}
+.tbl .row b{font-weight:600}
+.tbl .row span{color:#3f3f46}
+.tbl .row .ok{display:inline-flex;align-items:center;gap:7px;color:#15803d;font-weight:600}
+.tbl .row .ok::before{content:"✓";display:grid;place-items:center;width:18px;height:18px;border-radius:6px;background:#dcfce7;font-size:11px}
+/* preguntas */
+.faqw{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.qa{border-top:1px solid var(--line)}
+.qa:last-child{border-bottom:1px solid var(--line)}
+.qa button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;text-align:left;font-size:17px;font-weight:500}
+.qa button i{font-style:normal;font-size:20px;color:var(--mut);transition:transform .25s}
+.qa[open] button i{transform:rotate(45deg)}
+.qa .a{display:none;padding:0 0 20px;color:var(--mut);font-size:15px;line-height:1.6;max-width:640px}
+.qa[open] .a{display:block}
+/* cierre */
+.fin{border-radius:56px;background:var(--gradfin);color:#fff;text-align:center;padding:110px 24px 130px;margin:0 14px}
+.fin h2{max-width:760px;margin:0 auto}
+.fin p{color:#d6e2f2;margin:18px auto 0;max-width:560px;font-size:17px}
+.fin .btns{justify-content:center;margin-top:30px}
+.fin .btn-ghost{background:#0a0a0a;color:#fff}
+footer{padding:70px 0 40px}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px}
+.fgrid h4{font-size:13px;font-weight:600;margin-bottom:12px}
+.fgrid a{display:block;color:var(--mut);font-size:14px;margin:6px 0}.fgrid a:hover{color:var(--ink)}
+.fgrid .bl{font-size:20px;letter-spacing:-.02em;line-height:1.35;color:var(--mut);max-width:340px}.fgrid .bl b{color:var(--ink);font-weight:500}
+.mark{display:flex;align-items:center;gap:18px;margin-top:64px;font-family:'Inter Tight',Inter,sans-serif;font-size:clamp(56px,9vw,120px);letter-spacing:-.06em;line-height:1}
+.mark svg{height:.62em;width:auto}
+.copy{margin-top:14px;color:#a1a1aa;font-size:12.5px}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media (max-width:980px){.pillars{grid-template-columns:1fr 1fr}.blk,.faqw{grid-template-columns:1fr;gap:28px}.fgrid{grid-template-columns:1fr 1fr}.fgrid>div:first-child{grid-column:1/-1}}
+@media (max-width:640px){
+ section{padding:64px 0}.wrap{padding:0 18px}
+ .nav{top:10px;width:calc(100% - 20px);height:48px;padding:0 6px 0 14px}
+ .nav .hide-m{display:none}
+ .hero{padding:110px 0 20px}
+ .hero .btns{flex-direction:column;align-items:stretch}.hero .btn{justify-content:center}
+ .pillars{grid-template-columns:1fr;gap:12px;margin-top:30px}
+ .pil{min-height:0;border-radius:22px}.pil .ic{margin:18px 0 0}.pil h3{margin-top:20px}
+ .blk + .blk{margin-top:64px}
+ .tbl .row{grid-template-columns:1fr;gap:4px;padding:14px 18px}
+ .tbl .row:first-child{display:none}
+ .fin{border-radius:32px;margin:0 10px;padding:72px 20px 88px}
+ .fin .btns{flex-direction:column;align-items:stretch}.fin .btn{justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+/* precios */
+.formula{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:stretch;max-width:980px;margin:46px auto 0}
+.fx{border-radius:26px;background:var(--gradcard);color:#fff;padding:26px 26px 30px;display:flex;flex-direction:column}
+.fx .no{font-size:13px;color:#b9c8e6}.fx .ic{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;margin:22px 0 26px}.fx .ic svg{width:26px;height:26px}
+.fx p{margin-top:10px;font-size:15px;line-height:1.6;color:#dbe4f3}
+.plus{display:grid;place-items:center;font-family:'Inter Tight',Inter,sans-serif;font-size:44px;font-weight:300;color:var(--mut)}
+.fnote{max-width:680px;margin:20px auto 0;text-align:center;color:var(--mut);font-size:14px}
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:46px;align-items:stretch}
+.plan{background:#fff;border:1px solid var(--line);border-radius:26px;padding:26px;display:flex;flex-direction:column}
+.plan .tag{align-self:flex-start;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;background:#f1f1f3;color:#3f3f46;margin-bottom:22px}
+.plan h3{font-size:28px}.plan .who{display:block;margin-top:6px;font-size:14px;font-weight:500;color:var(--mut)}
+.plan p{margin-top:16px;font-size:15px;line-height:1.6;color:#3f3f46}
+.plan ul{list-style:none;margin:20px 0 26px;display:grid;gap:10px;font-size:14.5px}
+.plan li{display:flex;gap:10px;align-items:flex-start}.plan li::before{content:"✓";flex:none;display:grid;place-items:center;width:20px;height:20px;border-radius:7px;background:#e0e7ff;color:#1d4ed8;font-size:11px;font-weight:700;margin-top:1px}
+.plan .btn{margin-top:auto;justify-content:center}
+.plan.hl{background:var(--gradcard);color:#fff;border-color:transparent}.plan.hl .tag{background:rgba(255,255,255,.14);color:#fff}.plan.hl .who{color:#b9c8e6}.plan.hl p{color:#dbe4f3}.plan.hl li::before{background:rgba(255,255,255,.16);color:#fff}
+.tbl.inc .row{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}.tbl.inc .row:first-child{display:grid;background:none;font-size:14.5px;letter-spacing:0;text-transform:none;color:inherit;padding:16px 22px}
+.tbl.inc .row b::before{content:"✓";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:6px;background:#dcfce7;color:#15803d;font-size:11px;margin-right:9px;vertical-align:1px}
+.steps4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:46px}
+.st{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px}
+.st .n{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#0a0a0a;color:#fff;font-weight:600;font-size:14px;margin-bottom:18px}
+.st h3{font-size:19px}.st p{margin-top:8px;color:var(--mut);font-size:14px;line-height:1.55}
+@media (max-width:980px){.formula{grid-template-columns:1fr}.plus{font-size:34px}.plans{grid-template-columns:1fr}.steps4{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.steps4{grid-template-columns:1fr}.fx,.plan{border-radius:22px;padding:22px}.tbl.inc .row:first-child{display:grid}}
+/* auditoría */
+.probs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pb{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px}.pb .n{font-size:13px;color:var(--mut)}.pb h3{margin-top:14px;font-size:21px}.pb p{margin-top:8px;color:var(--mut);font-size:14.5px;line-height:1.55}
+.aud{max-width:880px;margin:40px auto 0;border-radius:28px;background:radial-gradient(120% 80% at 30% 0%,#16285a 0%,rgba(22,40,90,0) 60%),linear-gradient(180deg,#0a0f1e 0%,#0c1630 50%,#10234d 100%);color:#fff;padding:24px}
+.aud-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.aud-h small{display:block;font-size:12px;color:#9fb7ff;letter-spacing:.04em}.aud-h b{display:block;font-family:'Inter Tight',Inter,sans-serif;font-size:24px;font-weight:500;letter-spacing:-.02em;margin-top:4px}
+.aud-pill{flex:none;font-size:12px;font-weight:600;border-radius:999px;padding:5px 11px}.aud-pill.run{background:rgba(91,140,255,.25);color:#c7d6ff}.aud-pill.ok{background:rgba(34,197,94,.18);color:#86efac}
+.aud-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px}
+.aud-kpi div{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);border-radius:14px;padding:12px 14px}.aud-kpi b{display:block;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}.aud-kpi span{display:block;font-size:12px;color:#aab6d3;margin-top:2px}
+.aud-bar{height:6px;border-radius:6px;background:rgba(255,255,255,.1);margin:18px 0 16px;overflow:hidden}.aud-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5b8cff,#9fb7ff);border-radius:6px}
+.aud-rows{display:grid;gap:8px}
+.ar{display:flex;align-items:center;gap:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:14px;padding:11px 14px;opacity:.2;transform:translateY(6px);transition:opacity .5s,transform .5s}
+.ar.on{opacity:1;transform:none}.ar .d{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:13px;font-weight:700}
+.ar.bad .d{background:rgba(248,113,113,.18);color:#fca5a5}.ar.warn .d{background:rgba(251,191,36,.16);color:#fcd34d}.ar.ok .d{background:rgba(34,197,94,.18);color:#86efac}
+.ar div{min-width:0;flex:1}.ar b{display:block;font-size:14px;font-weight:600}.ar small{display:block;color:#c8d3ea;font-size:13px}.ar em{font-style:normal;font-size:12.5px;color:#aab6d3;white-space:nowrap}
+.aud-ill{margin-top:14px;font-size:11.5px;color:#8b9bc2}
+@media (max-width:980px){.probs{grid-template-columns:1fr}.aud-kpi{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.aud{padding:18px 14px;border-radius:22px;margin:28px -4px 0}.aud-h b{font-size:20px}.aud-kpi b{font-size:20px}.ar{flex-wrap:wrap}.ar em{width:100%;padding-left:40px}}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Principal">
+ <a href="./" class="logo" aria-label="Ax AI, inicio"><svg viewBox="0 0 1122 883" aria-hidden="true"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg><span>Ax AI</span></a>
+ <div class="nav-r">
+  <a class="nav-link hide-m" href="./#como-funciona" data-i="nav.how"></a>
+  <a class="nav-link hide-m" href="seguridad" data-i="nav.sec"></a>
+  <a class="nav-link hide-m" href="precios" data-i="nav.price"></a>
+  <a class="nav-link hide-m" href="app" data-i="nav.login"></a>
+  <a class="btn hide-m" href="./#piloto" data-i="cta.pilot"></a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+ </div>
+</nav>
+
+<main>
+<section class="hero center"><div class="wrap">
+ <div class="shield" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M9 3.5h6v3H9z"/><path d="M8.5 12l2 2 4.5-4.5"/><path d="M8.5 17h7"/></svg></div>
+ <span class="eyebrow" data-i="h.k"></span>
+ <h1 data-i="h.t"></h1>
+ <p class="sub" data-i="h.s"></p>
+ <div class="btns"><a class="btn btn-dark" href="./#piloto"><span data-i="cta.talk"></span><span>→</span></a><a class="btn btn-light" href="#simulacro"><span data-i="h.see"></span><span>↓</span></a></div>
+ <div class="badges" id="badges"></div>
+</div></section>
+
+<section style="padding-top:30px"><div class="wrap">
+ <div class="probs" id="probs"></div>
+</div></section>
+
+<section id="simulacro" style="padding-top:20px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="s.k"></span><h2 class="rv" data-i="s.t"></h2><p class="sub rv" style="margin-top:16px" data-i="s.s"></p></div>
+ <div class="aud rv" id="aud">
+  <div class="aud-h"><div><small data-i="s.ag"></small><b data-i="s.title"></b></div><span class="aud-pill" id="audPill"></span></div>
+  <div class="aud-kpi"><div><b id="audN">0</b><span data-i="s.k1"></span></div><div><b id="audC">0</b><span data-i="s.k2"></span></div><div><b id="audF">0</b><span data-i="s.k3"></span></div><div><b id="audP">0%</b><span data-i="s.k4"></span></div></div>
+  <div class="aud-bar"><i id="audBar"></i></div>
+  <div class="aud-rows" id="audRows"></div>
+  <p class="aud-ill" data-i="s.ill"></p>
+ </div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="p.k"></span><h2 class="rv" data-i="p.t"></h2></div>
+ <div class="pillars" id="pillars"></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="blk rv"><div><span class="eyebrow" data-i="r.k"></span><h2 data-i="r.t"></h2><p class="sub" data-i="r.s"></p></div><div class="tbl" id="tRev"></div></div>
+ <div class="blk rv"><div><span class="eyebrow" data-i="z.k"></span><h2 data-i="z.t"></h2><p class="sub" data-i="z.s"></p></div><div class="tbl" id="tPlz"></div></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="w.k"></span><h2 class="rv" data-i="w.t"></h2></div>
+ <div class="steps4" id="steps4"></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap faqw">
+ <div><span class="eyebrow" data-i="f.k"></span><h2 class="rv" data-i="f.t"></h2></div>
+ <div id="faq"></div>
+</div></section>
+
+<div class="fin rv">
+ <h2 data-i="c.t"></h2>
+ <p data-i="c.s"></p>
+ <div class="btns"><a class="btn btn-light" href="./#piloto"><span data-i="cta.talk"></span><span>→</span></a><a class="btn btn-ghost" href="precios"><span data-i="c.price"></span><span>→</span></a></div>
+</div>
+</main>
+
+<footer><div class="wrap">
+ <div class="fgrid">
+  <div><p class="bl"><b>Ax AI ·</b> <span data-i="ft.tag"></span></p></div>
+  <div><h4 data-i="ft.prod"></h4><a href="./#como-funciona" data-i="nav.how"></a><a href="./#red" data-i="ft.red"></a><a href="seguridad" data-i="nav.sec"></a><a href="precios" data-i="nav.price"></a><a href="auditoria" data-i="nav.aud"></a></div>
+  <div><h4 data-i="ft.co"></h4><a href="./#piloto" data-i="cta.pilot"></a><a href="app" data-i="nav.login"></a></div>
+  <div><h4>Legal</h4><a href="privacidad" data-i="ft.privacy"></a><a href="terminos" data-i="ft.terms"></a></div>
+ </div>
+ <div class="mark" aria-hidden="true"><svg viewBox="0 0 1122 883"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg>Ax AI</div>
+ <p class="copy" data-i="ft.copy"></p>
+</div></footer>
+
+<script>
+(function(){
+var IC={
+ file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3.5H7a2 2 0 00-2 2v13a2 2 0 002 2h10a2 2 0 002-2V8.5z"/><path d="M14 3.5v5h5"/><path d="M9 13l2 2 4-4"/></svg>',
+ eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/><path d="M8.5 11l1.8 1.8 3.2-3.3"/></svg>',
+ clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+ pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19.5h14"/></svg>'};
+var T={
+es:{'nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.price':'Precios','nav.aud':'Auditoría','nav.login':'Iniciar sesión','cta.pilot':'Solicita un piloto','cta.talk':'Habla con el equipo',
+ 'h.k':'Auditoría','h.t':'Listos para la auditoría de la armadora, todos los días','h.s':'Ax AI revisa cada expediente contra las reglas de la marca mientras se arma. Cuando llega el auditor, ya sabes qué está completo, qué falta y quién lo tiene que corregir.','h.see':'Ver la auditoría en acción',
+ badges:['6 secciones obligatorias por expediente','Cada documento revisado contra las reglas','Plazos con semáforo','PDF de auditoría por expediente'],
+ probs:[['El débito llega meses después','La armadora debita el total de la transacción cuando el expediente no se sostiene en la auditoría, aunque la reparación se haya hecho bien.'],['Los faltantes se descubren tarde','Una firma, una foto o una fecha que no cuadra se nota hasta que el auditor está en la agencia.'],['Nadie tiene el panorama completo','Cada asesor guarda sus documentos a su manera; el gerente no sabe cuántos expedientes aguantarían una revisión hoy.']],
+ 's.k':'Auditoría interna','s.t':'Una auditoría completa, en segundos','s.s':'El Agente de Posventa revisa todos los expedientes del periodo, sección por sección, y te dice cuáles no pasarían y a qué asesor le toca corregirlos.',
+ 's.ag':'Agente de Posventa · Agencia Centro','s.title':'Auditoría interna · noviembre','s.k1':'Expedientes revisados','s.k2':'Completos','s.k3':'Por corregir','s.k4':'Listos para el auditor',
+ 'pill.run':'Revisando…','pill.done':'Revisión terminada',
+ rows:[['PREA-26-118','Laura M.','Falta la foto de la destrucción de partes','bad'],['PREA-26-131','Jorge R.','El kilometraje de la recepción no coincide con el diagnóstico','warn'],['PREA-26-140','Laura M.','La orden de garantía no tiene la firma del cliente','bad'],['PREA-26-097','Ana P.','Completo · PDF de auditoría listo','ok']],
+ 's.ill':'Ejemplo ilustrativo con datos simulados.',
+ 'p.k':'Cómo audita Ax AI','p.t':'Cuatro capas de revisión',
+ pil:[['file','Expediente completo','Cada expediente se arma con sus 6 secciones obligatorias: orden de garantía firmada, recepción, diagnóstico, evidencia, refacciones y destrucción de partes.'],
+  ['eye','Cada documento, revisado','Al subir un archivo, el cerebro lo lee y lo compara contra las reglas de la marca: dice qué cumple, qué no y por qué, con la regla y la fuente.'],
+  ['clock','Plazos con semáforo','Digitalización, cobro, PRA, envío de piezas y destrucción: cada expediente muestra qué vence y cuándo, en verde, amarillo o rojo.'],
+  ['pdf','PDF de auditoría','Un archivo por expediente con todos sus documentos, la revisión contra las reglas y los avisos, listo para entregar al auditor.']],
+ 'r.k':'Qué revisa','r.t':'Sección por sección','r.s':'Las reglas vienen de los manuales de la marca y de los débitos reales de la red. Cuando una agencia recibe un débito, la regla nueva se revisa en todas.',
+ rev:[['Sección','Qué revisa Ax AI'],['Orden de garantía','Firmas, fechas de apertura y cierre, VIN, kilometraje y que los datos no estén a mano'],['Recepción del vehículo','Kilometraje, condición del vehículo y que coincida con la orden'],['Diagnóstico','Escaneo, código de falla y que la causa corresponda a la reparación'],['Evidencia','Fotos y videos de la pieza dañada, del VIN y del kilometraje'],['Refacciones','Pedido, salida de almacén y que las piezas coincidan con la PREA'],['Destrucción de partes','Evidencia de la destrucción dentro del plazo']],
+ 'z.k':'Tablero de auditoría','z.t':'El gerente y el dueño lo ven todo','z.s':'El Tablero de posventa muestra qué porcentaje de expedientes está completo, qué plazos vencen y qué asesor tiene pendientes. El dueño lo ve por marca y por agencia.',
+ plz:[['Indicador','Dónde se ve'],['Expedientes completos','Tablero de posventa, por asesor'],['Plazos vencidos y por vencer','Inicio y Tablero de posventa'],['Partes por destruir','Alertas de la semana'],['Débitos y su regla','Tablero de posventa y Red de reglas'],['Dinero recuperado','Tablero del dueño, por marca']],
+ 'w.k':'El día de la auditoría','w.t':'Del aviso a la revisión, sin correr',
+ steps:[['Llega el aviso','Pides al Agente de Posventa una auditoría interna del periodo.'],['Ves qué falta','Lista de expedientes por corregir, con el motivo y el asesor responsable.'],['Se corrige a tiempo','Cada asesor sube lo que falta; Ax AI lo vuelve a revisar al momento.'],['Entregas los PDF','Un PDF de auditoría por expediente, completo y ordenado.']],
+ 'f.k':'Preguntas frecuentes','f.t':'Lo que preguntan los gerentes de posventa',
+ faq:[['¿Ax AI sustituye al auditor de la armadora?','No. Ax AI prepara a tu agencia para la auditoría: revisa los expedientes con las mismas reglas, para que el auditor no encuentre sorpresas.'],
+  ['¿Con qué marcas funciona?','Empezamos con las reglas de garantía de General Motors y cada marca suma las suyas. Las reglas que nacen de débitos reales se comparten en la red.'],
+  ['¿Qué pasa si el auditor encuentra algo?','Registras el débito en el expediente; Ax AI lo lee, identifica la regla y, si no existía, la crea para que no se repita en ninguna agencia del grupo.'],
+  ['¿Puedo descargar el expediente?','Sí. Cada expediente genera su PDF de auditoría con los documentos, la revisión contra las reglas y los avisos.'],
+  ['¿Cuánto tarda una auditoría interna?','Segundos. El Agente de Posventa revisa todos los expedientes del periodo y te da la lista por asesor.']],
+ 'c.t':'Que la próxima auditoría no te tome por sorpresa','c.s':'Prueba Ax AI en tus agencias y mide cuántos expedientes pasarían hoy una revisión.','c.price':'Ver precios',
+ 'ft.tag':'La red de reglas que será la infraestructura de garantías de la industria.','ft.prod':'Producto','ft.red':'La red de Ax AI','ft.co':'Empresa','ft.privacy':'Aviso de privacidad','ft.terms':'Términos de uso','ft.copy':'© 2026 Ax AI. Todos los derechos reservados.'},
+en:{'nav.how':'How it works','nav.sec':'Security','nav.price':'Pricing','nav.aud':'Audit','nav.login':'Sign in','cta.pilot':'Request a pilot','cta.talk':'Talk to the team',
+ 'h.k':'Audit','h.t':'Ready for the automaker’s audit, every day','h.s':'Ax AI checks every claim file against the brand’s rules while it’s being built. When the auditor arrives, you already know what’s complete, what’s missing and who has to fix it.','h.see':'See the audit in action',
+ badges:['6 required sections per claim file','Every document checked against the rules','Deadlines with a traffic light','Audit PDF per claim file'],
+ probs:[['The chargeback arrives months later','The automaker charges back the full transaction when a claim file doesn’t hold up in an audit, even if the repair was done right.'],['Gaps are found too late','A signature, a photo or a date that doesn’t match only shows up once the auditor is at the dealership.'],['Nobody has the full picture','Each advisor keeps documents their own way; the manager doesn’t know how many claim files would pass a review today.']],
+ 's.k':'Internal audit','s.t':'A full audit, in seconds','s.s':'The After-sales agent reviews every claim file for the period, section by section, and tells you which ones wouldn’t pass and which advisor has to fix them.',
+ 's.ag':'After-sales agent · Downtown dealership','s.title':'Internal audit · November','s.k1':'Claim files reviewed','s.k2':'Complete','s.k3':'To fix','s.k4':'Ready for the auditor',
+ 'pill.run':'Reviewing…','pill.done':'Review complete',
+ rows:[['PREA-26-118','Laura M.','Parts destruction photo missing','bad'],['PREA-26-131','Jorge R.','Check-in mileage doesn’t match the diagnosis','warn'],['PREA-26-140','Laura M.','Warranty order missing the customer’s signature','bad'],['PREA-26-097','Ana P.','Complete · audit PDF ready','ok']],
+ 's.ill':'Illustrative example with simulated data.',
+ 'p.k':'How Ax AI audits','p.t':'Four layers of review',
+ pil:[['file','Complete claim file','Every claim file is built with its 6 required sections: signed warranty order, check-in, diagnosis, evidence, parts and parts destruction.'],
+  ['eye','Every document, checked','When a file is uploaded, the brain reads it and compares it with the brand’s rules: what complies, what doesn’t and why, with the rule and its source.'],
+  ['clock','Deadlines with a traffic light','Digitizing, collection, pre-authorization, parts return and destruction: each claim file shows what’s due and when, in green, amber or red.'],
+  ['pdf','Audit PDF','One file per claim with all its documents, the rule check and the warnings, ready to hand to the auditor.']],
+ 'r.k':'What it checks','r.t':'Section by section','r.s':'Rules come from the brand’s manuals and from real chargebacks across the network. When a dealership gets a chargeback, the new rule is checked everywhere.',
+ rev:[['Section','What Ax AI checks'],['Warranty order','Signatures, open and close dates, VIN, mileage and no handwritten data'],['Vehicle check-in','Mileage, vehicle condition and that it matches the order'],['Diagnosis','Scan, failure code and that the cause matches the repair'],['Evidence','Photos and videos of the damaged part, VIN and mileage'],['Parts','Order, stock release and that parts match the claim'],['Parts destruction','Proof of destruction within the deadline']],
+ 'z.k':'Audit dashboard','z.t':'The manager and the owner see everything','z.s':'The After-sales dashboard shows what share of claim files is complete, which deadlines are due and which advisor has pending items. The owner sees it by brand and by dealership.',
+ plz:[['Indicator','Where it shows'],['Complete claim files','After-sales dashboard, by advisor'],['Overdue and upcoming deadlines','Home and After-sales dashboard'],['Parts to destroy','Weekly alerts'],['Chargebacks and their rule','After-sales dashboard and Rule network'],['Money recovered','Owner dashboard, by brand']],
+ 'w.k':'Audit day','w.t':'From the notice to the review, without rushing',
+ steps:[['The notice arrives','Ask the After-sales agent for an internal audit of the period.'],['See what’s missing','A list of claim files to fix, with the reason and the advisor responsible.'],['Fixed in time','Each advisor uploads what’s missing; Ax AI re-checks it instantly.'],['Hand over the PDFs','One audit PDF per claim file, complete and in order.']],
+ 'f.k':'FAQs','f.t':'What after-sales managers ask',
+ faq:[['Does Ax AI replace the automaker’s auditor?','No. Ax AI prepares your dealership for the audit: it reviews claim files with the same rules, so the auditor finds no surprises.'],
+  ['Which brands does it work with?','We start with General Motors warranty rules and each brand adds its own. Rules born from real chargebacks are shared across the network.'],
+  ['What if the auditor finds something?','You log the chargeback on the claim file; Ax AI reads it, identifies the rule and, if it didn’t exist, creates it so it doesn’t happen again at any dealership in the group.'],
+  ['Can I download the claim file?','Yes. Each claim file generates its audit PDF with the documents, the rule check and the warnings.'],
+  ['How long does an internal audit take?','Seconds. The After-sales agent reviews every claim file for the period and gives you the list by advisor.']],
+ 'c.t':'Don’t let the next audit catch you off guard','c.s':'Try Ax AI at your dealerships and measure how many claim files would pass a review today.','c.price':'See pricing',
+ 'ft.tag':'The rule network that will become the industry’s warranty infrastructure.','ft.prod':'Product','ft.red':'The Ax AI network','ft.co':'Company','ft.privacy':'Privacy notice','ft.terms':'Terms of use','ft.copy':'© 2026 Ax AI. All rights reserved.'}};
+var lang='es';try{var sv=localStorage.getItem('axai-lang');if(sv==='en'||sv==='es')lang=sv}catch(e){}
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function t(k){return T[lang][k]}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function table(id,rows){document.getElementById(id).innerHTML=rows.map(function(r,i){return '<div class="row">'+(i===0?'<span>'+esc(r[0])+'</span><span>'+esc(r[1])+'</span>':'<b>'+esc(r[0])+'</b><span>'+esc(r[1])+'</span>')+'</div>'}).join('')}
+/* simulacro: cuenta los expedientes revisados y va mostrando los hallazgos */
+var A={N:54,C:51,timer:null,run:false};
+function fmt(v){return Math.round(v).toLocaleString(lang==='en'?'en-US':'es-MX')}
+function audSet(p){var n=A.N*p,c=Math.min(A.C,Math.round(A.C*p)),f=Math.round((A.N-A.C)*Math.min(1,p*1.15));
+ document.getElementById('audN').textContent=fmt(n);document.getElementById('audC').textContent=fmt(c);document.getElementById('audF').textContent=fmt(f);
+ document.getElementById('audP').textContent=Math.round(c*100/A.N)+'%';document.getElementById('audBar').style.width=(p*100)+'%';
+ document.querySelectorAll('#audRows .ar').forEach(function(r,k){r.classList.toggle('on',p>=(k+1)/5)});
+ var pl=document.getElementById('audPill');pl.textContent=p>=1?t('pill.done'):t('pill.run');pl.className='aud-pill '+(p>=1?'ok':'run')}
+function audPlay(){if(A.run)return;A.run=true;var t0=performance.now(),D=4200;
+ (function f(now){var p=RM?1:Math.min(1,(now-t0)/D);audSet(p);if(p<1)requestAnimationFrame(f);else{A.run=false;clearTimeout(A.timer);if(!RM)A.timer=setTimeout(function(){if(A.vis)audPlay()},6000)}})(performance.now())}
+function render(){
+ document.documentElement.lang=lang;document.title=(lang==='en'?'Audit':'Auditoría')+' · Ax AI';
+ document.querySelectorAll('[data-i]').forEach(function(e){var v=t(e.dataset.i);if(typeof v==='string')e.textContent=v});
+ document.querySelectorAll('.lang button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.lang===lang))});
+ document.getElementById('badges').innerHTML=t('badges').map(function(b){return '<span>'+esc(b)+'</span>'}).join('');
+ document.getElementById('probs').innerHTML=t('probs').map(function(p,i){return '<div class="pb rv in"><span class="n">0'+(i+1)+'</span><h3>'+esc(p[0])+'</h3><p>'+esc(p[1])+'</p></div>'}).join('');
+ document.getElementById('pillars').innerHTML=t('pil').map(function(p,i){return '<div class="pil rv in"><span class="no">0'+(i+1)+'</span><div class="ic">'+IC[p[0]]+'</div><h3>'+esc(p[1])+'</h3><p>'+esc(p[2])+'</p></div>'}).join('');
+ document.getElementById('audRows').innerHTML=t('rows').map(function(r){return '<div class="ar '+r[3]+'"><span class="d">'+(r[3]==='ok'?'✓':r[3]==='warn'?'!':'✕')+'</span><div><b>'+esc(r[0])+'</b><small>'+esc(r[2])+'</small></div><em>'+esc(r[1])+'</em></div>'}).join('');
+ table('tRev',t('rev'));table('tPlz',t('plz'));
+ document.getElementById('steps4').innerHTML=t('steps').map(function(s,i){return '<div class="st"><span class="n">'+(i+1)+'</span><h3>'+esc(s[0])+'</h3><p>'+esc(s[1])+'</p></div>'}).join('');
+ document.getElementById('faq').innerHTML=t('faq').map(function(q,i){return '<div class="qa"'+(i===0?' open':'')+'><button type="button" aria-expanded="'+(i===0)+'"><span>'+esc(q[0])+'</span><i aria-hidden="true">+</i></button><div class="a">'+esc(q[1])+'</div></div>'}).join('');
+ document.querySelectorAll('.qa button').forEach(function(b){b.onclick=function(){var q=b.parentNode,o=!q.hasAttribute('open');if(o)q.setAttribute('open','');else q.removeAttribute('open');b.setAttribute('aria-expanded',String(o))}});
+ audSet(A.done?1:0);
+}
+document.querySelectorAll('.lang button').forEach(function(b){b.onclick=function(){lang=b.dataset.lang;try{localStorage.setItem('axai-lang',lang)}catch(e){}render()}});
+render();
+var io='IntersectionObserver' in window?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12}):null;
+document.querySelectorAll('.rv').forEach(function(e){if(io)io.observe(e);else e.classList.add('in')});
+if('IntersectionObserver' in window)new IntersectionObserver(function(es){es.forEach(function(e){A.vis=e.isIntersecting;if(e.isIntersecting){A.done=true;audPlay()}})},{threshold:.35}).observe(document.getElementById('aud'));else{A.done=true;audSet(1)}
+})();
+</script>
+</body>
+</html>
