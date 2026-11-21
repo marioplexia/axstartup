@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Subprocesadores y datos · Ax AI</title>
+<meta name="description" content="Los proveedores que ayudan a operar Ax AI, los datos de garantías que tratamos, dónde se alojan y cuánto tiempo se conservan.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ax AI">
+<meta property="og:locale" content="es_MX">
+<meta property="og:title" content="Subprocesadores y datos · Ax AI">
+<meta property="og:description" content="Los proveedores que ayudan a operar Ax AI, los datos de garantías que tratamos, dónde se alojan y cuánto tiempo se conservan.">
+<meta property="og:url" content="__SITE__/datos">
+<meta property="og:image" content="__SITE__/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="__SITE__/og.png">
+<link rel="canonical" href="__SITE__/datos">
+
+<meta name="theme-color" content="#EFEFEF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-180 -300 1482 1482'%3E%3Crect x='-180' y='-300' width='1482' height='1482' rx='300' fill='%23000'/%3E%3Cpath fill='%23fff' d='M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#F1F1F1;--ink:#0A0A0A;--mut:#6F6F73;--soft:#9A9AA0;--line:#DCDCDE;--card:#fff;--blue:#1D4ED8;
+ --edge:radial-gradient(130% 95% at 50% 42%,rgba(0,0,0,0) 52%,rgba(150,175,200,.42) 100%);
+ --gradcard:var(--edge),linear-gradient(180deg,#3a3b40 0%,#1d212b 12%,#0e1626 26%,#0b1730 40%,#13295a 54%,#1f4677 66%,#3f6d98 78%,#7c9bb7 90%,#aebdc8 100%);
+ --gradfin:var(--edge),linear-gradient(180deg,#00163f 0%,#022657 18%,#103e6c 32%,#1d577e 44%,#2d698c 54%,#6092ad 66%,#aac8db 82%,#d4e4ee 100%)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;font-size:15px}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:10px}
+.wrap{width:100%;max-width:1140px;margin:0 auto;padding:0 24px}
+section{padding:96px 0}
+h1,h2,h3{font-family:'Inter Tight',Inter,sans-serif;font-weight:500;letter-spacing:-.035em;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,6vw,76px)}
+h2{font-size:clamp(30px,4vw,50px)}
+h3{font-size:22px;letter-spacing:-.02em;line-height:1.15}
+.eyebrow{display:block;font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:14px}
+.sub{color:var(--mut);font-size:17px;max-width:620px;line-height:1.6}
+.center{text-align:center}.center .sub{margin-left:auto;margin-right:auto}
+.btn{display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 22px;border-radius:999px;font-weight:500;font-size:15px;transition:transform .2s,box-shadow .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.btn-light{background:#fff;color:var(--ink)}.btn-light:hover{box-shadow:0 8px 20px rgba(0,0,0,.08)}
+.btns{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+/* menú */
+.nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;width:calc(100% - 28px);max-width:780px;height:52px;background:rgba(12,12,14,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#fff;border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.logo{display:flex;align-items:center;gap:8px;white-space:nowrap;flex:none;font-family:'Inter Tight',Inter,sans-serif;font-weight:500;font-size:17px;letter-spacing:-.03em}
+.logo svg{height:.95em;width:auto}
+.nav-r{display:flex;align-items:center;gap:4px}
+.nav-link{padding:8px 11px;border-radius:10px;font-size:13px;color:#c9c9cf;white-space:nowrap}.nav-link:hover{color:#fff}.nav-link[aria-current=page]{color:#fff}
+.nav .btn{height:36px;padding:0 14px;font-size:13px;background:#fff;color:#0a0a0a}
+.lang{display:flex;background:rgba(255,255,255,.08);border-radius:10px;padding:3px;margin-left:2px}
+.lang button{padding:5px 8px;border-radius:8px;font-size:11px;font-weight:600;color:#a1a1aa}
+.lang button[aria-pressed=true]{background:#fff;color:#0a0a0a}
+/* portada */
+.hero{padding:150px 0 40px;position:relative;overflow:hidden}
+.hero .sub{margin-top:22px}
+.hero .btns{margin-top:30px;justify-content:center}
+.shield{width:84px;height:84px;margin:0 auto 26px;border-radius:24px;background:var(--gradcard);display:grid;place-items:center;color:#fff;box-shadow:0 20px 40px rgba(16,35,77,.25)}
+.shield svg{width:38px;height:38px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:34px}
+.badges span{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:13px;color:#3f3f46}
+.badges span::before{content:"";width:7px;height:7px;border-radius:50%;background:#22c55e}
+/* pilares */
+.pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:46px}
+.pil{border-radius:26px;background:var(--gradcard);color:#fff;padding:24px 22px 26px;min-height:340px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.pil .no{font-size:13px;color:#b9c8e6}
+.pil .ic{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;margin:22px 0 auto}
+.pil .ic svg{width:26px;height:26px}
+.pil h3{margin-top:28px}
+.pil p{margin-top:10px;font-size:14px;line-height:1.55;color:#dbe4f3}
+/* tablas */
+.blk{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.blk + .blk{margin-top:96px}
+.blk .sub{margin-top:16px;font-size:16px}
+.tbl{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden}
+.tbl .row{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:18px;padding:16px 22px;border-top:1px solid #ececee;font-size:14.5px}
+.tbl .row:first-child{border-top:0;background:#fafafa;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:12px 22px}
+.tbl .row b{font-weight:600}
+.tbl .row span{color:#3f3f46}
+.tbl .row .ok{display:inline-flex;align-items:center;gap:7px;color:#15803d;font-weight:600}
+.tbl .row .ok::before{content:"✓";display:grid;place-items:center;width:18px;height:18px;border-radius:6px;background:#dcfce7;font-size:11px}
+/* preguntas */
+.faqw{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:start}
+.qa{border-top:1px solid var(--line)}
+.qa:last-child{border-bottom:1px solid var(--line)}
+.qa button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;text-align:left;font-size:17px;font-weight:500}
+.qa button i{font-style:normal;font-size:20px;color:var(--mut);transition:transform .25s}
+.qa[open] button i{transform:rotate(45deg)}
+.qa .a{display:none;padding:0 0 20px;color:var(--mut);font-size:15px;line-height:1.6;max-width:640px}
+.qa[open] .a{display:block}
+/* cierre */
+.fin{border-radius:56px;background:var(--gradfin);color:#fff;text-align:center;padding:110px 24px 130px;margin:0 14px}
+.fin h2{max-width:760px;margin:0 auto}
+.fin p{color:#d6e2f2;margin:18px auto 0;max-width:560px;font-size:17px}
+.fin .btns{justify-content:center;margin-top:30px}
+.fin .btn-ghost{background:#0a0a0a;color:#fff}
+footer{padding:70px 0 40px}
+.fgrid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:28px}
+.fgrid h4{font-size:13px;font-weight:600;margin-bottom:12px}
+.fgrid a{display:block;color:var(--mut);font-size:14px;margin:6px 0}.fgrid a:hover{color:var(--ink)}
+.fgrid .bl{font-size:20px;letter-spacing:-.02em;line-height:1.35;color:var(--mut);max-width:340px}.fgrid .bl b{color:var(--ink);font-weight:500}
+.mark{display:flex;align-items:center;gap:18px;margin-top:64px;font-family:'Inter Tight',Inter,sans-serif;font-size:clamp(56px,9vw,120px);letter-spacing:-.06em;line-height:1}
+.mark svg{height:.62em;width:auto}
+.copy{margin-top:14px;color:#a1a1aa;font-size:12.5px}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media (max-width:980px){.pillars{grid-template-columns:1fr 1fr}.blk,.faqw{grid-template-columns:1fr;gap:28px}.fgrid{grid-template-columns:1fr 1fr}.fgrid>div:first-child{grid-column:1/-1}}
+@media (max-width:640px){
+ section{padding:64px 0}.wrap{padding:0 18px}
+ .nav{top:10px;width:calc(100% - 20px);height:48px;padding:0 6px 0 14px}
+ .nav .hide-m{display:none}
+ .hero{padding:110px 0 20px}
+ .hero .btns{flex-direction:column;align-items:stretch}.hero .btn{justify-content:center}
+ .pillars{grid-template-columns:1fr;gap:12px;margin-top:30px}
+ .pil{min-height:0;border-radius:22px}.pil .ic{margin:18px 0 0}.pil h3{margin-top:20px}
+ .blk + .blk{margin-top:64px}
+ .tbl .row{grid-template-columns:1fr;gap:4px;padding:14px 18px}
+ .tbl .row:first-child{display:none}
+ .fin{border-radius:32px;margin:0 10px;padding:72px 20px 88px}
+ .fin .btns{flex-direction:column;align-items:stretch}.fin .btn{justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+/* precios */
+.formula{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:stretch;max-width:980px;margin:46px auto 0}
+.fx{border-radius:26px;background:var(--gradcard);color:#fff;padding:26px 26px 30px;display:flex;flex-direction:column}
+.fx .no{font-size:13px;color:#b9c8e6}.fx .ic{width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;margin:22px 0 26px}.fx .ic svg{width:26px;height:26px}
+.fx p{margin-top:10px;font-size:15px;line-height:1.6;color:#dbe4f3}
+.plus{display:grid;place-items:center;font-family:'Inter Tight',Inter,sans-serif;font-size:44px;font-weight:300;color:var(--mut)}
+.fnote{max-width:680px;margin:20px auto 0;text-align:center;color:var(--mut);font-size:14px}
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:46px;align-items:stretch}
+.plan{background:#fff;border:1px solid var(--line);border-radius:26px;padding:26px;display:flex;flex-direction:column}
+.plan .tag{align-self:flex-start;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;background:#f1f1f3;color:#3f3f46;margin-bottom:22px}
+.plan h3{font-size:28px}.plan .who{display:block;margin-top:6px;font-size:14px;font-weight:500;color:var(--mut)}
+.plan p{margin-top:16px;font-size:15px;line-height:1.6;color:#3f3f46}
+.plan ul{list-style:none;margin:20px 0 26px;display:grid;gap:10px;font-size:14.5px}
+.plan li{display:flex;gap:10px;align-items:flex-start}.plan li::before{content:"✓";flex:none;display:grid;place-items:center;width:20px;height:20px;border-radius:7px;background:#e0e7ff;color:#1d4ed8;font-size:11px;font-weight:700;margin-top:1px}
+.plan .btn{margin-top:auto;justify-content:center}
+.plan.hl{background:var(--gradcard);color:#fff;border-color:transparent}.plan.hl .tag{background:rgba(255,255,255,.14);color:#fff}.plan.hl .who{color:#b9c8e6}.plan.hl p{color:#dbe4f3}.plan.hl li::before{background:rgba(255,255,255,.16);color:#fff}
+.tbl.inc .row{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}.tbl.inc .row:first-child{display:grid;background:none;font-size:14.5px;letter-spacing:0;text-transform:none;color:inherit;padding:16px 22px}
+.tbl.inc .row b::before{content:"✓";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:6px;background:#dcfce7;color:#15803d;font-size:11px;margin-right:9px;vertical-align:1px}
+.steps4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:46px}
+.st{background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px}
+.st .n{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#0a0a0a;color:#fff;font-weight:600;font-size:14px;margin-bottom:18px}
+.st h3{font-size:19px}.st p{margin-top:8px;color:var(--mut);font-size:14px;line-height:1.55}
+@media (max-width:980px){.formula{grid-template-columns:1fr}.plus{font-size:34px}.plans{grid-template-columns:1fr}.steps4{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.steps4{grid-template-columns:1fr}.fx,.plan{border-radius:22px;padding:22px}.tbl.inc .row:first-child{display:grid}}
+/* auditoría */
+.probs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pb{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px}.pb .n{font-size:13px;color:var(--mut)}.pb h3{margin-top:14px;font-size:21px}.pb p{margin-top:8px;color:var(--mut);font-size:14.5px;line-height:1.55}
+.aud{max-width:880px;margin:40px auto 0;border-radius:28px;background:radial-gradient(120% 80% at 30% 0%,#16285a 0%,rgba(22,40,90,0) 60%),linear-gradient(180deg,#0a0f1e 0%,#0c1630 50%,#10234d 100%);color:#fff;padding:24px}
+.aud-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.aud-h small{display:block;font-size:12px;color:#9fb7ff;letter-spacing:.04em}.aud-h b{display:block;font-family:'Inter Tight',Inter,sans-serif;font-size:24px;font-weight:500;letter-spacing:-.02em;margin-top:4px}
+.aud-pill{flex:none;font-size:12px;font-weight:600;border-radius:999px;padding:5px 11px}.aud-pill.run{background:rgba(91,140,255,.25);color:#c7d6ff}.aud-pill.ok{background:rgba(34,197,94,.18);color:#86efac}
+.aud-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px}
+.aud-kpi div{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);border-radius:14px;padding:12px 14px}.aud-kpi b{display:block;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}.aud-kpi span{display:block;font-size:12px;color:#aab6d3;margin-top:2px}
+.aud-bar{height:6px;border-radius:6px;background:rgba(255,255,255,.1);margin:18px 0 16px;overflow:hidden}.aud-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5b8cff,#9fb7ff);border-radius:6px}
+.aud-rows{display:grid;gap:8px}
+.ar{display:flex;align-items:center;gap:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:14px;padding:11px 14px;opacity:.2;transform:translateY(6px);transition:opacity .5s,transform .5s}
+.ar.on{opacity:1;transform:none}.ar .d{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:13px;font-weight:700}
+.ar.bad .d{background:rgba(248,113,113,.18);color:#fca5a5}.ar.warn .d{background:rgba(251,191,36,.16);color:#fcd34d}.ar.ok .d{background:rgba(34,197,94,.18);color:#86efac}
+.ar div{min-width:0;flex:1}.ar b{display:block;font-size:14px;font-weight:600}.ar small{display:block;color:#c8d3ea;font-size:13px}.ar em{font-style:normal;font-size:12.5px;color:#aab6d3;white-space:nowrap}
+.aud-ill{margin-top:14px;font-size:11.5px;color:#8b9bc2}
+@media (max-width:980px){.probs{grid-template-columns:1fr}.aud-kpi{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.aud{padding:18px 14px;border-radius:22px;margin:28px -4px 0}.aud-h b{font-size:20px}.aud-kpi b{font-size:20px}.ar{flex-wrap:wrap}.ar em{width:100%;padding-left:40px}}
+/* TPU */
+.probs.four{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:40px}
+.tup{max-width:980px;margin:40px auto 0;border-radius:28px;background:radial-gradient(120% 80% at 30% 0%,#16285a 0%,rgba(22,40,90,0) 60%),linear-gradient(180deg,#0a0f1e 0%,#0c1630 50%,#10234d 100%);color:#fff;padding:28px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:28px;align-items:center}
+.tup-g{position:relative;text-align:center}.tup-g svg{width:100%;max-width:320px;display:block;margin:0 auto}
+.tup-v{margin-top:-62px}.tup-v b{display:block;font-family:'Inter Tight',Inter,sans-serif;font-size:56px;font-weight:500;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}.tup-v span{font-size:13px;color:#aab6d3}
+.tup-tg{display:inline-flex;margin-top:18px;background:rgba(255,255,255,.08);border-radius:12px;padding:4px}.tup-tg button{padding:7px 14px;border-radius:9px;font-size:13px;font-weight:500;color:#c8d3ea}.tup-tg button.on{background:#fff;color:#0a0a0a}
+.tup-d{display:grid;gap:16px}
+.dvh{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#dbe4f3}.dvh b{font-weight:600;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dvb{height:8px;border-radius:8px;background:rgba(255,255,255,.1);margin-top:7px;overflow:hidden}.dvb i{display:block;height:100%;width:0;border-radius:8px;background:linear-gradient(90deg,#5b8cff,#9fb7ff)}
+.steps4.next .st{background:var(--gradcard);color:#fff;border-color:transparent}.steps4.next .st p{color:#dbe4f3}.soon{display:inline-block;font-size:11.5px;font-weight:600;border-radius:999px;padding:4px 10px;background:rgba(255,255,255,.14);color:#fff;margin-bottom:16px}
+.tup-ill{grid-column:1/-1;font-size:11.5px;color:#8b9bc2}
+.tbl.tri .row{grid-template-columns:minmax(0,.8fr) minmax(0,1.3fr) minmax(0,.7fr)}.tbl.tri .row .w{color:var(--mut);font-size:13.5px}
+@media (max-width:980px){.probs.four{grid-template-columns:1fr 1fr}.tup{grid-template-columns:1fr}}
+@media (max-width:640px){.probs.four{grid-template-columns:1fr}.tup{padding:20px 16px;border-radius:22px;margin:28px -4px 0}.tbl.tri .row{grid-template-columns:1fr}}
+/* páginas comunes */
+.tbl.quad .row{grid-template-columns:minmax(0,.7fr) minmax(0,1.1fr) minmax(0,1.2fr) minmax(0,.8fr)}
+.upd{margin-top:14px;font-size:13px;color:var(--soft)}
+.flow{display:grid;grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr) 70px minmax(0,1fr);align-items:center;max-width:1000px;margin:40px auto 0;border-radius:28px;background:radial-gradient(120% 80% at 30% 0%,#16285a 0%,rgba(22,40,90,0) 60%),linear-gradient(180deg,#0a0f1e 0%,#0c1630 50%,#10234d 100%);color:#fff;padding:30px 26px}
+.fnode{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);border-radius:20px;padding:20px;min-height:170px}
+.fnode.mid{background:rgba(91,140,255,.16);border-color:rgba(159,183,255,.5);box-shadow:0 0 0 6px rgba(91,140,255,.08)}
+.fnode .fi{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.1);display:grid;place-items:center;margin-bottom:14px}.fnode .fi svg{width:22px;height:22px}
+.fnode b{display:block;font-family:'Inter Tight',Inter,sans-serif;font-size:20px;font-weight:500;letter-spacing:-.02em}.fnode p{margin-top:6px;font-size:14px;line-height:1.5;color:#c8d3ea}
+.farr{position:relative;height:2px;background:rgba(159,183,255,.25);margin:0 8px;overflow:hidden;border-radius:2px}
+.farr i{position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg,transparent,#9fb7ff,transparent);animation:fl 1.8s linear infinite}
+@keyframes fl{to{left:100%}}
+.e404{min-height:72vh;display:flex;align-items:center}
+.e404 .big{font-family:'Inter Tight',Inter,sans-serif;font-size:clamp(110px,22vw,220px);font-weight:500;letter-spacing:-.06em;line-height:.9;background:var(--gradcard);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media (max-width:980px){.flow{grid-template-columns:1fr;gap:0;padding:20px}.farr{width:2px;height:34px;margin:6px auto}.farr i{left:0;top:-40%;width:100%;height:40%;background:linear-gradient(180deg,transparent,#9fb7ff,transparent);animation-name:flv}.tbl.quad .row{grid-template-columns:1fr}}
+@keyframes flv{to{top:100%}}
+@media (prefers-reduced-motion:reduce){.farr i{animation:none;left:30%}}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Principal">
+ <a href="./" class="logo" aria-label="Ax AI, inicio"><svg viewBox="0 0 1122 883" aria-hidden="true"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg><span>Ax AI</span></a>
+ <div class="nav-r">
+  <a class="nav-link hide-m" href="./#como-funciona" data-i="nav.how"></a>
+  <a class="nav-link hide-m" href="seguridad" data-i="nav.sec"></a>
+  <a class="nav-link hide-m" href="precios" data-i="nav.price"></a>
+  <a class="nav-link hide-m" href="app" data-i="nav.login"></a>
+  <a class="btn hide-m" href="./#piloto" data-i="cta.pilot"></a>
+  <div class="lang" role="group" aria-label="Idioma"><button type="button" data-lang="es" aria-pressed="true">ES</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+ </div>
+</nav>
+
+<main>
+<section class="hero center"><div class="wrap">
+ <div class="shield" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v6c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6"/><path d="M5 12v6c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-6"/></svg></div>
+ <span class="eyebrow" data-i="h.k"></span>
+ <h1 data-i="h.t"></h1>
+ <p class="sub" data-i="h.s"></p>
+ <div class="badges" id="badges"></div>
+</div></section>
+
+<section style="padding-top:30px"><div class="wrap">
+ <div class="blk rv"><div><span class="eyebrow" data-i="s.k"></span><h2 data-i="s.t"></h2><p class="sub" data-i="s.s"></p><p class="upd" data-i="s.upd"></p></div><div class="tbl quad" id="tSub"></div></div>
+ <div class="blk rv"><div><span class="eyebrow" data-i="x.k"></span><h2 data-i="x.t"></h2><p class="sub" data-i="x.s"></p></div><div class="tbl" id="tSup"></div></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="p.k"></span><h2 class="rv" data-i="p.t"></h2></div>
+ <div class="pillars" id="pillars"></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+ <div class="blk rv"><div><span class="eyebrow" data-i="c.k"></span><h2 data-i="c.t"></h2><p class="sub" data-i="c.s"></p></div><div class="tbl" id="tCat"></div></div>
+ <div class="blk rv"><div><span class="eyebrow" data-i="r.k"></span><h2 data-i="r.t"></h2><p class="sub" data-i="r.s"></p></div><div class="tbl" id="tRet"></div></div>
+</div></section>
+
+<div class="fin rv">
+ <h2 data-i="e.t"></h2>
+ <p data-i="e.s"></p>
+ <div class="btns"><a class="btn btn-light" href="./#piloto"><span data-i="cta.talk"></span><span>→</span></a><a class="btn btn-ghost" href="seguridad"><span data-i="e.sec"></span><span>→</span></a></div>
+</div>
+</main>
+
+<footer><div class="wrap">
+ <div class="fgrid">
+  <div><p class="bl"><b>Ax AI ·</b> <span data-i="fo.tag"></span></p></div>
+  <div><h4 data-i="fo.prod"></h4><a href="./#como-funciona" data-i="fo.how"></a><a href="./#red" data-i="fo.red"></a><a href="armadoras" data-i="fo.oem"></a><a href="auditoria" data-i="fo.aud"></a><a href="tpu" data-i="fo.tpu"></a><a href="seguridad" data-i="fo.sec"></a><a href="precios" data-i="fo.price"></a></div>
+  <div><h4 data-i="fo.co"></h4><a href="./#piloto" data-i="fo.pilot"></a><a href="app" data-i="fo.login"></a></div>
+  <div><h4 data-i="fo.legal"></h4><a href="privacidad" data-i="fo.priv"></a><a href="terminos" data-i="fo.terms"></a><a href="datos" data-i="fo.data"></a></div>
+ </div>
+ <div class="mark" aria-hidden="true"><svg viewBox="0 0 1122 883"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg>Ax AI</div>
+ <p class="copy" data-i="fo.copy"></p>
+</div></footer>
+
+<script>
+(function(){
+var IC={
+ min:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+ nt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></svg>',
+ sep:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="7" height="7" rx="2"/><rect x="13.5" y="4" width="7" height="7" rx="2"/><rect x="3.5" y="14" width="7" height="7" rx="2"/><rect x="13.5" y="14" width="7" height="7" rx="2"/></svg>',
+ del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7h15"/><path d="M9 7V4.5h6V7"/><path d="M6.5 7l1 13h9l1-13"/></svg>',
+ rules:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h11l3 3v12H5z"/><path d="M8.5 11h7M8.5 15h5"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.2l2.5 2.5 5-5"/></svg>',
+ data:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5h16"/><path d="M7 16v-5M12 16V7M17 16v-8"/></svg>',
+ net:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="12" cy="13" r="2"/><path d="M12 7.5v3.5M10.4 14.2l-3.8 2.6M13.6 14.2l3.8 2.6"/></svg>',
+ car:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15.5l1.5-5A2 2 0 017.4 9h9.2a2 2 0 011.9 1.5l1.5 5"/><rect x="3" y="15" width="18" height="4" rx="1.5"/><circle cx="7.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>',
+ ax:'<svg viewBox="0 0 1122 883"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg>',
+ oem:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20.5h17"/><path d="M5 20.5V9l5 3V9l5 3V5.5h4v15"/></svg>'};
+var T={es:{'title':'Subprocesadores y datos · Ax AI','fo.tag':'La red de reglas que será la infraestructura de garantías de la industria.','fo.prod':'Producto','fo.how':'Cómo funciona','fo.red':'La red de Ax AI','fo.oem':'Para armadoras','fo.aud':'Auditoría','fo.tpu':'TPU de posventa','fo.sec':'Seguridad','fo.price':'Precios','fo.co':'Empresa','fo.pilot':'Solicita un piloto','fo.login':'Iniciar sesión','fo.legal':'Legal','fo.priv':'Aviso de privacidad','fo.terms':'Términos de uso','fo.data':'Subprocesadores y datos','fo.copy':'© 2026 Ax AI. Todos los derechos reservados.','nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.price':'Precios','nav.login':'Iniciar sesión','cta.pilot':'Solicita un piloto','cta.talk':'Habla con el equipo',
+ 'h.k':'Subprocesadores y datos','h.t':'Qué datos tratamos, dónde viven y con quién','h.s':'Transparencia para tu área de compras y de seguridad: los proveedores que ayudan a operar Ax AI, los datos que tratamos y qué pasa con ellos.',
+ badges:['Datos alojados en Estados Unidos (Oregon)','Tres subprocesadores','Sin entrenamiento con tus datos','Borrado a solicitud'],
+ 's.k':'Subprocesadores','s.t':'Quién nos ayuda a operar Ax AI','s.s':'Proveedores con acceso a datos de clientes para prestar el servicio. Cada uno trata solo lo necesario para su función.','s.upd':'Última actualización: noviembre de 2026.',
+ sub:[['Proveedor','Para qué','Datos que trata','Ubicación'],['Supabase','Base de datos, inicio de sesión y almacenamiento de documentos','Cuentas, expedientes, documentos, cobranza y registro de actividad','Estados Unidos (Oregon)'],['Anthropic','Modelos de lenguaje (Claude) por API para los agentes','Solo la información que cada tarea necesita, en el momento; sin entrenamiento','Estados Unidos'],['Render','Aloja y sirve las páginas y la aplicación','No guarda datos de clientes; solo atiende las solicitudes','Región del servicio en Render']],
+ 'x.k':'Servicios de apoyo','x.t':'Sin acceso a tus expedientes','x.s':'Servicios que usan las páginas para funcionar y que no reciben datos de clientes.',
+ sup:[['Servicio','Uso'],['Google Fonts','Tipografías de las páginas públicas; recibe la dirección IP del visitante'],['jsDelivr','Entrega librerías de código abierto que usa la aplicación']],
+ 'p.k':'Cómo tratamos los datos','p.t':'Cuatro principios',
+ pil:[['min','Datos mínimos','Solo pedimos lo que hace falta para armar, revisar y cobrar un reclamo de garantía.'],['nt','Sin entrenamiento','Los modelos de lenguaje se usan por API bajo condiciones que excluyen entrenar con tus datos.'],['sep','Cada agencia, aparte','Los permisos se aplican en la base de datos: cada quien ve solo lo de su agencia o su grupo.'],['del','Borrado a solicitud','Si dejas Ax AI, te entregamos tus datos y los borramos cuando lo pidas.']],
+ 'c.k':'Categorías de datos','c.t':'Qué datos tratamos','c.s':'Datos de la operación de garantías de la agencia. No tratamos datos de pago de clientes finales ni contraseñas de portales de las armadoras.',
+ cat:[['Categoría','Ejemplos y para qué'],['Cuentas de usuario','Nombre, correo, puesto y agencia: para entrar y aplicar permisos'],['Expedientes de garantía','Orden, VIN, vehículo, kilometraje, queja y documentos: para armar y revisar reclamos'],['Cobranza y débitos','Montos facturados, pagados y debitados: para medir el cobro y el dinero recuperado'],['Conversaciones con los agentes','Preguntas y respuestas: para dar contexto al agente en la misma orden'],['Registro de actividad','Corridas de los agentes y movimientos del expediente: para auditoría y seguridad']],
+ 'r.k':'Conservación','r.t':'Cuánto tiempo y qué pasa al final','r.s':'Los datos se conservan mientras tu agencia use Ax AI, para operar y para las auditorías de la armadora.',
+ ret:[['Momento','Qué pasa'],['Mientras usas Ax AI','Se guardan para operar, auditar y medir resultados'],['Baja de un usuario','Quitamos su acceso en cuanto la agencia lo pide; sus registros quedan en la agencia'],['Si dejas Ax AI','Te entregamos tus expedientes y documentos, y los borramos a solicitud'],['Lo aprendido por la red','Solo reglas y cifras agregadas, sin datos de clientes ni de expedientes']],
+ 'e.t':'¿Tu equipo necesita un contrato de tratamiento de datos?','e.s':'Lo preparamos contigo y respondemos el cuestionario de seguridad de tu grupo o de tu marca.','e.sec':'Ver seguridad'},
+en:{'title':'Subprocessors and data · Ax AI','fo.tag':'The rule network that will become the industry’s warranty infrastructure.','fo.prod':'Product','fo.how':'How it works','fo.red':'The Ax AI network','fo.oem':'For automakers','fo.aud':'Audit','fo.tpu':'After-sales TPU','fo.sec':'Security','fo.price':'Pricing','fo.co':'Company','fo.pilot':'Request a pilot','fo.login':'Sign in','fo.legal':'Legal','fo.priv':'Privacy notice','fo.terms':'Terms of use','fo.data':'Subprocessors and data','fo.copy':'© 2026 Ax AI. All rights reserved.','nav.how':'How it works','nav.sec':'Security','nav.price':'Pricing','nav.login':'Sign in','cta.pilot':'Request a pilot','cta.talk':'Talk to the team',
+ 'h.k':'Subprocessors and data','h.t':'What data we process, where it lives and with whom','h.s':'Transparency for your procurement and security teams: the providers that help us run Ax AI, the data we process and what happens to it.',
+ badges:['Data hosted in the United States (Oregon)','Three subprocessors','Your data never trains models','Deletion on request'],
+ 's.k':'Subprocessors','s.t':'Who helps us run Ax AI','s.s':'Providers with access to customer data to deliver the service. Each one processes only what its role needs.','s.upd':'Last updated: November 2026.',
+ sub:[['Provider','Purpose','Data processed','Location'],['Supabase','Database, sign-in and document storage','Accounts, claim files, documents, collections and activity log','United States (Oregon)'],['Anthropic','Language models (Claude) via API for the agents','Only what each task needs, when it needs it; no training','United States'],['Render','Hosts and serves the pages and the app','Stores no customer data; only handles requests','Render service region']],
+ 'x.k':'Supporting services','x.t':'No access to your claim files','x.s':'Services the pages use to work, which receive no customer data.',
+ sup:[['Service','Use'],['Google Fonts','Typefaces for the public pages; receives the visitor’s IP address'],['jsDelivr','Delivers open-source libraries used by the app']],
+ 'p.k':'How we handle data','p.t':'Four principles',
+ pil:[['min','Minimal data','We only ask for what’s needed to build, check and collect a warranty claim.'],['nt','No training','Language models are used via API under terms that exclude training on your data.'],['sep','Every dealership, separate','Permissions are enforced in the database: everyone sees only their dealership’s or group’s data.'],['del','Deletion on request','If you leave Ax AI, we hand over your data and delete it when you ask.']],
+ 'c.k':'Data categories','c.t':'What data we process','c.s':'Data from the dealership’s warranty operation. We don’t process end-customer payment data or automaker portal passwords.',
+ cat:[['Category','Examples and purpose'],['User accounts','Name, email, role and dealership: to sign in and apply permissions'],['Warranty claim files','Repair order, VIN, vehicle, mileage, complaint and documents: to build and check claims'],['Collections and chargebacks','Invoiced, paid and charged-back amounts: to track collections and money recovered'],['Agent conversations','Questions and answers: to give the agent context on the same order'],['Activity log','Agent runs and claim file changes: for audit and security']],
+ 'r.k':'Retention','r.t':'How long, and what happens at the end','r.s':'Data is kept while your dealership uses Ax AI, to operate and for automaker audits.',
+ ret:[['When','What happens'],['While you use Ax AI','Kept to operate, audit and measure results'],['A user leaves','Access is removed as soon as the dealership asks; their records stay with the dealership'],['If you leave Ax AI','We hand over your claim files and documents, and delete them on request'],['What the network learns','Only rules and aggregated figures, no customer or claim file data']],
+ 'e.t':'Does your team need a data processing agreement?','e.s':'We’ll prepare it with you and answer your group’s or your brand’s security questionnaire.','e.sec':'See security'}
+};
+var lang='es';try{var sv=localStorage.getItem('axai-lang');if(sv==='en'||sv==='es')lang=sv}catch(e){}
+function t(k){return T[lang][k]}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function $(id){return document.getElementById(id)}
+function table(id,key){var el=$(id),rows=t(key);if(!el||!rows)return;el.innerHTML=rows.map(function(r,i){return '<div class="row">'+(i===0?r.map(function(c){return '<span>'+esc(c)+'</span>'}).join(''):'<b>'+esc(r[0])+'</b>'+r.slice(1).map(function(c){return '<span>'+esc(c)+'</span>'}).join(''))+'</div>'}).join('')}
+function render(){
+ document.documentElement.lang=lang;if(t('title'))document.title=t('title');
+ document.querySelectorAll('[data-i]').forEach(function(e){var v=t(e.dataset.i);if(typeof v==='string')e.textContent=v});
+ document.querySelectorAll('.lang button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.lang===lang))});
+ if($('badges')&&t('badges'))$('badges').innerHTML=t('badges').map(function(b){return '<span>'+esc(b)+'</span>'}).join('');
+ if($('probs')&&t('probs'))$('probs').innerHTML=t('probs').map(function(p,i){return '<div class="pb rv in"><span class="n">0'+(i+1)+'</span><h3>'+esc(p[0])+'</h3><p>'+esc(p[1])+'</p></div>'}).join('');
+ if($('pillars')&&t('pil'))$('pillars').innerHTML=t('pil').map(function(p,i){return '<div class="pil rv in"><span class="no">0'+(i+1)+'</span><div class="ic">'+IC[p[0]]+'</div><h3>'+esc(p[1])+'</h3><p>'+esc(p[2])+'</p></div>'}).join('');
+ if($('flow')&&t('flow')){var FI=['car','ax','oem'];$('flow').innerHTML=t('flow').map(function(f,i){return (i?'<div class="farr" aria-hidden="true"><i style="animation-delay:'+(i*0.6)+'s"></i></div>':'')+'<div class="fnode'+(i===1?' mid':'')+'"><div class="fi">'+IC[FI[i]]+'</div><b>'+esc(f[0])+'</b><p>'+esc(f[1])+'</p></div>'}).join('')}
+ table('tSub','sub');table('tSup','sup');table('tCat','cat');table('tRet','ret');table('tGain','gain');
+ if($('steps4')&&t('steps'))$('steps4').innerHTML=t('steps').map(function(s,i){return '<div class="st"><span class="n">'+(i+1)+'</span><h3>'+esc(s[0])+'</h3><p>'+esc(s[1])+'</p></div>'}).join('');
+ if($('faq')&&t('faq')){$('faq').innerHTML=t('faq').map(function(q,i){return '<div class="qa"'+(i===0?' open':'')+'><button type="button" aria-expanded="'+(i===0)+'"><span>'+esc(q[0])+'</span><i aria-hidden="true">+</i></button><div class="a">'+esc(q[1])+'</div></div>'}).join('');
+  document.querySelectorAll('.qa button').forEach(function(b){b.onclick=function(){var q=b.parentNode,o=!q.hasAttribute('open');if(o)q.setAttribute('open','');else q.removeAttribute('open');b.setAttribute('aria-expanded',String(o))}})}
+}
+document.querySelectorAll('.lang button').forEach(function(b){b.onclick=function(){lang=b.dataset.lang;try{localStorage.setItem('axai-lang',lang)}catch(e){}render()}});
+render();
+var io='IntersectionObserver' in window?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12}):null;
+document.querySelectorAll('.rv').forEach(function(e){if(io)io.observe(e);else e.classList.add('in')});
+})();
+</script>
+</body>
+</html>
