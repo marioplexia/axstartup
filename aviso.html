@@ -1,0 +1,30 @@
+<!-- aviso de privacidad breve y eventos de analítica; el servidor lo inserta en las páginas públicas -->
+<style>
+.ax-aviso{position:fixed;left:16px;bottom:16px;z-index:70;max-width:400px;display:flex;align-items:center;gap:12px;background:rgba(12,12,14,.94);color:#e4e4e7;border-radius:16px;padding:12px 12px 12px 16px;font:13px/1.45 Inter,system-ui,sans-serif;box-shadow:0 12px 30px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);animation:axav .5s cubic-bezier(.2,.7,.2,1)}
+.ax-aviso a{color:#9fb7ff;text-decoration:underline;text-underline-offset:2px}
+.ax-aviso button{flex:none;border:0;border-radius:10px;background:#fff;color:#0a0a0a;font:600 12.5px Inter,system-ui,sans-serif;padding:8px 12px;cursor:pointer}
+@keyframes axav{from{opacity:0;transform:translateY(10px)}}
+@media (max-width:640px){.ax-aviso{left:10px;right:10px;bottom:10px;max-width:none}}
+@media print{.ax-aviso{display:none}}
+@media (prefers-reduced-motion:reduce){.ax-aviso{animation:none}}
+</style>
+<script>
+(function(){
+var ANALITICA='__ANALITICA__'==='1';
+var TX={es:{t:'Este sitio no usa cookies de seguimiento.',a:' Contamos las visitas de forma anónima, sin cookies.',m:'Más información',ok:'Entendido'},
+        en:{t:'This site uses no tracking cookies.',a:' We count visits anonymously, without cookies.',m:'Learn more',ok:'Got it'}};
+function lang(){var l='';try{l=localStorage.getItem('axai-lang')||''}catch(e){}return l==='en'||(!l&&document.documentElement.lang==='en')?'en':'es'}
+function ev(n,p){try{if(window.plausible)window.plausible(n,p?{props:p}:undefined)}catch(e){}}
+window.axEvento=ev;
+/* clics en «Solicita un piloto» y en los botones que llevan al formulario */
+document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href')||'';
+ if(/#piloto$/.test(h))ev('Clic piloto',{pagina:location.pathname});else if(/^app$|\/app$/.test(h))ev('Clic iniciar sesión',{pagina:location.pathname})},true);
+function visto(){try{return localStorage.getItem('axai-aviso')==='1'}catch(e){return false}}
+function pinta(el){var x=TX[lang()];el.querySelector('span').innerHTML=x.t+(ANALITICA?x.a:'')+' <a href="privacidad#cookies">'+x.m+'</a>';el.querySelector('button').textContent=x.ok}
+function muestra(){if(visto()||document.querySelector('.ax-aviso'))return;var el=document.createElement('div');el.className='ax-aviso';el.setAttribute('role','region');el.setAttribute('aria-label','Privacidad');
+ el.innerHTML='<span></span><button type="button"></button>';pinta(el);document.body.appendChild(el);
+ el.querySelector('button').onclick=function(){try{localStorage.setItem('axai-aviso','1')}catch(e){}el.remove()};
+ document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.lang button,[data-lang]'))setTimeout(function(){if(document.body.contains(el))pinta(el)},50)})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(muestra,900)});else setTimeout(muestra,900);
+})();
+</script>

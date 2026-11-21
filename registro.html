@@ -279,6 +279,7 @@ function verify(s){
 }
 
 function done(x){
+  if(window.axEvento)window.axEvento('Cuenta creada',{tipo:typeof ACCT!=='undefined'?ACCT:''});
   $('#vForm').hidden=true;$('#vOk').hidden=false;window.scrollTo(0,0);
   var L=$('#okSteps');
   if(x.pending){

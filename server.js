@@ -22,6 +22,7 @@ const PAGES = [
   [['/auditoria', '/audit'], 'auditoria.html', 0.7],
   [['/tpu', '/tup'], 'tpu.html', 0.7],
   [['/armadoras', '/automakers'], 'armadoras.html', 0.8],
+  [['/equipo', '/team'], 'equipo.html', 0.6],
   [['/datos', '/subprocesadores', '/subprocessors'], 'datos.html', 0.5],
   [['/privacidad'], 'privacidad.html', 0.3],
   [['/terminos'], 'terminos.html', 0.3],
@@ -36,6 +37,15 @@ const VARS = {
   __LINKEDIN_URL__: process.env.LINKEDIN_URL || '',
   __SITE__: SITE
 };
+
+// Analítica sin cookies (Plausible): solo se carga si PLAUSIBLE_DOMAIN está configurado en Render.
+// Siempre se muestra un aviso breve de privacidad; si la analítica está activa, el aviso lo menciona.
+const PL_DOMAIN = (process.env.PLAUSIBLE_DOMAIN || '').replace(/[^a-z0-9.-]/gi, '');
+const PL_SRC = (process.env.PLAUSIBLE_SRC || 'https://plausible.io/js/script.js').replace(/["<>\s]/g, '');
+const ANALYTICS = (PL_DOMAIN
+  ? '<script defer data-domain="' + PL_DOMAIN + '" src="' + PL_SRC + '"></script>' +
+    '<script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>'
+  : '') + fs.readFileSync(P('aviso.html'), 'utf8').replace('__ANALITICA__', PL_DOMAIN ? '1' : '');
 
 const HEADERS = {
   'Content-Type': 'text/html; charset=utf-8',
@@ -85,6 +95,7 @@ http.createServer((req, res) => {
     if (file !== APP) {
       let txt = html.toString('utf8');
       for (const k in VARS) txt = txt.split(k).join(VARS[k].replace(/['"<>\\]/g, ''));
+      txt = txt.replace('</head>', ANALYTICS + '</head>');
       html = Buffer.from(txt, 'utf8');
     }
     send(req, res, status, HEADERS['Content-Type'], html);
