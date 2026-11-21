@@ -15,7 +15,7 @@ const TERMINOS = path.join(__dirname, 'terminos.html');
 const SEGURIDAD = path.join(__dirname, 'seguridad.html');
 const PRECIOS = path.join(__dirname, 'precios.html');
 const AUDITORIA = path.join(__dirname, 'auditoria.html');
-const TUP = path.join(__dirname, 'tup.html');
+const TPU = path.join(__dirname, 'tpu.html');
 // La landing recibe su configuración desde variables de entorno (sin claves en el código)
 const LANDING_VARS = {
   __FORM_ENDPOINT__: process.env.FORM_ENDPOINT || '',
@@ -49,7 +49,7 @@ http.createServer((req, res) => {
   else if (url === '/seguridad' || url === '/security') file = SEGURIDAD;
   else if (url === '/precios' || url === '/pricing') file = PRECIOS;
   else if (url === '/auditoria' || url === '/audit') file = AUDITORIA;
-  else if (url === '/tup') file = TUP;
+  else if (url === '/tpu' || url === '/tup') file = TPU;
   fs.readFile(file, (err, html) => {
     if (err) {
       res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });

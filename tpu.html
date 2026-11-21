@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TUP de posventa · Ax AI</title>
-<meta name="description" content="Cómo mejora Ax AI la TUP, la encuesta de satisfacción de posventa y garantía: menos días con el auto parado, reclamos aceptados a la primera y piezas con fecha. Medido antes y después, por agencia.">
+<title>TPU de posventa · Ax AI</title>
+<meta name="description" content="Cómo mejora Ax AI la TPU, la encuesta de satisfacción de posventa y garantía: menos días con el auto parado, reclamos aceptados a la primera y piezas con fecha. Medido antes y después, por agencia.">
 <meta name="theme-color" content="#EFEFEF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -155,7 +155,7 @@ footer{padding:70px 0 40px}
 .aud-ill{margin-top:14px;font-size:11.5px;color:#8b9bc2}
 @media (max-width:980px){.probs{grid-template-columns:1fr}.aud-kpi{grid-template-columns:1fr 1fr}}
 @media (max-width:640px){.aud{padding:18px 14px;border-radius:22px;margin:28px -4px 0}.aud-h b{font-size:20px}.aud-kpi b{font-size:20px}.ar{flex-wrap:wrap}.ar em{width:100%;padding-left:40px}}
-/* TUP */
+/* TPU */
 .probs.four{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:40px}
 .tup{max-width:980px;margin:40px auto 0;border-radius:28px;background:radial-gradient(120% 80% at 30% 0%,#16285a 0%,rgba(22,40,90,0) 60%),linear-gradient(180deg,#0a0f1e 0%,#0c1630 50%,#10234d 100%);color:#fff;padding:28px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:28px;align-items:center}
 .tup-g{position:relative;text-align:center}.tup-g svg{width:100%;max-width:320px;display:block;margin:0 auto}
@@ -164,6 +164,7 @@ footer{padding:70px 0 40px}
 .tup-d{display:grid;gap:16px}
 .dvh{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#dbe4f3}.dvh b{font-weight:600;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
 .dvb{height:8px;border-radius:8px;background:rgba(255,255,255,.1);margin-top:7px;overflow:hidden}.dvb i{display:block;height:100%;width:0;border-radius:8px;background:linear-gradient(90deg,#5b8cff,#9fb7ff)}
+.steps4.next .st{background:var(--gradcard);color:#fff;border-color:transparent}.steps4.next .st p{color:#dbe4f3}.soon{display:inline-block;font-size:11.5px;font-weight:600;border-radius:999px;padding:4px 10px;background:rgba(255,255,255,.14);color:#fff;margin-bottom:16px}
 .tup-ill{grid-column:1/-1;font-size:11.5px;color:#8b9bc2}
 .tbl.tri .row{grid-template-columns:minmax(0,.8fr) minmax(0,1.3fr) minmax(0,.7fr)}.tbl.tri .row .w{color:var(--mut);font-size:13.5px}
 @media (max-width:980px){.probs.four{grid-template-columns:1fr 1fr}.tup{grid-template-columns:1fr}}
@@ -220,6 +221,11 @@ footer{padding:70px 0 40px}
  <div class="steps4" id="steps4"></div>
 </div></section>
 
+<section style="padding-top:20px"><div class="wrap">
+ <div class="center"><span class="eyebrow" data-i="n.k"></span><h2 class="rv" data-i="n.t"></h2><p class="sub rv" style="margin-top:16px" data-i="n.s"></p></div>
+ <div class="steps4 next" id="next"></div>
+</div></section>
+
 <section style="padding-top:20px"><div class="wrap faqw">
  <div><span class="eyebrow" data-i="f.k"></span><h2 class="rv" data-i="f.t"></h2></div>
  <div id="faq"></div>
@@ -235,7 +241,7 @@ footer{padding:70px 0 40px}
 <footer><div class="wrap">
  <div class="fgrid">
   <div><p class="bl"><b>Ax AI ·</b> <span data-i="ft.tag"></span></p></div>
-  <div><h4 data-i="ft.prod"></h4><a href="./#como-funciona" data-i="nav.how"></a><a href="./#red" data-i="ft.red"></a><a href="seguridad" data-i="nav.sec"></a><a href="precios" data-i="nav.price"></a><a href="auditoria" data-i="nav.aud"></a><a href="tup" data-i="nav.tup"></a></div>
+  <div><h4 data-i="ft.prod"></h4><a href="./#como-funciona" data-i="nav.how"></a><a href="./#red" data-i="ft.red"></a><a href="seguridad" data-i="nav.sec"></a><a href="precios" data-i="nav.price"></a><a href="auditoria" data-i="nav.aud"></a><a href="tpu" data-i="nav.tup"></a></div>
   <div><h4 data-i="ft.co"></h4><a href="./#piloto" data-i="cta.pilot"></a><a href="app" data-i="nav.login"></a></div>
   <div><h4>Legal</h4><a href="privacidad" data-i="ft.privacy"></a><a href="terminos" data-i="ft.terms"></a></div>
  </div>
@@ -246,47 +252,51 @@ footer{padding:70px 0 40px}
 <script>
 (function(){
 var T={
-es:{'nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.price':'Precios','nav.aud':'Auditoría','nav.tup':'TUP de posventa','nav.login':'Iniciar sesión','cta.pilot':'Solicita un piloto','cta.talk':'Habla con el equipo',
- 'h.k':'TUP de posventa','h.t':'Clientes más satisfechos en posventa, y se nota en tu TUP','h.s':'La TUP es la encuesta que contesta tu cliente después del taller. En garantía, lo que más la baja es esperar: la aprobación de planta, una pieza o una segunda visita. Ax AI ataca esas esperas.','h.see':'Ver cómo se mide',
- badges:['Menos días con el auto parado','Reclamos aceptados a la primera','Piezas con fecha y seguimiento','Antes y después, por agencia'],
- 'b.k':'Lo que baja la TUP en garantía','b.t':'Cuatro esperas que el cliente no perdona',
+es:{'nav.how':'Cómo funciona','nav.sec':'Seguridad','nav.price':'Precios','nav.aud':'Auditoría','nav.tup':'TPU de posventa','nav.login':'Iniciar sesión','cta.pilot':'Solicita un piloto','cta.talk':'Habla con el equipo',
+ 'h.k':'TPU de posventa','h.t':'Clientes más satisfechos en posventa, y se nota en tu TPU','h.s':'La TPU mide la satisfacción de tu cliente con el trabajo del taller de posventa y garantía. En garantía, lo que más la baja es esperar: la aprobación de planta, una pieza o una segunda visita. Ax AI ataca esas esperas.','h.see':'Ver cómo se mide',
+ badges:['Menos días con el auto parado','Reclamos aceptados a la primera','Piezas con fecha y seguimiento','Próximamente: la encuesta dentro de Ax AI'],
+ 'b.k':'Lo que baja la TPU en garantía','b.t':'Cuatro esperas que el cliente no perdona',
  probs:[['Esperar la aprobación','Un reclamo rechazado por un código o una foto regresa al inicio, y el auto del cliente se queda parado mientras se corrige.'],['Volver al taller','Si el diagnóstico y la causa no coinciden, la reparación no se sostiene y el cliente regresa por lo mismo.'],['La pieza sin fecha','El cliente pregunta por su refacción y nadie sabe si ya se pidió ni cuándo llega.'],['No saber qué pasa','Sin seguimiento claro, el asesor se entera tarde y el cliente se entera después.']],
- 'g.k':'La medición','g.t':'Tu TUP, antes y con Ax AI','g.s':'Medimos la encuesta junto con lo que la mueve: días de espera, rechazos, piezas sin fecha y segundas visitas. Así se ve por qué subió.',
- 'g.unit':'TUP de posventa','g.before':'Antes','g.after':'Con Ax AI',
+ 'g.k':'La medición','g.t':'Tu TPU, antes y con Ax AI','g.s':'Medimos la encuesta junto con lo que la mueve: días de espera, rechazos, piezas sin fecha y segundas visitas. Así se ve por qué subió.',
+ 'g.unit':'TPU de posventa','g.before':'Antes','g.after':'Con Ax AI',
  drv:[['Días con el auto parado por garantía',[6.5,3.2],'días'],['Reclamos rechazados por planta',[18,6],'%'],['Piezas sin fecha de llegada',[41,8],'%'],['Clientes que vuelven por la misma falla',[9,4],'%']],
  tupv:[84,91],
  'g.ill':'Ejemplo ilustrativo con datos simulados: los números reales salen de tu agencia en el piloto.',
- 'r.k':'Cómo lo mejora Ax AI','r.t':'Una acción para cada espera','r.s':'Cada punto que baja la TUP tiene una función de la plataforma que lo ataca, y un lugar donde se ve.',
+ 'r.k':'Cómo lo mejora Ax AI','r.t':'Una acción para cada espera','r.s':'Cada punto que baja la TPU tiene una función de la plataforma que lo ataca, y un lugar donde se ve.',
  rel:[['Lo que molesta al cliente','Lo que hace Ax AI','Dónde se ve'],['Esperar la aprobación de planta','Arma el reclamo con lo que ya aceptó la marca y lo revisa antes de enviarlo; si hay rechazo, da el plan de corrección','Expediente y Tablero de posventa'],['Volver por la misma falla','Revisa que el diagnóstico, la causa y la reparación coincidan, y avisa si hay reincidencia en el mismo VIN','Revisión del expediente'],['La pieza sin fecha','Seguimiento de cada pieza: por pedir, pedida y en planta, con su fecha prometida','Inicio y expediente'],['No saber qué pasa','Recordatorios y agenda del asesor, plazos con semáforo y alertas del gerente','Mi Agente e Inicio']],
  'w.k':'Cómo lo medimos','w.t':'Cuatro pasos, con tus encuestas',
- steps:[['Tu TUP de hoy','Partimos de tus resultados recientes de la encuesta, por agencia y, si los tienes, por asesor.'],['Lo que la mueve','Medimos desde los expedientes los días de espera, los rechazos, las piezas sin fecha y las segundas visitas.'],['Ax AI trabaja','Los asesores arman y revisan cada reclamo con Ax AI y dan seguimiento a sus piezas.'],['Antes y después','Cada mes comparamos tu TUP y sus indicadores contra el punto de partida.']],
+ steps:[['Tu TPU de hoy','Partimos de tus resultados recientes de la encuesta, por agencia y, si los tienes, por asesor.'],['Lo que la mueve','Medimos desde los expedientes los días de espera, los rechazos, las piezas sin fecha y las segundas visitas.'],['Ax AI trabaja','Los asesores arman y revisan cada reclamo con Ax AI y dan seguimiento a sus piezas.'],['Antes y después','Cada mes comparamos tu TPU y sus indicadores contra el punto de partida.']],
+ 'n.k':'Lo que viene','n.t':'La encuesta TPU, dentro de Ax AI','n.s':'El siguiente paso es que Ax AI aplique la encuesta y la mida en tiempo real, conectada a cada expediente.','n.soon':'Próximamente',
+ next:[['Encuesta al entregar el auto','Al cerrar la orden, Ax AI envía la encuesta a tu cliente por WhatsApp o correo.'],['Ligada al expediente','Cada respuesta queda con su orden, su asesor y su reclamo de garantía.'],['Alerta al momento','Si un cliente califica bajo, el gerente recibe el aviso para contactarlo ese mismo día.'],['TPU en tiempo real','Por asesor, por agencia y por marca, en el Tablero de posventa y en el del dueño.']],
  'f.k':'Preguntas frecuentes','f.t':'Lo que preguntan los gerentes de posventa',
- faq:[['¿Ax AI aplica la encuesta?','No. La TUP la aplica la marca a tus clientes. Ax AI mejora lo que la mueve en el taller y en garantía, y en el piloto comparamos tus resultados antes y después.'],
+ faq:[['¿Ax AI aplica la encuesta?','Hoy la encuesta la aplica la marca, y en el piloto comparamos tus resultados antes y después. Lo que sigue es que Ax AI la aplique directamente a tu cliente al entregar su auto, ligada a su expediente y a su asesor.'],
   ['¿Cuándo se nota en la encuesta?','Los días de espera y los rechazos bajan desde los primeros reclamos que se arman con Ax AI. La encuesta lo refleja conforme contestan los clientes atendidos con la plataforma.'],
-  ['¿Puedo verlo por asesor?','Sí. Los días de espera, los rechazos y los pendientes de piezas se ven por asesor en el Tablero de posventa. La TUP por asesor la comparamos con el reporte de la marca.'],
+  ['¿Puedo verlo por asesor?','Sí. Los días de espera, los rechazos y los pendientes de piezas se ven por asesor en el Tablero de posventa. La TPU por asesor la comparamos con el reporte de la marca.'],
   ['¿Sirve fuera de garantía?','Ax AI está hecho para garantía y posventa: reclamos, piezas, plazos y cobranza con planta. Es donde más se espera y donde más baja la satisfacción.']],
- 'c.t':'Menos esperas, mejor TUP','c.s':'Prueba Ax AI en tus agencias y compara tu encuesta antes y después.','c.aud':'Ver auditoría',
+ 'c.t':'Menos esperas, mejor TPU','c.s':'Prueba Ax AI en tus agencias y compara tu encuesta antes y después.','c.aud':'Ver auditoría',
  'ft.tag':'La red de reglas que será la infraestructura de garantías de la industria.','ft.prod':'Producto','ft.red':'La red de Ax AI','ft.co':'Empresa','ft.privacy':'Aviso de privacidad','ft.terms':'Términos de uso','ft.copy':'© 2026 Ax AI. Todos los derechos reservados.'},
-en:{'nav.how':'How it works','nav.sec':'Security','nav.price':'Pricing','nav.aud':'Audit','nav.tup':'After-sales TUP','nav.login':'Sign in','cta.pilot':'Request a pilot','cta.talk':'Talk to the team',
- 'h.k':'After-sales satisfaction (TUP)','h.t':'Happier after-sales customers, and it shows in your TUP','h.s':'TUP is the survey your customer answers after the service visit. In warranty, what drags it down most is waiting: for the automaker’s approval, for a part or for a second visit. Ax AI tackles those waits.','h.see':'See how it’s measured',
- badges:['Fewer days with the car stuck','Claims accepted the first time','Parts with a date and tracking','Before and after, per dealership'],
- 'b.k':'What lowers TUP in warranty','b.t':'Four waits customers don’t forgive',
+en:{'nav.how':'How it works','nav.sec':'Security','nav.price':'Pricing','nav.aud':'Audit','nav.tup':'After-sales TPU','nav.login':'Sign in','cta.pilot':'Request a pilot','cta.talk':'Talk to the team',
+ 'h.k':'After-sales satisfaction (TPU)','h.t':'Happier after-sales customers, and it shows in your TPU','h.s':'TPU measures your customer’s satisfaction with the after-sales and warranty shop’s work. In warranty, what drags it down most is waiting: for the automaker’s approval, for a part or for a second visit. Ax AI tackles those waits.','h.see':'See how it’s measured',
+ badges:['Fewer days with the car stuck','Claims accepted the first time','Parts with a date and tracking','Coming soon: the survey inside Ax AI'],
+ 'b.k':'What lowers TPU in warranty','b.t':'Four waits customers don’t forgive',
  probs:[['Waiting for approval','A claim rejected over a code or a photo goes back to square one, and the customer’s car sits while it’s fixed.'],['Coming back','If the diagnosis and the cause don’t match, the repair doesn’t hold and the customer returns for the same issue.'],['A part with no date','The customer asks about their part and nobody knows if it was ordered or when it arrives.'],['Not knowing what’s happening','Without clear tracking, the advisor finds out late and the customer even later.']],
- 'g.k':'The measurement','g.t':'Your TUP, before and with Ax AI','g.s':'We measure the survey together with what drives it: waiting days, rejections, parts with no date and repeat visits. That’s how you see why it went up.',
- 'g.unit':'After-sales TUP','g.before':'Before','g.after':'With Ax AI',
+ 'g.k':'The measurement','g.t':'Your TPU, before and with Ax AI','g.s':'We measure the survey together with what drives it: waiting days, rejections, parts with no date and repeat visits. That’s how you see why it went up.',
+ 'g.unit':'After-sales TPU','g.before':'Before','g.after':'With Ax AI',
  drv:[['Days with the car stuck on warranty',[6.5,3.2],'days'],['Claims rejected by the automaker',[18,6],'%'],['Parts with no arrival date',[41,8],'%'],['Customers back for the same issue',[9,4],'%']],
  tupv:[84,91],
  'g.ill':'Illustrative example with simulated data: real numbers come from your dealership in the pilot.',
- 'r.k':'How Ax AI improves it','r.t':'One action for every wait','r.s':'Every factor that lowers TUP has a platform feature that tackles it, and a place where you see it.',
+ 'r.k':'How Ax AI improves it','r.t':'One action for every wait','r.s':'Every factor that lowers TPU has a platform feature that tackles it, and a place where you see it.',
  rel:[['What bothers the customer','What Ax AI does','Where it shows'],['Waiting for approval','Builds the claim with what the brand has already accepted and checks it before submission; if rejected, gives the correction plan','Claim file and After-sales dashboard'],['Coming back for the same issue','Checks that diagnosis, cause and repair match, and flags repeats on the same VIN','Claim file review'],['A part with no date','Tracks every part: to order, ordered and at the plant, with its promised date','Home and claim file'],['Not knowing what’s happening','Advisor reminders and schedule, deadlines with a traffic light and manager alerts','My Agent and Home']],
  'w.k':'How we measure it','w.t':'Four steps, with your surveys',
- steps:[['Your TUP today','We start from your recent survey results, by dealership and, if you have them, by advisor.'],['What drives it','From the claim files we measure waiting days, rejections, parts with no date and repeat visits.'],['Ax AI at work','Advisors build and check every claim with Ax AI and track their parts.'],['Before and after','Every month we compare your TUP and its drivers against the baseline.']],
+ steps:[['Your TPU today','We start from your recent survey results, by dealership and, if you have them, by advisor.'],['What drives it','From the claim files we measure waiting days, rejections, parts with no date and repeat visits.'],['Ax AI at work','Advisors build and check every claim with Ax AI and track their parts.'],['Before and after','Every month we compare your TPU and its drivers against the baseline.']],
+ 'n.k':'What’s next','n.t':'The TPU survey, inside Ax AI','n.s':'The next step is for Ax AI to run the survey and measure it in real time, connected to every claim file.','n.soon':'Coming soon',
+ next:[['Survey at vehicle delivery','When the order closes, Ax AI sends the survey to your customer by WhatsApp or email.'],['Linked to the claim file','Every answer stays with its order, its advisor and its warranty claim.'],['Instant alert','If a customer rates low, the manager gets an alert to reach out the same day.'],['TPU in real time','By advisor, dealership and brand, in the After-sales and Owner dashboards.']],
  'f.k':'FAQs','f.t':'What after-sales managers ask',
- faq:[['Does Ax AI run the survey?','No. The brand sends the TUP survey to your customers. Ax AI improves what drives it in the shop and in warranty, and in the pilot we compare your results before and after.'],
+ faq:[['Does Ax AI run the survey?','Today the brand runs the survey, and in the pilot we compare your results before and after. Next, Ax AI will send it directly to your customer at vehicle delivery, linked to their claim file and their advisor.'],
   ['When does it show in the survey?','Waiting days and rejections drop from the first claims built with Ax AI. The survey reflects it as customers served with the platform respond.'],
-  ['Can I see it by advisor?','Yes. Waiting days, rejections and pending parts show by advisor in the After-sales dashboard. TUP by advisor we compare with the brand’s report.'],
+  ['Can I see it by advisor?','Yes. Waiting days, rejections and pending parts show by advisor in the After-sales dashboard. TPU by advisor we compare with the brand’s report.'],
   ['Does it work beyond warranty?','Ax AI is built for warranty and after-sales: claims, parts, deadlines and collections with the automaker. That’s where customers wait the most and satisfaction drops the most.']],
- 'c.t':'Fewer waits, a better TUP','c.s':'Try Ax AI at your dealerships and compare your survey before and after.','c.aud':'See audit',
+ 'c.t':'Fewer waits, a better TPU','c.s':'Try Ax AI at your dealerships and compare your survey before and after.','c.aud':'See audit',
  'ft.tag':'The rule network that will become the industry’s warranty infrastructure.','ft.prod':'Product','ft.red':'The Ax AI network','ft.co':'Company','ft.privacy':'Privacy notice','ft.terms':'Terms of use','ft.copy':'© 2026 Ax AI. All rights reserved.'}};
 var lang='es';try{var sv=localStorage.getItem('axai-lang');if(sv==='en'||sv==='es')lang=sv}catch(e){}
 var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -302,7 +312,7 @@ function gTo(m){G.m=m;document.querySelectorAll('.tup-tg button').forEach(functi
  (function f(now){var p=dur?Math.min(1,(now-t0)/dur):1,e=1-Math.pow(1-p,3);G.v=a+(b-a)*e;G.dv=da.map(function(x,k){return x+(db[k]-x)*e});gDraw(G.v,G.dv);if(p<1)requestAnimationFrame(f)})(performance.now())}
 function gLoop(){clearTimeout(G.timer);if(RM||!G.vis)return;G.timer=setTimeout(function(){gTo(G.m?0:1);gLoop()},4200)}
 function render(){
- document.documentElement.lang=lang;document.title=(lang==='en'?'After-sales TUP':'TUP de posventa')+' · Ax AI';
+ document.documentElement.lang=lang;document.title=(lang==='en'?'After-sales TPU':'TPU de posventa')+' · Ax AI';
  document.querySelectorAll('[data-i]').forEach(function(e){var v=t(e.dataset.i);if(typeof v==='string')e.textContent=v});
  document.querySelectorAll('.lang button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.lang===lang))});
  document.getElementById('badges').innerHTML=t('badges').map(function(b){return '<span>'+esc(b)+'</span>'}).join('');
@@ -310,6 +320,7 @@ function render(){
  document.getElementById('drv').innerHTML=t('drv').map(function(d,k){return '<div class="dvr"><div class="dvh"><span>'+esc(d[0])+'</span><b id="dv'+k+'"></b></div><div class="dvb"><i id="db'+k+'"></i></div></div>'}).join('');
  document.getElementById('tRel').innerHTML=t('rel').map(function(r,i){return '<div class="row">'+(i===0?r.map(function(c){return '<span>'+esc(c)+'</span>'}).join(''):'<b>'+esc(r[0])+'</b><span>'+esc(r[1])+'</span><span class="w">'+esc(r[2])+'</span>')+'</div>'}).join('');
  document.getElementById('steps4').innerHTML=t('steps').map(function(s,i){return '<div class="st"><span class="n">'+(i+1)+'</span><h3>'+esc(s[0])+'</h3><p>'+esc(s[1])+'</p></div>'}).join('');
+ document.getElementById('next').innerHTML=t('next').map(function(s){return '<div class="st"><span class="soon">'+esc(t('n.soon'))+'</span><h3>'+esc(s[0])+'</h3><p>'+esc(s[1])+'</p></div>'}).join('');
  document.getElementById('faq').innerHTML=t('faq').map(function(q,i){return '<div class="qa"'+(i===0?' open':'')+'><button type="button" aria-expanded="'+(i===0)+'"><span>'+esc(q[0])+'</span><i aria-hidden="true">+</i></button><div class="a">'+esc(q[1])+'</div></div>'}).join('');
  document.querySelectorAll('.qa button').forEach(function(b){b.onclick=function(){var q=b.parentNode,o=!q.hasAttribute('open');if(o)q.setAttribute('open','');else q.removeAttribute('open');b.setAttribute('aria-expanded',String(o))}});
  gDraw(G.v,G.dv);
