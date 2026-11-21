@@ -23,6 +23,7 @@ const PAGES = [
   [['/tpu', '/tup'], 'tpu.html', 0.7],
   [['/armadoras', '/automakers'], 'armadoras.html', 0.8],
   [['/equipo', '/team'], 'equipo.html', 0.6],
+  [['/inversion', '/investors'], 'inversion.html', 0.6],
   [['/datos', '/subprocesadores', '/subprocessors'], 'datos.html', 0.5],
   [['/privacidad'], 'privacidad.html', 0.3],
   [['/terminos'], 'terminos.html', 0.3],
@@ -35,7 +36,9 @@ for (const [urls, file] of PAGES) for (const u of urls) ROUTES[u] = P(file);
 const VARS = {
   __FORM_ENDPOINT__: process.env.FORM_ENDPOINT || '',
   __LINKEDIN_URL__: process.env.LINKEDIN_URL || '',
-  __SITE__: SITE
+  __SITE__: SITE,
+  // correo para inversionistas (página /inversion); sin él, el botón lleva al formulario de la landing
+  __CONTACT__: (process.env.CONTACT_EMAIL || '').replace(/[^a-z0-9@._+-]/gi, '')
 };
 
 // Analítica sin cookies (Plausible): solo se carga si PLAUSIBLE_DOMAIN está configurado en Render.
