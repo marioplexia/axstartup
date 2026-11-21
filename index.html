@@ -1,10 +1,59 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}/* pantalla de acceso: mismo diseño que crear cuenta */
+.axl{position:fixed;inset:0;z-index:100;background:#000;color:#f4f4f5;overflow:auto;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.axl[hidden]{display:none}
+.axl-wrap{min-height:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:16px}
+.axl-hero{position:relative;min-height:calc(100vh - 32px);overflow:hidden;color:#fff}
+.axl-hero .b{position:absolute;left:28px;top:26px;z-index:2;font-weight:600;font-size:17px;letter-spacing:-.02em}
+.axl-hero svg.ln{position:absolute;inset:0;width:100%;height:100%}
+.axl-hero svg.ln line{stroke:rgba(255,255,255,.14);stroke-width:1;vector-effect:non-scaling-stroke}
+.axl-hero .mk{position:absolute;left:50%;top:50%;width:clamp(120px,15vw,190px);transform:translate(-50%,-50%);animation:axlin 1.1s cubic-bezier(.2,.7,.2,1) both}
+.axl-hero .mk svg{display:block;width:100%;height:auto}
+.axl-hero .cp{position:absolute;left:28px;bottom:24px;font-size:11px;color:#6d6d73}
+@keyframes axlin{from{opacity:0;transform:translate(-50%,-50%) scale(.92)}}
+.axl-card{position:relative;border-radius:22px;background:linear-gradient(160deg,#1d1d1d 0%,#161616 60%,#121212 100%);padding:28px clamp(24px,4vw,56px) 40px;display:flex;flex-direction:column;min-height:calc(100vh - 32px)}
+.axl-top{display:flex;justify-content:flex-end}
+.axl-top button{border:0;background:none;color:#f4f4f5;font:inherit;font-size:12px;cursor:pointer;padding:0}.axl-top button:hover{text-decoration:underline}
+.axl-tabs{display:none}
+.axl-form{width:100%;max-width:560px;margin:auto 0;padding:40px 0 20px}
+.axl h1{margin:0 0 12px;font-family:'Inter Tight',Inter,sans-serif;font-weight:400;font-size:clamp(48px,5.4vw,72px);letter-spacing:-.035em;line-height:1;color:#f4f4f5}
+.axl-sub{margin:0 0 34px;color:#8a8a90;font-size:13.5px}
+.axl-g2{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
+.axl-f{margin:0 0 20px}
+.axl label{display:block;margin:0 0 6px;font-size:10.5px;font-weight:500;color:#d4d4d8}
+.axl-ctl{position:relative}
+.axl input,.axl select{width:100%;height:36px;padding:0 0 4px;border:0;border-bottom:1px solid rgba(255,255,255,.28);border-radius:0;background:transparent;color:#f4f4f5;font:inherit;font-size:15px;appearance:none;-webkit-appearance:none}
+.axl input::placeholder{color:#5c5c62}
+.axl select{background-image:linear-gradient(45deg,transparent 50%,#a1a1aa 50%),linear-gradient(135deg,#a1a1aa 50%,transparent 50%);background-position:calc(100% - 9px) 15px,calc(100% - 4px) 15px;background-size:5px 5px;background-repeat:no-repeat;padding-right:22px}
+.axl select option{background:#1a1a1a;color:#f4f4f5}
+.axl input:focus,.axl select:focus{outline:none;border-bottom-color:#fff;box-shadow:none}
+.axl input:-webkit-autofill{-webkit-text-fill-color:#f4f4f5;-webkit-box-shadow:0 0 0 40px #181818 inset;caret-color:#fff}
+.axl-eye{position:absolute;right:0;top:4px;height:28px;width:30px;padding:0;border:0;background:none;color:#a1a1aa;cursor:pointer;display:grid;place-items:center}.axl-eye:hover{color:#fff}
+.axl-hint{margin:6px 0 0;font-size:11px;color:#77777d}
+.axl-seg{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.axl-seg button{height:34px;padding:0 14px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:transparent;color:#d4d4d8;font:inherit;font-size:12.5px;cursor:pointer}
+.axl-seg button[aria-pressed="true"]{background:#fff;color:#0a0a0a;border-color:#fff;font-weight:600}
+.axl-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-top:24px}
+.axl-st{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;color:#c4c4c8;margin:0}
+.axl-st i{flex:none;width:16px;height:16px;border-radius:50%;border:1px solid rgba(255,255,255,.45);display:grid;place-items:center}
+.axl-st i::after{content:"";width:6px;height:6px;border-radius:50%;background:#e0a100}
+.axl-st.ok i::after{background:#7ee2a8}.axl-st.bad{color:#ff8a7d}.axl-st.bad i::after{background:#ff8a7d}
+.axl-alt{margin:10px 0 0;font-size:12px;color:#8a8a90}
+.axl-alt a{color:#f4f4f5;text-decoration:underline;cursor:pointer}
+.axl-go{flex:none;width:104px;height:104px;border:0;border-radius:50%;background:#fff;color:#0a0a0a;font:600 10.5px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;display:grid;place-items:center;text-align:center;line-height:1.3;padding:0 12px;transition:transform .2s,box-shadow .2s}
+.axl-go:hover{transform:scale(1.04);box-shadow:0 0 0 8px rgba(255,255,255,.06)}
+.axl-go:disabled{opacity:.7;cursor:wait;transform:none}
+.axl-msg{display:none;margin:0 0 18px;padding:10px 12px;border-radius:10px;font-size:13px;background:rgba(255,255,255,.06);color:#e4e4e7}
+.axl-msg.on{display:block}
+.axl-msg.err{background:rgba(255,138,125,.1);border:1px solid rgba(255,138,125,.35);color:#ff8a7d}
+@media(max-width:900px){.axl-wrap{grid-template-columns:1fr;padding:10px}.axl-hero{min-height:200px;height:200px}.axl-hero .mk{width:88px}.axl-hero .cp{display:none}.axl-card{min-height:0;padding:22px 20px 28px}.axl-form{padding:16px 0 4px}.axl h1{font-size:44px}.axl-g2{grid-template-columns:1fr}.axl-go{width:92px;height:92px}}
+@media(prefers-reduced-motion:reduce){.axl-hero .mk{animation:none}}
+</style></head><body>
 <title>Ax AI Garantías</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-180 -300 1482 1482'%3E%3Crect x='-180' y='-300' width='1482' height='1482' rx='300' fill='%23000'/%3E%3Cpath fill='%23fff' d='M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z'/%3E%3C/svg%3E">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=Inter+Tight:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
 <style>
 /* Layout: sidebar negra fija + columna principal; el composer vive al centro (inicio) o abajo (chat) y se anima entre ambos. */
 :root{
@@ -1089,22 +1138,6 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .mi-aa button{height:30px;padding:0 12px;border-radius:8px;border:1px solid color-mix(in srgb,var(--bg) 35%,transparent);background:none;color:var(--bg);font:500 12.5px var(--f-ui);cursor:pointer}
 .mi-aa button:first-child{background:var(--bg);color:var(--fg)}
 @media(max-width:600px){.mi-row{flex-wrap:wrap}.mi-act{width:100%;justify-content:flex-end}}
-.axl{position:fixed;inset:0;z-index:100;background:var(--bg);color:var(--fg);display:grid;place-items:center;padding:16px;overflow:auto}
-.axl[hidden]{display:none}
-.axl-card{width:100%;max-width:384px;background:var(--card);border:1px solid var(--card-line);border-radius:16px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.axl-brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px}
-.axl-logo{width:28px;height:28px;border-radius:6px;background:#000;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
-.axl-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:24px 0;padding:4px;background:var(--surface);border-radius:10px}
-.axl-tabs button{text-align:center;border:0;background:none;padding:9px;border-radius:8px;font:inherit;color:var(--muted);cursor:pointer}
-.axl-tabs button[aria-selected=true]{background:var(--card);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-.axl h1{margin:0 0 6px;font-size:22px;font-weight:700;letter-spacing:-.01em;font-family:inherit}
-.axl-sub{margin:0 0 22px;color:var(--muted)}
-.axl label{display:block;margin:14px 0 6px;font-size:12px;font-weight:500}
-.axl input,.axl select{width:100%;height:39px;padding:0 12px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:14px}
-.axl input:focus,.axl select:focus{outline:none;border-color:var(--fg);box-shadow:0 0 0 1px var(--fg)}
-.axl-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
-.axl-seg button{height:38px;border:1px solid var(--card-line);border-radius:8px;background:var(--card);color:var(--fg);font:inherit;font-size:13px;cursor:pointer}
-.axl-seg button[aria-pressed="true"]{border-color:var(--fg);box-shadow:0 0 0 1px var(--fg);font-weight:600}
 .mr-h{margin:22px 0 10px;font-size:15px}
 .ms-off{display:none!important}
 .pr-stat{display:flex;align-items:center;gap:8px;margin:10px auto 22px;max-width:760px;font-size:12.5px;color:var(--muted);text-align:left}
@@ -1162,14 +1195,6 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .mr-adv{border:1px solid var(--card-line);border-radius:12px;background:var(--card);margin-bottom:14px;overflow:auto}
 .mr-adv table{width:100%;border-collapse:collapse;font-size:13px}.mr-adv th,.mr-adv td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--card-line)}.mr-adv th{font-size:11px;color:var(--muted);font-weight:500}
 .mr-code{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px}.mr-code code{font-size:18px;letter-spacing:.08em;font-weight:600}
-.axl-hint{margin:4px 0 0;font-size:12px;color:var(--muted)}
-.axl-go{text-align:center;width:100%;height:38px;margin-top:20px;border:0;border-radius:8px;background:var(--fg);color:var(--bg);font:inherit;font-weight:500;cursor:pointer}
-.axl-go:disabled{opacity:.6;cursor:wait}
-.axl-msg{display:none;margin-top:14px;padding:9px 12px;border-radius:8px;font-size:13px;background:var(--surface)}
-.axl-msg.on{display:block}
-.axl-msg.err{background:color-mix(in srgb,#d92d20 14%,transparent);color:#d92d20}
-.axl-alt{margin:18px 0 0;text-align:center;font-size:12px;color:var(--muted)}
-.axl-alt a{color:inherit;text-decoration:underline;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:13px;z-index:90;box-shadow:0 10px 30px -10px rgba(0,0,0,.4);animation:toast .3s cubic-bezier(.2,.9,.3,1) both;max-width:calc(100vw - 32px)}
 
 @keyframes wordin{from{opacity:0;transform:translateY(12px);filter:blur(6px)}to{opacity:1;transform:none;filter:blur(0)}}
@@ -2291,41 +2316,48 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
   <div class="row"><button class="bt" type="button" id="pgNo">Cancelar</button><button class="bt pri" type="submit">Guardar pago</button></div>
 </form></dialog>
 <div class="axl" id="lg">
+ <div class="axl-wrap">
+  <aside class="axl-hero" aria-hidden="true">
+   <div class="b">Ax AI</div>
+   <svg class="ln" preserveAspectRatio="none" viewBox="0 0 100 100"><line x1="50" y1="0" x2="50" y2="100"/><line x1="0" y1="50" x2="100" y2="50"/><line x1="0" y1="0" x2="100" y2="100"/><line x1="100" y1="0" x2="0" y2="100"/></svg>
+   <div class="mk"><svg viewBox="0 0 1122 883"><path fill="#fff" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg></div>
+   <div class="cp">© Ax AI 2026. Todos los derechos reservados.</div>
+  </aside>
   <main class="axl-card">
-    <div class="axl-brand"><span class="axl-logo">Ax</span>Ax AI Garantías</div>
-    <div class="axl-tabs" role="tablist">
-      <button type="button" role="tab" id="lgTabUp" aria-selected="false">Crear cuenta</button>
-      <button type="button" role="tab" id="lgTabIn" aria-selected="true">Iniciar sesión</button>
-    </div>
-    <form id="lgForm" novalidate>
+    <div class="axl-top"><button type="button" id="lgTabUp" role="tab" aria-selected="false">Crear cuenta</button></div>
+    <div class="axl-tabs" role="tablist"><button type="button" role="tab" id="lgTabIn" aria-selected="true">Iniciar sesión</button></div>
+    <form id="lgForm" class="axl-form" novalidate>
       <h1 id="lgTitle">Inicia sesión</h1>
       <p class="axl-sub" id="lgSub">Accede al agente de garantías de tu agencia.</p>
-      <label for="lgEmail">Correo</label>
-      <input id="lgEmail" type="email" autocomplete="email" required>
-      <label for="lgPass">Contraseña</label>
-      <input id="lgPass" type="password" autocomplete="current-password" minlength="8" required>
-      <p class="axl-hint" id="lgHint" hidden>Mínimo 8 caracteres.</p>
-      <div id="lgTypeW" hidden>
+      <div class="axl-msg" id="lgMsg" role="alert"></div>
+      <div class="axl-g2">
+        <div class="axl-f"><label for="lgEmail">Correo</label><input id="lgEmail" type="email" autocomplete="email" placeholder="tu@correo.com" required></div>
+        <div class="axl-f"><label for="lgPass">Contraseña</label><div class="axl-ctl"><input id="lgPass" type="password" autocomplete="current-password" minlength="8" placeholder="••••••••••" style="padding-right:34px" required><button class="axl-eye" type="button" id="lgEye" aria-label="Mostrar contraseña"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div><p class="axl-hint" id="lgHint" hidden>Mínimo 8 caracteres.</p></div>
+      </div>
+      <div id="lgTypeW" class="axl-f" hidden>
         <label>Tipo de cuenta</label>
         <div class="axl-seg" id="lgType"><button type="button" data-t="asesor" aria-pressed="true">Asesor de garantías</button><button type="button" data-t="marca" aria-pressed="false">Administrador de marca</button></div>
       </div>
       <div id="lgMarW" hidden>
-        <label for="lgBr">Marca</label>
-        <select id="lgBr"><option value="">Cargando marcas…</option></select>
-        <label for="lgCode">Código de administrador</label>
-        <input id="lgCode" autocomplete="off" placeholder="XXXX-XXXX-XXXX" spellcheck="false">
-        <p class="axl-hint">Te lo da el administrador actual de la marca (se ve en su Tablero de marca).</p>
+        <div class="axl-g2">
+          <div class="axl-f"><label for="lgBr">Marca</label><select id="lgBr"><option value="">Cargando marcas…</option></select></div>
+          <div class="axl-f"><label for="lgCode">Código de administrador</label><input id="lgCode" autocomplete="off" placeholder="XXXX-XXXX-XXXX" spellcheck="false"><p class="axl-hint">Te lo da el administrador actual de la marca (se ve en su Tablero de marca).</p></div>
+        </div>
       </div>
-      <div id="lgAgW" hidden>
+      <div id="lgAgW" class="axl-f" hidden>
         <label for="lgAg">Agencia</label>
         <select id="lgAg" required><option value="">Cargando agencias…</option></select>
       </div>
-      <button class="axl-go" id="lgGo" type="submit">Entrar</button>
-      <div class="axl-msg" id="lgMsg" role="alert"></div>
-      <p class="axl-alt" id="lgAltP">¿No tienes cuenta? <a id="lgAlt">Crea una</a></p>
-      <p class="axl-hint" id="lgConn" style="text-align:center;margin-top:14px" role="status">Conectando con Supabase…</p>
+      <div class="axl-foot">
+        <div>
+          <p class="axl-st" id="lgConn" role="status"><i></i><span>Conectando con Supabase…</span></p>
+          <p class="axl-alt" id="lgAltP">¿No tienes cuenta? <a id="lgAlt">Crea una</a></p>
+        </div>
+        <button class="axl-go" id="lgGo" type="submit">Entrar</button>
+      </div>
     </form>
   </main>
+ </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
 <script>window.supabase||document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"><\/script>')</script>
@@ -6393,7 +6425,7 @@ SB.lgAcct=function(t,keep){
   if(up)$('#lgSub').textContent=mar?'Para quien administra las agencias de una marca: cerebro, reglas y entrenamiento.':'Registra tu correo y elige tu agencia.';
 };
 $('#lgType').addEventListener('click',function(e){var b=e.target.closest('button[data-t]');if(b)SB.lgAcct(b.dataset.t)});
-SB.conn=function(t,err){var c=$('#lgConn');c.textContent=t;c.style.color=err?'#d92d20':''};
+SB.conn=function(t,err){var c=$('#lgConn');c.className='axl-st'+(err?' bad':/^✓/.test(t)?' ok':'');c.innerHTML='<i></i><span></span>';c.lastChild.textContent=String(t).replace(/^[✓✗]\s*/,'')};
 /* detalle técnico del error, para poder reportarlo tal cual */
 SB.detail=function(e){
   if(!e)return 'error desconocido';
@@ -6513,6 +6545,7 @@ SB.init=function(){
   SB.toRegistro=function(){location.href=location.protocol==='file:'?'registro.html':'registro'};
   $('#lgTabUp').addEventListener('click',SB.toRegistro);
   $('#lgTabIn').addEventListener('click',function(){SB.lgMode('in')});
+  $('#lgEye').addEventListener('click',function(){var p=$('#lgPass'),sh=p.type==='password';p.type=sh?'text':'password';this.style.color=sh?'#fff':'';this.setAttribute('aria-label',sh?'Ocultar contraseña':'Mostrar contraseña')});
   $('#lgAltP').addEventListener('click',function(e){if(e.target.id==='lgAlt')SB.toRegistro()});
   if(location.hash==='#registro')SB.toRegistro();
   if(!window.supabase||!window.supabase.createClient){SB.conn('✗ No cargó la librería de Supabase (revisa tu conexión o un bloqueador de anuncios) y recarga.',true);SB.lgMsg('No se pudo cargar el servicio. Revisa tu conexión y recarga.',true);return}
