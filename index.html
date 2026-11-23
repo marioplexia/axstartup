@@ -1950,6 +1950,25 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .cg-sug{display:flex;flex-wrap:wrap;gap:6px}.cg-in{display:flex;gap:8px}.cg-in input{flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--card-line);background:var(--fill-slab);color:inherit;font:13.5px var(--f-ui,inherit)}
 .cg-ban .xa-mk{background:#fff;color:#111}
 @media(max-width:760px){.cg-g{grid-template-columns:1fr}.cg-l{border-right:0;max-height:none}.cg-g.sel .cg-l{display:none}.cg-g:not(.sel) .cg-m{display:none}.cg-back{display:inline-block}.cg-m{max-height:none;padding:16px}}
+.vw{margin:0 0 20px}.vw-ask{display:flex;gap:12px;padding:16px;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff)}
+.vw-q{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}.vw-q>b{font-size:15px}
+.vw-q form{display:flex;gap:8px}.vw-q input{flex:1;min-width:0;padding:10px 14px;border-radius:10px;border:1px solid color-mix(in srgb,var(--bg,#fff) 22%,transparent);background:color-mix(in srgb,var(--bg,#fff) 8%,transparent);color:inherit;font:14px var(--f-ui,inherit)}
+.vw-q input::placeholder{color:color-mix(in srgb,var(--bg,#fff) 55%,transparent)}.vw-q .bt.pri{background:var(--signal,#2231dd);color:#fff;border-color:transparent}
+.vw-sug{display:flex;flex-wrap:wrap;gap:6px}.vw-sug .bx-f{background:transparent;color:inherit;border-color:color-mix(in srgb,var(--bg,#fff) 25%,transparent);font-size:12.3px;padding:5px 12px}
+.vw-msg{margin:0;font-size:12.8px;opacity:.85}.vw-msg:empty{display:none}.vw-msg.bad{color:#ffb3a8;opacity:1}
+.vw-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px;margin-top:14px}
+.vw-c{padding:16px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);display:flex;flex-direction:column;gap:10px;min-width:0}
+.vw-h{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}.vw-h h4{margin:0;font-size:14.5px}.vw-h p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.vw-mn{display:flex;gap:4px;flex:none}.vw-b{padding:3px 9px;border-radius:99px;border:1px solid var(--card-line);background:var(--card);color:var(--muted);font:500 11.5px var(--f-ui,inherit);cursor:pointer}.vw-b:hover{color:var(--fg,inherit)}
+.vw-svg{width:100%;height:auto;display:block}.vw-svg .vw-ax{stroke:var(--card-line,#e5e7eb)}.vw-svg text{font:10.5px var(--f-ui,sans-serif);fill:var(--muted,#6b7280);text-anchor:middle}.vw-svg .vw-val{fill:var(--fg,#111);font-weight:600}
+.vw-hb{display:flex;flex-direction:column;gap:7px}.vw-hr{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:10px;align-items:center;font-size:12.5px}
+.vw-hr span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.vw-hr i{height:10px;border-radius:5px;background:var(--fill-slab)}.vw-hr i b{display:block;height:100%;border-radius:5px;background:#2231dd}.vw-hr em{font-style:normal;font-weight:600;font-variant-numeric:tabular-nums}
+.vw-num{font-size:40px;font-weight:600;letter-spacing:-.02em;line-height:1.1}.vw-num small{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
+.vw-dona{display:flex;gap:16px;align-items:center}.vw-dona svg{width:130px;flex:none}.vw-dona ul{list-style:none;margin:0;padding:0;font-size:12.5px;display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.vw-dona li{display:flex;align-items:center;gap:6px}.vw-dona li i{width:10px;height:10px;border-radius:3px;flex:none}.vw-dona li b{margin-left:auto;padding-left:8px}
+.vw-vacio{padding:18px;border-radius:12px;background:var(--fill-slab);font-size:12.8px;color:var(--muted);text-align:center}.vw-mut{color:var(--muted)}
+.vw-ped{margin:0;font-size:11px;color:var(--muted)}.vw-empty{margin:12px 2px 0}
+@media(max-width:640px){.vw-g{grid-template-columns:1fr}.vw-q form{flex-direction:column}.vw-ask .xa-mk{display:none}}
 .hm-bx{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:14px 16px;border:0;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff);font:inherit;text-align:left;cursor:pointer}
 .hm-bx span:nth-child(2){flex:1;min-width:0}.hm-bx b{display:block;font-size:14.5px}.hm-bx small{display:block;font-size:12.3px;opacity:.72;margin-top:2px}.hm-bx em{font-style:normal;font-weight:600;font-size:13px;white-space:nowrap}
 @media(max-width:640px){.bx-c{grid-template-columns:1fr;gap:10px;padding:14px}.bx-r{width:76px;height:76px}.bx-r b{font-size:18px}.bx-r span{font-size:9px}.bx-h em{margin-left:0}.bx-a .bt{flex:1;min-width:0}.hm-bx em{display:none}}
@@ -2332,6 +2351,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div class="bx-ban" data-bxban></div>
         <div class="bx-ban" data-cgban></div>
         <div class="ad-head"><div><h2>Tablero de grupo</h2><p id="grpSub">Todas las agencias del grupo</p></div></div>
+        <div data-vwbox></div>
         <div id="grpBody"></div>
       </div>
     </section>
@@ -2340,6 +2360,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div class="bx-ban" data-bxban></div>
         <div class="bx-ban" data-cgban></div>
         <div class="ad-head"><div><h2>Tablero del dueño</h2><p id="dnSub">Lo que Ax AI hace por tu grupo</p></div></div>
+        <div data-vwbox></div>
         <div id="dnBody"></div>
       </div>
     </section>
@@ -6701,7 +6722,7 @@ SB.loadAdvisors=async function(){
   if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;try{var au=await SB.c.auth.getUser();SB.email=au&&au.data&&au.data.user&&au.data.user.email||''}catch(_){}SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
     me.dueno=me.role==='dueno';me.director=me.role==='director';me.gerente=me.role==='gerente'||me.director;
     if(me.director||me.dueno){try{if(me.agency_id){var gq=await SB.c.from('agencies').select('grupo_id,grupos(nombre)').eq('id',me.agency_id).maybeSingle();SB.grupoId=gq.data&&gq.data.grupo_id;SB.grupo=gq.data&&gq.data.grupos&&gq.data.grupos.nombre||'Tu grupo'}else{var gg=await SB.c.from('grupos').select('id,nombre').eq('id',me.grupo_id).maybeSingle();SB.grupoId=me.grupo_id;SB.grupo=gg.data&&gg.data.nombre||'Tu grupo';SB.agency=SB.grupo;var aa=$('#adAgency');if(aa)aa.textContent=SB.agency}}catch(_){}}
-    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);AGV.side();CG.nav();CG.load();
+    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);AGV.side();CG.nav();CG.load();VW.load();
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
@@ -7735,6 +7756,76 @@ document.addEventListener('click',function(e){
 });
 
 CG.nav=function(){var b=$('#cgNav');if(!b)return;var on=CG.on();b.hidden=!on;b.style.display=on?'':'none'};
+/* ══ Vistas a la medida ══════════════════════════════════════════════════════════════
+   El dueño o el director escriben lo que quieren ver y Ax AI crea la tarjeta en su tablero (función "vistas").
+   Sin consultores: «quiero ver los débitos de BYD por mes», «aceptación por agencia de Chevrolet», «cámbiala a línea». */
+var VW={rows:[],busy:false,loaded:false,
+  SUG:['Débitos de BYD por mes','Aceptación de planta por agencia de Chevrolet','Lo que GM me debe por agencia','Expedientes por sistema este año','Motivos de débito más caros'],
+  FUE:{expedientes:'Expedientes',debitos:'Débitos de GM',cartera:'Cobranza a planta'}};
+VW.on=function(){return !!(SB.user&&(SB.user.dueno||SB.user.director))};
+VW.load=async function(){
+  if(!SB.c||!VW.on())return;
+  try{var r=await SB.c.functions.invoke('vistas',{body:{datos:true}});if(r.error)throw r.error;VW.rows=(r.data&&r.data.vistas)||[];VW.loaded=true}catch(e){console.warn('[vistas]',e)}
+  VW.render();
+};
+VW.fmt=function(v,f){return f==='dinero'?DEB.mx(v):f==='porcentaje'?Math.round(v)+'%':Number(v||0).toLocaleString('es-MX')};
+VW.corto=function(v,f){if(f==='porcentaje')return Math.round(v)+'%';var a=Math.abs(v),p=f==='dinero'?'$':'';return a>=1e6?p+(v/1e6).toFixed(1)+'M':a>=1e4?p+Math.round(v/1e3)+'k':p+Math.round(v).toLocaleString('es-MX')};
+/* gráficas en SVG, sin librerías: barras, línea, dona, tabla y número */
+VW.graf=function(v){
+  var D=v.datos||{etiquetas:[],valores:[]},L=D.etiquetas||[],V=D.valores||[],f=D.formato,t=(v.spec&&v.spec.tipo)||'barras',max=Math.max.apply(null,V.concat([0]))||1;
+  if(!D.filas)return '<div class="vw-vacio">Todavía no hay datos para esta vista. Se llena sola en cuanto las agencias registren '+esc((VW.FUE[v.spec&&v.spec.fuente]||'datos').toLowerCase())+'.</div>';
+  if(t==='numero')return '<div class="vw-num">'+VW.fmt(D.total,f)+'<small>'+D.filas+(D.filas===1?' registro':' registros')+'</small></div>';
+  if(t==='tabla')return '<div class="xf-tw"><table class="pv-tb"><tbody>'+L.map(function(l,i){return '<tr><td>'+esc(l)+'</td><td class="r"><b>'+VW.fmt(V[i],f)+'</b></td><td class="r vw-mut">'+D.casos[i]+'</td></tr>'}).join('')+'</tbody></table></div>';
+  if(t==='dona'){var tot=V.reduce(function(s,x){return s+x},0)||1,a=0,C=['#2231dd','#6b79ff','#9aa4ff','#1f8a4c','#d99a1e','#d6453b','#6b4fd8','#8a8f98'];
+    var arcs=V.slice(0,8).map(function(x,i){var p=x/tot,a0=a;a+=p;var l=p>.5?1:0,s0=[Math.cos(2*Math.PI*a0-Math.PI/2),Math.sin(2*Math.PI*a0-Math.PI/2)],s1=[Math.cos(2*Math.PI*a-Math.PI/2),Math.sin(2*Math.PI*a-Math.PI/2)];
+      return p>=.999?'<circle cx="0" cy="0" r="1" fill="'+C[i]+'"/>':'<path d="M0 0L'+s0[0]+' '+s0[1]+'A1 1 0 '+l+' 1 '+s1[0]+' '+s1[1]+'Z" fill="'+C[i]+'"/>'}).join('');
+    return '<div class="vw-dona"><svg viewBox="-1.05 -1.05 2.1 2.1" aria-hidden="true">'+arcs+'<circle r=".58" fill="var(--card,#fff)"/></svg><ul>'+L.slice(0,8).map(function(l,i){return '<li><i style="background:'+C[i]+'"></i>'+esc(l)+'<b>'+VW.fmt(V[i],f)+'</b></li>'}).join('')+'</ul></div>'}
+  var W=560,H=200,pl=8,pb=34,n=V.length||1,bw=(W-pl*2)/n;
+  if(t==='linea'){var pts=V.map(function(x,i){return [pl+bw*i+bw/2,(H-pb)-((H-pb-14)*x/max)]});
+    return '<svg class="vw-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+ea(v.titulo)+'"><line x1="0" x2="'+W+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'" class="vw-ax"/><polyline fill="none" stroke="#2231dd" stroke-width="2.5" points="'+pts.map(function(p){return p.join(',')}).join(' ')+'"/>'+
+      pts.map(function(p,i){return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.5" fill="#2231dd"><title>'+esc(L[i])+': '+VW.fmt(V[i],f)+'</title></circle>'+(V[i]?'<text x="'+p[0]+'" y="'+(p[1]-8)+'" class="vw-val">'+VW.corto(V[i],f)+'</text>':'')+'<text x="'+p[0]+'" y="'+(H-pb+16)+'" class="vw-lb">'+esc(L[i])+'</text>'}).join('')+'</svg>'}
+  if(v.spec&&v.spec.agrupar==='mes')return '<svg class="vw-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+ea(v.titulo)+'"><line x1="0" x2="'+W+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'" class="vw-ax"/>'+V.map(function(x,i){var h=(H-pb-16)*x/max,X=pl+bw*i+bw*.18;
+    return '<rect x="'+X+'" y="'+(H-pb-h)+'" width="'+bw*.64+'" height="'+Math.max(h,x?2:0)+'" rx="3" fill="#2231dd"><title>'+esc(L[i])+': '+VW.fmt(x,f)+'</title></rect>'+(x?'<text x="'+(X+bw*.32)+'" y="'+(H-pb-h-5)+'" class="vw-val">'+VW.corto(x,f)+'</text>':'')+'<text x="'+(X+bw*.32)+'" y="'+(H-pb+16)+'" class="vw-lb">'+esc(L[i])+'</text>'}).join('')+'</svg>';
+  return '<div class="vw-hb">'+L.map(function(l,i){return '<div class="vw-hr"><span title="'+ea(l)+'">'+esc(l)+'</span><i><b style="width:'+Math.max(1.5,V[i]*100/max)+'%"></b></i><em>'+VW.fmt(V[i],f)+'</em></div>'}).join('')+'</div>';
+};
+VW.card=function(v){
+  var s=v.spec||{},F=s.filtros||{},fil=[].concat(F.marcas||[],F.agencias||[]).join(', ');
+  return '<article class="vw-c" data-vw="'+ea(v.id)+'"><div class="vw-h"><div><h4>'+esc(v.titulo)+'</h4><p>'+esc(s.explicacion||((VW.FUE[s.fuente]||'')+(fil?' · '+fil:'')))+(v.datos&&v.datos.filas&&s.tipo!=='numero'?' · total '+VW.fmt(v.datos.total,v.datos.formato):'')+'</p></div>'+
+    '<div class="vw-mn"><button type="button" class="vw-b" data-vwedit title="Cambiar esta vista">Cambiar</button><button type="button" class="vw-b" data-vwdel title="Quitar del tablero" aria-label="Quitar">✕</button></div></div>'+VW.graf(v)+
+    (v.pedido?'<p class="vw-ped">Pedido: «'+esc(v.pedido)+'»</p>':'')+'</article>';
+};
+VW.render=function(){
+  var html=!VW.on()?'':'<section class="vw" aria-label="Tus vistas"><div class="vw-ask"><span class="xa-mk">A</span><div class="vw-q"><b>Pídele a Ax AI la vista que necesites</b><form data-vwform><input name="q" autocomplete="off" placeholder="Ej. quiero ver los débitos de BYD por mes" aria-label="Qué quieres ver"><button class="bt pri" type="submit">Crear vista</button></form>'+
+    '<div class="vw-sug">'+VW.SUG.map(function(q){return '<button type="button" class="bx-f" data-vwsug="'+ea(q)+'">'+esc(q)+'</button>'}).join('')+'</div><p class="vw-msg" id="vwMsg" role="status"></p></div></div>'+
+    (VW.rows.length?'<div class="vw-g">'+VW.rows.map(VW.card).join('')+'</div>':VW.loaded?'<p class="xz-mut vw-empty">Aquí aparecen las tarjetas que pidas. Se quedan en tu tablero y se actualizan solas cada vez que entras.</p>':'')+'</section>';
+  document.querySelectorAll('[data-vwbox]').forEach(function(e){e.innerHTML=html});
+};
+VW.msg=function(t,bad){document.querySelectorAll('.vw-msg').forEach(function(m){m.textContent=t||'';m.classList.toggle('bad',!!bad)})};
+VW.pedir=async function(q,id){
+  q=String(q||'').trim();if(!q||VW.busy)return;VW.busy=true;VW.msg(id?'Cambiando la vista…':'Ax AI está armando tu vista…');
+  try{
+    var r=await SB.c.functions.invoke('vistas',{body:{pedir:q,vista_id:id||undefined}});if(r.error)throw r.error;var d=r.data||{};
+    if(d.se_puede===false){VW.busy=false;VW.msg(d.motivo,true);return}
+    var v=d.vista;if(id)VW.rows=VW.rows.map(function(x){return x.id===id?v:x});else VW.rows.push(v);
+    VW.busy=false;VW.render();VW.msg(id?'Listo: cambié «'+v.titulo+'».':'Listo: «'+v.titulo+'» ya está en tu tablero.');
+    var c=document.querySelector('[data-vw="'+v.id+'"]');if(c)c.scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){VW.busy=false;SB.fail(e);VW.msg('No pude armar la vista: '+TR.errTxt(e),true)}
+};
+VW.quitar=async function(id){
+  var v=VW.rows.filter(function(x){return x.id===id})[0];if(!v||!confirm('¿Quitar «'+v.titulo+'» del tablero? La dirección del grupo deja de verla.'))return;
+  var r=await SB.c.from('vistas').delete().eq('id',id);if(r.error){SB.fail(r.error);toast('No se pudo quitar');return}
+  VW.rows=VW.rows.filter(function(x){return x.id!==id});VW.render();toast('Vista quitada');
+};
+document.addEventListener('submit',function(e){var f=e.target.closest&&e.target.closest('[data-vwform]');if(!f)return;e.preventDefault();VW.pedir(f.elements.q.value);f.elements.q.value=''});
+document.addEventListener('click',function(e){
+  var t=e.target;if(!t.closest)return;
+  var s=t.closest('[data-vwsug]');if(s){VW.pedir(s.dataset.vwsug);return}
+  var c=t.closest('[data-vw]');if(!c)return;
+  if(t.closest('[data-vwdel]')){VW.quitar(c.dataset.vw);return}
+  if(t.closest('[data-vwedit]')){var v=VW.rows.filter(function(x){return x.id===c.dataset.vw})[0];
+    HM.dlg({title:'Cambiar «'+(v?v.titulo:'vista')+'»',intro:'Dile a Ax AI qué cambiar. Por ejemplo: «solo los últimos 6 meses», «en línea», «solo Morelia y Uruapan», «por asesor».',fields:[{k:'t',label:'Qué cambio',type:'textarea',req:true}],ok:'Cambiar vista'}).then(function(x){if(x&&x.t)VW.pedir(x.t,c.dataset.vw)})}
+});
+
 /* ---- la red de reglas: lo que la red aprendió de débitos reales + el manual ---- */
 var RED={rows:[],q:'',f:'alertas'};
 RED.SEC={general:'Todo el expediente',contrato:'Orden de garantía',recepcion:'Recepción',diagnostico:'Diagnóstico',evidencia:'Evidencia',piezas:'Refacciones y eSPOM',destruccion:'Destrucción',actualizacion:'PRA',bateria:'Batería 12V',facturas_partes:'Facturas TOT/NAR/No GM',tac:'TAC',mantenimiento:'Mantenimientos',m2:'Formato M2',wpc:'WPC',factura:'Factura a planta',planta:'Transacción de planta'};
