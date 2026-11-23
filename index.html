@@ -1912,6 +1912,20 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .bx-a .bx-nb{min-width:0;margin-left:auto}
 @media(max-width:640px){.bx-a .bx-nb{margin-left:0;flex-basis:100%}}
 .bx-ban:empty{display:none}.bx-ban .hm-bx{margin:0 0 16px}
+.sb-ags{margin:14px 0 4px}.sb-agh{display:flex;align-items:center;gap:8px;width:100%;padding:0 12px;margin:0 0 6px;background:none;border:0;color:var(--sb-muted);font:inherit;font-size:11.5px;cursor:pointer;text-align:left}
+.sb-agh span{flex:1}.sb-agh b{font-weight:600}.sb-agh i{font-style:normal;width:12px;text-align:center}
+.sb-agq{display:block;width:calc(100% - 8px);margin:0 4px 6px;box-sizing:border-box;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#e8e8e5;font:12.5px var(--f-ui,inherit)}
+.sb-agm{padding:0 12px;margin:8px 0 2px;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--sb-muted);opacity:.8}
+.nav.sb-ag{height:30px;font-size:13px;gap:8px;padding-left:20px}.nav.sb-ag .sb-agn{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:left}
+.nav.sb-ag.on{background:rgba(255,255,255,.1);color:#fff}.sb-age{padding:0 20px;font-size:12px;color:var(--sb-muted)}
+.agv-back{margin:0 0 14px;padding:0;border:0;background:none;color:var(--muted);font:500 13px var(--f-ui,inherit);cursor:pointer}.agv-back:hover{color:var(--fg,inherit)}
+.agv-s{margin:16px 0 0;padding:16px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}.agv-s h3{margin:0 0 12px;font-size:15px}
+.agv-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.agv-h h3{margin:0 0 12px}
+.agv-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}.agv-g .agv-s{margin-top:16px}
+.agv-l{margin:0 0 10px;padding-left:18px;font-size:13px;line-height:1.6}.agv-l small{color:var(--muted)}.agv-l .bad,.pv-tb td.bad{color:#b4372b}
+.agv-t tbody tr{cursor:pointer}.agv-t tbody tr:hover{background:var(--hover,rgba(0,0,0,.03))}
+.agv-e{padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:600;background:color-mix(in srgb,#2231dd 9%,transparent);color:#2231dd}.agv-e.warn{background:color-mix(in srgb,#d99a1e 14%,transparent);color:#8a5a00}.agv-e.bad{background:color-mix(in srgb,#d6453b 12%,transparent);color:#b4372b}
+@media(max-width:640px){.agv-g{grid-template-columns:1fr}}
 .hm-bx{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:14px 16px;border:0;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff);font:inherit;text-align:left;cursor:pointer}
 .hm-bx span:nth-child(2){flex:1;min-width:0}.hm-bx b{display:block;font-size:14.5px}.hm-bx small{display:block;font-size:12.3px;opacity:.72;margin-top:2px}.hm-bx em{font-style:normal;font-weight:600;font-size:13px;white-space:nowrap}
 @media(max-width:640px){.bx-c{grid-template-columns:1fr;gap:10px;padding:14px}.bx-r{width:76px;height:76px}.bx-r b{font-size:18px}.bx-r span{font-size:9px}.bx-h em{margin-left:0}.bx-a .bt{flex:1;min-width:0}.hm-bx em{display:none}}
@@ -2103,6 +2117,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <button class="nav" data-pv-nav data-dir-nav data-view="grp" data-i="folderchart" hidden>Tablero de grupo</button>
         <button class="nav" data-pv-nav data-view="pv" data-i="chart" hidden>Tablero de posventa</button>
         <button class="nav" data-pv-nav data-view="posventa" data-i="chat" hidden>Agente de Posventa</button>
+        <div class="sb-ags" id="sbAgs" data-dueno-nav hidden></div>
         <div class="grp" data-nm style="margin-top:6px">Agentes</div>
         <button class="nav" data-nm data-view="agent" data-i="file" aria-current="true">Agente de Garantías</button>
         <div class="grp" data-nm style="margin-top:22px">Sistema de registro</div>
@@ -2299,6 +2314,12 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div class="bx-ban" data-bxban></div>
         <div class="ad-head"><div><h2>Tablero del dueño</h2><p id="dnSub">Lo que Ax AI hace por tu grupo</p></div></div>
         <div id="dnBody"></div>
+      </div>
+    </section>
+    <section class="admin" id="viewAgv" hidden>
+      <div class="ad-in">
+        <div class="ad-head"><div><h2 id="agvTitle">Agencia</h2><p id="agvSub"></p></div></div>
+        <div id="agvBody"></div>
       </div>
     </section>
     <section class="admin" id="viewBx" hidden>
@@ -2523,25 +2544,27 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){if(MI.due().length&&!AL.unread().length){showView('mi');MI.send('¿Qué tengo pendiente?');return}RED.f='alertas';showView('red')});
 
-var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',bx:'Bandeja',dueno:'Tablero del dueño'};
+var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',bx:'Bandeja',agv:'Agencia',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewDueno').hidden=id!=='dueno';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='agv'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewAgv').hidden=id!=='agv';$('#viewDueno').hidden=id!=='dueno';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='pv'){crumb.textContent=VIEWS.pv;crumbSep.hidden=true;crumb2.hidden=true;PV.load()}
   else if(id==='grp'){crumb.textContent=VIEWS.grp;crumbSep.hidden=true;crumb2.hidden=true;GRP.load()}
   else if(id==='red'){crumb.textContent=VIEWS.red;crumbSep.hidden=true;crumb2.hidden=true;RED.load()}
   else if(id==='bx'){crumb.textContent=VIEWS.bx;crumbSep.hidden=true;crumb2.hidden=true;BX.render();BX.load()}
+  else if(id==='agv'){crumb.textContent=VIEWS.agv;crumbSep.hidden=true;crumb2.hidden=true;AGV.load()}
   else if(id==='dueno'){crumb.textContent=VIEWS.dueno;crumbSep.hidden=true;crumb2.hidden=true;DN.load()}
   else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
   else if(id==='cfg'){crumb.textContent=VIEWS.cfg;crumbSep.hidden=true;crumb2.hidden=true;CFG.open()}
   else if(id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'){crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true;if(id==='exp')EX.load();else if(id==='bitacora')BI.load();else if(id==='cartera')CAR.load();else if(id==='inicio')HM.open();else RC.open()}
   else{crumb.textContent=AG[S.agent].crumb;syncCrumb()}
+  if(typeof AGV!=='undefined'&&AGV.sideRender)AGV.sideRender();
   if(mq.matches)setSb(false);
 }
 $$('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){showView(b.dataset.view)})});
@@ -5951,7 +5974,7 @@ XD.open=function(id){
   FL.refresh(x);
   XD.formInit(x);
 };
-XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera',pv=XD.from==='pv',bx=XD.from==='bx';$('#exDoc').hidden=true;$(bx?'#viewBx':pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true);if(bx)BX.load()};
+XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera',pv=XD.from==='pv',bx=XD.from==='bx',agv=XD.from==='agv';$('#exDoc').hidden=true;$(agv?'#viewAgv':bx?'#viewBx':pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true);if(bx)BX.load();if(agv)AGV.load()};
 XD.sec=function(k){return $('#exDoc .xd-sec[data-k="'+k+'"]')};
 /* lo ya subido */
 XD.load=async function(id,k){
@@ -6643,7 +6666,7 @@ SB.loadAdvisors=async function(){
   if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;try{var au=await SB.c.auth.getUser();SB.email=au&&au.data&&au.data.user&&au.data.user.email||''}catch(_){}SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
     me.dueno=me.role==='dueno';me.director=me.role==='director';me.gerente=me.role==='gerente'||me.director;
     if(me.director||me.dueno){try{if(me.agency_id){var gq=await SB.c.from('agencies').select('grupo_id,grupos(nombre)').eq('id',me.agency_id).maybeSingle();SB.grupoId=gq.data&&gq.data.grupo_id;SB.grupo=gq.data&&gq.data.grupos&&gq.data.grupos.nombre||'Tu grupo'}else{var gg=await SB.c.from('grupos').select('id,nombre').eq('id',me.grupo_id).maybeSingle();SB.grupoId=me.grupo_id;SB.grupo=gg.data&&gg.data.nombre||'Tu grupo';SB.agency=SB.grupo;var aa=$('#adAgency');if(aa)aa.textContent=SB.agency}}catch(_){}}
-    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);
+    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);AGV.side();
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
@@ -7357,7 +7380,7 @@ BX.load=async function(){
     BX.rows=E.map(function(x){var R=BX.riesgo(x,sec[x.id]||{},rev[x.folio]||[],deb);return {x:x,r:R,sec:sec[x.id]||{},rev:rev[x.folio]||[],d:last[x.id]||null,n:(notas[x.id]||[]).slice().reverse()}})
       .sort(function(a,b){var ta=a.d&&a.d.decision==='tecnico'?1:0,tb=b.d&&b.d.decision==='tecnico'?1:0;return (ta-tb)||(b.r.pct-a.r.pct)});
   }catch(e){SB.fail(e)}
-  BX.busy=false;BX.badge();if(S.view==='bx')BX.render();if(S.view==='inicio')HM.render();
+  BX.busy=false;BX.badge();AGV.sideRender();if(S.view==='bx')BX.render();if(S.view==='agv'&&AGV.d)AGV.render();if(S.view==='inicio')HM.render();
 };
 BX.badge=function(){var b=$('#bxBadge');if(b){var n=BX.rows.length;b.hidden=!n;b.textContent=String(n)}document.querySelectorAll('[data-bxban]').forEach(function(e){e.innerHTML=HM.cardBx()})};
 BX.tipo=function(it){var x=it.x,f=x.flujo||{};
@@ -7447,6 +7470,93 @@ document.addEventListener('click',function(e){
 HM.cardBx=function(){
   var L=BX.rows;if(!L.length)return '';var alto=L.filter(function(i){return i.r.pct>=50}).length;
   return '<button type="button" class="hm-bx" data-nav="bx"><span class="xa-mk">A</span><span><b>Tu bandeja: '+L.length+(L.length===1?' decisión pendiente':' decisiones pendientes')+'</b><small>'+(alto?alto+' con riesgo alto de débito · ':'')+'Ax AI ya revisó cada caso; tú decides enviar, corregir o pedir al técnico</small></span><em>Abrir →</em></button>';
+};
+
+/* ══ Agencias del grupo en el menú lateral · cada agencia con su pantalla ══════════════
+   El dueño y el director ven en el menú todas las agencias de su grupo (con buscador y cuántas decisiones
+   tiene pendientes cada una). Cada agencia abre su propia pantalla: números del mes, ciclo de sus garantías,
+   su bandeja, sus asesores, sus débitos y alertas, y sus expedientes. */
+var AGV={ags:[],id:null,q:'',open:true,d:null};
+AGV.on=function(){return !!(SB.user&&(SB.user.dueno||SB.user.director)&&SB.grupoId)};
+AGV.side=async function(){
+  var box=$('#sbAgs');if(!box)return;
+  if(!AGV.on()){box.hidden=true;box.style.display='none';return}
+  if(!AGV.ags.length){var r=await SB.c.from('agencies').select('id,name,brand,marca_grupo,city,tipo').eq('grupo_id',SB.grupoId).order('name');AGV.ags=(r.data||[]).filter(function(a){return !a.tipo||a.tipo==='agencia'})}
+  box.hidden=false;box.style.display='';AGV.sideRender();
+};
+AGV.pend=function(id){return (BX.rows||[]).filter(function(i){return i.x.profiles&&i.x.profiles.agency_id===id}).length};
+AGV.sideRender=function(){
+  var box=$('#sbAgs');if(!box||box.hidden)return;
+  var q=norm(AGV.q),L=AGV.ags.filter(function(a){return !q||norm(a.name+' '+(a.city||'')+' '+(a.marca_grupo||a.brand||'')).indexOf(q)>=0});
+  var by={};L.forEach(function(a){var k=a.marca_grupo||a.brand||'Otras';(by[k]=by[k]||[]).push(a)});
+  box.innerHTML='<button type="button" class="sb-agh" data-agt aria-expanded="'+AGV.open+'"><span>Agencias del grupo</span><b>'+AGV.ags.length+'</b><i>'+(AGV.open?'−':'+')+'</i></button>'+
+    (AGV.open?(AGV.ags.length>8?'<input class="sb-agq" id="sbAgQ" type="search" placeholder="Buscar agencia" value="'+ea(AGV.q)+'" aria-label="Buscar agencia">':'')+
+      Object.keys(by).sort().map(function(k){return (Object.keys(by).length>1?'<div class="sb-agm">'+esc(k)+'</div>':'')+by[k].map(function(a){var n=AGV.pend(a.id);
+        return '<button type="button" class="nav sb-ag'+(S.view==='agv'&&AGV.id===a.id?' on':'')+'" data-agv="'+a.id+'" title="'+ea(a.name)+'"><span class="sb-agn">'+esc(a.name)+'</span>'+(n?'<span class="nbadge">'+n+'</span>':'')+'</button>'}).join('')}).join('')+
+      (!L.length?'<p class="sb-age">Sin resultados</p>':''):'');
+};
+document.addEventListener('click',function(e){
+  var t=e.target.closest&&e.target.closest('[data-agt]');if(t){AGV.open=!AGV.open;AGV.sideRender();return}
+  var a=e.target.closest&&e.target.closest('[data-agv]');if(a){AGV.id=Number(a.dataset.agv);showView('agv');return}
+  var x=e.target.closest&&e.target.closest('#viewAgv [data-agexp]');if(x){AGV.openExp(x.dataset.agexp);return}
+  if(e.target.closest&&e.target.closest('[data-agbx]')){var ag=AGV.ag();BX.ag=ag?ag.name:'';showView('bx');return}
+  if(e.target.closest&&e.target.closest('[data-agback]')){showView(DN.is()?'dueno':'grp')}
+});
+document.addEventListener('keydown',function(e){var r=e.target.closest&&e.target.closest('#viewAgv [data-agexp]');if(r&&e.key==='Enter')AGV.openExp(r.dataset.agexp)});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='sbAgQ'){AGV.q=e.target.value;var p=e.target.selectionStart;AGV.sideRender();var i=$('#sbAgQ');if(i){i.focus();try{i.setSelectionRange(p,p)}catch(_){}}}});
+AGV.ag=function(){return AGV.ags.filter(function(a){return a.id===AGV.id})[0]||null};
+AGV.load=async function(){
+  var id=AGV.id,el=$('#agvBody');if(!el||!id)return;
+  var a=AGV.ag();$('#agvTitle').textContent=a?a.name:'Agencia';$('#agvSub').textContent=a?[a.marca_grupo||a.brand,a.city].filter(Boolean).join(' · '):'';
+  crumb.textContent=a?a.name:'Agencia';AGV.sideRender();
+  el.innerHTML='<p class="xz-mut">Cargando la agencia…</p>';
+  try{
+    var r=await Promise.all([
+      SB.c.from('expedientes').select('*,profiles!inner(name,agency_id)').eq('profiles.agency_id',id).order('created_at',{ascending:false}).limit(600),
+      SB.c.from('debitos').select('id,fecha,monto,motivo,estado,regla_id,monto_revertido,expediente_id,expedientes(wo,folio)').eq('agency_id',id).order('created_at',{ascending:false}).limit(60),
+      SB.c.from('alertas').select('*').or('origen_agency_id.eq.'+id+',agency_id.eq.'+id).order('created_at',{ascending:false}).limit(8),
+      BX.rows.length?null:BX.load()]);
+    if(r[0].error)throw r[0].error;
+    var E=r[0].data||[],ids=E.map(function(x){return x.id}),car=[];
+    if(ids.length){var c=await SB.c.from('cartera').select('expediente_id,estado,monto,monto_pagado,facturada_at,pagada_at').in('expediente_id',ids.slice(0,500));car=c.data||[]}
+    if(AGV.id!==id)return;
+    AGV.d={E:E,deb:(r[1]&&r[1].data)||[],al:(r[2]&&r[2].data)||[],car:car};AGV.render();
+  }catch(e){SB.fail(e);el.innerHTML='<div class="pv-empty">No se pudo cargar la agencia.</div>'}
+};
+AGV.mx=function(n){return DEB.mx(n)};
+AGV.render=function(){
+  var el=$('#agvBody'),D=AGV.d;if(!el||!D)return;
+  var E=D.E,now=new Date(),m0=new Date(now.getFullYear(),now.getMonth(),1);
+  var mes=E.filter(function(x){return new Date(x.created_at)>=m0}).length,ac=E.filter(function(x){return x.status==='aceptada'}).length,re=E.filter(function(x){return x.status==='rechazada'}).length;
+  var monto=E.filter(function(x){return x.status==='aceptada'}).reduce(function(s,x){return s+Number(x.parts_total||0)+Number(x.labor||0)},0);
+  var xc=D.car.filter(function(c){return c.estado!=='pagada'}).reduce(function(s,c){return s+Number(c.monto||0)},0),cob=D.car.filter(function(c){return c.estado==='pagada'}).reduce(function(s,c){return s+Number(c.monto_pagado||c.monto||0)},0);
+  var dm=D.deb.reduce(function(s,d){return s+Number(d.monto||0)},0),drev=D.deb.reduce(function(s,d){return s+Number(d.monto_revertido||0)},0);
+  var venc=E.filter(function(x){return x.flujo&&x.flujo.estado==='bad'&&x.flujo.etapa!=='cerrado'}).length;
+  var K=function(l,v,s,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
+  var cnt={};E.forEach(function(x){if(x.flujo)cnt[x.flujo.etapa]=(cnt[x.flujo.etapa]||0)+1});
+  var B=(BX.rows||[]).filter(function(i){return i.x.profiles&&i.x.profiles.agency_id===AGV.id});
+  var as={};E.forEach(function(x){var n=(x.profiles&&x.profiles.name)||'Asesor',o=as[n]||(as[n]={n:n,t:0,a:0,r:0,v:0,p:0});o.t++;if(x.status==='aceptada')o.a++;if(x.status==='rechazada')o.r++;if(x.flujo&&x.flujo.estado==='bad'&&x.flujo.etapa!=='cerrado')o.v++});
+  B.forEach(function(i){var n=(i.x.profiles&&i.x.profiles.name)||'Asesor';if(as[n])as[n].p++});
+  var AS=Object.keys(as).map(function(k){return as[k]}).sort(function(a,b){return b.t-a.t});
+  var ST={borrador:'Esperando planta',aceptada:'Aceptada',rechazada:'Rechazada'};
+  el.innerHTML='<button type="button" class="agv-back" data-agback>← '+(DN.is()?'Tablero del dueño':'Tablero de grupo')+'</button>'+
+    '<div class="ad-kpi">'+K('Expedientes',E.length,mes+' este mes')+K('Aceptación',ac+re?Math.round(ac*100/(ac+re))+'%':'—',ac+' aceptadas · '+re+' rechazadas',ac+re&&ac/(ac+re)<.8?'bad':'')+
+      K('Monto aceptado',AGV.mx(monto),'mano de obra + piezas')+K('Por cobrar a planta',AGV.mx(xc),AGV.mx(cob)+' ya cobrado')+
+      K('Débitos de GM',AGV.mx(dm),D.deb.length+(D.deb.length===1?' débito':' débitos')+(drev?' · '+AGV.mx(drev)+' revertido':''),dm?'bad':'')+K('Plazos vencidos',venc,venc?'casos con un plazo del manual vencido':'todo a tiempo',venc?'bad':'ok')+'</div>'+
+    '<section class="agv-s"><h3>Ciclo de sus garantías</h3><div class="hm-fl-p">'+FL.E.map(function(e){return '<div class="'+(cnt[e[0]]?'on':'')+'"><b>'+(cnt[e[0]]||0)+'</b><span>'+esc(e[1])+'</span></div>'}).join('')+'</div></section>'+
+    '<section class="agv-s"><div class="agv-h"><h3>Su bandeja · '+B.length+(B.length===1?' decisión pendiente':' decisiones pendientes')+'</h3>'+(B.length?'<button class="bt" type="button" data-agbx>Ver en la bandeja</button>':'')+'</div>'+
+      (B.length?'<div class="bx-list">'+B.slice(0,4).map(BX.card).join('')+'</div>'+(B.length>4?'<p class="xz-mut">y '+(B.length-4)+' más en la bandeja.</p>':''):'<p class="xz-mut">Nada que decidir: sus casos esperan a planta o ya avanzaron.</p>')+'</section>'+
+    '<div class="agv-g"><section class="agv-s"><h3>Asesores</h3>'+(AS.length?'<div class="xf-tw"><table class="pv-tb"><thead><tr><th>Asesor</th><th class="r">Expedientes</th><th class="r">Aceptación</th><th class="r">Por decidir</th><th class="r">Vencidos</th></tr></thead><tbody>'+
+      AS.map(function(o){return '<tr><td>'+esc(o.n)+'</td><td class="r">'+o.t+'</td><td class="r">'+(o.a+o.r?Math.round(o.a*100/(o.a+o.r))+'%':'—')+'</td><td class="r">'+o.p+'</td><td class="r'+(o.v?' bad':'')+'">'+o.v+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="xz-mut">Aún no hay asesores con expedientes.</p>')+'</section>'+
+    '<section class="agv-s"><h3>Débitos y alertas</h3>'+(D.deb.length?'<ul class="agv-l">'+D.deb.slice(0,6).map(function(d){return '<li><b class="bad">'+AGV.mx(d.monto)+'</b> '+esc(d.motivo||'Débito')+' <small>'+esc((d.expedientes&&(d.expedientes.wo||d.expedientes.folio))||'')+(d.fecha?' · '+d.fecha:'')+(d.regla_id?' · regla '+esc(d.regla_id):'')+'</small></li>'}).join('')+'</ul>':'<p class="xz-mut">Sin débitos de GM registrados.</p>')+
+      (D.al.length?'<div class="al-list">'+D.al.slice(0,3).map(function(x){return AL.card(x,true)}).join('')+'</div>':'')+'</section></div>'+
+    '<section class="agv-s"><h3>Expedientes recientes</h3>'+(E.length?'<div class="xf-tw"><table class="pv-tb agv-t"><thead><tr><th>Orden</th><th>Asesor</th><th>Sistema</th><th>Etapa</th><th>Planta</th><th class="r">Monto</th></tr></thead><tbody>'+
+      E.slice(0,25).map(function(x){var f=x.flujo;return '<tr data-agexp="'+ea(x.id)+'" tabindex="0"><td><b>'+esc(x.wo||x.folio)+'</b></td><td>'+esc((x.profiles&&x.profiles.name)||'')+'</td><td>'+esc(x.sys||'')+'</td><td>'+(f?'<span class="agv-e '+(f.estado||'ok')+'">'+esc(FL.nom(f.etapa))+'</span>':'—')+'</td><td>'+esc(ST[x.status]||x.status||'')+'</td><td class="r">'+AGV.mx(Number(x.parts_total||0)+Number(x.labor||0))+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="xz-mut">Esta agencia todavía no tiene expedientes en Ax AI.</p>')+'</section>';
+};
+AGV.openExp=function(id){
+  var x=AGV.d&&AGV.d.E.filter(function(z){return z.id===id})[0];if(!x)return;
+  if(!EX.rows.some(function(r){return r.id===x.id}))EX.rows.unshift(x);
+  XD.open(x.id);XD.from='agv';$('#viewAgv').hidden=true;
 };
 
 /* ---- la red de reglas: lo que la red aprendió de débitos reales + el manual ---- */
