@@ -1891,6 +1891,24 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .fl-hist{margin:10px 0 0;font-size:11.5px;color:var(--muted)}
 .al-upf .bt{display:flex;align-items:center;justify-content:center;min-height:36px}.al-up .bt.pri{background:var(--signal,#2231dd);color:#fff;border-color:transparent}
 @media(max-width:640px){.al-up{grid-template-columns:1fr}.fl-st li:not(.now) span{display:none}.fl-st li.now span{white-space:nowrap}.hm-fl-p span{font-size:9.5px}.fl-st{gap:0}.hm-fl-p{grid-template-columns:repeat(4,minmax(0,1fr))}.fl-next{flex-direction:column;align-items:flex-start}.fl-next em{text-align:left}}
+.bx-fs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.bx-f{padding:7px 14px;border-radius:99px;border:1px solid var(--card-line);background:var(--card);color:inherit;font:500 13px var(--f-ui,inherit);cursor:pointer}
+.bx-f b{margin-left:4px;font-weight:600;opacity:.6}.bx-f.on{background:var(--fill-on,#111);color:var(--bg,#fff);border-color:transparent}.bx-f.on b{opacity:.8}
+.bx-list{display:flex;flex-direction:column;gap:12px}
+.bx-c{display:grid;grid-template-columns:96px 1fr;gap:18px;padding:18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
+.bx-r{--c:#1f8a4c;width:88px;height:88px;border-radius:50%;display:grid;place-content:center;text-align:center;background:radial-gradient(closest-side,var(--card) 78%,transparent 80% 100%),conic-gradient(var(--c) calc(var(--p)*1%),color-mix(in srgb,var(--c) 14%,transparent) 0)}
+.bx-r.warn{--c:#d99a1e}.bx-r.bad{--c:#d6453b}.bx-r b{font-size:22px;line-height:1;color:var(--c)}.bx-r span{font-size:10.5px;color:var(--muted);margin-top:3px}
+.bx-m{min-width:0;display:flex;flex-direction:column;gap:6px}
+.bx-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px}.bx-h b{font-size:16px}.bx-h span{font-size:12.5px;color:var(--muted)}.bx-h em{margin-left:auto;font-style:normal;font-size:12px;padding:2px 10px;border-radius:99px;background:var(--fill-slab)}
+.bx-q{margin:0;font-weight:600;font-size:14px}.bx-why{margin:0;font-size:13.5px;line-height:1.5}
+.bx-l{margin:0;padding-left:18px;font-size:12.8px;line-height:1.55;color:color-mix(in srgb,var(--fg,#111) 78%,transparent)}
+.bx-st{margin:0;font-size:12px;color:var(--muted)}
+.bx-a{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}.bx-a .bt{min-width:110px}
+.bx-dlg{max-width:520px;width:calc(100% - 32px);border:0;border-radius:16px;padding:20px;background:var(--card,#fff);color:inherit}.bx-dlg::backdrop{background:rgba(0,0,0,.4)}
+.bx-dlg h3{margin:0 0 6px}.bx-dlg p{margin:0 0 10px;font-size:13px;color:var(--muted)}.bx-dlg textarea{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--card-line);background:var(--fill-slab);color:inherit;font:13px/1.5 var(--f-ui,inherit)}
+.bx-dlg .row{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap}
+.hm-bx{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:14px 16px;border:0;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff);font:inherit;text-align:left;cursor:pointer}
+.hm-bx span:nth-child(2){flex:1;min-width:0}.hm-bx b{display:block;font-size:14.5px}.hm-bx small{display:block;font-size:12.3px;opacity:.72;margin-top:2px}.hm-bx em{font-style:normal;font-weight:600;font-size:13px;white-space:nowrap}
+@media(max-width:640px){.bx-c{grid-template-columns:1fr;gap:10px;padding:14px}.bx-r{width:76px;height:76px}.bx-r b{font-size:18px}.bx-r span{font-size:9px}.bx-h em{margin-left:0}.bx-a .bt{flex:1;min-width:0}.hm-bx em{display:none}}
 .xa-chat{margin:10px 0}.xa-chat .xd-ext{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--signal,#2231dd);color:#fff;font:600 9.5px var(--font-ui,inherit)}.xa-chat .xa-f{background:var(--fill-slab,#f2f2f0);color:inherit}.xa-chat .xa-st{opacity:.7}.xa-chat .xa-st.ok{color:#1a6e3e}.xa-chat .xa-st.warn{color:#9a6200}.xa-chat .xa-st.bad{color:#b4372b}
 .xa-chat .xa-docs em{color:var(--signal,#2231dd)}.xa-say{font-size:13px;opacity:.7}.xa-say:empty{display:none}
 .gp-chip.arm,.gpc-f button.arm{background:var(--signal,#2231dd);color:#fff;border-color:transparent}
@@ -2083,6 +2101,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <button class="nav" data-nm data-view="agent" data-i="file" aria-current="true">Agente de Garantías</button>
         <div class="grp" data-nm style="margin-top:22px">Sistema de registro</div>
         <button class="nav" data-nm data-view="inicio" data-i="home" aria-current="true">Inicio</button>
+        <button class="nav" data-nm data-view="bx" data-i="inbox">Bandeja<span class="nbadge" id="bxBadge" hidden></span></button>
         <button class="nav" data-nm data-view="mi" data-i="chat">Mi Agente</button>
         <button class="nav" data-nm data-view="bitacora" data-i="clip">Bitácora</button>
         <button class="nav" data-nm data-view="notas" data-i="note">Notas</button>
@@ -2273,6 +2292,12 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div id="dnBody"></div>
       </div>
     </section>
+    <section class="admin" id="viewBx" hidden>
+      <div class="ad-in">
+        <div class="ad-head"><div><h2>Bandeja</h2><p id="bxSub">Las decisiones que te tocan, con el riesgo de débito que calcula Ax AI</p></div></div>
+        <div id="bxBody"></div>
+      </div>
+    </section>
     <section class="admin" id="viewRed" hidden>
       <div class="ad-in">
         <div class="ad-head"><div><h2>Alertas y reglas</h2><p id="redSub">Lo que la red aprendió de los manuales de GM y de cada débito real</p></div>
@@ -2458,6 +2483,7 @@ var P={
   folderchart:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="M8 17v-4M12 17v-2M16 17v-5"/>',
   clip2:'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
   check:'<path d="M20 6 9 17l-5-5"/>',
+  inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
   copy:'<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
   regen:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M8 16H3v5"/>',
   tup:'<path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>',
@@ -2488,19 +2514,20 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){if(MI.due().length&&!AL.unread().length){showView('mi');MI.send('¿Qué tengo pendiente?');return}RED.f='alertas';showView('red')});
 
-var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',dueno:'Tablero del dueño'};
+var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',bx:'Bandeja',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewDueno').hidden=id!=='dueno';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewDueno').hidden=id!=='dueno';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='pv'){crumb.textContent=VIEWS.pv;crumbSep.hidden=true;crumb2.hidden=true;PV.load()}
   else if(id==='grp'){crumb.textContent=VIEWS.grp;crumbSep.hidden=true;crumb2.hidden=true;GRP.load()}
   else if(id==='red'){crumb.textContent=VIEWS.red;crumbSep.hidden=true;crumb2.hidden=true;RED.load()}
+  else if(id==='bx'){crumb.textContent=VIEWS.bx;crumbSep.hidden=true;crumb2.hidden=true;BX.render();BX.load()}
   else if(id==='dueno'){crumb.textContent=VIEWS.dueno;crumbSep.hidden=true;crumb2.hidden=true;DN.load()}
   else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
   else if(id==='cfg'){crumb.textContent=VIEWS.cfg;crumbSep.hidden=true;crumb2.hidden=true;CFG.open()}
@@ -4479,7 +4506,7 @@ HM.rHome=function(){
     '<button class="hm-btn dark" type="button" data-nav="mi"><span class="hm-mk">A</span> Preguntar a Ax AI</button></div>'+
     '<button class="hm-acts" type="button" id="hmActs" aria-expanded="false"><span class="hm-ico">'+ORB+'</span><span>'+(tot?'Hay '+tot+(tot===1?' acción recomendada':' acciones recomendadas')+' para aumentar tu uso de Ax AI':'Estás al día: no hay acciones pendientes')+'</span>'+(tot?'<span class="hm-chev">⌄</span>':'')+'</button>'+
     '<div class="hm-actlist" id="hmActList" hidden>'+A.map(function(x){return '<button type="button" data-nav="'+x.go+'"><b>'+x.n+'</b><span>'+esc(x.t)+'</span></button>'}).join('')+'</div><div class="hm-gap"></div>'+
-    HM.cardAlertas()+HM.cardFlujo()+HM.cardArm()+'<div class="hm-grid">'+HM.cardPre()+HM.cardPie()+HM.cardCam()+HM.cardSrv()+'</div>';
+    HM.cardBx()+HM.cardAlertas()+HM.cardFlujo()+HM.cardArm()+'<div class="hm-grid">'+HM.cardPre()+HM.cardPie()+HM.cardCam()+HM.cardSrv()+'</div>';
 };
 
 /* ---- páginas de detalle ---- */
@@ -5915,7 +5942,7 @@ XD.open=function(id){
   FL.refresh(x);
   XD.formInit(x);
 };
-XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera',pv=XD.from==='pv';$('#exDoc').hidden=true;$(pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true)};
+XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera',pv=XD.from==='pv',bx=XD.from==='bx';$('#exDoc').hidden=true;$(bx?'#viewBx':pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true);if(bx)BX.load()};
 XD.sec=function(k){return $('#exDoc .xd-sec[data-k="'+k+'"]')};
 /* lo ya subido */
 XD.load=async function(id,k){
@@ -6618,7 +6645,7 @@ SB.enter=async function(user){
     await SB.loadAdvisors();
     $('#lg').hidden=true;
     await SB.pull(true);
-    SB.loadHist();GP.load();AL.load();
+    SB.loadHist();GP.load();AL.load().then(BX.load);
     MI.loadAgenda().then(MI.startTimer);
     showView(MR.is()?'m_res':DN.is()?'dueno':SB.user&&SB.user.director?'grp':PV.is()?'pv':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
@@ -6626,6 +6653,7 @@ SB.enter=async function(user){
       if(p.table==='agenda'){MI.loadAgenda();return}
       if(p.table==='alertas'){if(p.eventType==='INSERT')AL.onNew(p.new);return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
+      if(p.table==='expedientes'||p.table==='decisiones'){clearTimeout(BX.t);BX.t=setTimeout(BX.load,800)}
       if(p.table==='expedientes'){AD.loadExp();if(S.view==='pv'&&!XD.cur)PV.load(true);if(S.view==='inicio')HM.load();if(p.new&&XD.cur&&String(p.new.id)===String(XD.cur.id)){if(p.new.prea_form)XD.formApply(p.new);if(p.new.plan_correccion)XD.planApply(p.new);if(p.new.cerebro)XD.brainApply(p.new);if(p.new.flujo&&JSON.stringify(p.new.flujo)!==JSON.stringify(XD.cur.flujo)){XD.cur.flujo=p.new.flujo;FL.draw(XD.cur)}}return}
       if(p.table==='activity')return;
       if(p.table==='reglas_lecciones'){LS.onNew(p);return}
@@ -6805,14 +6833,14 @@ XD.pdfName=function(x){
   var comp=(Array.isArray(x.parts)&&x.parts[0]&&x.parts[0].d)||x.opd||x.sys||'COMPONENTE';
   return [cl(x.vehicle)||'VEHICULO',cl(x.vin)||'SIN-VIN',cl(x.wo)||'SIN-OR',cl(comp).slice(0,40)].join('_')+'.pdf';
 };
-XD.pdf=async function(x,btn){
+XD.pdf=async function(x,btn,quiet){
   var C=XD.ctl||{},sec=C.sec||{},req=XD.DOCS.filter(function(d){return d[3]==='req'});
   var falta=req.filter(function(d){return !sec[d[0]]}).map(function(d){return d[1]}),avisos=[];
   if(!x.orden_apertura||!x.orden_cierre)avisos.push('Faltan las fechas de apertura y cierre de la orden: no se puede comprobar que los documentos estén dentro de la permanencia.');
   try{var lc=await SB.c.from('entrenamiento_docs').select('file_name,resultado,resumen').eq('kind','expediente').eq('folio',x.folio).limit(60);
     (lc.data||[]).forEach(function(d){if(/fuera de (la )?permanencia|fuera del (periodo|tiempo)|fuera de (las )?fechas|no coincide|falta|faltan|ilegible|sin firma|a mano|tachad/i.test(d.resumen||''))avisos.push((XD.DOCS.filter(function(k){return k[0]===d.resultado})[0]||[0,d.resultado])[1]+' · '+d.file_name+': '+String(d.resumen).slice(0,220))})}catch(_){}
   (C.rev||[]).forEach(function(c){if(c.estado==='no_cumple')avisos.push(c.tema+(c.nota?': '+c.nota:'')+' ('+c.regla+', '+c.fuente+')')});
-  if((falta.length||avisos.length)&&!confirm('Antes de armar el expediente:\n\n'+(falta.length?'Faltan secciones obligatorias: '+falta.join(', ')+'.\n\n':'')+(avisos.length?'Avisos del cerebro:\n• '+avisos.slice(0,6).join('\n• ')+'\n\n':'')+'¿Armar el PDF de todos modos?'))return;
+  if(!quiet&&(falta.length||avisos.length)&&!confirm('Antes de armar el expediente:\n\n'+(falta.length?'Faltan secciones obligatorias: '+falta.join(', ')+'.\n\n':'')+(avisos.length?'Avisos del cerebro:\n• '+avisos.slice(0,6).join('\n• ')+'\n\n':'')+'¿Armar el PDF de todos modos?'))return;
   var t0=btn.textContent;btn.disabled=true;btn.textContent='Armando el PDF…';
   try{
     var P=await XD.pdfLib(),doc=await P.PDFDocument.create(),font=await doc.embedFont(P.StandardFonts.Helvetica),bold=await doc.embedFont(P.StandardFonts.HelveticaBold);
@@ -7095,9 +7123,9 @@ XA.run=async function(files){
   XA.busy=false;if(z)z.removeAttribute('aria-disabled');
 };
 /* PDF de auditoría desde fuera del expediente (chat o Inicio) */
-XA.pdf=async function(id,btn){
+XA.pdf=async function(id,btn,quiet){
   var g=await SB.c.from('expedientes').select('*').eq('id',id).single();if(g.error||!g.data){toast('No encontré el expediente');return}
-  XD.ctl=await XA.ctx(g.data);await XD.pdf(g.data,btn);
+  XD.ctl=await XA.ctx(g.data);await XD.pdf(g.data,btn,quiet);
 };
 document.addEventListener('click',function(e){var z=e.target.closest&&e.target.closest('#xdArm .xa-zone');if(z&&e.target.tagName!=='INPUT')$('input',z).click()});
 document.addEventListener('keydown',function(e){var z=e.target.closest&&e.target.closest('#xdArm .xa-zone');if(z&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('input',z).click()}});
@@ -7257,6 +7285,141 @@ HM.cardAlertas=function(){
     '<div class="al-list">'+L.map(function(a){return AL.card(a,true)}).join('')+'</div></section>';
 };
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-alver]');if(b){RED.f='alertas';showView('red')}});
+
+/* ══ Bandeja del asesor ═══════════════════════════════════════════════════
+   El asesor no lee conversaciones: decide. Cada caso que le toca trae el riesgo de débito que calcula Ax AI
+   (lo que falta, lo que la revisión contra el manual marcó, lo que no cuadra, plazos y débitos o rechazos
+   parecidos en el grupo) y tres decisiones: Enviar, Corregir o Pedir al técnico. Cada decisión queda registrada
+   (tabla decisiones) con el riesgo y sus motivos, para medir después qué tan bien predijo. */
+var BX={rows:[],f:'todas',busy:false,
+  TEC:{recepcion:'Toma foto del VIN, del odómetro (que se lea bien el kilometraje) y una foto completa del vehículo.',
+    diagnostico:'Mándame el reporte del escáner con los códigos de falla y tu hoja con las lecturas que tomaste.',
+    evidencia:'Toma fotos claras de la falla y de la pieza dañada, de cerca y de lejos.',
+    destruccion:'Toma foto de la pieza con su etiqueta, antes y después de destruirla.'},
+  FALTA:{contrato:'falta la orden de garantía firmada por el cliente',recepcion:'faltan las fotos de recepción (VIN, odómetro y vehículo)',diagnostico:'falta el diagnóstico (reporte del escáner y hoja del técnico)',evidencia:'faltan las fotos de la falla',piezas:'falta el pedido y la salida de refacciones'}};
+BX.REQ=['contrato','recepcion','diagnostico','evidencia','piezas'];
+/* riesgo: cada motivo suma como probabilidad independiente (1 − ∏(1 − p)), para que muchos motivos chicos no pasen de 100 */
+BX.riesgo=function(x,sec,rev,deb){
+  var M=[],add=function(p,t,k){M.push({p:p,t:t,k:k})};
+  BX.REQ.forEach(function(k){if(!sec[k])add(k==='contrato'?18:12,BX.FALTA[k],k)});
+  rev.forEach(function(c){
+    var d=deb[c.regla];
+    if(c.estado==='no_cumple')add(15+(d?10:0),XA.SEC(c.seccion)+': '+(c.nota||c.tema)+(d?' (esta regla ya causó '+d+(d===1?' débito':' débitos')+' en la red)':''),c.seccion);
+    else if(c.estado==='no_se_puede_ver')add(8,XA.SEC(c.seccion)+': no se alcanza a ver '+String(c.tema||'').toLowerCase(),c.seccion);
+  });
+  ((x.armado&&x.armado.discrepancias)||[]).slice(0,3).forEach(function(t){add(10,t,'')});
+  if(!x.orden_apertura||!x.orden_cierre)add(8,'faltan las fechas de apertura y cierre de la orden','');
+  var f=x.flujo||{};if(f.estado==='bad')add(12,'el plazo del manual ya venció','');else if(f.estado==='warn')add(5,'el plazo vence en menos de 3 días','');
+  if(x.status==='rechazada')add(30,'planta ya la rechazó'+(x.comentario_fabricante?': '+String(x.comentario_fabricante).slice(0,160):''),'');
+  var al=(AL.rows||[]).filter(function(a){return (a.tipo==='debito'||a.tipo==='rechazo')&&a.expediente_id!==x.id&&AL.casos(a).some(function(z){return z.id===x.id})}).slice(0,2);
+  al.forEach(function(a){add(8,'un caso parecido acaba de tener un '+(a.tipo==='debito'?'débito':'rechazo')+' en tu grupo','')});
+  M.sort(function(a,b){return b.p-a.p});
+  var q=M.reduce(function(acc,m){return acc*(1-m.p/100)},1),pct=Math.round((1-q)*100);
+  return {pct:Math.max(3,Math.min(96,pct)),M:M};
+};
+BX.nivel=function(p){return p>=50?['alto','bad']:p>=25?['medio','warn']:['bajo','ok']};
+BX.load=async function(){
+  if(!SB.c||!SB.entered||BX.busy)return;BX.busy=true;
+  try{
+    var r=await Promise.all([SB.c.from('expedientes').select('*').order('updated_at',{ascending:false}).limit(400),
+      SB.c.from('decisiones').select('expediente_id,decision,riesgo,nota,created_at').order('created_at',{ascending:false}).limit(600),
+      SB.c.from('manual_reglas').select('id,veces').eq('origen','debito'),AL.loaded?null:AL.load()]);
+    if(r[0].error)throw r[0].error;
+    var E=(r[0].data||[]).filter(function(x){var f=x.flujo;
+      if(f)return f.responsable==='Asesor'&&['prea','expediente','transaccion'].indexOf(f.etapa)>=0;
+      return x.status!=='borrador'&&!x.enviado_at&&!x.transaccion_aceptada_at&&!x.gwm_cobrada_at});
+    var deb={};((r[2]&&r[2].data)||[]).forEach(function(g){if(g.veces)deb[g.id]=g.veces});
+    var last={};((r[1]&&r[1].data)||[]).forEach(function(d){if(!last[d.expediente_id])last[d.expediente_id]=d});
+    var sec={},rev={};
+    if(E.length){
+      var q=await Promise.all([SB.c.rpc('expediente_secciones',{p_ids:E.map(function(x){return x.id})}),
+        SB.c.from('entrenamiento_docs').select('folio,resultado,datos,created_at').eq('kind','expediente').in('folio',E.map(function(x){return x.folio}).filter(Boolean)).order('created_at',{ascending:false}).limit(1500)]);
+      (q[0].data||[]).forEach(function(s){(sec[s.expediente_id]=sec[s.expediente_id]||{})[s.seccion]=s.archivos});
+      /* la revisión más reciente de cada regla en cada sección */
+      var seen={};(q[1].data||[]).forEach(function(d){var C=d.datos&&d.datos.cumplimiento;if(!Array.isArray(C))return;C.forEach(function(c){var k=d.folio+'|'+d.resultado+'|'+c.regla;if(seen[k])return;seen[k]=1;(rev[d.folio]=rev[d.folio]||[]).push(Object.assign({seccion:d.resultado},c))})});
+    }
+    BX.rows=E.map(function(x){var R=BX.riesgo(x,sec[x.id]||{},rev[x.folio]||[],deb);return {x:x,r:R,sec:sec[x.id]||{},rev:rev[x.folio]||[],d:last[x.id]||null}})
+      .sort(function(a,b){var ta=a.d&&a.d.decision==='tecnico'?1:0,tb=b.d&&b.d.decision==='tecnico'?1:0;return (ta-tb)||(b.r.pct-a.r.pct)});
+  }catch(e){SB.fail(e)}
+  BX.busy=false;BX.badge();if(S.view==='bx')BX.render();if(S.view==='inicio')HM.render();
+};
+BX.badge=function(){var b=$('#bxBadge');if(!b)return;var n=BX.rows.length;b.hidden=!n;b.textContent=String(n)};
+BX.tipo=function(it){var x=it.x,f=x.flujo||{};
+  if(x.status==='rechazada'&&!x.pra_corregida_at)return 'Planta rechazó la PREA. ¿Corriges y la reenvías?';
+  return it.r.pct>=50?'Antes de enviar a GM conviene corregir':'¿La envías a GM o la corriges primero?'};
+BX.card=function(it){
+  var x=it.x,R=it.r,N=BX.nivel(R.pct),f=x.flujo||{},d=it.d,top=R.M[0];
+  var tec=d&&d.decision==='tecnico',ago=d?AL.ago(d.created_at):'';
+  return '<article class="bx-c '+N[1]+'" data-bx="'+ea(x.id)+'"><div class="bx-r '+N[1]+'" style="--p:'+R.pct+'"><b>'+R.pct+'%</b><span>riesgo '+N[0]+'</span></div>'+
+    '<div class="bx-m"><div class="bx-h"><b>'+esc(x.wo||x.folio)+'</b><span>'+esc([x.vehicle,x.sys,x.cliente].filter(Boolean).join(' · '))+'</span>'+(f.etapa?'<em>'+esc(FL.nom(f.etapa))+(f.vence?' · '+esc(FL.vence(f.vence)):'')+'</em>':'')+'</div>'+
+    '<p class="bx-q">'+esc(BX.tipo(it))+'</p>'+
+    '<p class="bx-why">'+(top&&R.pct<25?'Riesgo bajo de débito: <b>'+R.pct+'%</b>. Lo único a cuidar: '+esc(top.t)+'.':top?'Este reclamo tiene <b>'+R.pct+'% de riesgo de débito</b> por: '+esc(top.t)+'.':'No encontré nada que GM pueda debitar: <b>'+R.pct+'% de riesgo</b>.')+'</p>'+
+    (R.M.length>1?'<ul class="bx-l">'+R.M.slice(1,5).map(function(m){return '<li>'+esc(m.t)+'</li>'}).join('')+(R.M.length>5?'<li>y '+(R.M.length-5)+' más</li>':'')+'</ul>':'')+
+    (tec?'<p class="bx-st">Le pediste al técnico '+esc(ago)+'. Cuando llegue lo que pidió, súbelo y el riesgo se recalcula.</p>':d?'<p class="bx-st">Última decisión: '+esc({enviar:'enviar',corregir:'corregir',tecnico:'pedir al técnico'}[d.decision])+' · '+esc(ago)+'</p>':'')+
+    '<div class="bx-a"><button class="bt'+(R.pct<50&&x.status!=='rechazada'?' pri':'')+'" type="button" data-bxdo="enviar">Enviar</button><button class="bt'+(R.pct>=50||x.status==='rechazada'?' pri':'')+'" type="button" data-bxdo="corregir">Corregir</button><button class="bt" type="button" data-bxdo="tecnico">Pedir al técnico</button></div></div></article>';
+};
+BX.render=function(){
+  var el=$('#bxBody');if(!el)return;
+  var L=BX.rows,alto=L.filter(function(i){return i.r.pct>=50}).length,listos=L.filter(function(i){return i.r.pct<25}).length,tec=L.filter(function(i){return i.d&&i.d.decision==='tecnico'}).length;
+  var F=L.filter(function(i){return BX.f==='alto'?i.r.pct>=50:BX.f==='listos'?i.r.pct<25:BX.f==='tecnico'?(i.d&&i.d.decision==='tecnico'):true});
+  $('#bxSub').textContent=L.length?L.length+(L.length===1?' decisión pendiente':' decisiones pendientes')+'. Ax AI ya revisó cada caso contra el manual de GM y lo que pasó en tu grupo.':'Sin decisiones pendientes.';
+  var chip=function(k,t,n){return '<button type="button" class="bx-f'+(BX.f===k?' on':'')+'" data-bxf="'+k+'">'+t+' <b>'+n+'</b></button>'};
+  el.innerHTML='<div class="bx-fs">'+chip('todas','Todas',L.length)+chip('alto','Riesgo alto',alto)+chip('listos','Listas para enviar',listos)+chip('tecnico','Esperando al técnico',tec)+'</div>'+
+    (F.length?'<div class="bx-list">'+F.map(BX.card).join('')+'</div>':'<div class="pv-empty">'+(L.length?'Nada en este filtro.':'Estás al día. Cuando un caso necesite que decidas algo, aparece aquí con su riesgo y lo que hay que hacer.')+'</div>');
+};
+BX.item=function(id){return BX.rows.filter(function(i){return i.x.id===id})[0]};
+BX.decide=async function(it,dec,nota){
+  var r=await SB.c.from('decisiones').insert({expediente_id:it.x.id,decision:dec,riesgo:it.r.pct,motivos:it.r.M.slice(0,6).map(function(m){return m.t}),nota:nota||null});
+  if(r.error)SB.fail(r.error);
+};
+BX.enviar=async function(it,btn){
+  if(it.r.pct>=40&&!confirm('Este reclamo tiene '+it.r.pct+'% de riesgo de débito por: '+(it.r.M[0]?it.r.M[0].t:'')+'.\n\n¿Lo envías a GM de todos modos?'))return;
+  btn.disabled=true;
+  var u=await SB.c.from('expedientes').update({enviado_at:new Date().toISOString()}).eq('id',it.x.id);
+  if(u.error){SB.fail(u.error);toast('No se pudo marcar como enviado');btn.disabled=false;return}
+  await BX.decide(it,'enviar');
+  toast('Marcado como enviado. Te bajo el expediente en PDF para subirlo a GWM.');
+  try{await XA.pdf(it.x.id,btn,true)}catch(_){}
+  BX.load();
+};
+BX.corregir=async function(it){
+  await BX.decide(it,'corregir');
+  var x=it.x;if(!EX.rows.some(function(r){return r.id===x.id}))EX.rows.unshift(x);
+  XD.open(x.id);XD.from='bx';$('#viewBx').hidden=true;
+  var M=it.r.M,go=x.status==='rechazada'?'#xdPlan':M.some(function(m){return BX.REQ.indexOf(m.k)>=0})?'#xdArm':'#xdCtl';
+  setTimeout(function(){var t=$(go);if(!t||t.hidden)t=$('#xdCtl');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},500);
+};
+BX.msgTec=function(it){
+  var x=it.x,L=[];
+  BX.REQ.concat(['destruccion']).forEach(function(k){if(BX.TEC[k]&&!it.sec[k]&&(k!=='destruccion'))L.push(BX.TEC[k])});
+  it.rev.forEach(function(c){if((c.estado==='no_cumple'||c.estado==='no_se_puede_ver')&&BX.TEC[c.seccion]&&c.nota)L.push('Repite '+XA.SEC(c.seccion).toLowerCase()+': '+c.nota)});
+  L=L.filter(function(v,i,a){return a.indexOf(v)===i}).slice(0,6);
+  if(!L.length)L.push('Revisa que las fotos y el reporte del escáner de esta orden estén completos y se lean bien.');
+  return 'Hola, para el expediente de garantía de la orden '+(x.wo||x.folio)+(x.vehicle?' ('+x.vehicle+(x.vin?', VIN …'+String(x.vin).slice(-6):'')+')':'')+' necesito:\n'+L.map(function(t,i){return (i+1)+'. '+t}).join('\n')+'\nMándamelo por aquí, por favor. ¡Gracias!';
+};
+BX.tecnico=function(it){
+  var d=$('#bxDlg');if(!d){d=document.createElement('dialog');d.id='bxDlg';d.className='bx-dlg';document.body.appendChild(d)}
+  var m=BX.msgTec(it);
+  d.innerHTML='<form method="dialog"><h3>Pedir al técnico · '+esc(it.x.wo||it.x.folio)+'</h3><p>Ax AI escribió lo que falta en palabras del taller. Puedes cambiarlo antes de mandarlo.</p><textarea id="bxMsg" rows="9">'+esc(m)+'</textarea>'+
+    '<div class="row"><button class="bt" type="button" data-bxt="no">Cancelar</button><button class="bt" type="button" data-bxt="copiar">Copiar</button><button class="bt pri" type="button" data-bxt="wa">Mandar por WhatsApp</button></div></form>';
+  d.onclick=async function(e){var b=e.target.closest&&e.target.closest('[data-bxt]');if(!b)return;var t=$('#bxMsg').value.trim();
+    if(b.dataset.bxt==='no'){d.close();return}
+    if(b.dataset.bxt==='wa')window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank','noopener');
+    else{try{await copyText(t)}catch(_){}toast('Mensaje copiado')}
+    d.close();await BX.decide(it,'tecnico',t);BX.load();};
+  d.showModal();
+};
+document.addEventListener('click',function(e){
+  var f=e.target.closest&&e.target.closest('[data-bxf]');if(f){BX.f=f.dataset.bxf;BX.render();return}
+  var b=e.target.closest&&e.target.closest('[data-bxdo]');if(!b)return;
+  var c=b.closest('[data-bx]'),it=c&&BX.item(c.dataset.bx);if(!it)return;
+  if(b.dataset.bxdo==='enviar')BX.enviar(it,b);else if(b.dataset.bxdo==='corregir')BX.corregir(it);else BX.tecnico(it);
+});
+/* Inicio: la bandeja en una línea */
+HM.cardBx=function(){
+  var L=BX.rows;if(!L.length)return '';var alto=L.filter(function(i){return i.r.pct>=50}).length;
+  return '<button type="button" class="hm-bx" data-nav="bx"><span class="xa-mk">A</span><span><b>Tu bandeja: '+L.length+(L.length===1?' decisión pendiente':' decisiones pendientes')+'</b><small>'+(alto?alto+' con riesgo alto de débito · ':'')+'Ax AI ya revisó cada caso; tú decides enviar, corregir o pedir al técnico</small></span><em>Abrir →</em></button>';
+};
 
 /* ---- la red de reglas: lo que la red aprendió de débitos reales + el manual ---- */
 var RED={rows:[],q:'',f:'alertas'};
