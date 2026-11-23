@@ -6627,7 +6627,7 @@ SB.submit=async function(ev){
   btn.disabled=false;
 };
 SB.loadAdvisors=async function(){
-  var r=await SB.c.from('profiles').select('id,name,role,brand,created_at,agency_id,agencies(name,comparte)').order('created_at');
+  var r=await SB.c.from('profiles').select('id,name,role,brand,created_at,agency_id,grupo_id,agencies(name,comparte)').order('created_at');
   if(r.error)throw r.error;
   ADVISORS.length=0;
   r.data.forEach(function(p){ADVISORS.push({id:p.id,name:p.name,role:p.role==='marca'?'admin':p.role,tag:p.id===ME?'tú':''})});
@@ -6642,7 +6642,7 @@ SB.loadAdvisors=async function(){
   if(!me)throw new Error('No se pudo crear tu perfil de asesor. Cierra sesión e inténtalo de nuevo.');
   if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;try{var au=await SB.c.auth.getUser();SB.email=au&&au.data&&au.data.user&&au.data.user.email||''}catch(_){}SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
     me.dueno=me.role==='dueno';me.director=me.role==='director';me.gerente=me.role==='gerente'||me.director;
-    if(me.director||me.dueno){try{var gq=await SB.c.from('agencies').select('grupo_id,grupos(nombre)').eq('id',me.agency_id).maybeSingle();SB.grupoId=gq.data&&gq.data.grupo_id;SB.grupo=gq.data&&gq.data.grupos&&gq.data.grupos.nombre||'Tu grupo'}catch(_){}}
+    if(me.director||me.dueno){try{if(me.agency_id){var gq=await SB.c.from('agencies').select('grupo_id,grupos(nombre)').eq('id',me.agency_id).maybeSingle();SB.grupoId=gq.data&&gq.data.grupo_id;SB.grupo=gq.data&&gq.data.grupos&&gq.data.grupos.nombre||'Tu grupo'}else{var gg=await SB.c.from('grupos').select('id,nombre').eq('id',me.grupo_id).maybeSingle();SB.grupoId=me.grupo_id;SB.grupo=gg.data&&gg.data.nombre||'Tu grupo';SB.agency=SB.grupo;var aa=$('#adAgency');if(aa)aa.textContent=SB.agency}}catch(_){}}
     MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);

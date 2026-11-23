@@ -223,6 +223,8 @@ function vEmail(){return mark('fEmail',EMAIL.test($('#email').value.trim())?'':'
 var ACCT='asesor',GR=[],AGS=[];
 /* cuentas que eligen grupo y se validan con un código del grupo */
 function GRUPAL(){return ACCT==='gerente'||ACCT==='director'||ACCT==='dueno'}
+/* el dueño y el director son de todo el grupo: no eligen agencia */
+function DELGRUPO(){return ACCT==='director'||ACCT==='dueno'}
 var CODE_TXT={gerente:'de gerente',director:'de director',dueno:'de dueño'},CODE_RPC={gerente:'check_gerente_code',director:'check_director_code',dueno:'check_dueno_code'};
 /* agencias en el selector; para el gerente, solo las del grupo elegido */
 function fillAg(){
@@ -231,12 +233,12 @@ function fillAg(){
   AGS.forEach(function(a){if(gid&&a.grupo_id!==gid)return;if(GRUPAL()&&!gid)return;if(!g[a.region]){var og=document.createElement('optgroup');og.label=a.region;sel.appendChild(og);g[a.region]=og}var o=document.createElement('option');o.value=a.id;o.textContent=a.name;g[a.region].appendChild(o)});
   sel.value=cur;if(sel.value!==cur)sel.value='';
 }
-function vAg(){return ACCT==='marca'?true:mark('fAg',$('#ag').value?'':'Selecciona tu agencia.')}
+function vAg(){return ACCT==='marca'||DELGRUPO()?true:mark('fAg',$('#ag').value?'':'Selecciona tu agencia.')}
 function vCode(){if(GRUPAL())return mark('fGcode',$('#gcode').value.trim()?'':'Escribe el código '+CODE_TXT[ACCT]+' de tu grupo.');return ACCT!=='marca'?true:mark('fCode',$('#code').value.trim()?'':'Escribe el código de administrador.')}
 function vGr(){return !GRUPAL()?true:mark('fGr',$('#gr').value?'':'Selecciona tu grupo.')}
 Array.prototype.slice.call(document.querySelectorAll('.seg button')).forEach(function(b){b.addEventListener('click',function(){
   ACCT=b.dataset.t;Array.prototype.slice.call(document.querySelectorAll('.seg button')).forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
-  $('#marW').hidden=ACCT!=='marca';$('#fAg').hidden=ACCT==='marca';$('#fGr').hidden=$('#fGcode').hidden=!GRUPAL();$('#gcodeL').textContent='Código '+(CODE_TXT[ACCT]||'de gerente')+' del grupo';var lb=document.querySelector('#fAg label');if(lb)lb.textContent=ACCT==='director'||ACCT==='dueno'?'Agencia sede':'Agencia';fillAg();
+  $('#marW').hidden=ACCT!=='marca';$('#fAg').hidden=ACCT==='marca'||DELGRUPO();$('#fGr').hidden=$('#fGcode').hidden=!GRUPAL();$('#gcodeL').textContent='Código '+(CODE_TXT[ACCT]||'de gerente')+' del grupo';var lb=document.querySelector('#fAg label');if(lb)lb.textContent=ACCT==='director'||ACCT==='dueno'?'Agencia sede':'Agencia';fillAg();
 })});
 function vPass(){var v=$('#pass').value;return mark('fPass',v.length<8?'La contraseña debe tener al menos 8 caracteres.':'')}
 function vPass2(){return mark('fPass2',$('#pass2').value===$('#pass').value&&$('#pass2').value?'':'Las contraseñas no coinciden.')}
@@ -271,6 +273,10 @@ $('#f').addEventListener('submit',function(e){
   if(ACCT==='marca'){
     meta={name:name,role_req:'marca',brand:$('#br').value,code:$('#code').value.trim()};
     pre=api('/rest/v1/rpc/check_marca_code',{method:'POST',body:{p_brand:meta.brand,p_code:meta.code}}).then(function(r){return r.ok&&r.data===true});
+  }else if(DELGRUPO()){
+    var gid=Number($('#gr').value);
+    meta={name:name,grupo_id:gid,role_req:ACCT,code:$('#gcode').value.trim()};
+    pre=api('/rest/v1/rpc/check_grupo_code',{method:'POST',body:{p_grupo:gid,p_rol:ACCT,p_code:meta.code}}).then(function(r){return r.ok&&r.data===true});
   }else if(GRUPAL()){
     meta={name:name,agency_id:ag,role_req:ACCT,code:$('#gcode').value.trim()};
     pre=api('/rest/v1/rpc/'+CODE_RPC[ACCT],{method:'POST',body:{p_agency:ag,p_code:meta.code}}).then(function(r){return r.ok&&r.data===true});
@@ -288,7 +294,7 @@ $('#f').addEventListener('submit',function(e){
   })
   .then(done)
   .catch(function(e){
-    if(e.code){showErr(GRUPAL()?'Ese código '+CODE_TXT[ACCT]+' no es correcto para el grupo de esa agencia.':'Ese código de administrador no es correcto para esa marca.');return}
+    if(e.code){showErr(DELGRUPO()?'Ese código '+CODE_TXT[ACCT]+' no es correcto para ese grupo.':GRUPAL()?'Ese código '+CODE_TXT[ACCT]+' no es correcto para el grupo de esa agencia.':'Ese código de administrador no es correcto para esa marca.');return}
     showErr(e.net?(e.message==='timeout'?'Supabase tardó demasiado en responder. Revisa tu conexión e inténtalo de nuevo.':'No se pudo conectar con Supabase. Revisa tu red, tu VPN o desactiva el bloqueador de anuncios para este sitio.'):e.res?authErr(e.res):'Ocurrió un error inesperado: '+(e.message||e));
   })
   .then(function(){busy=false;b.disabled=false;b.textContent='Crear cuenta'});
@@ -297,7 +303,7 @@ $('#f').addEventListener('submit',function(e){
 /* confirma de verdad que el perfil quedó guardado en la base (y lo repara si faltara) */
 function verify(s){
   var tok=s.access_token,uid=s.user&&s.user.id;
-  var q='/rest/v1/profiles?select=name,role,agencies(name)&id=eq.'+encodeURIComponent(uid);
+  var q='/rest/v1/profiles?select=name,role,agencies(name),grupos(nombre)&id=eq.'+encodeURIComponent(uid);
   var get=function(){return api(q,{token:tok}).then(function(r){return r.ok&&Array.isArray(r.data)?r.data[0]:null})};
   return get().then(function(p){
     if(p)return p;
@@ -319,7 +325,7 @@ function done(x){
   }
   var p=x.profile,u=x.session.user||{};
   L.innerHTML='<li><span class="c">✓</span><div><b>Usuario creado en Supabase</b><span>'+esc(u.email||'')+'</span></div></li>'+
-    (p?'<li><span class="c">✓</span><div><b>Perfil guardado</b><span>'+esc(p.name)+' · '+(p.role==='marca'?'administrador de marca':p.role==='admin'?'administrador':p.role==='gerente'?'gerente de posventa':p.role==='director'?'director de grupo':p.role==='dueno'?'dueño del grupo':'asesor')+' · '+esc((p.agencies&&p.agencies.name)||'sin agencia')+'</span></div></li>'
+    (p?'<li><span class="c">✓</span><div><b>Perfil guardado</b><span>'+esc(p.name)+' · '+(p.role==='marca'?'administrador de marca':p.role==='admin'?'administrador':p.role==='gerente'?'gerente de posventa':p.role==='director'?'director de grupo':p.role==='dueno'?'dueño del grupo':'asesor')+' · '+esc((p.agencies&&p.agencies.name)||(p.grupos&&p.grupos.nombre?'todo '+p.grupos.nombre:'sin agencia'))+'</span></div></li>'
        :'<li><span class="c" style="background:#e0a100">!</span><div><b>Cuenta creada, perfil pendiente</b><span>Se completará al iniciar sesión.</span></div></li>')+
     '<li><span class="c">✓</span><div><b>Sesión iniciada</b><span>Ya puedes entrar a la aplicación.</span></div></li>';
   if(p&&(p.role==='admin'||p.role==='marca'))$('#okSub').textContent='Tu cuenta es de administrador.';
