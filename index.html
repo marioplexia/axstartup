@@ -1906,6 +1906,12 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .bx-dlg{max-width:520px;width:calc(100% - 32px);border:0;border-radius:16px;padding:20px;background:var(--card,#fff);color:inherit}.bx-dlg::backdrop{background:rgba(0,0,0,.4)}
 .bx-dlg h3{margin:0 0 6px}.bx-dlg p{margin:0 0 10px;font-size:13px;color:var(--muted)}.bx-dlg textarea{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--card-line);background:var(--fill-slab);color:inherit;font:13px/1.5 var(--f-ui,inherit)}
 .bx-dlg .row{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap}
+.bx-who{padding:1px 8px;border-radius:99px;background:var(--fill-slab);font-size:11.5px;font-weight:600}
+.bx-sel{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}.bx-sel select{padding:6px 10px;border-radius:99px;border:1px solid var(--card-line);background:var(--card);color:var(--fg,inherit);font:500 12.5px var(--f-ui,inherit)}
+.bx-n{display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,#2231dd 6%,transparent)}.bx-n p{margin:0;font-size:12.8px;line-height:1.45}.bx-n small{color:var(--muted);font-size:11px}
+.bx-a .bx-nb{min-width:0;margin-left:auto}
+@media(max-width:640px){.bx-a .bx-nb{margin-left:0;flex-basis:100%}}
+.bx-ban:empty{display:none}.bx-ban .hm-bx{margin:0 0 16px}
 .hm-bx{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:14px 16px;border:0;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff);font:inherit;text-align:left;cursor:pointer}
 .hm-bx span:nth-child(2){flex:1;min-width:0}.hm-bx b{display:block;font-size:14.5px}.hm-bx small{display:block;font-size:12.3px;opacity:.72;margin-top:2px}.hm-bx em{font-style:normal;font-weight:600;font-size:13px;white-space:nowrap}
 @media(max-width:640px){.bx-c{grid-template-columns:1fr;gap:10px;padding:14px}.bx-r{width:76px;height:76px}.bx-r b{font-size:18px}.bx-r span{font-size:9px}.bx-h em{margin-left:0}.bx-a .bt{flex:1;min-width:0}.hm-bx em{display:none}}
@@ -2260,6 +2266,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
     </section>
     <section class="admin" id="viewPv" hidden>
       <div class="ad-in">
+        <div class="bx-ban" data-bxban></div>
         <div class="ad-head">
           <div><h2>Tablero de posventa</h2><p id="pvSub">Todos los expedientes de tu agencia</p></div>
           <input type="search" id="pvQ" placeholder="Buscar folio, orden, VIN, queja o asesor" aria-label="Buscar expedientes de la agencia">
@@ -2282,12 +2289,14 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
     </section>
     <section class="admin" id="viewGrp" hidden>
       <div class="ad-in">
+        <div class="bx-ban" data-bxban></div>
         <div class="ad-head"><div><h2>Tablero de grupo</h2><p id="grpSub">Todas las agencias del grupo</p></div></div>
         <div id="grpBody"></div>
       </div>
     </section>
     <section class="admin" id="viewDueno" hidden>
       <div class="ad-in">
+        <div class="bx-ban" data-bxban></div>
         <div class="ad-head"><div><h2>Tablero del dueño</h2><p id="dnSub">Lo que Ax AI hace por tu grupo</p></div></div>
         <div id="dnBody"></div>
       </div>
@@ -6654,6 +6663,7 @@ SB.enter=async function(user){
       if(p.table==='alertas'){if(p.eventType==='INSERT')AL.onNew(p.new);return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
       if(p.table==='expedientes'||p.table==='decisiones'){clearTimeout(BX.t);BX.t=setTimeout(BX.load,800)}
+      if(p.table==='decisiones')return;
       if(p.table==='expedientes'){AD.loadExp();if(S.view==='pv'&&!XD.cur)PV.load(true);if(S.view==='inicio')HM.load();if(p.new&&XD.cur&&String(p.new.id)===String(XD.cur.id)){if(p.new.prea_form)XD.formApply(p.new);if(p.new.plan_correccion)XD.planApply(p.new);if(p.new.cerebro)XD.brainApply(p.new);if(p.new.flujo&&JSON.stringify(p.new.flujo)!==JSON.stringify(XD.cur.flujo)){XD.cur.flujo=p.new.flujo;FL.draw(XD.cur)}}return}
       if(p.table==='activity')return;
       if(p.table==='reglas_lecciones'){LS.onNew(p);return}
@@ -7291,7 +7301,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
    (lo que falta, lo que la revisión contra el manual marcó, lo que no cuadra, plazos y débitos o rechazos
    parecidos en el grupo) y tres decisiones: Enviar, Corregir o Pedir al técnico. Cada decisión queda registrada
    (tabla decisiones) con el riesgo y sus motivos, para medir después qué tan bien predijo. */
-var BX={rows:[],f:'todas',busy:false,
+var BX={rows:[],f:'todas',as:'',ag:'',busy:false,
   TEC:{recepcion:'Toma foto del VIN, del odómetro (que se lea bien el kilometraje) y una foto completa del vehículo.',
     diagnostico:'Mándame el reporte del escáner con los códigos de falla y tu hoja con las lecturas que tomaste.',
     evidencia:'Toma fotos claras de la falla y de la pieza dañada, de cerca y de lejos.',
@@ -7317,19 +7327,25 @@ BX.riesgo=function(x,sec,rev,deb){
   var q=M.reduce(function(acc,m){return acc*(1-m.p/100)},1),pct=Math.round((1-q)*100);
   return {pct:Math.max(3,Math.min(96,pct)),M:M};
 };
+BX.quien=function(d){return d&&SB.user&&d.user_id===SB.user.id?'Tú':((d&&d.profiles&&d.profiles.name)||'Alguien del equipo').split(' ')[0]};
+BX.ase=function(x){var n=x.profiles&&x.profiles.name;return x.user_id===(SB.user&&SB.user.id)?'Tuyo':n||'Asesor'};
+BX.agn=function(x){return (x.profiles&&x.profiles.agencies&&x.profiles.agencies.name)||''};
+BX.VERB={enviar:'lo envió a GM',corregir:'lo abrió para corregir',tecnico:'le pidió al técnico'};
 BX.nivel=function(p){return p>=50?['alto','bad']:p>=25?['medio','warn']:['bajo','ok']};
 BX.load=async function(){
   if(!SB.c||!SB.entered||BX.busy)return;BX.busy=true;
   try{
-    var r=await Promise.all([SB.c.from('expedientes').select('*').order('updated_at',{ascending:false}).limit(400),
-      SB.c.from('decisiones').select('expediente_id,decision,riesgo,nota,created_at').order('created_at',{ascending:false}).limit(600),
+    var r=await Promise.all([SB.c.from('expedientes').select('*,profiles(name,agency_id,agencies(name))').order('updated_at',{ascending:false}).limit(400),
+      SB.c.from('decisiones').select('expediente_id,decision,riesgo,nota,created_at,user_id,profiles(name)').order('created_at',{ascending:false}).limit(800),
       SB.c.from('manual_reglas').select('id,veces').eq('origen','debito'),AL.loaded?null:AL.load()]);
     if(r[0].error)throw r[0].error;
     var E=(r[0].data||[]).filter(function(x){var f=x.flujo;
       if(f)return f.responsable==='Asesor'&&['prea','expediente','transaccion'].indexOf(f.etapa)>=0;
       return x.status!=='borrador'&&!x.enviado_at&&!x.transaccion_aceptada_at&&!x.gwm_cobrada_at});
     var deb={};((r[2]&&r[2].data)||[]).forEach(function(g){if(g.veces)deb[g.id]=g.veces});
-    var last={};((r[1]&&r[1].data)||[]).forEach(function(d){if(!last[d.expediente_id])last[d.expediente_id]=d});
+    var last={},notas={};((r[1]&&r[1].data)||[]).forEach(function(d){
+      if(d.decision==='nota'){var n=notas[d.expediente_id]=notas[d.expediente_id]||[];if(n.length<3)n.push(d)}
+      else if(!last[d.expediente_id])last[d.expediente_id]=d});
     var sec={},rev={};
     if(E.length){
       var q=await Promise.all([SB.c.rpc('expediente_secciones',{p_ids:E.map(function(x){return x.id})}),
@@ -7338,12 +7354,12 @@ BX.load=async function(){
       /* la revisión más reciente de cada regla en cada sección */
       var seen={};(q[1].data||[]).forEach(function(d){var C=d.datos&&d.datos.cumplimiento;if(!Array.isArray(C))return;C.forEach(function(c){var k=d.folio+'|'+d.resultado+'|'+c.regla;if(seen[k])return;seen[k]=1;(rev[d.folio]=rev[d.folio]||[]).push(Object.assign({seccion:d.resultado},c))})});
     }
-    BX.rows=E.map(function(x){var R=BX.riesgo(x,sec[x.id]||{},rev[x.folio]||[],deb);return {x:x,r:R,sec:sec[x.id]||{},rev:rev[x.folio]||[],d:last[x.id]||null}})
+    BX.rows=E.map(function(x){var R=BX.riesgo(x,sec[x.id]||{},rev[x.folio]||[],deb);return {x:x,r:R,sec:sec[x.id]||{},rev:rev[x.folio]||[],d:last[x.id]||null,n:(notas[x.id]||[]).slice().reverse()}})
       .sort(function(a,b){var ta=a.d&&a.d.decision==='tecnico'?1:0,tb=b.d&&b.d.decision==='tecnico'?1:0;return (ta-tb)||(b.r.pct-a.r.pct)});
   }catch(e){SB.fail(e)}
   BX.busy=false;BX.badge();if(S.view==='bx')BX.render();if(S.view==='inicio')HM.render();
 };
-BX.badge=function(){var b=$('#bxBadge');if(!b)return;var n=BX.rows.length;b.hidden=!n;b.textContent=String(n)};
+BX.badge=function(){var b=$('#bxBadge');if(b){var n=BX.rows.length;b.hidden=!n;b.textContent=String(n)}document.querySelectorAll('[data-bxban]').forEach(function(e){e.innerHTML=HM.cardBx()})};
 BX.tipo=function(it){var x=it.x,f=x.flujo||{};
   if(x.status==='rechazada'&&!x.pra_corregida_at)return 'Planta rechazó la PREA. ¿Corriges y la reenvías?';
   return it.r.pct>=50?'Antes de enviar a GM conviene corregir':'¿La envías a GM o la corriges primero?'};
@@ -7351,20 +7367,26 @@ BX.card=function(it){
   var x=it.x,R=it.r,N=BX.nivel(R.pct),f=x.flujo||{},d=it.d,top=R.M[0];
   var tec=d&&d.decision==='tecnico',ago=d?AL.ago(d.created_at):'';
   return '<article class="bx-c '+N[1]+'" data-bx="'+ea(x.id)+'"><div class="bx-r '+N[1]+'" style="--p:'+R.pct+'"><b>'+R.pct+'%</b><span>riesgo '+N[0]+'</span></div>'+
-    '<div class="bx-m"><div class="bx-h"><b>'+esc(x.wo||x.folio)+'</b><span>'+esc([x.vehicle,x.sys,x.cliente].filter(Boolean).join(' · '))+'</span>'+(f.etapa?'<em>'+esc(FL.nom(f.etapa))+(f.vence?' · '+esc(FL.vence(f.vence)):'')+'</em>':'')+'</div>'+
+    '<div class="bx-m"><div class="bx-h"><b>'+esc(x.wo||x.folio)+'</b><span>'+esc([x.vehicle,x.sys,x.cliente].filter(Boolean).join(' · '))+'</span><span class="bx-who">'+esc(BX.ase(x))+(BX.multi?' · '+esc(BX.agn(x)):'')+'</span>'+(f.etapa?'<em>'+esc(FL.nom(f.etapa))+(f.vence?' · '+esc(FL.vence(f.vence)):'')+'</em>':'')+'</div>'+
     '<p class="bx-q">'+esc(BX.tipo(it))+'</p>'+
     '<p class="bx-why">'+(top&&R.pct<25?'Riesgo bajo de débito: <b>'+R.pct+'%</b>. Lo único a cuidar: '+esc(top.t)+'.':top?'Este reclamo tiene <b>'+R.pct+'% de riesgo de débito</b> por: '+esc(top.t)+'.':'No encontré nada que GM pueda debitar: <b>'+R.pct+'% de riesgo</b>.')+'</p>'+
     (R.M.length>1?'<ul class="bx-l">'+R.M.slice(1,5).map(function(m){return '<li>'+esc(m.t)+'</li>'}).join('')+(R.M.length>5?'<li>y '+(R.M.length-5)+' más</li>':'')+'</ul>':'')+
-    (tec?'<p class="bx-st">Le pediste al técnico '+esc(ago)+'. Cuando llegue lo que pidió, súbelo y el riesgo se recalcula.</p>':d?'<p class="bx-st">Última decisión: '+esc({enviar:'enviar',corregir:'corregir',tecnico:'pedir al técnico'}[d.decision])+' · '+esc(ago)+'</p>':'')+
-    '<div class="bx-a"><button class="bt'+(R.pct<50&&x.status!=='rechazada'?' pri':'')+'" type="button" data-bxdo="enviar">Enviar</button><button class="bt'+(R.pct>=50||x.status==='rechazada'?' pri':'')+'" type="button" data-bxdo="corregir">Corregir</button><button class="bt" type="button" data-bxdo="tecnico">Pedir al técnico</button></div></div></article>';
+    (d?'<p class="bx-st"><b>'+esc(BX.quien(d))+'</b> '+esc(BX.VERB[d.decision]||d.decision)+' · '+esc(ago)+(tec?'. Cuando llegue lo que pidió, súbelo y el riesgo se recalcula.':'')+'</p>':'')+
+    (it.n&&it.n.length?'<div class="bx-n">'+it.n.map(function(n){return '<p><b>'+esc(BX.quien(n))+':</b> '+esc(n.nota)+' <small>'+esc(AL.ago(n.created_at))+'</small></p>'}).join('')+'</div>':'')+
+    '<div class="bx-a"><button class="bt'+(R.pct<50&&x.status!=='rechazada'?' pri':'')+'" type="button" data-bxdo="enviar">Enviar</button><button class="bt'+(R.pct>=50||x.status==='rechazada'?' pri':'')+'" type="button" data-bxdo="corregir">Corregir</button><button class="bt" type="button" data-bxdo="tecnico">Pedir al técnico</button><button class="bt bx-nb" type="button" data-bxdo="nota">Nota al equipo</button></div></div></article>';
 };
 BX.render=function(){
   var el=$('#bxBody');if(!el)return;
   var L=BX.rows,alto=L.filter(function(i){return i.r.pct>=50}).length,listos=L.filter(function(i){return i.r.pct<25}).length,tec=L.filter(function(i){return i.d&&i.d.decision==='tecnico'}).length;
+  var noms={},ags={};L.forEach(function(i){noms[i.x.user_id]=BX.ase(i.x);var a=BX.agn(i.x);if(a)ags[a]=1});BX.multi=Object.keys(ags).length>1;
+  L=L.filter(function(i){return (!BX.as||i.x.user_id===BX.as)&&(!BX.ag||BX.agn(i.x)===BX.ag)});
+  alto=L.filter(function(i){return i.r.pct>=50}).length;listos=L.filter(function(i){return i.r.pct<25}).length;tec=L.filter(function(i){return i.d&&i.d.decision==='tecnico'}).length;
   var F=L.filter(function(i){return BX.f==='alto'?i.r.pct>=50:BX.f==='listos'?i.r.pct<25:BX.f==='tecnico'?(i.d&&i.d.decision==='tecnico'):true});
-  $('#bxSub').textContent=L.length?L.length+(L.length===1?' decisión pendiente':' decisiones pendientes')+'. Ax AI ya revisó cada caso contra el manual de GM y lo que pasó en tu grupo.':'Sin decisiones pendientes.';
+  var sel=(Object.keys(noms).length>1?'<label class="bx-sel">Asesor <select data-bxsel="as"><option value="">Todo el equipo</option>'+Object.keys(noms).map(function(k){return '<option value="'+ea(k)+'"'+(BX.as===k?' selected':'')+'>'+esc(noms[k])+'</option>'}).join('')+'</select></label>':'')+
+    (BX.multi?'<label class="bx-sel">Agencia <select data-bxsel="ag"><option value="">Todas</option>'+Object.keys(ags).sort().map(function(k){return '<option'+(BX.ag===k?' selected':'')+'>'+esc(k)+'</option>'}).join('')+'</select></label>':'');
+  $('#bxSub').textContent=(L.length?L.length+(L.length===1?' decisión pendiente':' decisiones pendientes')+'. ':'Sin decisiones pendientes. ')+'La comparten el asesor, posventa y dirección: todos ven el mismo riesgo y quién decidió qué.';
   var chip=function(k,t,n){return '<button type="button" class="bx-f'+(BX.f===k?' on':'')+'" data-bxf="'+k+'">'+t+' <b>'+n+'</b></button>'};
-  el.innerHTML='<div class="bx-fs">'+chip('todas','Todas',L.length)+chip('alto','Riesgo alto',alto)+chip('listos','Listas para enviar',listos)+chip('tecnico','Esperando al técnico',tec)+'</div>'+
+  el.innerHTML='<div class="bx-fs">'+sel+chip('todas','Todas',L.length)+chip('alto','Riesgo alto',alto)+chip('listos','Listas para enviar',listos)+chip('tecnico','Esperando al técnico',tec)+'</div>'+
     (F.length?'<div class="bx-list">'+F.map(BX.card).join('')+'</div>':'<div class="pv-empty">'+(L.length?'Nada en este filtro.':'Estás al día. Cuando un caso necesite que decidas algo, aparece aquí con su riesgo y lo que hay que hacer.')+'</div>');
 };
 BX.item=function(id){return BX.rows.filter(function(i){return i.x.id===id})[0]};
@@ -7389,6 +7411,10 @@ BX.corregir=async function(it){
   var M=it.r.M,go=x.status==='rechazada'?'#xdPlan':M.some(function(m){return BX.REQ.indexOf(m.k)>=0})?'#xdArm':'#xdCtl';
   setTimeout(function(){var t=$(go);if(!t||t.hidden)t=$('#xdCtl');if(t)t.scrollIntoView({behavior:'smooth',block:'start'})},500);
 };
+BX.nota=async function(it){
+  var v=await HM.dlg({title:'Nota al equipo · '+(it.x.wo||it.x.folio),intro:'La ven el asesor, posventa y dirección en esta bandeja.',fields:[{k:'t',label:'Nota',type:'textarea',ph:'Ej. Antes de enviarla revisa la firma del cliente',req:true}],ok:'Publicar nota'});
+  if(!v||!v.t)return;await BX.decide(it,'nota',v.t.slice(0,600));toast('Nota publicada');BX.load();
+};
 BX.msgTec=function(it){
   var x=it.x,L=[];
   BX.REQ.concat(['destruccion']).forEach(function(k){if(BX.TEC[k]&&!it.sec[k]&&(k!=='destruccion'))L.push(BX.TEC[k])});
@@ -7409,11 +7435,13 @@ BX.tecnico=function(it){
     d.close();await BX.decide(it,'tecnico',t);BX.load();};
   d.showModal();
 };
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-bxban] [data-nav]');if(b)showView('bx')});
+document.addEventListener('change',function(e){var t=e.target;if(t&&t.dataset&&t.dataset.bxsel){BX[t.dataset.bxsel]=t.value;BX.render()}});
 document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('[data-bxf]');if(f){BX.f=f.dataset.bxf;BX.render();return}
   var b=e.target.closest&&e.target.closest('[data-bxdo]');if(!b)return;
   var c=b.closest('[data-bx]'),it=c&&BX.item(c.dataset.bx);if(!it)return;
-  if(b.dataset.bxdo==='enviar')BX.enviar(it,b);else if(b.dataset.bxdo==='corregir')BX.corregir(it);else BX.tecnico(it);
+  if(b.dataset.bxdo==='enviar')BX.enviar(it,b);else if(b.dataset.bxdo==='corregir')BX.corregir(it);else if(b.dataset.bxdo==='nota')BX.nota(it);else BX.tecnico(it);
 });
 /* Inicio: la bandeja en una línea */
 HM.cardBx=function(){
@@ -7485,6 +7513,7 @@ DN.nav=function(on){
   var b=$('[data-dueno-nav]');if(b){b.hidden=!on;b.style.display=on?'':'none'}
   document.body.classList.toggle('dueno',!!on);if(!on)return;
   $$('.sb-scroll > *').forEach(function(e){if(!e.hasAttribute('data-dueno-nav'))e.style.display='none'});
+  var bxn=$('.nav[data-view="bx"]');if(bxn)bxn.style.display='';
 };
 DN.ym=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
 DN.mesTxt=function(ym){var p=String(ym).split('-');var d=new Date(Number(p[0]),Number(p[1])-1,15);var t=d.toLocaleDateString('es-MX',{month:'long',year:'numeric'});return t.charAt(0).toUpperCase()+t.slice(1)};
