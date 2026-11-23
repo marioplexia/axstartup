@@ -1969,6 +1969,8 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .vw-vacio{padding:18px;border-radius:12px;background:var(--fill-slab);font-size:12.8px;color:var(--muted);text-align:center}.vw-mut{color:var(--muted)}
 .vw-ped{margin:0;font-size:11px;color:var(--muted)}.vw-empty{margin:12px 2px 0}
 @media(max-width:640px){.vw-g{grid-template-columns:1fr}.vw-q form{flex-direction:column}.vw-ask .xa-mk{display:none}}
+.xd-del{margin-left:auto;align-self:center;padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,#d6453b 40%,transparent);background:transparent;color:#b4372b;font:500 12.5px var(--f-ui,inherit);cursor:pointer}
+.xd-del:hover{background:color-mix(in srgb,#d6453b 10%,transparent)}
 .hm-bx{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:14px 16px;border:0;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff);font:inherit;text-align:left;cursor:pointer}
 .hm-bx span:nth-child(2){flex:1;min-width:0}.hm-bx b{display:block;font-size:14.5px}.hm-bx small{display:block;font-size:12.3px;opacity:.72;margin-top:2px}.hm-bx em{font-style:normal;font-weight:600;font-size:13px;white-space:nowrap}
 @media(max-width:640px){.bx-c{grid-template-columns:1fr;gap:10px;padding:14px}.bx-r{width:76px;height:76px}.bx-r b{font-size:18px}.bx-r span{font-size:9px}.bx-h em{margin-left:0}.bx-a .bt{flex:1;min-width:0}.hm-bx em{display:none}}
@@ -2544,6 +2546,7 @@ var P={
   plus:'<path d="M5 12h14M12 5v14"/>',
   chart:'<path d="M3 3v18h18M7 14l4-4 4 4 5-6"/>',
   x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>',
   up:'<path d="m5 12 7-7 7 7M12 19V5"/>',
   stop:'<rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="currentColor" stroke="none"/>',
   mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/>',
@@ -5291,9 +5294,36 @@ GP.rename=async function(id){
   if(!o){toast('Escribe una orden válida, por ejemplo GA4041');return}
   if(await GP.setOrden(id,o))toast('Conversación titulada '+o);
 };
+/* por ahora solo el asesor borra, y solo lo suyo (la base de datos también lo exige) */
+var XDEL={};
+XDEL.puede=function(x){return !!(x&&SB.user&&x.user_id===SB.user.id&&!SB.user.dueno&&!SB.user.director&&!SB.user.marca)};
+XDEL.archivos=async function(id){
+  var paths=[];
+  var top=await SB.c.storage.from(XD.B).list(id,{limit:200});
+  for(var i=0;i<((top.data)||[]).length;i++){var f=top.data[i];
+    if(f.id){paths.push(id+'/'+f.name);continue}
+    var sub=await SB.c.storage.from(XD.B).list(id+'/'+f.name,{limit:500});
+    ((sub.data)||[]).forEach(function(g){if(g.name&&g.id)paths.push(id+'/'+f.name+'/'+g.name)})}
+  for(var j=0;j<paths.length;j+=100){var r=await SB.c.storage.from(XD.B).remove(paths.slice(j,j+100));if(r.error)console.warn('[borrar archivos]',r.error.message)}
+  return paths.length;
+};
+XDEL.uno=async function(x,sinPreguntar){
+  if(!XDEL.puede(x)){toast('Solo el asesor del caso puede eliminar su expediente');return false}
+  if(!sinPreguntar&&!confirm('¿Eliminar el expediente '+(x.folio||x.wo||'')+(x.wo&&x.folio!==x.wo?' (orden '+x.wo+')':'')+'?\n\nSe borran sus documentos, su revisión, su lugar en la bandeja y en cobranza. No se puede deshacer.'))return false;
+  var n=0;try{n=await XDEL.archivos(x.id)}catch(e){console.warn('[borrar archivos]',e)}
+  var r=await SB.c.from('expedientes').delete().eq('id',x.id).select('id');
+  if(r.error||!r.data||!r.data.length){SB.fail(r.error||'sin permiso');toast('No se pudo eliminar el expediente');return false}
+  EX.rows=(EX.rows||[]).filter(function(z){return z.id!==x.id});
+  if(HM.d&&HM.d.exp)HM.d.exp=HM.d.exp.filter(function(z){return z.id!==x.id});
+  BX.rows=(BX.rows||[]).filter(function(i){return i.x.id!==x.id});BX.badge();
+  toast('Expediente eliminado'+(n?' con sus '+n+(n===1?' archivo':' archivos'):''));
+  return true;
+};
 GP.del=async function(id){
   var c=GP.all.filter(function(x){return x.id===id})[0];if(!c)return;
-  if(!confirm('¿Eliminar la conversación '+(c.orden||c.title||'sin orden')+'? Lo que generó (PREA, estimado) se conserva.'))return;
+  var ex=(await SB.c.from('expedientes').select('id,folio,wo,user_id').eq('conversation_id',id)).data||[],mias=ex.filter(XDEL.puede);
+  if(!confirm('¿Eliminar la orden '+(c.orden||c.title||'sin orden')+'? Se borra su conversación.'))return;
+  if(mias.length&&confirm('¿También eliminar '+(mias.length===1?'su expediente '+mias[0].folio:'sus '+mias.length+' expedientes')+' con todos sus documentos?\n\nAceptar: se borra también.\nCancelar: se conserva en Expedientes.')){for(var i=0;i<mias.length;i++)await XDEL.uno(mias[i],true)}
   var r=await SB.c.from('conversations').delete().eq('id',id);
   if(r.error){SB.fail(r.error);toast('No se pudo eliminar');return}
   GP.all=GP.all.filter(function(x){return x.id!==id});SB.loadHist();
@@ -5750,6 +5780,7 @@ var NODE=(function(){
     var L=[];
     if(x.status==='borrador'){L.push(A('data-r="ok"','Fue aceptada','ok'));L.push(A('data-r="no"','Fue rechazada','no'))}
     L.push(A(cp(x.folio,'Folio copiado'),'Copiar folio','copy'));
+    if(XDEL.puede(x))L.push(A('data-xdelc="1"','Eliminar expediente','trash'));
     if(x.status!=='borrador')L.push(A(cp([x.folio,x.queja,[x.sys,x.op].filter(Boolean).join(' · ')].filter(Boolean).join(' — '),'Resumen copiado'),'Copiar resumen','doc'));
     return L;
   }
@@ -6011,6 +6042,7 @@ EX.resolve=async function(id,ok){
 };
 document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('#exBar [data-f]');if(f){EX.pick(f.dataset.f);return}
+  var dl=e.target.closest&&e.target.closest('#exList [data-xdelc]');if(dl){var rw=dl.closest('[data-id]'),xx=EX.rows.filter(function(z){return String(z.id)===String(rw.dataset.id)})[0];if(xx)XDEL.uno(xx).then(function(ok){if(ok)EX.load()});return}
   var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('[data-id]');EX.resolve(row.dataset.id,b.dataset.r==='ok');return}
 });
 $('#exQ').addEventListener('input',function(){EX.q=this.value;EX.render()});
@@ -6065,7 +6097,8 @@ XD.open=function(id){
   var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x){toast('No encontré ese expediente');return}
   XD.cur=x;XD.mode='exp';var el=$('#exDoc');
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
-    '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div></div>'+
+    '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
+    (XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div>'+
     FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
@@ -6645,6 +6678,7 @@ XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k
 document.addEventListener('click',function(e){
   var t=e.target;if(!t.closest)return;
   if(t.closest('[data-xdclose]')){XD.close();return}
+  if(t.closest('[data-xddel]')&&XD.cur){var cx=XD.cur;XDEL.uno(cx).then(function(ok){if(ok){XD.close();if(S.view==='exp')EX.load()}});return}
   if(t.closest('[data-xdsave]')){XD.qSave();return}
   var o=t.closest('[data-xdopen]');
   if(o){SB.c.storage.from(XD.B).createSignedUrl(o.dataset.xdopen,300).then(function(r){if(r.data&&r.data.signedUrl)window.open(r.data.signedUrl,'_blank','noopener');else toast('No pude abrir el archivo')});return}
