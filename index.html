@@ -1855,6 +1855,42 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .xa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:10px}
 .xa-b{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--bg) 6%,transparent)}.xa-b h4{margin:0 0 6px;font-size:13px}
 .xa-b ul{margin:0;padding-left:18px;font-size:12.5px;line-height:1.5}.xa-b.bad h4{color:#ffb3a8}.xa-b.warn h4{color:#f5c26b}.xa-b.ok h4{color:#6fdc9a}
+.al-up{display:grid;grid-template-columns:1fr minmax(280px,420px);gap:16px;align-items:start;margin:0 0 16px;padding:16px;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff)}
+.al-up h3{margin:0 0 4px;font-size:15px}.al-up p{margin:0;font-size:12.8px;line-height:1.5;opacity:.75}.al-up .xz-mut{grid-column:1/-1;color:inherit;opacity:.85}.al-up .xz-mut:empty{display:none}
+.al-upf{display:flex;flex-direction:column;gap:8px}.al-upf textarea{width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;border:1px solid color-mix(in srgb,var(--bg,#fff) 25%,transparent);background:color-mix(in srgb,var(--bg,#fff) 8%,transparent);color:inherit;font:13px var(--f-ui,inherit);resize:vertical}
+.al-upf .bt{text-align:center;cursor:pointer}
+.al-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;font-size:13.5px}
+.al-list{display:flex;flex-direction:column;gap:10px}
+.al-c{position:relative;padding:14px 16px;border:1px solid var(--card-line,#e5e7eb);border-left:4px solid var(--card-line,#e5e7eb);border-radius:14px;background:var(--card,#fff)}
+.al-c.bad{border-left-color:#d6453b}.al-c.warn{border-left-color:#d99a1e}.al-c.ok{border-left-color:#1f8a4c}.al-c.info{border-left-color:#2231dd}.al-c.nw{box-shadow:0 0 0 1px color-mix(in srgb,#2231dd 30%,transparent)}
+.al-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px}.al-t{padding:2px 8px;border-radius:99px;font-weight:600;background:var(--fill-slab,#f1f1ef)}
+.al-t.bad{color:#b4372b;background:color-mix(in srgb,#d6453b 12%,transparent)}.al-t.warn{color:#8a5a00;background:color-mix(in srgb,#d99a1e 15%,transparent)}.al-t.ok{color:#1a6e3e;background:color-mix(in srgb,#1f8a4c 12%,transparent)}.al-t.info{color:#2231dd;background:color-mix(in srgb,#2231dd 10%,transparent)}
+.al-s{color:var(--muted,#6b7280)}.al-dot{width:8px;height:8px;border-radius:50%;background:#2231dd;margin-left:auto}
+.al-c h4{margin:8px 0 4px;font-size:14px;line-height:1.35}.al-c p{margin:4px 0;font-size:13px;line-height:1.5}.al-do{padding:8px 10px;border-radius:10px;background:var(--fill-slab,#f4f4f2)}
+.al-cs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;font-size:12px;color:var(--muted,#6b7280)}.al-cs button{padding:3px 10px;border-radius:99px;border:1px solid var(--card-line,#e5e7eb);background:var(--card,#fff);color:inherit;font:600 12px var(--f-ui,inherit);cursor:pointer}
+.al-r{display:block;margin-top:6px;font-size:11.5px;color:var(--muted,#6b7280)}
+.hm-al,.hm-fl{margin:0 0 18px;padding:16px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);display:flex;flex-direction:column;gap:10px}
+.hm-al .hm-arm-h .hm-btn{margin-left:auto}
+.hm-fl-p{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.hm-fl-p div{padding:8px;border-radius:10px;background:var(--fill-slab);text-align:center;opacity:.55}.hm-fl-p div.on{opacity:1}
+.hm-fl-p b{display:block;font-size:20px}.hm-fl-p span{font-size:11px;color:var(--muted)}
+.hm-fl-l{display:flex;flex-direction:column;gap:6px}.hm-arm-r em.fl-warn{color:#8a5a00}.hm-arm-r em.fl-ok{color:var(--muted)}
+.fl{margin:0 0 16px;padding:16px 18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
+.fl-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}.fl-h h3{margin:0;font-size:15px}.fl-who{font-size:12px;color:var(--muted)}
+.fl-st{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));margin:0 0 12px;padding:0;list-style:none;counter-reset:fl}
+.fl-st li{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;text-align:center;color:var(--muted)}
+.fl-st li::before{content:'';position:absolute;top:7px;left:-50%;width:100%;height:2px;background:var(--card-line)}.fl-st li:first-child::before{display:none}
+.fl-st li i{position:relative;z-index:1;width:16px;height:16px;border-radius:50%;background:var(--card);border:2px solid var(--card-line)}
+.fl-st li.done i{background:#1f8a4c;border-color:#1f8a4c}.fl-st li.done::before,.fl-st li.now::before{background:#1f8a4c}.fl-st li.done span{color:inherit}
+.fl-st li.now i{background:#2231dd;border-color:#2231dd;box-shadow:0 0 0 4px color-mix(in srgb,#2231dd 18%,transparent)}.fl-st li.now.warn i{background:#d99a1e;border-color:#d99a1e}.fl-st li.now.bad i{background:#d6453b;border-color:#d6453b}
+.fl-st li.now span{color:inherit;font-weight:600}
+.fl-next{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,#2231dd 7%,transparent)}
+.fl-next.warn{background:color-mix(in srgb,#d99a1e 12%,transparent)}.fl-next.bad{background:color-mix(in srgb,#d6453b 10%,transparent)}.fl-next.ok b{color:inherit}
+.fl-next span{display:block;font-size:11.5px;color:var(--muted)}.fl-next b{font-size:14px}.fl-next em{font-style:normal;font-weight:600;font-size:13px;text-align:right;white-space:nowrap}.fl-next em small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+.fl-next.bad em{color:#b4372b}.fl-next.warn em{color:#8a5a00}
+.fl-tb{margin:10px 0 0;padding-left:18px;font-size:12.8px;line-height:1.6}.fl-tb li.bad{color:#b4372b}
+.fl-hist{margin:10px 0 0;font-size:11.5px;color:var(--muted)}
+.al-upf .bt{display:flex;align-items:center;justify-content:center;min-height:36px}.al-up .bt.pri{background:var(--signal,#2231dd);color:#fff;border-color:transparent}
+@media(max-width:640px){.al-up{grid-template-columns:1fr}.fl-st li:not(.now) span{display:none}.fl-st li.now span{white-space:nowrap}.hm-fl-p span{font-size:9.5px}.fl-st{gap:0}.hm-fl-p{grid-template-columns:repeat(4,minmax(0,1fr))}.fl-next{flex-direction:column;align-items:flex-start}.fl-next em{text-align:left}}
 .xa-chat{margin:10px 0}.xa-chat .xd-ext{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--signal,#2231dd);color:#fff;font:600 9.5px var(--font-ui,inherit)}.xa-chat .xa-f{background:var(--fill-slab,#f2f2f0);color:inherit}.xa-chat .xa-st{opacity:.7}.xa-chat .xa-st.ok{color:#1a6e3e}.xa-chat .xa-st.warn{color:#9a6200}.xa-chat .xa-st.bad{color:#b4372b}
 .xa-chat .xa-docs em{color:var(--signal,#2231dd)}.xa-say{font-size:13px;opacity:.7}.xa-say:empty{display:none}
 .gp-chip.arm,.gpc-f button.arm{background:var(--signal,#2231dd);color:#fff;border-color:transparent}
@@ -2051,7 +2087,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <button class="nav" data-nm data-view="bitacora" data-i="clip">Bitácora</button>
         <button class="nav" data-nm data-view="notas" data-i="note">Notas</button>
         <button class="nav" data-nm data-view="exp" data-i="folderopen">Expedientes</button>
-        <button class="nav" data-nm data-view="red" data-i="clip">Red de reglas</button>
+        <button class="nav" data-nm data-view="red" data-i="bell">Alertas y reglas</button>
         <button class="nav" data-nm data-view="cobros" data-i="dollar">Agente de Cobros</button>
         <button class="nav" data-nm data-view="cartera" data-i="wallet">Agente de Cartera</button>
         <div class="grp" data-mr-nav style="margin-top:6px" hidden>Marca</div>
@@ -2239,7 +2275,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
     </section>
     <section class="admin" id="viewRed" hidden>
       <div class="ad-in">
-        <div class="ad-head"><div><h2>Red de reglas</h2><p id="redSub">Lo que la red aprendió de los manuales de GM y de cada débito real</p></div>
+        <div class="ad-head"><div><h2>Alertas y reglas</h2><p id="redSub">Lo que la red aprendió de los manuales de GM y de cada débito real</p></div>
           <input type="search" id="redQ" placeholder="Buscar regla, tema o sección" aria-label="Buscar reglas"></div>
         <div id="redBody"></div>
       </div>
@@ -2450,9 +2486,9 @@ $('#sbClose').addEventListener('click',function(){setSb(false)});
 $('#sbOpen').addEventListener('click',function(){setSb(true)});
 $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
-$('#bell').addEventListener('click',function(){if(!MI.due().length){toast('Sin avisos pendientes');return}showView('mi');MI.send('¿Qué tengo pendiente?')});
+$('#bell').addEventListener('click',function(){if(MI.due().length&&!AL.unread().length){showView('mi');MI.send('¿Qué tengo pendiente?');return}RED.f='alertas';showView('red')});
 
-var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Red de reglas',dueno:'Tablero del dueño'};
+var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
@@ -4278,7 +4314,7 @@ HM.load=async function(){
   try{
     var q=function(t,sel,ord){return SB.c.from(t).select(sel).order(ord,{ascending:false}).limit(2000)};
     var r=await Promise.all([
-      q('expedientes','id,user_id,folio,wo,cliente,sys,status,parts,parts_total,labor,created_at,updated_at,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,armado,profiles(name)','updated_at'),
+      q('expedientes','id,user_id,folio,wo,cliente,sys,status,parts,parts_total,labor,created_at,updated_at,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,armado,flujo,profiles(name)','updated_at'),
       q('piezas_pedido','id,expediente_id,user_id,pieza,cantidad,estado,eta,created_at,expedientes(folio,wo,cliente)','created_at'),
       q('campanas','*','created_at'),
       q('cartera','expediente_id,user_id,estado,monto,facturada_at,pagada_at,monto_pagado,created_at','created_at'),RED.load()]);
@@ -4443,7 +4479,7 @@ HM.rHome=function(){
     '<button class="hm-btn dark" type="button" data-nav="mi"><span class="hm-mk">A</span> Preguntar a Ax AI</button></div>'+
     '<button class="hm-acts" type="button" id="hmActs" aria-expanded="false"><span class="hm-ico">'+ORB+'</span><span>'+(tot?'Hay '+tot+(tot===1?' acción recomendada':' acciones recomendadas')+' para aumentar tu uso de Ax AI':'Estás al día: no hay acciones pendientes')+'</span>'+(tot?'<span class="hm-chev">⌄</span>':'')+'</button>'+
     '<div class="hm-actlist" id="hmActList" hidden>'+A.map(function(x){return '<button type="button" data-nav="'+x.go+'"><b>'+x.n+'</b><span>'+esc(x.t)+'</span></button>'}).join('')+'</div><div class="hm-gap"></div>'+
-    HM.cardArm()+'<div class="hm-grid">'+HM.cardPre()+HM.cardPie()+HM.cardCam()+HM.cardSrv()+'</div>';
+    HM.cardAlertas()+HM.cardFlujo()+HM.cardArm()+'<div class="hm-grid">'+HM.cardPre()+HM.cardPie()+HM.cardCam()+HM.cardSrv()+'</div>';
 };
 
 /* ---- páginas de detalle ---- */
@@ -4773,7 +4809,7 @@ MI.del=async function(id){
 
 /* ---- avisos: campana, tarjetas y notificación del navegador ---- */
 MI.due=function(){var n=+MI.now();return MI.agenda.filter(function(x){return x.kind!=='nota'&&!x.hecho&&x.fecha_hora&&+new Date(x.fecha_hora)-(x.kind==='evento'?600000:0)<=n})};
-MI.badge=function(){var b=$('#bell');if(b)b.dataset.n=String(MI.due().length)};
+MI.badge=function(){AL.badge()};
 MI.alertBox=function(){var c=$('#miAlerts');if(!c){c=document.createElement('div');c.id='miAlerts';c.setAttribute('role','region');c.setAttribute('aria-label','Recordatorios');document.body.appendChild(c)}return c};
 MI.alert=function(x){
   var c=MI.alertBox(),el=document.createElement('div');el.className='mi-alert';el.dataset.id=x.id;
@@ -5869,13 +5905,14 @@ XD.open=function(id){
   XD.cur=x;XD.mode='exp';var el=$('#exDoc');
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div></div>'+
-    XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
+    FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
   XD.qLoad(x.id);
   XD.ctl=null;XD.ctlLoad(x).catch(function(e){console.warn('[control GM]',e)});
   XA.show(x.armado||null);
+  FL.refresh(x);
   XD.formInit(x);
 };
 XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera',pv=XD.from==='pv';$('#exDoc').hidden=true;$(pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true)};
@@ -5989,7 +6026,7 @@ XD.learn=async function(k,file,meta,runId,intento){
     }
     meta.textContent=base+' · ✓ '+ok;
     XD.revShow(meta,r&&r.cumplimiento);
-    if(XD.cur&&XD.cur.id===x.id)XD.ctlLoad(x).catch(function(){});
+    if(XD.cur&&XD.cur.id===x.id){XD.ctlLoad(x).catch(function(){});FL.refresh(x)}
     if(XD.mode==='cartera')CC.docLeido(k,r);
     if(r&&r.lecciones){try{LS.learnNow()}catch(_){}}
     return r;
@@ -6581,14 +6618,15 @@ SB.enter=async function(user){
     await SB.loadAdvisors();
     $('#lg').hidden=true;
     await SB.pull(true);
-    SB.loadHist();GP.load();
+    SB.loadHist();GP.load();AL.load();
     MI.loadAgenda().then(MI.startTimer);
     showView(MR.is()?'m_res':DN.is()?'dueno':SB.user&&SB.user.director?'grp':PV.is()?'pv':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
       if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
+      if(p.table==='alertas'){if(p.eventType==='INSERT')AL.onNew(p.new);return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
-      if(p.table==='expedientes'){AD.loadExp();if(S.view==='pv'&&!XD.cur)PV.load(true);if(S.view==='inicio')HM.load();if(p.new&&XD.cur&&String(p.new.id)===String(XD.cur.id)){if(p.new.prea_form)XD.formApply(p.new);if(p.new.plan_correccion)XD.planApply(p.new);if(p.new.cerebro)XD.brainApply(p.new)}return}
+      if(p.table==='expedientes'){AD.loadExp();if(S.view==='pv'&&!XD.cur)PV.load(true);if(S.view==='inicio')HM.load();if(p.new&&XD.cur&&String(p.new.id)===String(XD.cur.id)){if(p.new.prea_form)XD.formApply(p.new);if(p.new.plan_correccion)XD.planApply(p.new);if(p.new.cerebro)XD.brainApply(p.new);if(p.new.flujo&&JSON.stringify(p.new.flujo)!==JSON.stringify(XD.cur.flujo)){XD.cur.flujo=p.new.flujo;FL.draw(XD.cur)}}return}
       if(p.table==='activity')return;
       if(p.table==='reglas_lecciones'){LS.onNew(p);return}
       if(p.table==='aprendizaje_eventos'){LS.refresh();return}
@@ -7040,6 +7078,7 @@ XA.core=async function(x,files,log,o){
   var u=await SB.c.from('expedientes').update({armado:res}).eq('id',x.id);if(u.error)SB.fail(u.error);
   if(XD.cur&&XD.cur.id===x.id)XA.show(res);
   if(!o.enChat)res.chat=await XA.chat(x,res);
+  await FL.refresh(x);
   if(HM.d&&HM.d.exp){var h=HM.d.exp.filter(function(r){return r.id===x.id})[0];if(h)h.armado=res}
   var ex=(typeof EX!=='undefined'&&EX.rows||[]).filter(function(r){return r.id===x.id})[0];if(ex)Object.assign(ex,x);
   return res;
@@ -7110,13 +7149,123 @@ document.addEventListener('change',function(e){
   if(t.dataset.debrev){SB.c.from('debitos').update({monto_revertido:Number(t.value)||0}).eq('id',t.dataset.debrev).then(function(r){if(r.error)SB.fail(r.error);else toast('Monto revertido guardado')})}
 });
 
+/* ══ 5. Alertas de reglas ═══════════════════════════════════════════════
+   Los agentes escuchan (débitos, rechazos de planta, boletines y cambios de política de GM, avances y plazos del flujo)
+   y la base de datos escribe la alerta para quien le toca (tabla alertas, con RLS: red, marca, grupo, agencia o usuario).
+   Llegan en vivo por Supabase Realtime: campana, aviso en pantalla y notificación del navegador.
+   Cada alerta dice a cuáles de MIS casos abiertos les aplica. */
+var AL={rows:[],read:{},loaded:false,
+  T:{debito:['Débito','bad'],rechazo:['Rechazo de planta','bad'],boletin:['Boletín de GM','info'],politica:['Política de GM','info'],regla:['Regla nueva','info'],plazo:['Plazo','warn'],etapa:['Avance','ok']},
+  A:{red:'Toda la red',marca:'Toda la marca',grupo:'Tu grupo',agencia:'Tu agencia',usuario:'Solo para ti'}};
+AL.load=async function(){
+  if(!SB.c||!SB.entered)return;
+  var r=await Promise.all([SB.c.from('alertas').select('*').order('created_at',{ascending:false}).limit(120),SB.c.from('alertas_leidas').select('alerta_id').limit(1000)]);
+  if(r[0].error){console.warn('[alertas]',r[0].error.message);return}
+  AL.rows=r[0].data||[];AL.read={};(r[1].data||[]).forEach(function(x){AL.read[x.alerta_id]=1});AL.loaded=true;AL.badge();
+  if(S.view==='red'&&RED.f==='alertas')RED.render();if(S.view==='inicio')HM.render();
+};
+AL.unread=function(){return AL.rows.filter(function(a){return !AL.read[a.id]})};
+AL.badge=function(){var b=$('#bell');if(b)b.dataset.n=String(AL.unread().length+(typeof MI!=='undefined'&&MI.due?MI.due().length:0))};
+AL.markAll=async function(){
+  var L=AL.unread();if(!L.length)return;L.forEach(function(a){AL.read[a.id]=1});AL.badge();
+  var r=await SB.c.from('alertas_leidas').upsert(L.map(function(a){return {alerta_id:a.id}}),{onConflict:'alerta_id,user_id',ignoreDuplicates:true});if(r.error)console.warn('[alertas]',r.error.message);
+};
+AL.onNew=function(a){
+  if(!a||AL.rows.some(function(x){return x.id===a.id}))return;
+  AL.rows.unshift(a);AL.badge();
+  toast((a.urgente?'⚠ ':'')+a.titulo);
+  try{if('Notification' in window&&Notification.permission==='granted'&&document.hidden)new Notification('Ax AI · '+(AL.T[a.tipo]||[a.tipo])[0],{body:a.titulo,tag:a.id})}catch(_){}
+  if(S.view==='red'&&RED.f==='alertas')RED.render();if(S.view==='inicio')HM.render();
+};
+/* mis casos abiertos a los que les aplica: mismo sistema, o reglas del expediente mientras el caso no se cobra */
+AL.casos=function(a){
+  var E=((HM.d&&HM.d.exp)||EX.rows||[]).filter(function(x){return !x.flujo||x.flujo.etapa!=='cerrado'});
+  if(a.tipo==='plazo'||a.tipo==='etapa')return E.filter(function(x){return x.id===a.expediente_id});
+  var s=norm(a.sys||''),sis=((a.datos&&a.datos.sistemas)||[]).map(norm);
+  var L=E.filter(function(x){if(x.id===a.expediente_id)return false;var xs=norm(x.sys||'');
+    if(s&&xs&&(xs.indexOf(s)>=0||s.indexOf(xs)>=0))return true;if(sis.some(function(z){return z&&xs&&(xs.indexOf(z)>=0||z.indexOf(xs)>=0)}))return true;
+    return !s&&!sis.length&&a.seccion&&(!x.flujo||['prea','expediente','transaccion'].indexOf(x.flujo.etapa)>=0)});
+  return L.slice(0,8);
+};
+AL.ago=function(t){var m=Math.round((Date.now()-new Date(t))/6e4);return m<1?'ahora':m<60?'hace '+m+' min':m<1440?'hace '+Math.round(m/60)+' h':new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'})};
+AL.card=function(a,mini){
+  var t=AL.T[a.tipo]||[a.tipo,''],C=AL.casos(a),nw=!AL.read[a.id];
+  return '<article class="al-c '+t[1]+(nw?' nw':'')+(a.urgente?' urg':'')+'"><div class="al-h"><span class="al-t '+t[1]+'">'+esc(t[0])+'</span><span class="al-s">'+esc(AL.A[a.alcance]||'')+' · '+AL.ago(a.created_at)+'</span>'+(nw?'<i class="al-dot" aria-label="Nueva"></i>':'')+'</div>'+
+    '<h4>'+esc(a.titulo)+'</h4>'+(!mini&&a.cuerpo?'<p>'+esc(a.cuerpo)+'</p>':'')+(a.accion?'<p class="al-do"><b>Qué hacer:</b> '+esc(a.accion)+'</p>':'')+
+    (C.length?'<div class="al-cs"><span>'+(a.tipo==='plazo'||a.tipo==='etapa'?'Caso':'Aplica a '+C.length+(C.length===1?' caso tuyo abierto':' casos tuyos abiertos'))+':</span>'+C.map(function(x){return '<button type="button" data-exp="'+ea(x.folio)+'">'+esc(x.wo||x.folio)+'</button>'}).join('')+'</div>':'')+
+    (!mini&&a.regla_id?'<small class="al-r">Regla '+esc(a.regla_id)+' · el revisor de documentos ya la aplica</small>':'')+'</article>';
+};
+AL.html=function(){
+  var L=AL.rows,u=AL.unread().length;
+  return '<div class="al-up"><div><h3>¿Llegó un boletín o un cambio de política de GM?</h3><p>Súbelo o pega el texto. El agente lo explica en palabras simples, lo convierte en reglas para revisar los expedientes y avisa al instante a todas las agencias de tu grupo.</p></div>'+
+    '<div class="al-upf"><label class="bt" for="alF">Subir boletín (PDF o foto)</label><input type="file" id="alF" accept=".pdf,image/*,.txt,.eml" hidden><textarea id="alT" rows="2" placeholder="O pega aquí el texto del correo o la circular"></textarea><button class="bt pri" type="button" id="alGo">Publicar alerta</button></div><p class="xz-mut" id="alMsg" role="status"></p></div>'+
+    '<div class="al-bar"><b>'+(L.length?L.length+(L.length===1?' alerta':' alertas')+(u?' · '+u+(u===1?' nueva':' nuevas'):''):'Sin alertas todavía')+'</b>'+(u?'<button class="bt" type="button" id="alRead">Marcar como leídas</button>':'')+'</div>'+
+    (L.length?'<div class="al-list">'+L.map(function(a){return AL.card(a)}).join('')+'</div>':'<div class="pv-empty">Aquí llegan los débitos y rechazos de las agencias de tu grupo, los boletines de GM y los avisos del flujo de tus casos. Todo en el momento en que pasa.</div>');
+};
+AL.publicar=async function(){
+  var fi=$('#alF'),file=fi&&fi.files&&fi.files[0],texto=($('#alT').value||'').trim(),msg=$('#alMsg'),btn=$('#alGo');
+  if(!file&&!texto){msg.textContent='Sube el boletín o pega su texto.';return}
+  btn.disabled=true;msg.textContent='El agente está leyendo el boletín…';
+  try{
+    var f=null;if(file)f=/\.(txt|eml)$/i.test(file.name)?{name:file.name,text:await file.text()}:await TR.prep(file);
+    var r=await SB.ai({file:f||undefined,texto:texto||undefined},'boletin');
+    if(r&&r.es_boletin===false){msg.textContent=r.motivo||'No parece un boletín de GM.';btn.disabled=false;return}
+    var ok='<b>Publicado para '+esc(AL.A[r.alcance]||'tu grupo').toLowerCase()+':</b> '+esc(r.titulo||'')+'.'+(r.reglas&&r.reglas.length?' Reglas nuevas: '+r.reglas.map(function(g){return esc(g.id)}).join(', ')+'.':'');
+    await AL.load();await RED.load();var m2=$('#alMsg');if(m2)m2.innerHTML=ok;var b2=$('#alGo');if(b2)b2.disabled=false;return;
+  }catch(e){SB.fail(e);msg.textContent='No se pudo publicar: '+TR.errTxt(e)}
+  btn.disabled=false;
+};
+document.addEventListener('click',function(e){var t=e.target;if(!t||!t.id)return;if(t.id==='alGo')AL.publicar();if(t.id==='alRead'){AL.markAll().then(function(){RED.render()})}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='alF'&&e.target.files[0]){var m=$('#alMsg');if(m)m.textContent='Archivo: '+e.target.files[0].name}});
+
+/* ══ 6. El ciclo de la garantía ═════════════════════════════════════════
+   La base de datos calcula la etapa de cada caso (flujo_calc) con lo que ya pasó y la guarda en expedientes.flujo;
+   un agente la recalcula cada hora y en cuanto cambia algo (planta responde, se sube un documento, se factura, se cobra).
+   Aquí se muestra: la línea del ciclo, el siguiente paso, de quién es y cuándo vence. */
+var FL={E:[['orden','Orden abierta'],['prea','Preautorización'],['expediente','Expediente'],['transaccion','Transacción GWM'],['factura','Factura a planta'],['cobro','Cobro'],['cerrado','Cerrada']]};
+FL.nom=function(k){return (FL.E.filter(function(e){return e[0]===k})[0]||[k,k])[1]};
+FL.idx=function(f){return f?FL.E.map(function(e){return e[0]}).indexOf(f.etapa):-1};
+FL.vence=function(v){if(!v)return '';var d=Math.ceil((new Date(v+'T12:00:00')-Date.now())/864e5);return d<0?'vencido hace '+(-d)+(d===-1?' día':' días'):d===0?'vence hoy':'vence en '+d+(d===1?' día':' días')};
+FL.html=function(x){
+  var f=x.flujo,i=FL.idx(f);
+  if(!f)return '<section class="fl" id="xdFlujo" aria-label="Ciclo de la garantía"><div class="fl-h"><h3>Ciclo de la garantía</h3><span class="xz-mut">El agente está calculando la etapa…</span></div></section>';
+  var st=f.estado==='bad'?'bad':f.estado==='warn'?'warn':'ok',H=(f.historia||[]).slice(-4).reverse();
+  return '<section class="fl" id="xdFlujo" aria-label="Ciclo de la garantía"><div class="fl-h"><h3>Ciclo de la garantía</h3><span class="fl-who">El agente la avanza solo con lo que va pasando</span></div>'+
+    '<ol class="fl-st">'+FL.E.map(function(e,k){return '<li class="'+(k<i||f.etapa==='cerrado'?'done':k===i?'now '+st:'')+'"><i></i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'+
+    (f.etapa!=='cerrado'?'<div class="fl-next '+st+'"><div><span>Siguiente paso · '+esc(f.responsable||'')+'</span><b>'+esc(f.siguiente||'')+'</b></div>'+(f.vence?'<em>'+esc(FL.vence(f.vence))+'<small>'+new Date(f.vence+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'})+'</small></em>':'')+'</div>':'<div class="fl-next ok"><div><b>Garantía cobrada</b></div></div>')+
+    ((f.tambien||[]).length?'<ul class="fl-tb">'+f.tambien.map(function(t){var v=t.vence&&new Date(t.vence+'T12:00:00')<Date.now();return '<li class="'+(v||t.urgente?'bad':'')+'">'+esc(t.t)+(t.vence?' · '+esc(FL.vence(t.vence)):'')+'</li>'}).join('')+'</ul>':'')+
+    (H.length?'<p class="fl-hist">'+H.map(function(h){return esc(FL.nom(h.etapa))+' '+new Date(h.at).toLocaleDateString('es-MX',{day:'numeric',month:'short'})}).join(' ← ')+'</p>':'')+'</section>';
+};
+FL.draw=function(x){var el=$('#xdFlujo');if(el&&XD.cur&&XD.cur.id===x.id)el.outerHTML=FL.html(x)};
+FL.refresh=async function(x){
+  if(!x||!SB.c)return;
+  try{var r=await SB.c.rpc('flujo_refrescar',{p_id:x.id});if(!r.error&&r.data){x.flujo=r.data;FL.draw(x);var h=HM.d&&HM.d.exp&&HM.d.exp.filter(function(z){return z.id===x.id})[0];if(h)h.flujo=r.data}}catch(e){console.warn('[flujo]',e)}
+};
+/* Inicio: el embudo de mis casos y lo siguiente que hay que hacer */
+HM.cardFlujo=function(){
+  var E=(HM.exp()||[]).filter(function(x){return x.flujo});if(!E.length)return '';
+  var cnt={};E.forEach(function(x){cnt[x.flujo.etapa]=(cnt[x.flujo.etapa]||0)+1});
+  var R={bad:0,warn:1,ok:2},T=E.filter(function(x){return x.flujo.etapa!=='cerrado'&&(x.flujo.responsable==='Asesor'||x.flujo.estado!=='ok'||(x.flujo.tambien||[]).length)})
+    .sort(function(a,b){return (R[a.flujo.estado]-R[b.flujo.estado])||String(a.flujo.vence||'9').localeCompare(String(b.flujo.vence||'9'))}).slice(0,6);
+  return '<section class="hm-fl" aria-label="Ciclo de tus garantías"><div class="hm-arm-h"><span class="xa-mk">A</span><div><h3>Ciclo de tus garantías</h3><p>El agente mueve cada caso de etapa solo; tú solo haces lo que te toca</p></div></div>'+
+    '<div class="hm-fl-p">'+FL.E.map(function(e){return '<div class="'+(cnt[e[0]]?'on':'')+'"><b>'+(cnt[e[0]]||0)+'</b><span>'+esc(e[1])+'</span></div>'}).join('')+'</div>'+
+    (T.length?'<div class="hm-fl-l">'+T.map(function(x){var f=x.flujo;return '<button type="button" class="hm-arm-r" data-exp="'+ea(x.folio)+'"><b>'+esc(HM.orden(x))+'</b><span>'+esc(FL.nom(f.etapa))+' · '+esc(f.siguiente)+'</span><em class="'+(f.estado==='bad'?'':'fl-'+f.estado)+'">'+esc(f.vence?FL.vence(f.vence):f.responsable)+'</em></button>'}).join('')+'</div>':'<p class="xz-mut">Nada te toca ahorita: tus casos esperan a planta o ya están cobrados.</p>')+'</section>';
+};
+HM.cardAlertas=function(){
+  var L=AL.unread().slice(0,3);if(!L.length)return '';
+  return '<section class="hm-al" aria-label="Alertas nuevas"><div class="hm-arm-h"><span class="xa-mk">!</span><div><h3>'+AL.unread().length+(AL.unread().length===1?' alerta nueva':' alertas nuevas')+'</h3><p>Lo que pasó en tu grupo y en GM, y a cuáles de tus casos les aplica</p></div><button class="hm-btn" type="button" data-alver>Ver todas</button></div>'+
+    '<div class="al-list">'+L.map(function(a){return AL.card(a,true)}).join('')+'</div></section>';
+};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-alver]');if(b){RED.f='alertas';showView('red')}});
+
 /* ---- la red de reglas: lo que la red aprendió de débitos reales + el manual ---- */
-var RED={rows:[],q:'',f:'debito'};
+var RED={rows:[],q:'',f:'alertas'};
 RED.SEC={general:'Todo el expediente',contrato:'Orden de garantía',recepcion:'Recepción',diagnostico:'Diagnóstico',evidencia:'Evidencia',piezas:'Refacciones y eSPOM',destruccion:'Destrucción',actualizacion:'PRA',bateria:'Batería 12V',facturas_partes:'Facturas TOT/NAR/No GM',tac:'TAC',mantenimiento:'Mantenimientos',m2:'Formato M2',wpc:'WPC',factura:'Factura a planta',planta:'Transacción de planta'};
 RED.load=async function(){
   if(!SB.c||!SB.entered)return;
   var r=await SB.c.from('manual_reglas').select('id,seccion_expediente,tema,regla,como_verificar,consecuencia,fuente,pagina,origen,veces,monto_debitado,agencias,ultima_vez,creada_at').order('orden');
   if(r.error){SB.fail(r.error);return}RED.rows=r.data||[];RED.render();
+  if(RED.f==='alertas'){await AL.load();setTimeout(function(){if(S.view==='red'&&RED.f==='alertas')AL.markAll()},2500)}
 };
 RED.nuevas=function(dias){var lim=Date.now()-dias*PZ.DAY;return RED.rows.filter(function(r){return r.origen==='debito'&&r.ultima_vez&&new Date(r.ultima_vez)>=lim})};
 RED.render=function(){
@@ -7124,12 +7273,13 @@ RED.render=function(){
   var D=RED.rows.filter(function(r){return r.origen==='debito'}).sort(function(a,b){return new Date(b.ultima_vez||0)-new Date(a.ultima_vez||0)}),M=RED.rows.filter(function(r){return r.origen!=='debito'});
   var q=norm(RED.q),L=(RED.f==='debito'?D:M).filter(function(r){return !q||norm([r.id,r.tema,r.regla,RED.SEC[r.seccion_expediente]].join(' ')).indexOf(q)>=0});
   var tot=D.reduce(function(a,r){return a+Number(r.monto_debitado||0)},0),ag=D.reduce(function(a,r){return a+Number(r.agencias||0)},0);
-  $('#redSub').textContent=RED.rows.length+' reglas: '+M.length+' del manual de GM y '+D.length+' aprendidas de débitos reales'+(tot?' ('+DEB.mx(tot)+' debitados que ya no deben repetirse)':'');
-  el.innerHTML='<div class="ad-kpi"><div class="kp"><span>Reglas aprendidas de débitos</span><b>'+D.length+'</b><small>'+RED.nuevas(14).length+' en las últimas 2 semanas</small></div><div class="kp"><span>Débitos que las originaron</span><b>'+D.reduce(function(a,r){return a+Number(r.veces||0)},0)+'</b><small>'+ag+(ag===1?' agencia afectada':' casos por agencia')+'</small></div><div class="kp bad"><span>Monto debitado en la red</span><b>'+DEB.mx(tot)+'</b><small>la revisión de cada expediente ya los vigila</small></div><div class="kp"><span>Reglas del manual de GM</span><b>'+M.length+'</b><small>Manual 2026 y curso de garantías</small></div></div>'+
-    '<div class="ad-bar"><label>Ver <select id="redF"><option value="debito"'+(RED.f==='debito'?' selected':'')+'>Aprendidas de débitos</option><option value="manual"'+(RED.f==='manual'?' selected':'')+'>Del manual de GM</option></select></label><span class="sp"></span></div>'+
-    '<div class="ad-card">'+(L.length?L.map(function(r){return '<div class="red-r"><div class="red-h"><b>'+esc(r.id)+'</b><span>'+esc(RED.SEC[r.seccion_expediente]||r.seccion_expediente)+' · '+esc(r.tema)+'</span>'+(r.origen==='debito'?'<em>'+r.veces+(r.veces===1?' débito':' débitos')+' · '+r.agencias+(r.agencias===1?' agencia':' agencias')+' · '+DEB.mx(r.monto_debitado)+'</em>':'')+'</div><p>'+esc(r.regla)+'</p><small>Cómo se revisa: '+esc(r.como_verificar||'—')+' · Si no se cumple: '+esc(r.consecuencia||'—')+' · '+esc(r.fuente)+(r.pagina?', pág. '+r.pagina:'')+'</small></div>'}).join(''):'<div class="pv-empty">'+(RED.f==='debito'?'Todavía no hay débitos registrados. Cuando una agencia suba un débito de GM, aquí aparece la regla que protege a todas las demás.':'Sin resultados.')+'</div>')+'</div>';
+  $('#redSub').textContent=RED.f==='alertas'?'Lo que pasa en tu grupo y en GM, en el momento, y a cuáles de tus casos les aplica':RED.rows.length+' reglas: '+M.length+' del manual de GM y '+D.length+' aprendidas de débitos reales'+(tot?' ('+DEB.mx(tot)+' debitados que ya no deben repetirse)':'');
+  el.innerHTML=(RED.f==='alertas'?'':'<div class="ad-kpi"><div class="kp"><span>Reglas aprendidas de débitos</span><b>'+D.length+'</b><small>'+RED.nuevas(14).length+' en las últimas 2 semanas</small></div><div class="kp"><span>Débitos que las originaron</span><b>'+D.reduce(function(a,r){return a+Number(r.veces||0)},0)+'</b><small>'+ag+(ag===1?' agencia afectada':' casos por agencia')+'</small></div><div class="kp bad"><span>Monto debitado en la red</span><b>'+DEB.mx(tot)+'</b><small>la revisión de cada expediente ya los vigila</small></div><div class="kp"><span>Reglas del manual de GM</span><b>'+M.length+'</b><small>Manual 2026 y curso de garantías</small></div></div>')+
+    '<div class="ad-bar"><label>Ver <select id="redF"><option value="alertas"'+(RED.f==='alertas'?' selected':'')+'>Alertas</option><option value="debito"'+(RED.f==='debito'?' selected':'')+'>Reglas aprendidas de débitos</option><option value="manual"'+(RED.f==='manual'?' selected':'')+'>Reglas del manual y boletines de GM</option></select></label><span class="sp"></span></div>'+
+    (RED.f==='alertas'?AL.html():'<div class="ad-card">'+(L.length?L.map(function(r){return '<div class="red-r"><div class="red-h"><b>'+esc(r.id)+'</b><span>'+esc(RED.SEC[r.seccion_expediente]||r.seccion_expediente)+' · '+esc(r.tema)+'</span>'+(r.origen==='debito'?'<em>'+r.veces+(r.veces===1?' débito':' débitos')+' · '+r.agencias+(r.agencias===1?' agencia':' agencias')+' · '+DEB.mx(r.monto_debitado)+'</em>':'')+'</div><p>'+esc(r.regla)+'</p><small>Cómo se revisa: '+esc(r.como_verificar||'—')+' · Si no se cumple: '+esc(r.consecuencia||'—')+' · '+esc(r.fuente)+(r.pagina?', pág. '+r.pagina:'')+'</small></div>'}).join(''):'<div class="pv-empty">'+(RED.f==='debito'?'Todavía no hay débitos registrados. Cuando una agencia suba un débito de GM, aquí aparece la regla que protege a todas las demás.':'Sin resultados.')+'</div>')+'</div>');
 };
-document.addEventListener('change',function(e){if(e.target&&e.target.id==='redF'){RED.f=e.target.value;RED.render()}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='redF'){RED.f=e.target.value;RED.render();if(RED.f==='alertas')AL.load().then(function(){setTimeout(AL.markAll,2500)})}});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#viewRed [data-exp]');if(b){EX.q=b.dataset.exp;$('#exQ').value=EX.q;EX.f='prea';showView('exp')}});
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='redQ'){RED.q=e.target.value;RED.render()}});
 
 /* ---- dinero recuperado (función dinero_recuperado: respeta lo que cada quien puede ver) ---- */
