@@ -1969,6 +1969,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .vw-vacio{padding:18px;border-radius:12px;background:var(--fill-slab);font-size:12.8px;color:var(--muted);text-align:center}.vw-mut{color:var(--muted)}
 .vw-ped{margin:0;font-size:11px;color:var(--muted)}.vw-empty{margin:12px 2px 0}
 @media(max-width:640px){.vw-g{grid-template-columns:1fr}.vw-q form{flex-direction:column}.vw-ask .xa-mk{display:none}}
+.fl-st.srv{grid-template-columns:repeat(5,minmax(0,1fr))}
 .xd-del{margin-left:auto;align-self:center;padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,#d6453b 40%,transparent);background:transparent;color:#b4372b;font:500 12.5px var(--f-ui,inherit);cursor:pointer}
 .xd-del:hover{background:color-mix(in srgb,#d6453b 10%,transparent)}
 .hm-bx{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:14px 16px;border:0;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff);font:inherit;text-align:left;cursor:pointer}
@@ -5365,7 +5366,21 @@ GP.prea=function(e){
 /* servicios y campañas no llevan PREA: la orden se abre sin texto ni evidencia y el agente solo acompaña */
 GP.sinPrea=function(){var t=GP.tipo||(typeof GATE!=='undefined'&&GATE.v&&GATE.v.tipo);return !!t&&t!=='PREA'};
 GP.abrirSinPrea=function(){return S.agent==='garantias'&&!S.convId&&!S.streaming&&typeof GATE!=='undefined'&&!!GATE.v&&GATE.v.tipo!=='PREA'};
+GP.abrirServicio=async function(){
+  var ord=GATE.v.orden;
+  try{
+    var cv=await SB.c.from('conversations').select('id').eq('agent','garantias').eq('orden',ord).limit(1),cid=cv.data&&cv.data[0]&&cv.data[0].id;
+    if(!cid){var ci=await SB.c.from('conversations').insert({agent:'garantias',title:ord,text:'Orden '+ord+' (Servicio).',orden:ord}).select('id').single();if(ci.error)throw ci.error;cid=ci.data.id}
+    var q=await SB.c.from('expedientes').select('*').eq('conversation_id',cid).eq('tipo','Servicio').limit(1),ex=q.data&&q.data[0];
+    if(!ex){var ni=await SB.c.from('expedientes').insert({conversation_id:cid,folio:'SRV-'+ord,wo:ord,tipo:'Servicio',brand:S.brand||null,status:'borrador'}).select('*').single();if(ni.error)throw ni.error;ex=ni.data}
+    GATE.reset();SB.loadHist();
+    EX.f='srv';EX.q='';$('#exQ').value='';showView('exp');
+    await EX.load();if(!EX.rows.some(function(r){return r.id===ex.id}))EX.rows.unshift(ex);
+    XD.open(ex.id);
+  }catch(e){SB.fail(e);toast('No se pudo crear el servicio: '+((e&&e.message)||'error'))}
+};
 GP.abrir=async function(text,fobjs){
+  if(GATE.v&&GATE.v.tipo==='Servicio'){GP.abrirServicio();return}
   var v=GATE.v,ord=v.orden,tipo=v.tipo,ut=('Orden '+ord+' ('+tipo+'). '+(text||'')).trim();
   closeMenu();showView('agent');enterChat(ord);addUser(text||('Abrir la orden '+ord+' · '+tipo),fobjs||[]);
   ta.value='';S.files=[];renderFiles();autosize();
@@ -5438,6 +5453,9 @@ GP.open=async function(id){
   showView(cob?'cobros':'agent');resetChat();S.convId=id;
   GP.cur=cv.orden;GP.msgs=Array.isArray(cv.messages)?cv.messages.slice():[];GP.caseText=cv.text||'';
   var tm=/\((Servicio|Campaña)\)/.exec(cv.text||'');GP.tipo=tm?tm[1]:null;if(GP.tipo)GP.evid=true;
+  /* una orden de servicio no es una plática: se abre su expediente en Expedientes → Servicios */
+  if(GP.tipo==='Servicio'){var sx=await SB.c.from('expedientes').select('*').eq('conversation_id',id).eq('tipo','Servicio').limit(1);
+    if(sx.data&&sx.data[0]){resetChat();EX.f='srv';EX.q='';$('#exQ').value='';showView('exp');await EX.load();if(!EX.rows.some(function(r){return r.id===sx.data[0].id}))EX.rows.unshift(sx.data[0]);XD.open(sx.data[0].id);return}}
   enterChat(cv.orden||cv.title||'Conversación');
   var ex=await SB.c.from('expedientes').select(GP.COLS).eq('conversation_id',id).order('created_at',{ascending:true}).limit(10);
   var rows=(ex.data||[]);GP.nPrea=rows.length;
@@ -5778,7 +5796,7 @@ var NODE=(function(){
   function cp(text,msg){return 'data-copy="'+ea(text)+'" data-msg="'+ea(msg)+'"'}
   function acts(x){
     var L=[];
-    if(x.status==='borrador'){L.push(A('data-r="ok"','Fue aceptada','ok'));L.push(A('data-r="no"','Fue rechazada','no'))}
+    if(x.status==='borrador'&&x.tipo!=='Servicio'){L.push(A('data-r="ok"','Fue aceptada','ok'));L.push(A('data-r="no"','Fue rechazada','no'))}
     L.push(A(cp(x.folio,'Folio copiado'),'Copiar folio','copy'));
     if(XDEL.puede(x))L.push(A('data-xdelc="1"','Eliminar expediente','trash'));
     if(x.status!=='borrador')L.push(A(cp([x.folio,x.queja,[x.sys,x.op].filter(Boolean).join(' · ')].filter(Boolean).join(' — '),'Resumen copiado'),'Copiar resumen','doc'));
@@ -5945,7 +5963,7 @@ var NODE=(function(){
 
 var EX={rows:[],cam:[],f:'prea',q:'',loading:false};
 EX.SUB={prea:function(){return SB.user&&(SB.user.role==='admin'||SB.user.gerente)?'Todas las PREAs de la agencia y lo que respondió el fabricante':'Tus PREAs generadas por el agente y lo que respondió el fabricante'},
-  cam:function(){return 'Campañas de las unidades de tu agencia'},srv:function(){return 'Tus PREAs agrupadas por tipo de servicio'}};
+  cam:function(){return 'Campañas de las unidades de tu agencia'},srv:function(){return 'Servicios: se abre la orden, se sube la evidencia, se factura y se cobra. Sin PREA.'}};
 EX.load=async function(){
   if(!SB.c||!SB.entered){return}
   EX.loading=true;EX.render();
@@ -5991,7 +6009,7 @@ EX.render=function(){
   var q=norm(EX.q),admin=SB.user&&(SB.user.role==='admin'||SB.user.gerente),stl={borrador:'Pendiente',aceptada:'Aceptada',rechazada:'Rechazada'},html='',n=0;
   if(EX.loading){$('#exList').innerHTML='<div class="ex-empty">Cargando…</div>';return}
   if(EX.f==='prea'){
-    var list=EX.rows.filter(function(x){return !q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0});
+    var list=EX.rows.filter(function(x){return x.tipo!=='Servicio'}).filter(function(x){return !q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0});
     n=list.length;html=list.map(function(x){return NODE.card(x,admin,stl)}).join('');
     if(!n)html='<div class="ex-empty">'+(EX.rows.length?'Sin resultados para esa búsqueda.':'Aún no hay expedientes. Cada PREA que arme el agente aparecerá aquí.')+'</div>';
   }else if(EX.f==='cam'){
@@ -5999,11 +6017,10 @@ EX.render=function(){
     n=lc.length;html=lc.map(function(x){return NODE.cam(x)}).join('');
     if(!n)html='<div class="ex-empty">'+(EX.cam.length?'Sin resultados para esa búsqueda.':'Aún no hay campañas registradas.')+'</div>';
   }else{
-    var g={};EX.rows.forEach(function(x){var k=x.sys||'Sin sistema';(g[k]=g[k]||{name:k,n:0,acc:0,pen:0});g[k].n++;if(x.status==='aceptada')g[k].acc++;if(x.status==='borrador')g[k].pen++});
-    var ls=Object.keys(g).map(function(k){var o=g[k];o.say=o.n+(o.n===1?' PREA':' PREAs')+' · '+o.acc+(o.acc===1?' aceptada':' aceptadas');o.more=o.pen?o.pen+(o.pen===1?' pendiente':' pendientes'):'Sin pendientes';return o})
-      .filter(function(o){return !q||norm(o.name).indexOf(q)>=0}).sort(function(a,b){return b.n-a.n});
-    n=ls.length;html=ls.map(function(o){return NODE.srv(o)}).join('');
-    if(!n)html='<div class="ex-empty">'+(EX.rows.length?'Sin resultados para esa búsqueda.':'Aún no hay servicios: aparecerán con tus PREAs.')+'</div>';
+    var sv=EX.rows.filter(function(x){return x.tipo==='Servicio'&&(!q||norm([x.folio,x.wo,x.queja].join(' ')).indexOf(q)>=0)});
+    var stS={borrador:'En proceso'};
+    n=sv.length;html=sv.map(function(x){var f=x.flujo,y=Object.assign({},x,{status:f&&f.etapa==='cerrado'?'aceptada':'borrador'});return NODE.card(y,admin,{borrador:f?FL.nom(f.etapa):'En proceso',aceptada:'Cobrado'})}).join('');
+    if(!n)html='<div class="ex-empty">'+(EX.rows.some(function(x){return x.tipo==='Servicio'})?'Sin resultados para esa búsqueda.':'Aún no hay servicios. En el Agente de Garantías elige «Servicio», escribe la orden y dale Continuar.')+'</div>';
   }
   $('#exList').innerHTML=html;
   NODE.mount($('#exList'));
@@ -6093,9 +6110,20 @@ XD.gridHtml=function(){
     '<details class="xd-mas" id="xdOpt"><summary>Según aplique <span>'+opt.length+' apartados · PRA, batería, facturas de partes, TAC, mantenimientos, M2 y envío a WPC</span></summary>'+
     '<div class="xd-grid">'+opt.map(XD.secBox).join('')+'</div></details>'+
     '<div class="xd-gh"><h3>Cobranza</h3></div><div class="xd-grid">'+g('cob').map(XD.secBox).join('')+'</div>'};
+XD.SRV=[['evidencia','Evidencia del servicio','Fotos y documentos del trabajo realizado'],['factura','Factura','La factura del servicio'],['planta','Comprobante de cobro','El pago recibido del servicio']];
+XD.openSrv=function(x,el){
+  el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Servicios</button>'+
+    '<div><h2>'+esc(x.wo||x.folio)+'</h2><p>'+esc(['Servicio',x.queja].filter(Boolean).join(' · '))+'</p></div>'+
+    (XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</div>'+
+    FL.html(x)+'<div class="xd-grid">'+XD.SRV.map(XD.secBox).join('')+'</div></div>';
+  $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;$('.xd-back',el).focus();
+  XD.SRV.forEach(function(d){XD.load(x.id,d[0])});
+  FL.refresh(x);
+};
 XD.open=function(id){
   var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x){toast('No encontré ese expediente');return}
   XD.cur=x;XD.mode='exp';var el=$('#exDoc');
+  if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
     (XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div>'+
@@ -6116,7 +6144,7 @@ XD.load=async function(id,k){
   if(!SB.c)return;
   var r=await SB.c.storage.from(XD.B).list(id+'/'+k,{limit:100,sortBy:{column:'created_at',order:'desc'}});
   if(r.error||!XD.cur||XD.cur.id!==id)return;
-  var ls=$('.xd-list',XD.sec(k));
+  var sk=XD.sec(k);if(!sk)return;var ls=$('.xd-list',sk);
   ls.innerHTML=(r.data||[]).filter(function(f){return f.name&&f.name!=='.emptyFolderPlaceholder'}).map(function(f){
     return XD.rowHtml({name:f.name.replace(/^\d+_/,''),path:id+'/'+k+'/'+f.name,meta:XD.fmt((f.metadata&&f.metadata.size)||0)+' · Subido',ok:true})}).join('');
   if(ls.children.length){var op=ls.closest('details');if(op)op.open=true}
@@ -6143,6 +6171,7 @@ XD.send=async function(k,file){
     return;
   }
   bar.style.transform='scaleX(1)';meta.textContent=XD.fmt(file.size)+' · Subido';
+  if(x.tipo==='Servicio'){FL.refresh(x);setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>')},350);return}
   var rev=k==='actualizacion'?XD.formRead(x.id,file,file.name,path,meta):XD.learn(k,file,meta);
   setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>');
     var nm=row.querySelector('.xd-name');nm.outerHTML='<button type="button" class="xd-name" data-xdopen="'+ea(path)+'">'+esc(file.name)+'</button>'},350);
@@ -6684,7 +6713,7 @@ document.addEventListener('click',function(e){
   if(o){SB.c.storage.from(XD.B).createSignedUrl(o.dataset.xdopen,300).then(function(r){if(r.data&&r.data.signedUrl)window.open(r.data.signedUrl,'_blank','noopener');else toast('No pude abrir el archivo')});return}
   var z=t.closest('#exDoc .xd-zone');if(z){if(t.tagName!=='INPUT')$('input',z).click();return}
   /* la tarjeta del expediente (no sus botones) */
-  var c=t.closest('#exList .nod');if(c&&EX.f==='prea'&&!t.closest('.nod-act')&&c.dataset.id)XD.open(c.dataset.id);
+  var c=t.closest('#exList .nod');if(c&&(EX.f==='prea'||EX.f==='srv')&&!t.closest('.nod-act')&&c.dataset.id)XD.open(c.dataset.id);
 });
 document.addEventListener('change',function(e){
   var i=e.target;if(i.matches&&i.matches('#xdQ input[type=radio]')){XD.qVerd(XD.qRead());return}
@@ -6697,7 +6726,7 @@ document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.cl
 document.addEventListener('keydown',function(e){
   if(XD.cur&&e.key==='Escape'){XD.close();return}
   var z=e.target.closest&&e.target.closest('#exDoc .xd-zone');if(z&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('input',z).click()}
-  var c=e.target.classList&&e.target.classList.contains('nod')&&e.target.closest('#exList');if(c&&e.key==='Enter'&&EX.f==='prea')XD.open(e.target.dataset.id);
+  var c=e.target.classList&&e.target.classList.contains('nod')&&e.target.closest('#exList');if(c&&e.key==='Enter'&&(EX.f==='prea'||EX.f==='srv'))XD.open(e.target.dataset.id);
 });
 SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='axl-msg'+(t?' on':'')+(t&&err?' err':'')};
 SB.lgMode=function(m){
@@ -7421,16 +7450,19 @@ document.addEventListener('change',function(e){if(e.target&&e.target.id==='alF'&
    un agente la recalcula cada hora y en cuanto cambia algo (planta responde, se sube un documento, se factura, se cobra).
    Aquí se muestra: la línea del ciclo, el siguiente paso, de quién es y cuándo vence. */
 var FL={E:[['orden','Orden abierta'],['prea','Preautorización'],['expediente','Expediente'],['transaccion','Transacción GWM'],['factura','Factura a planta'],['cobro','Cobro'],['cerrado','Cerrada']]};
-FL.nom=function(k){return (FL.E.filter(function(e){return e[0]===k})[0]||[k,k])[1]};
-FL.idx=function(f){return f?FL.E.map(function(e){return e[0]}).indexOf(f.etapa):-1};
+FL.nom=function(k){return (FL.E.concat(FL.ES).filter(function(e){return e[0]===k})[0]||[k,k])[1]};
+FL.ES=[['orden','Orden abierta'],['servicio','Servicio y evidencia'],['factura','Factura'],['cobro','Cobro'],['cerrado','Cerrado']];
+FL.lista=function(f){return f&&f.tipo==='Servicio'?FL.ES:FL.E};
+FL.idx=function(f){return f?FL.lista(f).map(function(e){return e[0]}).indexOf(f.etapa):-1};
 FL.vence=function(v){if(!v)return '';var d=Math.ceil((new Date(v+'T12:00:00')-Date.now())/864e5);return d<0?'vencido hace '+(-d)+(d===-1?' día':' días'):d===0?'vence hoy':'vence en '+d+(d===1?' día':' días')};
 FL.html=function(x){
   var f=x.flujo,i=FL.idx(f);
   if(!f)return '<section class="fl" id="xdFlujo" aria-label="Ciclo de la garantía"><div class="fl-h"><h3>Ciclo de la garantía</h3><span class="xz-mut">El agente está calculando la etapa…</span></div></section>';
   var st=f.estado==='bad'?'bad':f.estado==='warn'?'warn':'ok',H=(f.historia||[]).slice(-4).reverse();
-  return '<section class="fl" id="xdFlujo" aria-label="Ciclo de la garantía"><div class="fl-h"><h3>Ciclo de la garantía</h3><span class="fl-who">El agente la avanza solo con lo que va pasando</span></div>'+
-    '<ol class="fl-st">'+FL.E.map(function(e,k){return '<li class="'+(k<i||f.etapa==='cerrado'?'done':k===i?'now '+st:'')+'"><i></i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'+
-    (f.etapa!=='cerrado'?'<div class="fl-next '+st+'"><div><span>Siguiente paso · '+esc(f.responsable||'')+'</span><b>'+esc(f.siguiente||'')+'</b></div>'+(f.vence?'<em>'+esc(FL.vence(f.vence))+'<small>'+new Date(f.vence+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'})+'</small></em>':'')+'</div>':'<div class="fl-next ok"><div><b>Garantía cobrada</b></div></div>')+
+  var srv=f.tipo==='Servicio';
+  return '<section class="fl" id="xdFlujo" aria-label="Ciclo"><div class="fl-h"><h3>'+(srv?'Ciclo del servicio':'Ciclo de la garantía')+'</h3><span class="fl-who">'+(srv?'Sin PREA · se cierra en un día: evidencia, factura y cobro':'El agente la avanza solo con lo que va pasando')+'</span></div>'+
+    '<ol class="fl-st'+(f.tipo==='Servicio'?' srv':'')+'">'+FL.lista(f).map(function(e,k){return '<li class="'+(k<i||f.etapa==='cerrado'?'done':k===i?'now '+st:'')+'"><i></i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'+
+    (f.etapa!=='cerrado'?'<div class="fl-next '+st+'"><div><span>Siguiente paso · '+esc(f.responsable||'')+'</span><b>'+esc(f.siguiente||'')+'</b></div>'+(f.vence?'<em>'+esc(FL.vence(f.vence))+'<small>'+new Date(f.vence+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'})+'</small></em>':'')+'</div>':'<div class="fl-next ok"><div><b>'+(f.tipo==='Servicio'?'Servicio cobrado':'Garantía cobrada')+'</b></div></div>')+
     ((f.tambien||[]).length?'<ul class="fl-tb">'+f.tambien.map(function(t){var v=t.vence&&new Date(t.vence+'T12:00:00')<Date.now();return '<li class="'+(v||t.urgente?'bad':'')+'">'+esc(t.t)+(t.vence?' · '+esc(FL.vence(t.vence)):'')+'</li>'}).join('')+'</ul>':'')+
     (H.length?'<p class="fl-hist">'+H.map(function(h){return esc(FL.nom(h.etapa))+' '+new Date(h.at).toLocaleDateString('es-MX',{day:'numeric',month:'short'})}).join(' ← ')+'</p>':'')+'</section>';
 };
