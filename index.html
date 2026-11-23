@@ -1836,6 +1836,31 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .xd-verd{font-size:13px;font-weight:500}
 .xd-verd[data-v="bien"]{color:var(--ok)}.xd-verd[data-v="mal"]{color:#e5484d}
 @media (prefers-reduced-motion: reduce){.xd,.xd-row,.xd-tick,.xd-zone{animation:none;transition:none}}
+.xa{margin:0 0 16px;padding:18px;border-radius:18px;background:var(--fill-on);color:var(--bg);display:flex;flex-direction:column;gap:14px}
+.xa-h{display:flex;gap:12px;align-items:flex-start}.xa-h h3{margin:0 0 4px;font-size:16px;font-weight:600}.xa-h p{margin:0;font-size:12.8px;line-height:1.5;opacity:.72;max-width:760px}
+.xa-mk{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--signal,#2231dd);color:#fff;font:700 14px var(--font-ui)}
+.xa-zone{display:flex;align-items:center;justify-content:center;gap:12px;min-height:96px;padding:12px 16px;border:1.5px dashed color-mix(in srgb,var(--bg) 30%,transparent);border-radius:14px;cursor:pointer;text-align:left;transition:scale 420ms cubic-bezier(.24,1.34,.38,1),background-color 200ms}
+.xa-zone:hover,.xa-zone[data-over]{background:color-mix(in srgb,var(--bg) 8%,transparent)}.xa-zone[data-over]{scale:1.01}
+.xa-zone[aria-disabled]{opacity:.55;pointer-events:none}.xa-zone:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.xa-zone .xd-icon{background:color-mix(in srgb,var(--bg) 12%,transparent);color:var(--bg)}.xa-zone .xd-say span{color:color-mix(in srgb,var(--bg) 60%,transparent)}
+.xa-log{display:flex;flex-direction:column;gap:8px}.xa-log:empty{display:none}
+.xa-f{padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--bg) 7%,transparent)}
+.xa-fh{display:flex;align-items:center;gap:10px;font-size:13px}.xa-fh b{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-weight:500}
+.xa-st{font-size:12px;opacity:.75;text-align:right}.xa-st.ok{color:#6fdc9a;opacity:1}.xa-st.warn{color:#f5c26b;opacity:1}.xa-st.bad{color:#ff8a80;opacity:1}
+.xa-docs{margin:8px 0 0;padding:0 0 0 44px;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:12.3px;opacity:.85}.xa-docs:empty{display:none}
+.xa-docs em{font-style:normal;font-weight:600;color:#9cc4ff}.xa-docs em.no{color:inherit;opacity:.6}.xa-docs span{opacity:.7}
+.xa-res:empty{display:none}.xa-res .xz-mut{color:inherit;opacity:.7;margin:0}
+.xa-sum{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--bg) 8%,transparent)}
+.xa-sum b{display:block;font-size:14px}.xa-sum span{font-size:12px;opacity:.7}.xa-sum.ok b{color:#6fdc9a}.xa-sum.bad b{color:#ffb3a8}
+.xa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:10px}
+.xa-b{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--bg) 6%,transparent)}.xa-b h4{margin:0 0 6px;font-size:13px}
+.xa-b ul{margin:0;padding-left:18px;font-size:12.5px;line-height:1.5}.xa-b.bad h4{color:#ffb3a8}.xa-b.warn h4{color:#f5c26b}.xa-b.ok h4{color:#6fdc9a}
+.hm-arm{margin:0 0 18px;padding:16px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);display:flex;flex-direction:column;gap:8px}
+.hm-arm-h{display:flex;gap:12px;align-items:center;margin-bottom:4px}.hm-arm-h h3{margin:0;font-size:14.5px}.hm-arm-h p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.hm-arm-r{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:10px 12px;border:0;border-radius:10px;background:var(--fill-slab);color:inherit;font:inherit;text-align:left;cursor:pointer}
+.hm-arm-r:hover{background:var(--hover)}.hm-arm-r b{font-size:13px}.hm-arm-r span{font-size:12.5px;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.hm-arm-r em{font-style:normal;font-size:11.5px;color:#b4372b;white-space:nowrap}
+@media(max-width:640px){.hm-arm-r{grid-template-columns:1fr}.hm-arm-r span{white-space:normal}.xa-docs{padding-left:0}.xa-fh{flex-wrap:wrap}.xa-st{flex-basis:100%;text-align:left}.xa{padding:14px}}
+
 /* ══ Create menu: elegir qué se va a trabajar antes de iniciar el chat ═══
    (Bencho · MIT · bencho.dev/licence.) Adapted to vanilla JS: Framer's
    spring on width/height/radius became one CSS curve with no overshoot
@@ -4249,7 +4274,7 @@ HM.load=async function(){
   try{
     var q=function(t,sel,ord){return SB.c.from(t).select(sel).order(ord,{ascending:false}).limit(2000)};
     var r=await Promise.all([
-      q('expedientes','id,user_id,folio,wo,cliente,sys,status,parts,parts_total,labor,created_at,updated_at,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,profiles(name)','updated_at'),
+      q('expedientes','id,user_id,folio,wo,cliente,sys,status,parts,parts_total,labor,created_at,updated_at,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,armado,profiles(name)','updated_at'),
       q('piezas_pedido','id,expediente_id,user_id,pieza,cantidad,estado,eta,created_at,expedientes(folio,wo,cliente)','created_at'),
       q('campanas','*','created_at'),
       q('cartera','expediente_id,user_id,estado,monto,facturada_at,pagada_at,monto_pagado,created_at','created_at'),RED.load()]);
@@ -4414,7 +4439,7 @@ HM.rHome=function(){
     '<button class="hm-btn dark" type="button" data-nav="mi"><span class="hm-mk">A</span> Preguntar a Ax AI</button></div>'+
     '<button class="hm-acts" type="button" id="hmActs" aria-expanded="false"><span class="hm-ico">'+ORB+'</span><span>'+(tot?'Hay '+tot+(tot===1?' acción recomendada':' acciones recomendadas')+' para aumentar tu uso de Ax AI':'Estás al día: no hay acciones pendientes')+'</span>'+(tot?'<span class="hm-chev">⌄</span>':'')+'</button>'+
     '<div class="hm-actlist" id="hmActList" hidden>'+A.map(function(x){return '<button type="button" data-nav="'+x.go+'"><b>'+x.n+'</b><span>'+esc(x.t)+'</span></button>'}).join('')+'</div><div class="hm-gap"></div>'+
-    '<div class="hm-grid">'+HM.cardPre()+HM.cardPie()+HM.cardCam()+HM.cardSrv()+'</div>';
+    HM.cardArm()+'<div class="hm-grid">'+HM.cardPre()+HM.cardPie()+HM.cardCam()+HM.cardSrv()+'</div>';
 };
 
 /* ---- páginas de detalle ---- */
@@ -5812,12 +5837,13 @@ XD.open=function(id){
   XD.cur=x;XD.mode='exp';var el=$('#exDoc');
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div></div>'+
-    '<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
+    XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
   XD.qLoad(x.id);
   XD.ctl=null;XD.ctlLoad(x).catch(function(e){console.warn('[control GM]',e)});
+  XA.show(x.armado||null);
   XD.formInit(x);
 };
 XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera',pv=XD.from==='pv';$('#exDoc').hidden=true;$(pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true)};
@@ -5854,9 +5880,10 @@ XD.send=async function(k,file){
     return;
   }
   bar.style.transform='scaleX(1)';meta.textContent=XD.fmt(file.size)+' · Subido';
-  if(k==='actualizacion')XD.formRead(x.id,file,file.name,path,meta);else XD.learn(k,file,meta);
+  var rev=k==='actualizacion'?XD.formRead(x.id,file,file.name,path,meta):XD.learn(k,file,meta);
   setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>');
     var nm=row.querySelector('.xd-name');nm.outerHTML='<button type="button" class="xd-name" data-xdopen="'+ea(path)+'">'+esc(file.name)+'</button>'},350);
+  return rev;
 };
 /* mini cuestionario: ¿planta pagó bien? Se guarda como cuestionario.json junto a los
    documentos (sin tocar el esquema de la tabla) y, de respaldo, en este navegador. */
@@ -5933,6 +5960,7 @@ XD.learn=async function(k,file,meta,runId,intento){
     if(XD.cur&&XD.cur.id===x.id)XD.ctlLoad(x).catch(function(){});
     if(XD.mode==='cartera')CC.docLeido(k,r);
     if(r&&r.lecciones){try{LS.learnNow()}catch(_){}}
+    return r;
   }catch(e){
     var m=String((e&&e.message)||e),rid=(e&&e.run_id)||runId||null;
     /* fallas transitorias (el proveedor de IA, la red): se reintenta solo, hasta dos veces */
@@ -6396,7 +6424,7 @@ document.addEventListener('click',function(e){
 });
 document.addEventListener('change',function(e){
   var i=e.target;if(i.matches&&i.matches('#xdQ input[type=radio]')){XD.qVerd(XD.qRead());return}
-  if(!i.matches||!i.matches('#exDoc input[type=file]'))return;
+  if(!i.matches||!i.matches('#exDoc .xd-sec input[type=file]'))return;
   XD.take(i.closest('.xd-sec').dataset.k,i.files);i.value='';
 });
 ['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#exDoc .xd-zone');if(!z)return;e.preventDefault();z.setAttribute('data-over','')})});
@@ -6723,15 +6751,30 @@ XD.pdf=async function(x,btn){
     var line=function(s,o){o=o||{};var f=o.b?bold:font,sz=o.s||10.5,words=safe(s).split(' '),cur='';
       var out=function(t){if(y<60){pg=doc.addPage([W,H]);y=H-56}pg.drawText(t,{x:o.x||56,y:y,size:sz,font:f,color:o.c||P.rgb(.1,.1,.12)});y-=sz*1.45};
       words.forEach(function(w){var n=cur?cur+' '+w:w;if(f.widthOfTextAtSize(n,sz)>W-112-(o.x?o.x-56:0)){out(cur);cur=w}else cur=n});if(cur)out(cur)};
-    line('Expediente de garantía',{b:1,s:20});y-=4;
-    line('Nombre del archivo: '+XD.pdfName(x),{s:9.5,c:P.rgb(.4,.4,.45)});y-=8;
-    [['Folio',x.folio],['Orden de reparación',x.wo],['VIN',x.vin],['Vehículo',x.vehicle],['Kilometraje',x.km?Number(x.km).toLocaleString('es-MX')+' km':''],['Sistema / operación',[x.sys,x.op,x.opd].filter(Boolean).join(' - ')],['Apertura de la orden',x.orden_apertura],['Cierre de la orden',x.orden_cierre],['Condición reportada',String(x.queja||'').slice(0,300)]].forEach(function(r){line(r[0]+': '+(r[1]||'-'))});
-    y-=10;line('Contenido según el manual de GM',{b:1,s:13});
+    var AR=x.armado||null,RV=C.rev||[],NOW=XA.check(x,{at:new Date().toISOString(),archivos:[],documentos:[],datos:[],avisos:[]}),gris=P.rgb(.4,.4,.45);
+    var DT=(AR&&AR.datos)||{},cod=x.codes||{};
+    line('Carátula del expediente de garantía',{b:1,s:20});y-=4;
+    line('Nombre del archivo: '+XD.pdfName(x),{s:9.5,c:gris});
+    line((AR?'Armado por Ax AI el '+new Date(AR.at).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+'. ':'')+'Revisado el '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+' contra el Manual de Políticas y Procedimientos de Garantías GMM 2026 y el curso Administración de Garantías 2026.',{s:9.5,c:gris});y-=8;
+    line('Datos de la orden',{b:1,s:13});
+    [['Folio',x.folio],['Orden de reparación',x.wo],['VIN',x.vin],['Vehículo',x.vehicle],['Kilometraje',x.km?Number(x.km).toLocaleString('es-MX')+' km':''],['Sistema / operación',[x.sys,x.op||DT.operacion,x.opd].filter(Boolean).join(' - ')],['Apertura de la orden',x.orden_apertura],['Cierre de la orden',x.orden_cierre],['Condición reportada',String(x.queja||'').slice(0,300)],
+      ['Códigos (queja / causa / corrección)',[DT.codigo_queja||(cod.q&&cod.q[0]),DT.codigo_causa||(cod.c&&cod.c[0]),DT.codigo_correccion||(cod.r&&cod.r[0])].map(function(v){return v||'-'}).join(' / ')],
+      ['Códigos de falla (DTC)',(DT.dtc||[]).join(', ')],['Piezas',((DT.piezas&&DT.piezas.length?DT.piezas:x.parts)||[]).map(function(p){return (p.q||1)+' x '+(p.no?p.no+' ':'')+(p.d||'')}).join('; ')]].forEach(function(r){line(r[0]+': '+(r[1]||'-'),{s:10})});
+    var cu=RV.filter(function(c){return c.estado==='cumple'}).length,nc=RV.filter(function(c){return c.estado==='no_cumple'||c.estado==='no_se_puede_ver'}).length;
+    y-=8;line('Resultado de la revisión',{b:1,s:13});
+    line(!NOW.faltantes.length&&!(AR&&AR.discrepancias.length)?'Expediente completo: todas las secciones obligatorias están y lo revisado cumple con el manual.':(NOW.faltantes.length+(NOW.faltantes.length===1?' punto por completar':' puntos por completar')+(AR&&AR.discrepancias.length?' y '+AR.discrepancias.length+(AR.discrepancias.length===1?' dato que no cuadra':' datos que no cuadran'):'')+'.'),{b:1,s:10.5,c:NOW.faltantes.length?P.rgb(.56,.16,.13):P.rgb(.1,.43,.24)});
+    var ndoc=RV.map(function(c){return c.archivo}).filter(function(v,i,a){return a.indexOf(v)===i}).length;line(cu+(cu===1?' regla cumplida':' reglas cumplidas')+', '+nc+' por corregir, en '+ndoc+(ndoc===1?' documento revisado.':' documentos revisados.'),{s:10});
+    y-=8;line('Contenido según el manual de GM y lo que se revisó',{b:1,s:13});
     var files=[];
     for(var i=0;i<XD.DOCS.length;i++){var d=XD.DOCS[i],ls=await SB.c.storage.from(XD.B).list(x.id+'/'+d[0],{limit:100,sortBy:{column:'created_at',order:'asc'}}),L2=(ls.data||[]).filter(function(f){return f.name&&f.name!=='.emptyFolderPlaceholder'});
-      if(L2.length||d[3]==='req')line((L2.length?'[OK] ':'[FALTA] ')+d[1]+(L2.length?' ('+L2.length+(L2.length===1?' archivo':' archivos')+')':'')+(d[2]?' - '+d[2]:''),{s:10});
+      var rs=RV.filter(function(c){return c.seccion===d[0]}),rc=rs.filter(function(c){return c.estado==='cumple'}).length,rn=rs.filter(function(c){return c.estado==='no_cumple'||c.estado==='no_se_puede_ver'}).length;
+      if(L2.length||d[3]==='req')line((L2.length?(rn?'[REVISAR] ':'[OK] '):'[FALTA] ')+d[1]+(L2.length?' ('+L2.length+(L2.length===1?' archivo':' archivos')+(rs.length?'; '+rc+' cumplen'+(rn?', '+rn+' por corregir':''):'')+')':'')+(d[2]?' - '+d[2]:''),{s:9.5});
       L2.forEach(function(f){files.push({sec:d[1],path:x.id+'/'+d[0]+'/'+f.name,name:f.name.replace(/^\d+_/,'')})})}
-    if(avisos.length){y-=8;line('Avisos',{b:1,s:13});avisos.forEach(function(a){line('- '+a,{s:9.5})})}
+    var blk=function(t,L){if(L&&L.length){y-=8;line(t,{b:1,s:13});L.forEach(function(a){line('- '+a,{s:9.5})})}};
+    blk('Lo que falta',NOW.faltantes);
+    blk('Lo que no cuadra',AR&&AR.discrepancias);
+    blk('Plazos',NOW.plazos.map(function(p){return p.label+': '+p.txt+' ('+p.ref+')'}));
+    blk('Otros avisos',avisos.filter(function(a){return !/^Faltan las fechas/.test(a)&&!RV.some(function(c){return c.nota&&a.indexOf(c.nota)>=0})&&!NOW.faltantes.some(function(f){return a.indexOf(f)>=0||f.indexOf(a)>=0})}).slice(0,8));
     var omit=[];
     for(var k=0;k<files.length;k++){var f=files[k];btn.textContent='Agregando '+(k+1)+' de '+files.length+'…';
       var dl=await SB.c.storage.from(XD.B).download(f.path);if(dl.error||!dl.data){omit.push(f.name+' (no se pudo descargar)');continue}
@@ -6752,6 +6795,221 @@ XD.pdf=async function(x,btn){
     setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);toast('Expediente listo: '+XD.pdfName(x));
   }catch(e){console.error(e);toast((e&&e.message)||'No se pudo armar el PDF')}
   btn.disabled=false;btn.textContent=t0;
+};
+
+
+/* ══ El agente arma el expediente ══════════════════════════════════════
+   El asesor suelta TODO lo de la orden (PDFs escaneados con varios documentos, PDFs sueltos, fotos del celular).
+   1. La función "armar" lee cada archivo y dice qué páginas van en qué sección (en pedazos de pocas páginas).
+   2. Aquí se separan las páginas en PDFs nuevos y cada parte se sube a su sección con XD.send, que la manda a
+      revisar contra las reglas del manual (función "documento"), igual que si el asesor la subiera a mano.
+   3. Con los datos que sacó (orden, VIN, km, fechas) se llena el expediente (solo lo vacío) y se buscan cosas que no cuadran.
+   4. Lo que falta queda en expedientes.armado: se ve aquí, en Inicio y en el chat de la orden, y va en la carátula del PDF. */
+var XA={busy:false,CH:10,B64:4.2e6,PIEZA:4.4e6};
+XA.SEC=function(k){return k==='otro'?'No es del expediente':(XD.DOCS.filter(function(d){return d[0]===k})[0]||[0,k])[1]};
+XA.FALTA={contrato:'Falta la orden de garantía firmada por el cliente.',recepcion:'Faltan las fotos de la recepción: el VIN, el odómetro y una foto completa del vehículo.',diagnostico:'Falta el diagnóstico: el reporte del escáner o la hoja del técnico con sus lecturas.',evidencia:'Faltan las fotos de la falla y de los daños.',piezas:'Falta el pedido y la salida de las refacciones, con la captura de eSPOM.',destruccion:'Faltan las fotos de la pieza con su etiqueta, antes y después de destruirla.'};
+XA.html=function(){
+  return '<section class="xa" id="xdArm" aria-label="Armar el expediente con Ax AI"><div class="xa-h"><span class="xa-mk">A</span><div><h3>Arma el expediente con Ax AI</h3>'+
+    '<p>Sube todo lo de la orden de una vez, como venga: PDFs escaneados, fotos del celular o capturas. El agente pone cada documento en su sección (si un PDF trae varios, separa sus páginas), llena los datos, revisa contra el manual de GM y te dice qué falta.</p></div></div>'+
+    '<div class="xa-zone" tabindex="0" role="button" aria-label="Subir todos los documentos de la orden"><span class="xd-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
+    '<span class="xd-say"><b>Arrastra aquí todo lo de la orden</b><span>o haz clic · PDF, fotos o XML · varios a la vez</span></span><input type="file" multiple hidden accept=".pdf,image/*,.xml"></div>'+
+    '<div class="xa-log" id="xaLog" aria-live="polite"></div><div class="xa-res" id="xaRes"></div></section>'};
+XA.row=function(name){
+  var log=$('#xaLog'),d=document.createElement('div');d.className='xa-f';
+  d.innerHTML='<div class="xa-fh"><span class="xd-ext">'+esc(XD.ext(name))+'</span><b>'+esc(name)+'</b><span class="xa-st">En espera</span></div><ul class="xa-docs"></ul>';
+  if(log)log.appendChild(d);
+  return {set:function(t,c){var s=$('.xa-st',d);s.textContent=t;s.className='xa-st'+(c?' '+c:'')},
+    doc:function(sec,pg,desc){$('.xa-docs',d).insertAdjacentHTML('beforeend','<li><em class="'+(sec==='otro'?'no':'')+'">'+esc(XA.SEC(sec))+'</em> '+(pg?'<span>'+esc(pg)+'</span> ':'')+esc(desc||'')+'</li>')}};
+};
+XA.rango=function(p){
+  var out=[],i=0;while(i<p.length){var j=i;while(j+1<p.length&&p[j+1]===p[j]+1)j++;out.push(p[i]===p[j]?String(p[i]):p[i]+'–'+p[j]);i=j+1}
+  return (p.length===1?'pág. ':'págs. ')+out.join(', ');
+};
+/* la IA, con un reintento si falla algo pasajero */
+XA.ai=async function(x,f,paginas){
+  for(var i=0;i<2;i++){
+    try{return await SB.ai({expediente_id:x.id,file:f,paginas:paginas},'armar')}
+    catch(e){if(i||!/upstream|failed to fetch|network|timeout|bad_output/i.test(String(e&&e.message)))throw e;await new Promise(function(r){setTimeout(r,1500)})}
+  }
+};
+XA.sub=async function(P,src,pages){
+  var d=await P.PDFDocument.create(),cp=await d.copyPages(src,pages.map(function(p){return p-1}));cp.forEach(function(p){d.addPage(p)});
+  return await d.save();
+};
+/* clasifica las páginas a..b de un PDF; si el pedazo pesa mucho, lo parte en dos */
+XA.cls=async function(x,P,src,name,a,b,A,row){
+  var pages=[];for(var p=a;p<=b;p++)pages.push(p);
+  var bytes=await XA.sub(P,src,pages),b64=TR.b64(bytes);
+  if(b64.length>XA.B64){
+    if(b>a){var m=Math.floor((a+b)/2);return (await XA.cls(x,P,src,name,a,m,A,row)).concat(await XA.cls(x,P,src,name,m+1,b,A,row))}
+    A.avisos.push(name+', pág. '+a+': pesa demasiado para leerla; súbela en su sección a mano.');
+    return [{seccion:'otro',paginas:[a],descripcion:'Página muy pesada para leerla'}];
+  }
+  row.set('Leyendo '+(a===b?'pág. '+a:'págs. '+a+'–'+b)+' de '+src.getPageCount()+'…');
+  var r=await XA.ai(x,{name:name,media_type:'application/pdf',data:b64},b-a+1);
+  if(r.datos)A.datos.push(r.datos);(r.observaciones||[]).forEach(function(o){A.avisos.push(o)});
+  return (r.documentos||[]).map(function(d){return Object.assign({},d,{paginas:d.paginas.map(function(p){return p+a-1})})});
+};
+/* una sección de un PDF puede pesar más de lo que el revisor lee: se parte en piezas */
+XA.piezas=async function(P,src,pages){
+  var bytes=await XA.sub(P,src,pages);
+  if(bytes.length<=XA.PIEZA||pages.length<2)return [{pages:pages,bytes:bytes}];
+  var m=Math.ceil(pages.length/2);return (await XA.piezas(P,src,pages.slice(0,m))).concat(await XA.piezas(P,src,pages.slice(m)));
+};
+XA.base=function(n){return String(n||'archivo').replace(/\.[a-z0-9]{1,4}$/i,'').replace(/[^\w\-]+/g,'_').slice(0,60)};
+XA.place=function(sec,file,jobs){
+  var s=XD.sec(sec);if(!s)return;var op=s.closest('details');if(op)op.open=true;
+  jobs.push(Promise.resolve(XD.send(sec,file)).catch(function(){}));
+};
+XA.file=async function(x,file,A,jobs){
+  var row=XA.row(file.name),pdf=file.type==='application/pdf'||/\.pdf$/i.test(file.name),img=/^image\//.test(file.type||'')||/\.(png|jpe?g|webp|gif|heic)$/i.test(file.name);
+  A.archivos.push(file.name);
+  try{
+    if(pdf){
+      if(file.size>80e6){row.set('Pesa más de 80 MB: divídelo','bad');A.avisos.push(file.name+' pesa más de 80 MB y no se pudo leer.');return}
+      var P=await XD.pdfLib(),src=await P.PDFDocument.load(new Uint8Array(await file.arrayBuffer()),{ignoreEncryption:true}),n=src.getPageCount(),docs=[];
+      for(var a=1;a<=n;a+=XA.CH){if(!XD.cur||XD.cur.id!==x.id)return;docs=docs.concat(await XA.cls(x,P,src,file.name,a,Math.min(n,a+XA.CH-1),A,row))}
+      /* las páginas de cada sección, juntas y en orden */
+      var by={},orden=[];docs.forEach(function(d){if(!by[d.seccion]){by[d.seccion]={p:[],d:[]};orden.push(d.seccion)}by[d.seccion].p=by[d.seccion].p.concat(d.paginas);by[d.seccion].d.push(d.descripcion)});
+      orden.forEach(function(k){by[k].p.sort(function(a,b){return a-b});row.doc(k,XA.rango(by[k].p),by[k].d.filter(function(v,i,a){return v&&a.indexOf(v)===i}).join(' · ').slice(0,200));
+        A.documentos.push({archivo:file.name,seccion:k,paginas:by[k].p,descripcion:by[k].d.join(' · ').slice(0,200)})});
+      var secs=orden.filter(function(k){return k!=='otro'});
+      if(!secs.length){row.set('No encontré documentos del expediente','warn');return}
+      /* un PDF que es un solo documento se sube tal cual; si trae varios, cada sección recibe sus páginas */
+      if(secs.length===1&&by[secs[0]].p.length===n&&file.size<=XA.PIEZA){XA.place(secs[0],file,jobs)}
+      else for(var i=0;i<secs.length;i++){
+        var pz=await XA.piezas(P,src,by[secs[i]].p);
+        pz.forEach(function(q,j){XA.place(secs[i],new File([q.bytes],secs[i]+'_'+XA.base(file.name)+(pz.length>1?'_'+(j+1):'')+'.pdf',{type:'application/pdf'}),jobs)});
+      }
+      row.set(n+(n===1?' página':' páginas')+' en '+secs.length+(secs.length===1?' sección':' secciones'),'ok');
+    }else if(img){
+      if(file.size>XD.MAX*1e6){row.set('Pesa más de '+XD.MAX+' MB','bad');return}
+      row.set('Leyendo la imagen…');
+      var r=await XA.ai(x,await TR.prep(file),1),d0=(r.documentos||[])[0]||{seccion:'otro',descripcion:''};
+      if(r.datos)A.datos.push(r.datos);(r.observaciones||[]).forEach(function(o){A.avisos.push(o)});
+      row.doc(d0.seccion,'',d0.descripcion);A.documentos.push({archivo:file.name,seccion:d0.seccion,paginas:[1],descripcion:d0.descripcion});
+      if(d0.seccion==='otro'){row.set('No es del expediente','warn');return}
+      XA.place(d0.seccion,file,jobs);row.set('En '+XA.SEC(d0.seccion),'ok');
+    }else if(/\.xml$/i.test(file.name)){
+      var t=await file.text();
+      if(/cfdi:Comprobante|<Comprobante/i.test(t)){row.doc('factura','','Factura electrónica (CFDI)');A.documentos.push({archivo:file.name,seccion:'factura',paginas:[1],descripcion:'Factura electrónica (CFDI)'});XA.place('factura',file,jobs);row.set('En '+XA.SEC('factura'),'ok')}
+      else row.set('No reconozco este XML: súbelo en su sección','warn');
+    }else row.set('Solo leo PDF, fotos y XML: súbelo en su sección','warn');
+  }catch(e){
+    row.set('No se pudo leer: '+TR.errTxt(e),'bad');A.errores.push(file.name+': '+TR.errTxt(e));
+  }
+};
+/* llena solo lo que el expediente no tiene */
+XA.fill=async function(x,A){
+  var D=A.datos,first=function(k){for(var i=0;i<D.length;i++)if(D[i][k])return D[i][k];return null};
+  var km=[];D.forEach(function(d){(d.km||[]).forEach(function(k){km.push(k)})});
+  var pick=function(){for(var s of ['contrato','recepcion','diagnostico']){var k=km.filter(function(z){return z.seccion===s})[0];if(k)return k.valor}return km[0]&&km[0].valor};
+  var patch={},lleno=[],put=function(f,v,l){if(v!=null&&v!==''&&(x[f]==null||x[f]==='')){patch[f]=v;lleno.push(l)}};
+  put('wo',first('orden'),'Orden '+first('orden'));put('vin',first('vin'),'VIN '+first('vin'));
+  var kv=pick();put('km',kv||null,kv?'Kilometraje '+Number(kv).toLocaleString('es-MX')+' km':'');
+  put('orden_apertura',first('fecha_apertura'),'Apertura '+first('fecha_apertura'));put('orden_cierre',first('fecha_cierre'),'Cierre '+first('fecha_cierre'));
+  put('queja',first('queja'),'Queja del cliente');
+  if(Object.keys(patch).length){
+    var r=await SB.c.from('expedientes').update(patch).eq('id',x.id);
+    if(r.error){SB.fail(r.error);A.avisos.push('No pude guardar los datos que saqué de los documentos.');lleno=[]}else Object.assign(x,patch);
+  }
+  A.lleno=lleno;A.km=km;
+  var pz=[];D.forEach(function(d){(d.piezas||[]).forEach(function(p){if(!pz.some(function(q){return (q.no&&q.no===p.no)||q.d===p.d}))pz.push(p)})});
+  var dtc=[];D.forEach(function(d){(d.dtc||[]).forEach(function(c){if(dtc.indexOf(c)<0)dtc.push(c)})});
+  A.extra={codigo_queja:first('codigo_queja'),codigo_causa:first('codigo_causa'),codigo_correccion:first('codigo_correccion'),operacion:first('operacion'),dtc:dtc,piezas:pz.slice(0,12)};
+};
+/* qué falta y qué no cuadra, en palabras simples */
+XA.check=function(x,A){
+  var C=XD.ctl||{},sec=C.sec||{},F=[],N=[],add=function(L,t){if(t&&L.indexOf(t)<0)L.push(t)};
+  XD.DOCS.filter(function(d){return d[3]==='req'&&!sec[d[0]]}).forEach(function(d){add(F,XA.FALTA[d[0]]||'Falta: '+d[1]+'.')});
+  if(!x.orden_apertura||!x.orden_cierre)add(F,'Faltan '+(!x.orden_apertura&&!x.orden_cierre?'las fechas de apertura y cierre':!x.orden_apertura?'la fecha de apertura':'la fecha de cierre')+' de la orden: no vienen en los documentos. Captúralas en «Fechas del expediente».');
+  (C.rev||[]).forEach(function(c){if(c.estado==='no_cumple'||c.estado==='no_se_puede_ver')add(F,XA.SEC(c.seccion)+': '+(c.nota||c.tema)+(c.estado==='no_se_puede_ver'?' (no se alcanza a ver)':''))});
+  var D=A.datos||[],vins=[],ords=[];
+  D.forEach(function(d){if(d.vin&&vins.indexOf(d.vin)<0)vins.push(d.vin);if(d.orden&&ords.indexOf(d.orden)<0)ords.push(d.orden)});
+  vins.forEach(function(v){if(x.vin&&String(x.vin).length===17&&v!==String(x.vin).toUpperCase())add(N,'El VIN de un documento ('+v+') no es el del expediente ('+x.vin+'). Revisa que sea de esta orden.')});
+  if(vins.length>1&&!x.vin)add(N,'Los documentos traen VIN distintos: '+vins.join(', ')+'.');
+  ords.forEach(function(o){var nz=function(v){return String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'')};if(x.wo&&nz(o)!==nz(x.wo))add(N,'Un documento es de la orden '+o+' y el expediente es de la '+x.wo+'.')});
+  var km=(A.km||[]).filter(function(k){return k.valor>0});
+  if(km.length>1){var mn=km.reduce(function(a,k){return k.valor<a.valor?k:a}),mx=km.reduce(function(a,k){return k.valor>a.valor?k:a});
+    if(mx.valor-mn.valor>20)add(N,'El kilometraje no cuadra: '+XA.SEC(mn.seccion)+' dice '+mn.valor.toLocaleString('es-MX')+' km y '+XA.SEC(mx.seccion)+' dice '+mx.valor.toLocaleString('es-MX')+' km.')}
+  if(x.km&&km.length&&km.every(function(k){return Math.abs(k.valor-Number(x.km))>20}))add(N,'El kilometraje del expediente ('+Number(x.km).toLocaleString('es-MX')+' km) no aparece en los documentos.');
+  if(x.orden_apertura&&x.orden_cierre&&String(x.orden_cierre)<String(x.orden_apertura))add(N,'La fecha de cierre es anterior a la de apertura.');
+  if(D.some(function(d){return d.firma_cliente===false}))add(N,'La orden de garantía no tiene la firma del cliente.');
+  (A.avisos||[]).forEach(function(t){add(N,t)});
+  var PL=[];try{PZ.list(x,sec,C.car).forEach(function(i){if(i.st==='bad'||i.st==='warn')PL.push({label:i.label,txt:i.txt,ref:i.ref,st:i.st})})}catch(_){}
+  var rv=C.rev||[];
+  return {at:A.at,archivos:A.archivos,documentos:A.documentos,lleno:A.lleno||[],datos:A.extra||{},errores:A.errores,
+    faltantes:F.slice(0,14),discrepancias:N.slice(0,10),plazos:PL,
+    revision:{cumple:rv.filter(function(c){return c.estado==='cumple'}).length,no_cumple:rv.filter(function(c){return c.estado==='no_cumple'||c.estado==='no_se_puede_ver'}).length}};
+};
+XA.show=function(o){
+  var el=$('#xaRes');if(!el)return;if(!o){el.innerHTML='';return}
+  var secs=(o.documentos||[]).filter(function(d){return d.seccion!=='otro'}).map(function(d){return d.seccion}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
+  var L=function(t,arr,cls){return arr&&arr.length?'<div class="xa-b '+cls+'"><h4>'+t+'</h4><ul>'+arr.map(function(a){return '<li>'+esc(typeof a==='string'?a:a.label+': '+a.txt)+'</li>'}).join('')+'</ul></div>':''};
+  var ok=!o.faltantes.length&&!o.discrepancias.length;
+  el.innerHTML='<div class="xa-sum '+(ok?'ok':'bad')+'"><div><b>'+(ok?'Expediente completo: listo para auditoría':'Expediente armado: '+o.faltantes.length+(o.faltantes.length===1?' cosa por completar':' cosas por completar'))+'</b>'+
+    '<span>'+(o.documentos||[]).filter(function(d){return d.seccion!=='otro'}).length+' documentos en '+secs+(secs===1?' sección':' secciones')+' · '+o.revision.cumple+(o.revision.cumple===1?' regla cumplida':' reglas cumplidas')+(o.revision.no_cumple?' · '+o.revision.no_cumple+' por corregir':'')+' · '+new Date(o.at).toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'</span></div>'+
+    '<button class="bt pri" type="button" data-xz="pdf">Descargar expediente armado (PDF)</button></div>'+
+    '<div class="xa-grid">'+L('Lo que falta',o.faltantes,'bad')+L('Lo que no cuadra',o.discrepancias,'warn')+L('Plazos',o.plazos,'warn')+L('Lo que llené solo',o.lleno,'ok')+'</div>';
+};
+XA.md=function(x,o){
+  var t=['**Armé el expediente de la orden '+(x.wo||x.folio||'')+'.** Puse '+(o.documentos||[]).filter(function(d){return d.seccion!=='otro'}).length+' documentos en su sección y los revisé contra el manual de GM ('+o.revision.cumple+(o.revision.cumple===1?' regla cumplida':' reglas cumplidas')+').'];
+  if(o.lleno.length)t.push('Llené solo: '+o.lleno.join(', ')+'.');
+  if(o.faltantes.length)t.push('**Para terminarlo me falta:**\n'+o.faltantes.map(function(f){return '- '+f}).join('\n'));
+  if(o.discrepancias.length)t.push('**Esto no cuadra, revísalo:**\n'+o.discrepancias.map(function(f){return '- '+f}).join('\n'));
+  if(o.plazos.length)t.push('**Plazos:**\n'+o.plazos.map(function(p){return '- '+p.label+': '+p.txt}).join('\n'));
+  t.push(o.faltantes.length?'Cuando lo tengas, súbelo en el expediente y lo vuelvo a revisar.':'Ya puedes descargar el PDF para auditoría desde el expediente.');
+  return t.join('\n\n').slice(0,2900);
+};
+/* lo dice en el chat de la orden */
+XA.chat=async function(x,o){
+  try{
+    var id=x.conversation_id||null;
+    if(!id&&x.wo){var f=await SB.c.from('conversations').select('id').eq('agent','garantias').eq('orden',x.wo).limit(1);if(!f.error&&f.data&&f.data[0])id=f.data[0].id}
+    if(!id)return false;
+    var msg=XA.md(x,o);
+    if(S.convId===id&&typeof GP!=='undefined'){GP.msgs.push({role:'assistant',content:msg});GP.persist();return true}
+    var c=await SB.c.from('conversations').select('messages').eq('id',id).single();if(c.error)return false;
+    var m=Array.isArray(c.data&&c.data.messages)?c.data.messages.slice():[];m.push({role:'assistant',content:msg});
+    var u=await SB.c.from('conversations').update({messages:m.slice(-40)}).eq('id',id);return !u.error;
+  }catch(e){console.warn('[armar] chat',e);return false}
+};
+XA.run=async function(files){
+  var x=XD.cur;files=[].slice.call(files||[]);if(!x||!SB.c||!files.length)return;
+  if(XA.busy){toast('Espera a que termine el armado anterior');return}
+  XA.busy=true;var z=$('#xdArm .xa-zone');if(z)z.setAttribute('aria-disabled','true');
+  $('#xaLog').innerHTML='';XA.show(null);
+  var A={at:new Date().toISOString(),archivos:[],documentos:[],datos:[],avisos:[],errores:[]},jobs=[];
+  try{
+    for(var i=0;i<files.length;i++){if(!XD.cur||XD.cur.id!==x.id)break;await XA.file(x,files[i],A,jobs)}
+    if(XD.cur&&XD.cur.id===x.id){
+      $('#xaRes').innerHTML='<p class="xz-mut">Revisando cada documento contra el manual de GM…</p>';
+      await XA.fill(x,A);
+      await Promise.all(jobs);
+      await XD.ctlLoad(x).catch(function(){});
+      var o=XA.check(x,A);x.armado=o;
+      var u=await SB.c.from('expedientes').update({armado:o}).eq('id',x.id);if(u.error)SB.fail(u.error);
+      if(XD.cur&&XD.cur.id===x.id)XA.show(o);
+      var enChat=await XA.chat(x,o);
+      if(HM.d&&HM.d.exp){var h=HM.d.exp.filter(function(r){return r.id===x.id})[0];if(h)h.armado=o}
+      toast(o.faltantes.length?'Expediente armado: '+o.faltantes.length+' cosas por completar'+(enChat?' (te lo dejé en el chat de la orden)':''):'Expediente completo');
+    }
+  }catch(e){console.error(e);toast('No se pudo armar: '+TR.errTxt(e))}
+  XA.busy=false;if(z)z.removeAttribute('aria-disabled');
+};
+document.addEventListener('click',function(e){var z=e.target.closest&&e.target.closest('#xdArm .xa-zone');if(z&&e.target.tagName!=='INPUT')$('input',z).click()});
+document.addEventListener('keydown',function(e){var z=e.target.closest&&e.target.closest('#xdArm .xa-zone');if(z&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('input',z).click()}});
+document.addEventListener('change',function(e){var i=e.target;if(i.matches&&i.matches('#xdArm input[type=file]')){XA.run(i.files);i.value=''}});
+['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#xdArm .xa-zone');if(!z)return;e.preventDefault();z.setAttribute('data-over','')})});
+document.addEventListener('dragleave',function(e){var z=e.target.closest&&e.target.closest('#xdArm .xa-zone');if(z&&!z.contains(e.relatedTarget))z.removeAttribute('data-over')});
+document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.closest('#xdArm .xa-zone');if(!z)return;e.preventDefault();z.removeAttribute('data-over');XA.run(e.dataTransfer.files)});
+
+/* ---- Inicio: expedientes que el agente armó y que piden algo ---- */
+HM.cardArm=function(){
+  var L=(HM.exp()||[]).filter(function(x){var a=x.armado;return a&&((a.faltantes||[]).length||(a.discrepancias||[]).length)}).sort(function(a,b){return String(b.armado.at).localeCompare(String(a.armado.at))}).slice(0,6);
+  if(!L.length)return '';
+  return '<section class="hm-arm" aria-label="Expedientes que piden algo"><div class="hm-arm-h"><span class="xa-mk">A</span><div><h3>Ax AI armó estos expedientes y le falta algo</h3><p>Lo que pide el agente para dejarlos listos para auditoría</p></div></div>'+
+    L.map(function(x){var a=x.armado,F=a.faltantes||[],N=a.discrepancias||[];return '<button type="button" class="hm-arm-r" data-exp="'+ea(x.folio)+'"><b>'+esc(HM.orden(x))+'</b><span>'+esc(F[0]||N[0])+'</span><em>'+(F.length?F.length+(F.length===1?' falta':' faltan'):'')+(F.length&&N.length?' · ':'')+(N.length?N.length+' no cuadra'+(N.length===1?'':'n'):'')+'</em></button>'}).join('')+'</section>';
 };
 
 /* ===== Débitos que se vuelven reglas para toda la red · dinero recuperado · tablero de grupo ===== */
