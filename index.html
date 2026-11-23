@@ -1927,6 +1927,29 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .agv-t tbody tr{cursor:pointer}.agv-t tbody tr:hover{background:var(--hover,rgba(0,0,0,.03))}
 .agv-e{padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:600;background:color-mix(in srgb,#2231dd 9%,transparent);color:#2231dd}.agv-e.warn{background:color-mix(in srgb,#d99a1e 14%,transparent);color:#8a5a00}.agv-e.bad{background:color-mix(in srgb,#d6453b 12%,transparent);color:#b4372b}
 @media(max-width:640px){.agv-g{grid-template-columns:1fr}}
+.cg-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin:0 0 12px}.cg-top .bx-fs{margin:0}.cg-run{display:flex;gap:8px;flex-wrap:wrap}
+.cg-g{display:grid;grid-template-columns:minmax(260px,380px) 1fr;border:1px solid var(--card-line);border-radius:16px;background:var(--card);overflow:hidden;min-height:480px}
+.cg-l{border-right:1px solid var(--card-line);max-height:72vh;overflow:auto}.cg-l .pv-empty{margin:16px}
+.cg-i{display:flex;gap:10px;width:100%;padding:12px 14px;border:0;border-bottom:1px solid var(--card-line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.cg-i:hover{background:var(--hover,rgba(0,0,0,.03))}.cg-i.on{background:color-mix(in srgb,#2231dd 7%,transparent)}.cg-i.nw b{font-weight:700}.cg-i.nw .cg-de::after{content:'';width:7px;height:7px;border-radius:50%;background:#2231dd;margin-left:6px;display:inline-block}
+.cg-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.cg-de{display:flex;align-items:center;font-size:11.5px;color:var(--muted)}.cg-de i{font-style:normal;margin-left:auto}
+.cg-t b{font-size:13px;font-weight:500;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cg-t em{align-self:flex-start;font-style:normal;font-size:10.5px;font-weight:600;padding:1px 8px;border-radius:99px;background:var(--fill-slab);color:var(--muted)}
+.cg-t em.cg-dec{background:#2231dd;color:#fff}.cg-t em.cg-ok{color:#1a6e3e;background:color-mix(in srgb,#1f8a4c 12%,transparent)}.cg-t em.cg-alta{color:#b4372b;background:color-mix(in srgb,#d6453b 12%,transparent)}
+.cg-av{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--fill-on,#111);color:var(--bg,#fff);font:700 14px var(--f-ui,inherit)}
+.cg-av.debitos{background:#b4372b;color:#fff}.cg-av.vigilante{background:#d99a1e;color:#fff}.cg-av.cobranza{background:#1f8a4c;color:#fff}.cg-av.adopcion{background:#2231dd;color:#fff}.cg-av.comparador{background:#6b4fd8;color:#fff}.cg-av.informe{background:#111;color:#fff}
+.cg-m{padding:20px 24px;max-height:72vh;overflow:auto}.cg-m .pv-empty{margin:0}
+.cg-mh{display:flex;gap:10px;align-items:center}.cg-mh b{display:block;font-size:13.5px}.cg-mh small{font-size:12px;color:var(--muted)}
+.cg-m h3{margin:14px 0 10px;font-size:18px;line-height:1.3}.cg-body{font-size:14px;line-height:1.6}.cg-body table{border-collapse:collapse;font-size:12.8px;margin:8px 0;display:block;overflow-x:auto}.cg-body th,.cg-body td{border-bottom:1px solid var(--card-line);padding:5px 10px;text-align:left;white-space:nowrap}
+.cg-prev{margin:14px 0 0;padding:12px 14px;border-radius:12px;background:var(--fill-slab)}.cg-prev p{margin:4px 0 8px;font-size:13px}.cg-prev textarea{width:100%;box-sizing:border-box;padding:8px 10px;border-radius:10px;border:1px solid var(--card-line);background:var(--card);color:inherit;font:13px var(--f-ui,inherit)}
+.cg-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.cg-done{margin:14px 0 0;padding:8px 12px;border-radius:10px;background:var(--fill-slab);font-size:13px}
+.cg-back{display:none}
+.cg-ags{margin-top:14px;padding:12px 16px;border:1px solid var(--card-line);border-radius:14px;background:var(--card)}.cg-ags summary{cursor:pointer;font-weight:600;font-size:13.5px}
+.cg-agl{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}.cg-agl>div{display:flex;gap:10px}.cg-agl p{margin:0;font-size:12.5px;line-height:1.45;color:var(--muted)}.cg-agl b{display:block;color:var(--fg,inherit);font-size:13px}.cg-agl small{display:block;margin-top:2px;font-weight:600}
+.cg-dlg{max-width:640px}.cg-chat{max-height:52vh;overflow:auto;display:flex;flex-direction:column;gap:10px;margin:0 0 10px}.cg-cm{padding:10px 12px;border-radius:12px;font-size:13.5px;line-height:1.55}.cg-cm.user{align-self:flex-end;background:var(--fill-on,#111);color:var(--bg,#fff);max-width:80%}.cg-cm.assistant{background:var(--fill-slab)}
+.cg-sug{display:flex;flex-wrap:wrap;gap:6px}.cg-in{display:flex;gap:8px}.cg-in input{flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--card-line);background:var(--fill-slab);color:inherit;font:13.5px var(--f-ui,inherit)}
+.cg-ban .xa-mk{background:#fff;color:#111}
+@media(max-width:760px){.cg-g{grid-template-columns:1fr}.cg-l{border-right:0;max-height:none}.cg-g.sel .cg-l{display:none}.cg-g:not(.sel) .cg-m{display:none}.cg-back{display:inline-block}.cg-m{max-height:none;padding:16px}}
 .hm-bx{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:14px 16px;border:0;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff);font:inherit;text-align:left;cursor:pointer}
 .hm-bx span:nth-child(2){flex:1;min-width:0}.hm-bx b{display:block;font-size:14.5px}.hm-bx small{display:block;font-size:12.3px;opacity:.72;margin-top:2px}.hm-bx em{font-style:normal;font-weight:600;font-size:13px;white-space:nowrap}
 @media(max-width:640px){.bx-c{grid-template-columns:1fr;gap:10px;padding:14px}.bx-r{width:76px;height:76px}.bx-r b{font-size:18px}.bx-r span{font-size:9px}.bx-h em{margin-left:0}.bx-a .bt{flex:1;min-width:0}.hm-bx em{display:none}}
@@ -2114,6 +2137,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
       </div>
       <div class="sb-scroll">
         <button class="nav" data-dueno-nav data-view="dueno" data-i="chart" hidden>Tablero del dueño</button>
+        <button class="nav" data-dueno-nav id="cgNav" data-view="cg" data-i="mail" hidden>Correo del grupo<span class="nbadge" id="cgBadge" hidden></span></button>
         <div class="grp" data-pv-nav style="margin-top:6px" hidden>Posventa</div>
         <button class="nav" data-pv-nav data-dir-nav data-view="grp" data-i="folderchart" hidden>Tablero de grupo</button>
         <button class="nav" data-pv-nav data-view="pv" data-i="chart" hidden>Tablero de posventa</button>
@@ -2306,6 +2330,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
     <section class="admin" id="viewGrp" hidden>
       <div class="ad-in">
         <div class="bx-ban" data-bxban></div>
+        <div class="bx-ban" data-cgban></div>
         <div class="ad-head"><div><h2>Tablero de grupo</h2><p id="grpSub">Todas las agencias del grupo</p></div></div>
         <div id="grpBody"></div>
       </div>
@@ -2313,8 +2338,15 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
     <section class="admin" id="viewDueno" hidden>
       <div class="ad-in">
         <div class="bx-ban" data-bxban></div>
+        <div class="bx-ban" data-cgban></div>
         <div class="ad-head"><div><h2>Tablero del dueño</h2><p id="dnSub">Lo que Ax AI hace por tu grupo</p></div></div>
         <div id="dnBody"></div>
+      </div>
+    </section>
+    <section class="admin" id="viewCg" hidden>
+      <div class="ad-in">
+        <div class="ad-head"><div><h2>Correo del grupo</h2><p>Tus agentes te escriben aquí. Ellos hacen el trabajo; tú solo apruebas.</p></div></div>
+        <div id="cgBody"></div>
       </div>
     </section>
     <section class="admin" id="viewAgv" hidden>
@@ -2514,6 +2546,7 @@ var P={
   folderchart:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="M8 17v-4M12 17v-2M16 17v-5"/>',
   clip2:'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',
   check:'<path d="M20 6 9 17l-5-5"/>',
+  mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
   inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
   copy:'<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
   regen:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M8 16H3v5"/>',
@@ -2545,14 +2578,14 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){if(MI.due().length&&!AL.unread().length){showView('mi');MI.send('¿Qué tengo pendiente?');return}RED.f='alertas';showView('red')});
 
-var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',bx:'Bandeja',agv:'Agencia',dueno:'Tablero del dueño'};
+var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',bx:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='agv'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewAgv').hidden=id!=='agv';$('#viewDueno').hidden=id!=='dueno';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='agv'||id==='cg'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewAgv').hidden=id!=='agv';$('#viewCg').hidden=id!=='cg';$('#viewDueno').hidden=id!=='dueno';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='pv'){crumb.textContent=VIEWS.pv;crumbSep.hidden=true;crumb2.hidden=true;PV.load()}
@@ -2560,6 +2593,7 @@ function showView(id){
   else if(id==='red'){crumb.textContent=VIEWS.red;crumbSep.hidden=true;crumb2.hidden=true;RED.load()}
   else if(id==='bx'){crumb.textContent=VIEWS.bx;crumbSep.hidden=true;crumb2.hidden=true;BX.render();BX.load()}
   else if(id==='agv'){crumb.textContent=VIEWS.agv;crumbSep.hidden=true;crumb2.hidden=true;AGV.load()}
+  else if(id==='cg'){crumb.textContent=VIEWS.cg;crumbSep.hidden=true;crumb2.hidden=true;CG.render();CG.load()}
   else if(id==='dueno'){crumb.textContent=VIEWS.dueno;crumbSep.hidden=true;crumb2.hidden=true;DN.load()}
   else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
   else if(id==='cfg'){crumb.textContent=VIEWS.cfg;crumbSep.hidden=true;crumb2.hidden=true;CFG.open()}
@@ -6667,7 +6701,7 @@ SB.loadAdvisors=async function(){
   if(me){if(me.role==='marca'){me.marca=true;me.role='admin'}SB.share=!(me.agencies&&me.agencies.comparte===false);SB.user=me;try{var au=await SB.c.auth.getUser();SB.email=au&&au.data&&au.data.user&&au.data.user.email||''}catch(_){}SB.agency=me.marca?me.brand:((me.agencies&&me.agencies.name)||'Tu agencia');$('#adAgency').textContent=SB.agency;
     me.dueno=me.role==='dueno';me.director=me.role==='director';me.gerente=me.role==='gerente'||me.director;
     if(me.director||me.dueno){try{if(me.agency_id){var gq=await SB.c.from('agencies').select('grupo_id,grupos(nombre)').eq('id',me.agency_id).maybeSingle();SB.grupoId=gq.data&&gq.data.grupo_id;SB.grupo=gq.data&&gq.data.grupos&&gq.data.grupos.nombre||'Tu grupo'}else{var gg=await SB.c.from('grupos').select('id,nombre').eq('id',me.grupo_id).maybeSingle();SB.grupoId=me.grupo_id;SB.grupo=gg.data&&gg.data.nombre||'Tu grupo';SB.agency=SB.grupo;var aa=$('#adAgency');if(aa)aa.textContent=SB.agency}}catch(_){}}
-    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);AGV.side();
+    MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);AGV.side();CG.nav();CG.load();
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
     $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
@@ -6685,6 +6719,7 @@ SB.enter=async function(user){
       if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
       if(p.table==='alertas'){if(p.eventType==='INSERT')AL.onNew(p.new);return}
+      if(p.table==='buzon'){if(p.eventType==='INSERT'&&p.new)toast('Correo de tu agente: '+p.new.asunto);clearTimeout(CG.t);CG.t=setTimeout(CG.load,600);return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
       if(p.table==='expedientes'||p.table==='decisiones'){clearTimeout(BX.t);BX.t=setTimeout(BX.load,800)}
       if(p.table==='decisiones')return;
@@ -7584,6 +7619,122 @@ AGV.openExp=function(id){
   XD.open(x.id);XD.from='agv';$('#viewAgv').hidden=true;
 };
 
+/* ══ Correo del grupo ══════════════════════════════════════════════════════════════
+   Los agentes de la dirección le escriben aquí al dueño y al director (tabla buzon). Cada mensaje puede traer una
+   decisión: aprobar una controversia, mandar un recordatorio a las agencias o reenviarlo a la agencia. La plataforma
+   ejecuta lo que se apruebe (función buzon_decidir). También vive aquí «Pregúntale a Ax AI», el chat del dueño. */
+var CG={rows:[],sel:null,f:'decidir',busy:false,chat:[],
+  AG:{debitos:['Débitos y controversias','Revisa cada débito de GM: si se puede pelear, con qué evidencia, y deja lista la carta de controversia.','Diario'],
+    vigilante:['Vigilante de agencias','Revisa las agencias todos los días y solo te avisa lo que se sale de lo normal, con la acción sugerida.','Diario'],
+    cobranza:['Cobranza a planta','Cuánto te debe GM y desde cuándo, y qué no han facturado las agencias.','Diario (1 correo por semana)'],
+    adopcion:['Adopción','Qué agencias ya usan Ax AI, cuáles se atoraron y su plan de arranque.','Semanal'],
+    comparador:['Comparador entre agencias','Compara agencias de la misma marca y dice qué práctica copiar.','Lunes'],
+    informe:['Informe semanal','Tu semana en una página: dinero, agencias en rojo y lo que te toca decidir.','Lunes'],
+    dueno:['Pregúntale a Ax AI','Contesta tus preguntas con los datos del grupo.','Cuando preguntes']},
+  ICO:{debitos:'$',vigilante:'◉',cobranza:'⟳',adopcion:'↗',comparador:'⇄',informe:'≡',dueno:'?'}};
+CG.on=function(){return !!(SB.user&&(SB.user.dueno||SB.user.director))};
+/* las tablas de los agentes (markdown) a HTML; lo demás con el render normal */
+CG.mdx=function(src){return String(src||'').split(/\n{2,}/).map(function(b){var L=b.trim().split('\n');
+  if(L.length>1&&L.every(function(l){return /^\s*\|/.test(l)})){var row=function(l){return l.trim().replace(/^\||\|$/g,'').split('|').map(function(c){return c.trim()})};
+    var h=row(L[0]),body=L.slice(1).filter(function(l){return !/^\s*\|?\s*:?-{2,}/.test(l)});
+    return '<table><thead><tr>'+h.map(function(c){return '<th>'+esc(c)+'</th>'}).join('')+'</tr></thead><tbody>'+body.map(function(l){return '<tr>'+row(l).map(function(c){return '<td>'+esc(c)+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table>'}
+  return md(b,false)}).join('')};
+CG.load=async function(){
+  if(!SB.c||!CG.on())return;
+  var r=await SB.c.from('buzon').select('*').order('created_at',{ascending:false}).limit(300);
+  if(r.error){console.warn('[correo]',r.error.message);return}
+  CG.rows=r.data||[];CG.badge();if(S.view==='cg')CG.render();
+  document.querySelectorAll('[data-cgban]').forEach(function(e){e.innerHTML=CG.ban()});
+};
+CG.pend=function(){return CG.rows.filter(function(m){return m.accion&&(m.estado==='nuevo'||m.estado==='leido')})};
+CG.nuevos=function(){return CG.rows.filter(function(m){return m.estado==='nuevo'})};
+CG.badge=function(){var b=$('#cgBadge');if(!b)return;var n=CG.nuevos().length;b.hidden=!n;b.textContent=String(n)};
+CG.ban=function(){var p=CG.pend().length,n=CG.nuevos().length;if(!p&&!n)return '';
+  return '<button type="button" class="hm-bx cg-ban" data-cgabrir><span class="xa-mk">@</span><span><b>Correo del grupo: '+(p?p+(p===1?' decisión te espera':' decisiones te esperan'):n+(n===1?' mensaje nuevo':' mensajes nuevos'))+'</b><small>Tus agentes revisaron débitos, agencias, cobranza y adopción. Tú solo apruebas.</small></span><em>Abrir →</em></button>'};
+CG.lista=function(){
+  return CG.rows.filter(function(m){return CG.f==='decidir'?(m.accion&&(m.estado==='nuevo'||m.estado==='leido')):CG.f==='todos'?m.estado!=='archivado':CG.f==='archivo'?m.estado==='archivado'||m.estado==='aprobado'||m.estado==='rechazado'||m.estado==='hecho':m.agente===CG.f});
+};
+CG.render=function(){
+  var el=$('#cgBody');if(!el)return;
+  var L=CG.lista(),p=CG.pend().length;
+  if(CG.sel&&!CG.rows.some(function(m){return m.id===CG.sel}))CG.sel=null;
+  if(!CG.sel&&L.length&&!mq.matches)CG.sel=L[0].id;
+  var m=CG.rows.filter(function(x){return x.id===CG.sel})[0];
+  var chip=function(k,t,n){return '<button type="button" class="bx-f'+(CG.f===k?' on':'')+'" data-cgf="'+k+'">'+t+(n!=null?' <b>'+n+'</b>':'')+'</button>'};
+  el.innerHTML='<div class="cg-top"><div class="bx-fs">'+chip('decidir','Por decidir',p)+chip('todos','Todos',CG.rows.filter(function(x){return x.estado!=='archivado'}).length)+
+      Object.keys(CG.AG).filter(function(k){return k!=='dueno'}).map(function(k){var n=CG.rows.filter(function(x){return x.agente===k}).length;return n?chip(k,CG.AG[k][0],n):''}).join('')+chip('archivo','Resueltos')+'</div>'+
+      '<div class="cg-run"><button class="bt" type="button" data-cgpreg>Pregúntale a Ax AI</button><button class="bt pri" type="button" data-cgrun>Ejecutar agentes ahora</button></div></div>'+
+    '<div class="cg-g'+(m?' sel':'')+'"><div class="cg-l">'+(L.length?L.map(function(x){var a=CG.AG[x.agente]||[x.agente];return '<button type="button" class="cg-i'+(x.id===CG.sel?' on':'')+(x.estado==='nuevo'?' nw':'')+'" data-cgid="'+ea(x.id)+'"><span class="cg-av '+x.agente+'">'+esc(CG.ICO[x.agente]||'A')+'</span><span class="cg-t"><span class="cg-de">'+esc(a[0])+'<i>'+esc(AL.ago(x.created_at))+'</i></span><b>'+esc(x.asunto)+'</b>'+
+      (x.accion&&(x.estado==='nuevo'||x.estado==='leido')?'<em class="cg-dec">Te toca decidir</em>':x.estado==='aprobado'?'<em class="cg-ok">Aprobado</em>':x.estado==='rechazado'?'<em>Rechazado</em>':x.estado==='hecho'?'<em class="cg-ok">Hecho</em>':'')+(x.prioridad==='alta'?'<em class="cg-alta">Importante</em>':'')+'</span></button>'}).join(''):
+      '<div class="pv-empty">'+(CG.f==='decidir'?'Nada que decidir. Tus agentes te escriben aquí cuando algo necesita tu visto bueno.':'Sin mensajes.')+'</div>')+'</div>'+
+      '<div class="cg-m">'+(m?CG.msg(m):'<div class="pv-empty">Elige un mensaje.</div>')+'</div></div>'+
+    '<details class="cg-ags"><summary>Tus agentes · qué hace cada uno y cuándo trabaja</summary><div class="cg-agl">'+Object.keys(CG.AG).map(function(k){var a=CG.AG[k];return '<div><span class="cg-av '+k+'">'+esc(CG.ICO[k])+'</span><p><b>'+esc(a[0])+'</b>'+esc(a[1])+'<small>'+esc(a[2])+'</small></p></div>'}).join('')+'</div></details>';
+  if(m&&m.estado==='nuevo')CG.leer(m);
+};
+CG.msg=function(m){
+  var a=CG.AG[m.agente]||[m.agente],ac=m.accion||null,abierto=m.estado==='nuevo'||m.estado==='leido',ag=m.agency_id&&typeof AGV!=='undefined'?(AGV.ags.filter(function(x){return x.id===m.agency_id})[0]||null):null;
+  var btn='';
+  if(ac&&abierto){
+    if(ac.tipo==='controversia')btn='<button class="bt pri" type="button" data-cgdo="aprobar">Aprobar: pelear el débito</button><button class="bt" type="button" data-cgdo="rechazar">No pelearlo</button>';
+    else if(ac.tipo==='recordatorio')btn='<button class="bt pri" type="button" data-cgdo="aprobar">Aprobar y mandar a '+((ac.agencias||[]).length===1?'la agencia':(ac.agencias||[]).length+' agencias')+'</button><button class="bt" type="button" data-cgdo="rechazar">No mandar</button>';
+  }
+  return '<button type="button" class="agv-back cg-back" data-cgback>← Correo</button><div class="cg-mh"><span class="cg-av '+m.agente+'">'+esc(CG.ICO[m.agente]||'A')+'</span><div><b>'+esc(a[0])+'</b><small>para la dirección · '+new Date(m.created_at).toLocaleString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+(ag?' · '+esc(ag.name):'')+'</small></div></div>'+
+    '<h3>'+esc(m.asunto)+'</h3><div class="cg-body">'+CG.mdx(m.cuerpo||'')+'</div>'+
+    (ac&&ac.tipo==='recordatorio'&&abierto?'<div class="cg-prev"><b>Lo que le llegará a la agencia:</b><p>'+esc(ac.mensaje||'')+'</p><textarea id="cgResp" rows="3" placeholder="Si quieres, cámbialo o agrega algo antes de mandarlo"></textarea></div>':'')+
+    (!abierto?'<p class="cg-done">'+({aprobado:'Aprobado',rechazado:'Rechazado',hecho:'Hecho',archivado:'Archivado'}[m.estado]||m.estado)+(m.decidido_at?' · '+new Date(m.decidido_at).toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'')+(m.respuesta?' · «'+esc(m.respuesta)+'»':'')+'</p>':'')+
+    '<div class="cg-acts">'+btn+(abierto&&m.agency_id?'<button class="bt" type="button" data-cgdo="reenviar">Reenviar a la agencia</button>':'')+(abierto&&!ac?'<button class="bt" type="button" data-cgdo="hecho">Marcar como visto</button>':'')+(m.estado!=='archivado'?'<button class="bt" type="button" data-cgdo="archivar">Archivar</button>':'')+
+      (m.agency_id&&ag?'<button class="bt" type="button" data-agv="'+m.agency_id+'">Ver la agencia</button>':'')+'</div>';
+};
+CG.leer=async function(m){m.estado='leido';CG.badge();var r=await SB.c.from('buzon').update({estado:'leido'}).eq('id',m.id).eq('estado','nuevo');if(r.error)console.warn('[correo]',r.error.message)};
+CG.decidir=async function(dec){
+  var m=CG.rows.filter(function(x){return x.id===CG.sel})[0];if(!m)return;var resp=null;
+  if(dec==='archivar'){var a=await SB.c.from('buzon').update({estado:'archivado'}).eq('id',m.id);if(a.error){SB.fail(a.error);return}m.estado='archivado';CG.sel=null;CG.render();CG.badge();return}
+  if(dec==='reenviar'){var v=await HM.dlg({title:'Reenviar a la agencia',intro:'Le llega como alerta a su gerente de posventa (o a sus usuarios si no tiene gerente).',fields:[{k:'t',label:'Mensaje',type:'textarea',value:m.asunto+'. ¿Cómo van con esto?',req:true}],ok:'Reenviar'});if(!v)return;resp=v.t}
+  else{var t=$('#cgResp');resp=t&&t.value.trim()?t.value.trim():null}
+  if(dec==='aprobar'&&m.accion&&m.accion.tipo==='controversia'&&!confirm('¿Apruebas pelear este débito de '+DEB.mx(m.accion.monto)+'? El asesor recibe la carta de controversia lista para subirla a GWM.'))return;
+  var r=await SB.c.rpc('buzon_decidir',{p_id:m.id,p_dec:dec,p_resp:resp});
+  if(r.error){SB.fail(r.error);toast('No se pudo: '+r.error.message);return}
+  var o=r.data||{};m.estado=o.estado||m.estado;m.decidido_at=new Date().toISOString();m.respuesta=resp;
+  toast(dec==='reenviar'?'Enviado a la agencia':o.estado==='aprobado'?'Aprobado'+(o.avisados?' · se avisó a '+o.avisados+(o.avisados===1?' persona':' personas'):''):o.estado==='rechazado'?'Listo, no se hará':'Listo');
+  CG.render();CG.badge();document.querySelectorAll('[data-cgban]').forEach(function(e){e.innerHTML=CG.ban()});
+};
+CG.run=async function(btn){
+  btn.disabled=true;var t=btn.textContent;btn.textContent='Tus agentes están trabajando…';
+  try{
+    var r=await SB.c.functions.invoke('agentes',{body:{}});if(r.error)throw r.error;
+    var R=r.data&&r.data.resultados||{},n=0,err=0;Object.keys(R).forEach(function(g){Object.keys(R[g]).forEach(function(a){n+=R[g][a].mensajes||0;if(R[g][a].error)err++})});
+    toast(n?n+(n===1?' mensaje nuevo en tu correo':' mensajes nuevos en tu correo'):'Tus agentes revisaron todo: nada nuevo desde la última vez'+(err?' ('+err+' con error)':''));
+    await CG.load();
+  }catch(e){SB.fail(e);toast('No se pudieron ejecutar los agentes')}
+  btn.disabled=false;btn.textContent=t;
+};
+CG.preguntar=function(){
+  var d=$('#cgDlg');if(!d){d=document.createElement('dialog');d.id='cgDlg';d.className='bx-dlg cg-dlg';document.body.appendChild(d)}
+  var draw=function(){d.innerHTML='<form method="dialog"><h3>Pregúntale a Ax AI</h3><p>Contesta con los datos de todas las agencias del grupo.</p><div class="cg-chat" id="cgChat">'+(CG.chat.length?CG.chat.map(function(m){return '<div class="cg-cm '+m.role+'">'+(m.role==='user'?esc(m.content):md(m.content,false))+'</div>'}).join(''):'<div class="cg-sug">'+['¿Cuánto me debitaron en Chevrolet este año?','¿Qué agencia tiene más plazos vencidos?','¿Cuánto me debe GM y de qué agencias?','¿Qué agencias no usan Ax AI todavía?'].map(function(q){return '<button type="button" class="bx-f" data-cgq="'+ea(q)+'">'+esc(q)+'</button>'}).join('')+'</div>')+'</div>'+
+    '<div class="cg-in"><input id="cgQ" autocomplete="off" placeholder="Escribe tu pregunta"><button class="bt pri" type="button" data-cgsend>Preguntar</button></div><div class="row"><button class="bt" type="button" data-cgcerrar>Cerrar</button></div></form>';
+    var c=$('#cgChat');if(c)c.scrollTop=c.scrollHeight;var q=$('#cgQ');if(q)q.focus()};
+  var ask=async function(q){
+    q=String(q||'').trim();if(!q||CG.busy)return;CG.busy=true;CG.chat.push({role:'user',content:q});CG.chat.push({role:'assistant',content:'_Revisando los datos del grupo…_'});draw();
+    try{var r=await SB.c.functions.invoke('agentes',{body:{pregunta:q,historial:CG.chat.slice(0,-2).slice(-8)}});if(r.error)throw r.error;CG.chat[CG.chat.length-1].content=(r.data&&r.data.respuesta)||'No encontré la respuesta en los datos del grupo.'}
+    catch(e){CG.chat[CG.chat.length-1].content='No pude contestar ahorita: '+TR.errTxt(e)}
+    CG.busy=false;draw();
+  };
+  d.onclick=function(e){var t=e.target;if(t.closest('[data-cgcerrar]')){d.close();return}var s=t.closest('[data-cgq]');if(s){ask(s.dataset.cgq);return}if(t.closest('[data-cgsend]'))ask($('#cgQ').value)};
+  d.onkeydown=function(e){if(e.key==='Enter'&&e.target.id==='cgQ'){e.preventDefault();ask(e.target.value)}};
+  draw();d.showModal();
+};
+document.addEventListener('click',function(e){
+  var t=e.target;if(!t.closest)return;
+  var i=t.closest('[data-cgid]');if(i){CG.sel=i.dataset.cgid;CG.render();var mm=$('#cgBody .cg-m');if(mq.matches&&mm)mm.scrollIntoView({block:'start'});return}
+  var f=t.closest('[data-cgf]');if(f){CG.f=f.dataset.cgf;CG.sel=null;CG.render();return}
+  var d=t.closest('[data-cgdo]');if(d){CG.decidir(d.dataset.cgdo);return}
+  if(t.closest('[data-cgrun]')){CG.run(t.closest('[data-cgrun]'));return}
+  if(t.closest('[data-cgpreg]')){CG.preguntar();return}
+  if(t.closest('[data-cgback]')){CG.sel=null;CG.render();return}
+  if(t.closest('[data-cgabrir]')){showView('cg');return}
+});
+
+CG.nav=function(){var b=$('#cgNav');if(!b)return;var on=CG.on();b.hidden=!on;b.style.display=on?'':'none'};
 /* ---- la red de reglas: lo que la red aprendió de débitos reales + el manual ---- */
 var RED={rows:[],q:'',f:'alertas'};
 RED.SEC={general:'Todo el expediente',contrato:'Orden de garantía',recepcion:'Recepción',diagnostico:'Diagnóstico',evidencia:'Evidencia',piezas:'Refacciones y eSPOM',destruccion:'Destrucción',actualizacion:'PRA',bateria:'Batería 12V',facturas_partes:'Facturas TOT/NAR/No GM',tac:'TAC',mantenimiento:'Mantenimientos',m2:'Formato M2',wpc:'WPC',factura:'Factura a planta',planta:'Transacción de planta'};
