@@ -5212,7 +5212,7 @@ document.addEventListener('click',function(e){
 document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('.mi-wrap [data-folio]');if(f){EX.q=f.dataset.folio;$('#exQ').value=EX.q;EX.f='prea';showView('exp')}});
 /* ===== Agentes de Garantías y Cobros: panel de conversaciones (título = número de orden) y charla sobre la orden ===== */
 var GP={all:[],q:'',cur:null,msgs:[],t:0,nPrea:0,caseText:'',lastExpP:null};
-GP.COLS='id,folio,status,wo,cliente,vin,sys,rule_id,queja,op,opd,hours,parts,parts_total,labor,codes,created_at';
+GP.COLS='id,folio,status,wo,cliente,vin,sys,rule_id,queja,op,opd,hours,parts,parts_total,labor,codes,created_at,tipo';
 GP.ag=function(){return S.agent==='cobros'?'cobros':'garantias'};
 GP.norm=function(v){
   v=String(v||'').toUpperCase().replace(/\s+/g,'');var m;
@@ -5235,7 +5235,7 @@ GP.mine=function(){var a=GP.ag();return GP.all.filter(function(c){return c.agent
 GP.sib=function(c){return c&&c.orden?GP.all.filter(function(x){return x.agent!==c.agent&&x.orden===c.orden})[0]||null:null};
 GP.load=async function(){
   if(!SB.c||!SB.entered)return;
-  var r=await SB.c.from('conversations').select('id,agent,title,orden,text,created_at,expedientes(status,folio)').in('agent',['garantias','cobros']).order('created_at',{ascending:false}).limit(300);
+  var r=await SB.c.from('conversations').select('id,agent,title,orden,text,created_at,expedientes(status,folio,tipo)').in('agent',['garantias','cobros']).order('created_at',{ascending:false}).limit(300);
   if(r.error){SB.fail(r.error);return}
   GP.all=r.data;GP.t=Date.now();GP.render();
 };
@@ -5248,7 +5248,7 @@ GP.render=function(){
   var html='',last='';
   L.forEach(function(c){
     var day=SB.dayLbl(c.created_at);if(day!==last){html+='<div class="gp-d">'+esc(day)+'</div>';last=day}
-    var sb=GP.sib(c),ex=(c.expedientes&&c.expedientes[0])||(sb&&sb.expedientes&&sb.expedientes[0])||null,st=ex?ex.status:'none',stl={borrador:'Esperando respuesta del fabricante',aceptada:'Aceptada por el fabricante',rechazada:'Rechazada por el fabricante',none:'Sin PREA generada'};
+    var sb=GP.sib(c),ex=(c.expedientes&&c.expedientes[0])||(sb&&sb.expedientes&&sb.expedientes[0])||null,st=ex?(ex.tipo&&ex.tipo!=='PREA'&&ex.status==='borrador'?'sinprea':ex.status):'none',stl={sinprea:(ex&&ex.tipo||'')+' · expediente abierto',borrador:'Esperando respuesta del fabricante',aceptada:'Aceptada por el fabricante',rechazada:'Rechazada por el fabricante',none:'Sin PREA generada'};
     var label=c.orden||(c.title&&c.title!=='Sin orden'?c.title:'Sin orden');
     html+='<div class="gp-i" role="listitem" tabindex="0" data-id="'+ea(c.id)+'"'+(S.convId===c.id?' aria-current="true"':'')+'>'+
       '<div class="gp-t'+(c.orden||label!=='Sin orden'?'':' no')+'"><i class="gp-st '+st+'" title="'+ea(stl[st])+'"></i><span>'+esc(label)+'</span>'+(sb?'<span class="gp-x" role="button" tabindex="0" data-gpopen="'+ea(sb.id)+'" title="Abrir su conversación de '+(sb.agent==='cobros'?'Cobros':'Garantías')+'">'+(sb.agent==='cobros'?'Cobros':'Garantías')+' ↗</span>':'')+'</div>'+
@@ -5326,7 +5326,8 @@ GP.prea=function(e){
   var parts=(Array.isArray(e.parts)?e.parts:[]).map(function(p){return p.no+' · '+p.d+' ×'+p.q+(p.pr?' · '+mo(p.pr):'')}).join('\n')||'—';
   var rows=[['Orden',e.wo||'—',e.wo||''],['Cliente',e.cliente||'—',e.cliente||''],['Queja',cj(cd.q),cj(cd.q)],['Causa',cj(cd.c),cj(cd.c)],['Corrección',cj(cd.r),cj(cd.r)],['Operación',(e.op||'—')+(e.opd?' · '+e.opd:'')+(e.hours?' · '+e.hours+' h':''),e.op||''],['Piezas',parts,''],['Total (antes de IVA)',mo(Number(e.parts_total)+Number(e.labor)),'']];
   var all=rows.filter(function(r){return r[1]!=='—'}).map(function(r){return r[0]+': '+r[1].replace(/\n/g,'; ')}).join('\n'),stl={borrador:'Esperando respuesta',aceptada:'Aceptada',rechazada:'Rechazada'};
-  return '<div class="gpc"><div class="gpc-h"><span>PREA '+esc(e.folio)+'</span><span class="st '+ea(e.status||'borrador')+'">'+(stl[e.status||'borrador'])+'</span></div>'+
+  var sp=e.tipo&&e.tipo!=='PREA';
+  return '<div class="gpc"><div class="gpc-h"><span>'+(sp?esc(e.tipo)+' · expediente ':'PREA ')+esc(e.folio)+'</span><span class="st '+ea(sp&&e.status==='borrador'?'aceptada':e.status||'borrador')+'">'+(sp&&e.status==='borrador'?'Sin PREA':stl[e.status||'borrador'])+'</span></div>'+
     rows.map(function(r){return '<div class="gpc-r"><span>'+r[0]+'</span><div>'+esc(r[1])+'</div>'+(r[2]?'<button type="button" data-gpcopy="'+ea(r[2])+'">Copiar</button>':'')+'</div>'}).join('')+
     '<div class="gpc-f"><button type="button" data-gpcopy="'+ea(all)+'">Copiar todo</button><button type="button" data-gpexp="'+ea(e.folio)+'">Ver en Expedientes</button><button type="button" class="arm" data-gparm="">Armar expediente</button></div></div>';
 };
@@ -5354,10 +5355,25 @@ GP.abrir=async function(text,fobjs){
   var t=tipo==='Campaña'?
     'Listo: abrí la orden **'+ord+'** como **campaña**. Una campaña del fabricante no lleva PREA, así que no te pido evidencia.'+(cam?' Ya quedó en tus campañas de Inicio como pendiente; cuando la realices márcala ahí.':'')+'\n\nSi quieres, escríbeme el código de la campaña y la unidad, o súbeme el boletín, y lo dejo anotado.':
     'Listo: abrí la orden **'+ord+'** como **servicio**. Un servicio no lleva PREA, así que no te pido texto ni evidencia.\n\nSi quieres, cuéntame qué se le hizo a la unidad o súbeme la orden y te ayudo con lo que necesites: tiempos, operaciones o qué revisar.';
-  body.innerHTML=md(t,false);w._text=t;$('.ai-actions',w).hidden=false;toBottom(true);
   try{await S.convP}catch(_){}
+  var ex=null;
+  try{
+    var q=await SB.c.from('expedientes').select(GP.COLS).eq('conversation_id',S.convId).order('created_at',{ascending:false}).limit(1);
+    ex=q.data&&q.data[0]||null;
+    if(!ex){
+      var ni=await SB.c.from('expedientes').insert({conversation_id:S.convId,folio:(tipo==='Campaña'?'CAM-':'SRV-')+ord,wo:ord,tipo:tipo,brand:S.brand||null,queja:text?String(text).slice(0,600):null,status:'borrador'}).select(GP.COLS).single();
+      if(ni.error)throw ni.error;ex=ni.data;
+    }
+  }catch(e){SB.fail(e);ex=null}
+  if(ex){GP.nPrea=1;t+='\n\nSu expediente **'+ex.folio+'** ya está creado, en blanco. Arrástrame aquí todo lo de la orden y lo armo yo, o ábrelo en Expedientes para subir cada documento.'}
+  else t+='\n\nNo pude crear su expediente; inténtalo de nuevo en un momento.';
+  body.innerHTML=md(t,false);w._text=t;
+  if(ex){var box=document.createElement('div');box.className='mi-wrap';box.innerHTML=GP.prea(ex);$('.ai-col',w).insertBefore(box,$('.ai-actions',w))}
+  $('.ai-actions',w).hidden=false;toBottom(true);
   GP.remember(text||('Abrir la orden '+ord+' · '+tipo),t);SB.loadHist();GP.load();
-  if(text||(fobjs&&fobjs.length)){/* lo que haya escrito queda en la conversación; se contesta como plática */}
+  if(ex)GP.suggest(w,[{t:'Armar el expediente · subir todo',arm:1},{t:'Ver en Expedientes',exp:ex.folio}]);
+  /* si trajo archivos al abrirla, el agente arma el expediente con ellos de una vez */
+  if(ex&&fobjs&&fobjs.length)setTimeout(function(){GP.armar('',fobjs)},300);
 };
 GP.armaQ=function(text){var t=norm(text||'');return /\b(expediente|auditoria|acomoda|clasifica|arma(lo|me)? todo)\b/.test(t)||(!t&&GP.nPrea>0)};
 GP.armar=async function(text,fobjs){
@@ -7662,7 +7678,7 @@ AGV.render=function(){
     '<section class="agv-s"><h3>Débitos y alertas</h3>'+(D.deb.length?'<ul class="agv-l">'+D.deb.slice(0,6).map(function(d){return '<li><b class="bad">'+AGV.mx(d.monto)+'</b> '+esc(d.motivo||'Débito')+' <small>'+esc((d.expedientes&&(d.expedientes.wo||d.expedientes.folio))||'')+(d.fecha?' · '+d.fecha:'')+(d.regla_id?' · regla '+esc(d.regla_id):'')+'</small></li>'}).join('')+'</ul>':'<p class="xz-mut">Sin débitos de GM registrados.</p>')+
       (D.al.length?'<div class="al-list">'+D.al.slice(0,3).map(function(x){return AL.card(x,true)}).join('')+'</div>':'')+'</section></div>'+
     '<section class="agv-s"><h3>Expedientes recientes</h3>'+(E.length?'<div class="xf-tw"><table class="pv-tb agv-t"><thead><tr><th>Orden</th><th>Asesor</th><th>Sistema</th><th>Etapa</th><th>Planta</th><th class="r">Monto</th></tr></thead><tbody>'+
-      E.slice(0,25).map(function(x){var f=x.flujo;return '<tr data-agexp="'+ea(x.id)+'" tabindex="0"><td><b>'+esc(x.wo||x.folio)+'</b></td><td>'+esc((x.profiles&&x.profiles.name)||'')+'</td><td>'+esc(x.sys||'')+'</td><td>'+(f?'<span class="agv-e '+(f.estado||'ok')+'">'+esc(FL.nom(f.etapa))+'</span>':'—')+'</td><td>'+esc(ST[x.status]||x.status||'')+'</td><td class="r">'+AGV.mx(Number(x.parts_total||0)+Number(x.labor||0))+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="xz-mut">Esta agencia todavía no tiene expedientes en Ax AI.</p>')+'</section>';
+      E.slice(0,25).map(function(x){var f=x.flujo;return '<tr data-agexp="'+ea(x.id)+'" tabindex="0"><td><b>'+esc(x.wo||x.folio)+'</b></td><td>'+esc((x.profiles&&x.profiles.name)||'')+'</td><td>'+esc(x.sys||'')+'</td><td>'+(f?'<span class="agv-e '+(f.estado||'ok')+'">'+esc(FL.nom(f.etapa))+'</span>':'—')+'</td><td>'+esc(x.tipo&&x.tipo!=='PREA'&&x.status==='borrador'?x.tipo+' · sin PREA':ST[x.status]||x.status||'')+'</td><td class="r">'+AGV.mx(Number(x.parts_total||0)+Number(x.labor||0))+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="xz-mut">Esta agencia todavía no tiene expedientes en Ax AI.</p>')+'</section>';
 };
 AGV.openExp=function(id){
   var x=AGV.d&&AGV.d.E.filter(function(z){return z.id===id})[0];if(!x)return;
@@ -8173,7 +8189,7 @@ PV.render=function(){
   var L=PV.list(),H=[['folio','Folio'],['orden','Orden'],['asesor','Asesor'],['sys','Sistema'],['estado','Estado'],['monto','Monto','r'],['exp','Expediente (manual GM)'],['pz','Plazos'],['cob','Cobranza'],['fecha','Fecha'],['dias','Días','r']];
   $('#pvN').textContent=L.length===R.length?R.length+' en total':L.length+' de '+R.length;
   $('#pvT').innerHTML=L.length?'<table class="pv-tb"><thead><tr>'+H.map(function(h){var on=PV.sort===h[0];return '<th'+(h[2]?' class="r"':'')+' data-sort="'+h[0]+'"'+(on?' aria-sort="'+(PV.dir>0?'ascending':'descending')+'"':'')+'>'+h[1]+'</th>'}).join('')+'</tr></thead><tbody>'+
-    L.map(function(x){var st=PV.ST[x.status]||PV.ST.borrador,c=PV.comp(x),seg='';for(var i=0;i<c.of;i++)seg+='<u'+(i<c.n?' class="on"':'')+'></u>';
+    L.map(function(x){var st=x.tipo&&x.tipo!=='PREA'&&x.status==='borrador'?[x.tipo+' · sin PREA','ok']:PV.ST[x.status]||PV.ST.borrador,c=PV.comp(x),seg='';for(var i=0;i<c.of;i++)seg+='<u'+(i<c.n?' class="on"':'')+'></u>';
       return '<tr data-id="'+ea(x.id)+'" tabindex="0" title="'+ea(c.faltan.length?'Falta: '+c.faltan.join(', '):'Expediente completo según el manual')+'"><td><b>'+esc(x.folio||'—')+'</b></td><td>'+esc(x.wo||'—')+'</td><td>'+esc(PV.who(x))+'</td><td>'+esc(x.sys||'—')+'</td><td><span class="pv-st '+st[1]+'">'+st[0]+'</span></td><td class="r">'+EX.money(PV.amt(x))+'</td>'+
         '<td><span class="pv-cm'+(c.n<c.of?' part':'')+'"><i aria-hidden="true">'+seg+'</i><small>'+c.n+'/'+c.of+'</small></span></td><td>'+(function(){var w=PZ.worst(PV.pz(x));if(!w)return '<span class="pv-st">—</span>';var m={bad:['Vencido','bad'],warn:['Por vencer','wait'],na:['Sin fechas',''],ok:['En tiempo','ok'],done:['Al día','ok']}[w.st];return '<span class="pv-st '+m[1]+'" title="'+ea(w.label+': '+w.txt)+'">'+m[0]+'</span>'})()+'</td><td>'+esc(PV.cob(x)||'—')+'</td><td>'+new Date(x.created_at).toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'2-digit'})+'</td><td class="r">'+PV.days(x)+'</td></tr>'}).join('')+'</tbody></table>'
     :'<div class="pv-empty">'+(PV.loading?'Cargando…':R.length?'Ningún expediente coincide con los filtros.':'Todavía no hay expedientes en la agencia.')+'</div>';
