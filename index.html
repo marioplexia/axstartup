@@ -1908,6 +1908,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .bx-dlg .row{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;flex-wrap:wrap}
 .bx-who{padding:1px 8px;border-radius:99px;background:var(--fill-slab);font-size:11.5px;font-weight:600}
 .bx-sel{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}.bx-sel select{padding:6px 10px;border-radius:99px;border:1px solid var(--card-line);background:var(--card);color:var(--fg,inherit);font:500 12.5px var(--f-ui,inherit)}
+.bx-n p.av{color:#2231dd}.bx-n p.av b{color:inherit}
 .bx-n{display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,#2231dd 6%,transparent)}.bx-n p{margin:0;font-size:12.8px;line-height:1.45}.bx-n small{color:var(--muted);font-size:11px}
 .bx-a .bx-nb{min-width:0;margin-left:auto}
 @media(max-width:640px){.bx-a .bx-nb{margin-left:0;flex-basis:100%}}
@@ -7216,7 +7217,7 @@ document.addEventListener('change',function(e){
    Llegan en vivo por Supabase Realtime: campana, aviso en pantalla y notificación del navegador.
    Cada alerta dice a cuáles de MIS casos abiertos les aplica. */
 var AL={rows:[],read:{},loaded:false,
-  T:{debito:['Débito','bad'],rechazo:['Rechazo de planta','bad'],boletin:['Boletín de GM','info'],politica:['Política de GM','info'],regla:['Regla nueva','info'],plazo:['Plazo','warn'],etapa:['Avance','ok']},
+  T:{debito:['Débito','bad'],rechazo:['Rechazo de planta','bad'],boletin:['Boletín de GM','info'],politica:['Política de GM','info'],regla:['Regla nueva','info'],plazo:['Plazo','warn'],etapa:['Avance','ok'],avance:['Dirección pregunta','info']},
   A:{red:'Toda la red',marca:'Toda la marca',grupo:'Tu grupo',agencia:'Tu agencia',usuario:'Solo para ti'}};
 AL.load=async function(){
   if(!SB.c||!SB.entered)return;
@@ -7241,7 +7242,7 @@ AL.onNew=function(a){
 /* mis casos abiertos a los que les aplica: mismo sistema, o reglas del expediente mientras el caso no se cobra */
 AL.casos=function(a){
   var E=((HM.d&&HM.d.exp)||EX.rows||[]).filter(function(x){return !x.flujo||x.flujo.etapa!=='cerrado'});
-  if(a.tipo==='plazo'||a.tipo==='etapa')return E.filter(function(x){return x.id===a.expediente_id});
+  if(a.tipo==='plazo'||a.tipo==='etapa'||a.tipo==='avance')return E.filter(function(x){return x.id===a.expediente_id});
   var s=norm(a.sys||''),sis=((a.datos&&a.datos.sistemas)||[]).map(norm);
   var L=E.filter(function(x){if(x.id===a.expediente_id)return false;var xs=norm(x.sys||'');
     if(s&&xs&&(xs.indexOf(s)>=0||s.indexOf(xs)>=0))return true;if(sis.some(function(z){return z&&xs&&(xs.indexOf(z)>=0||z.indexOf(xs)>=0)}))return true;
@@ -7253,7 +7254,7 @@ AL.card=function(a,mini){
   var t=AL.T[a.tipo]||[a.tipo,''],C=AL.casos(a),nw=!AL.read[a.id];
   return '<article class="al-c '+t[1]+(nw?' nw':'')+(a.urgente?' urg':'')+'"><div class="al-h"><span class="al-t '+t[1]+'">'+esc(t[0])+'</span><span class="al-s">'+esc(AL.A[a.alcance]||'')+' · '+AL.ago(a.created_at)+'</span>'+(nw?'<i class="al-dot" aria-label="Nueva"></i>':'')+'</div>'+
     '<h4>'+esc(a.titulo)+'</h4>'+(!mini&&a.cuerpo?'<p>'+esc(a.cuerpo)+'</p>':'')+(a.accion?'<p class="al-do"><b>Qué hacer:</b> '+esc(a.accion)+'</p>':'')+
-    (C.length?'<div class="al-cs"><span>'+(a.tipo==='plazo'||a.tipo==='etapa'?'Caso':'Aplica a '+C.length+(C.length===1?' caso tuyo abierto':' casos tuyos abiertos'))+':</span>'+C.map(function(x){return '<button type="button" data-exp="'+ea(x.folio)+'">'+esc(x.wo||x.folio)+'</button>'}).join('')+'</div>':'')+
+    (C.length?'<div class="al-cs"><span>'+(a.tipo==='plazo'||a.tipo==='etapa'||a.tipo==='avance'?'Caso':'Aplica a '+C.length+(C.length===1?' caso tuyo abierto':' casos tuyos abiertos'))+':</span>'+C.map(function(x){return '<button type="button" data-exp="'+ea(x.folio)+'">'+esc(x.wo||x.folio)+'</button>'}).join('')+'</div>':'')+
     (!mini&&a.regla_id?'<small class="al-r">Regla '+esc(a.regla_id)+' · el revisor de documentos ya la aplica</small>':'')+'</article>';
 };
 AL.html=function(){
@@ -7353,7 +7354,16 @@ BX.riesgo=function(x,sec,rev,deb){
 BX.quien=function(d){return d&&SB.user&&d.user_id===SB.user.id?'Tú':((d&&d.profiles&&d.profiles.name)||'Alguien del equipo').split(' ')[0]};
 BX.ase=function(x){var n=x.profiles&&x.profiles.name;return x.user_id===(SB.user&&SB.user.id)?'Tuyo':n||'Asesor'};
 BX.agn=function(x){return (x.profiles&&x.profiles.agencies&&x.profiles.agencies.name)||''};
-BX.VERB={enviar:'lo envió a GM',corregir:'lo abrió para corregir',tecnico:'le pidió al técnico'};
+BX.VERB={enviar:'lo envió a GM',corregir:'lo abrió para corregir',tecnico:'le pidió al técnico',avance:'pidió avance'};
+/* solo el asesor dueño del caso lo envía; dirección (dueño y director) pide avance; el gerente corrige, pide al técnico o pide avance */
+BX.dir=function(){return !!(SB.user&&(SB.user.dueno||SB.user.director))};
+BX.mio=function(x){return !!(SB.user&&x.user_id===SB.user.id)};
+BX.puede=function(x,acc){
+  if(acc==='nota')return true;
+  if(acc==='enviar')return BX.mio(x)&&!BX.dir();
+  if(acc==='avance')return !BX.mio(x);
+  return !BX.dir();
+};
 BX.nivel=function(p){return p>=50?['alto','bad']:p>=25?['medio','warn']:['bajo','ok']};
 BX.load=async function(){
   if(!SB.c||!SB.entered||BX.busy)return;BX.busy=true;
@@ -7367,7 +7377,7 @@ BX.load=async function(){
       return x.status!=='borrador'&&!x.enviado_at&&!x.transaccion_aceptada_at&&!x.gwm_cobrada_at});
     var deb={};((r[2]&&r[2].data)||[]).forEach(function(g){if(g.veces)deb[g.id]=g.veces});
     var last={},notas={};((r[1]&&r[1].data)||[]).forEach(function(d){
-      if(d.decision==='nota'){var n=notas[d.expediente_id]=notas[d.expediente_id]||[];if(n.length<3)n.push(d)}
+      if(d.decision==='nota'||d.decision==='avance'){var n=notas[d.expediente_id]=notas[d.expediente_id]||[];if(n.length<4)n.push(d)}
       else if(!last[d.expediente_id])last[d.expediente_id]=d});
     var sec={},rev={};
     if(E.length){
@@ -7384,6 +7394,7 @@ BX.load=async function(){
 };
 BX.badge=function(){var b=$('#bxBadge');if(b){var n=BX.rows.length;b.hidden=!n;b.textContent=String(n)}document.querySelectorAll('[data-bxban]').forEach(function(e){e.innerHTML=HM.cardBx()})};
 BX.tipo=function(it){var x=it.x,f=x.flujo||{};
+  if(!BX.mio(x))return x.status==='rechazada'&&!x.pra_corregida_at?'Planta rechazó la PREA y espera corrección':it.r.pct>=50?'Tiene riesgo alto: conviene que la agencia lo corrija antes de enviar':'Listo para que el asesor decida';
   if(x.status==='rechazada'&&!x.pra_corregida_at)return 'Planta rechazó la PREA. ¿Corriges y la reenvías?';
   return it.r.pct>=50?'Antes de enviar a GM conviene corregir':'¿La envías a GM o la corriges primero?'};
 BX.card=function(it){
@@ -7395,8 +7406,12 @@ BX.card=function(it){
     '<p class="bx-why">'+(top&&R.pct<25?'Riesgo bajo de débito: <b>'+R.pct+'%</b>. Lo único a cuidar: '+esc(top.t)+'.':top?'Este reclamo tiene <b>'+R.pct+'% de riesgo de débito</b> por: '+esc(top.t)+'.':'No encontré nada que GM pueda debitar: <b>'+R.pct+'% de riesgo</b>.')+'</p>'+
     (R.M.length>1?'<ul class="bx-l">'+R.M.slice(1,5).map(function(m){return '<li>'+esc(m.t)+'</li>'}).join('')+(R.M.length>5?'<li>y '+(R.M.length-5)+' más</li>':'')+'</ul>':'')+
     (d?'<p class="bx-st"><b>'+esc(BX.quien(d))+'</b> '+esc(BX.VERB[d.decision]||d.decision)+' · '+esc(ago)+(tec?'. Cuando llegue lo que pidió, súbelo y el riesgo se recalcula.':'')+'</p>':'')+
-    (it.n&&it.n.length?'<div class="bx-n">'+it.n.map(function(n){return '<p><b>'+esc(BX.quien(n))+':</b> '+esc(n.nota)+' <small>'+esc(AL.ago(n.created_at))+'</small></p>'}).join('')+'</div>':'')+
-    '<div class="bx-a"><button class="bt'+(R.pct<50&&x.status!=='rechazada'?' pri':'')+'" type="button" data-bxdo="enviar">Enviar</button><button class="bt'+(R.pct>=50||x.status==='rechazada'?' pri':'')+'" type="button" data-bxdo="corregir">Corregir</button><button class="bt" type="button" data-bxdo="tecnico">Pedir al técnico</button><button class="bt bx-nb" type="button" data-bxdo="nota">Nota al equipo</button></div></div></article>';
+    (it.n&&it.n.length?'<div class="bx-n">'+it.n.map(function(n){return '<p'+(n.decision==='avance'?' class="av"':'')+'><b>'+esc(BX.quien(n))+(n.decision==='avance'?' pidió avance':'')+':</b> '+esc(n.nota)+' <small>'+esc(AL.ago(n.created_at))+'</small></p>'}).join('')+'</div>':'')+
+    '<div class="bx-a">'+(BX.puede(x,'enviar')?'<button class="bt'+(R.pct<50&&x.status!=='rechazada'?' pri':'')+'" type="button" data-bxdo="enviar">Enviar</button>':'')+
+      (BX.puede(x,'corregir')?'<button class="bt'+(BX.puede(x,'enviar')&&(R.pct>=50||x.status==='rechazada')||!BX.puede(x,'enviar')?' pri':'')+'" type="button" data-bxdo="corregir">Corregir</button>':'')+
+      (BX.puede(x,'tecnico')?'<button class="bt" type="button" data-bxdo="tecnico">Pedir al técnico</button>':'')+
+      (BX.puede(x,'avance')?'<button class="bt'+(BX.dir()?' pri':'')+'" type="button" data-bxdo="avance">Pedir avance a la agencia</button>':'')+
+      '<button class="bt bx-nb" type="button" data-bxdo="nota">Nota al equipo</button></div>'+(!BX.mio(x)?'<p class="bx-st">Solo '+esc(((x.profiles&&x.profiles.name)||'el asesor').split(' ')[0])+', el asesor de garantías del caso, puede enviarlo a GM.</p>':'')+'</div></article>';
 };
 BX.render=function(){
   var el=$('#bxBody');if(!el)return;
@@ -7438,6 +7453,15 @@ BX.nota=async function(it){
   var v=await HM.dlg({title:'Nota al equipo · '+(it.x.wo||it.x.folio),intro:'La ven el asesor, posventa y dirección en esta bandeja.',fields:[{k:'t',label:'Nota',type:'textarea',ph:'Ej. Antes de enviarla revisa la firma del cliente',req:true}],ok:'Publicar nota'});
   if(!v||!v.t)return;await BX.decide(it,'nota',v.t.slice(0,600));toast('Nota publicada');BX.load();
 };
+BX.avance=async function(it){
+  var x=it.x,quien=((x.profiles&&x.profiles.name)||'el asesor').split(' ')[0];
+  var v=await HM.dlg({title:'Pedir avance · '+(x.wo||x.folio),intro:'Le llega al instante a '+quien+' y al gerente de posventa de la agencia, y queda en este caso de la bandeja.',
+    fields:[{k:'t',label:'Mensaje',type:'textarea',value:it.r.pct>=50?'Este caso tiene '+it.r.pct+'% de riesgo de débito por: '+(it.r.M[0]?it.r.M[0].t:'')+'. ¿Ya lo resolvieron?':'¿Cómo va este caso? ¿Ya se resolvió?',req:true}],ok:'Enviar a la agencia'});
+  if(!v||!v.t)return;
+  var r=await SB.c.rpc('pedir_avance',{p_exp:x.id,p_msg:v.t});
+  if(r.error){SB.fail(r.error);toast('No se pudo enviar');return}
+  toast('Listo: '+quien+' ya tiene tu mensaje');BX.load();
+};
 BX.msgTec=function(it){
   var x=it.x,L=[];
   BX.REQ.concat(['destruccion']).forEach(function(k){if(BX.TEC[k]&&!it.sec[k]&&(k!=='destruccion'))L.push(BX.TEC[k])});
@@ -7464,7 +7488,8 @@ document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('[data-bxf]');if(f){BX.f=f.dataset.bxf;BX.render();return}
   var b=e.target.closest&&e.target.closest('[data-bxdo]');if(!b)return;
   var c=b.closest('[data-bx]'),it=c&&BX.item(c.dataset.bx);if(!it)return;
-  if(b.dataset.bxdo==='enviar')BX.enviar(it,b);else if(b.dataset.bxdo==='corregir')BX.corregir(it);else if(b.dataset.bxdo==='nota')BX.nota(it);else BX.tecnico(it);
+  if(!BX.puede(it.x,b.dataset.bxdo)){toast('Esa decisión le toca al asesor de garantías del caso');return}
+  if(b.dataset.bxdo==='enviar')BX.enviar(it,b);else if(b.dataset.bxdo==='corregir')BX.corregir(it);else if(b.dataset.bxdo==='nota')BX.nota(it);else if(b.dataset.bxdo==='avance')BX.avance(it);else BX.tecnico(it);
 });
 /* Inicio: la bandeja en una línea */
 HM.cardBx=function(){
