@@ -9336,7 +9336,10 @@ $('#gtIn').addEventListener('input',function(){this.removeAttribute('aria-invali
 $('#gtOrd').addEventListener('submit',function(e){
   e.preventDefault();var i=$('#gtIn'),o=GATE.fix(i.value);
   if(!GATE.ORD.test(o)){i.setAttribute('aria-invalid','true');$('#gtErr').textContent='Escribe un número de orden válido, por ejemplo GA4043';i.focus();return}
-  GATE.v={tipo:GATE.tipo,orden:o};GATE.sync();ta.focus();
+  GATE.v={tipo:GATE.tipo,orden:o};GATE.sync();
+  /* servicio o campaña: con Continuar se abre la orden con su conversación y su expediente */
+  if(GATE.tipo!=='PREA'&&GP.abrirSinPrea()){GP.abrir('',[]);return}
+  ta.focus();
 });
 $('#gtTagX').addEventListener('click',GATE.reset);
 /* ══ Subir una PREA que ya existe en planta ═════════════════
