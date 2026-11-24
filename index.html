@@ -1970,6 +1970,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .vw-ped{margin:0;font-size:11px;color:var(--muted)}.vw-empty{margin:12px 2px 0}
 @media(max-width:640px){.vw-g{grid-template-columns:1fr}.vw-q form{flex-direction:column}.vw-ask .xa-mk{display:none}}
 .fl-st.srv{grid-template-columns:repeat(5,minmax(0,1fr))}
+.xd-acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-self:center}.xd-acts .xd-del{margin-left:0}
 .xd-del{margin-left:auto;align-self:center;padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,#d6453b 40%,transparent);background:transparent;color:#b4372b;font:500 12.5px var(--f-ui,inherit);cursor:pointer}
 .xd-del:hover{background:color-mix(in srgb,#d6453b 10%,transparent)}
 .hm-bx{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:14px 16px;border:0;border-radius:16px;background:var(--fill-on,#111);color:var(--bg,#fff);font:inherit;text-align:left;cursor:pointer}
@@ -3276,7 +3277,7 @@ function enterChat(title){
   syncCrumb();if(GATE)GATE.sync();
 }
 function resetChat(){
-  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(typeof PR!=='undefined'&&PR)PR.msgs=[];if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.evid=false;GP.caseText='';GP.lastExpP=null;GP.tipo=null}if(typeof CB!=='undefined'&&CB)CB.last=null
+  if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(typeof PR!=='undefined'&&PR)PR.msgs=[];if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.evid=false;GP.caseText='';GP.lastExpP=null;GP.tipo=null;GP.srv=null}if(typeof CB!=='undefined'&&CB)CB.last=null
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
     flip(function(){stage.dataset.state='home';thread.hidden=true;ta.placeholder=AG[S.agent].ph;autosize()});
@@ -5346,7 +5347,7 @@ GP.ack=function(o){
 GP.suggest=function(w,items){
   if(!items||!items.length)return;
   var box=document.createElement('div');box.className='gp-chips';
-  box.innerHTML=items.map(function(i){return '<button type="button" class="gp-chip'+(i.arm?' arm':'')+'" '+(i.arm?'data-gparm=""':i.pdf?'data-gparmpdf="'+ea(i.pdf)+'"':i.exp?'data-gpexp="'+ea(i.exp)+'"':i.open?'data-gpopen="'+ea(i.open)+'"':'data-gpq="'+ea(i.q)+'"'+(i.go?' data-gpgo="'+i.go+'"':''))+'>'+esc(i.t)+'</button>'}).join('');
+  box.innerHTML=items.map(function(i){return '<button type="button" class="gp-chip'+(i.arm?' arm':'')+'" '+(i.srv?'data-gpsrv="'+ea(i.srv)+'"':i.arm?'data-gparm=""':i.pdf?'data-gparmpdf="'+ea(i.pdf)+'"':i.exp?'data-gpexp="'+ea(i.exp)+'"':i.open?'data-gpopen="'+ea(i.open)+'"':'data-gpq="'+ea(i.q)+'"'+(i.go?' data-gpgo="'+i.go+'"':''))+'>'+esc(i.t)+'</button>'}).join('');
   $('.ai-col',w).insertBefore(box,$('.ai-actions',w));toBottom();
 };
 GP.sendIn=function(agent,q){
@@ -5445,7 +5446,8 @@ GP.armar=async function(text,fobjs){
   XA.busy=false;
 };
 $('#gpArmIn').addEventListener('change',function(){var f=[].slice.call(this.files);this.value='';if(f.length)GP.armar('',f)});
-GP.open=async function(id){
+GP.open=async function(id,o){
+  o=o||{};
   if(!SB.c||!SB.entered)return;
   var c=await SB.c.from('conversations').select('id,agent,title,orden,text,messages').eq('id',id).single();
   if(c.error||!c.data){SB.fail(c.error||'sin datos');toast('No se pudo abrir la conversación');return}
@@ -5454,16 +5456,24 @@ GP.open=async function(id){
   GP.cur=cv.orden;GP.msgs=Array.isArray(cv.messages)?cv.messages.slice():[];GP.caseText=cv.text||'';
   var tm=/\((Servicio|Campaña)\)/.exec(cv.text||'');GP.tipo=tm?tm[1]:null;if(GP.tipo)GP.evid=true;
   /* una orden de servicio no es una plática: se abre su expediente en Expedientes → Servicios */
-  if(GP.tipo==='Servicio'){var sx=await SB.c.from('expedientes').select('*').eq('conversation_id',id).eq('tipo','Servicio').limit(1);
-    if(sx.data&&sx.data[0]){resetChat();EX.f='srv';EX.q='';$('#exQ').value='';showView('exp');await EX.load();if(!EX.rows.some(function(r){return r.id===sx.data[0].id}))EX.rows.unshift(sx.data[0]);XD.open(sx.data[0].id);return}}
+  GP.srv=null;
+  if(GP.tipo==='Servicio'){var sx=await SB.c.from('expedientes').select('*').eq('conversation_id',id).eq('tipo','Servicio').limit(1);GP.srv=sx.data&&sx.data[0]||null;
+    if(GP.srv&&!o.chat){resetChat();EX.f='srv';EX.q='';$('#exQ').value='';showView('exp');await EX.load();if(!EX.rows.some(function(r){return r.id===sx.data[0].id}))EX.rows.unshift(sx.data[0]);XD.open(sx.data[0].id);return}}
   enterChat(cv.orden||cv.title||'Conversación');
   var ex=await SB.c.from('expedientes').select(GP.COLS).eq('conversation_id',id).order('created_at',{ascending:true}).limit(10);
   var rows=(ex.data||[]);GP.nPrea=rows.length;
   if(GP.msgs.length)GP.msgs.forEach(function(m){
     if(m.role==='user')addUser(m.content,[]);
     else{var w=addAssistant();hideRegen(w);$('.ai-body',w).innerHTML=md(m.content,false);w._text=m.content;$('.ai-actions',w).hidden=false}
-  });else addUser(cv.text||'',[]);
+  });else if(GP.tipo!=='Servicio')addUser(cv.text||'',[]);
   var sb=GP.sib({agent:cv.agent,orden:cv.orden}),last=null;
+  if(GP.tipo==='Servicio'){
+    var fs=GP.srv&&GP.srv.flujo;
+    if(!GP.msgs.length){last=addAssistant();hideRegen(last);var hi='Chat del servicio **'+(cv.orden||'')+'**. Pregúntame lo que necesites de este servicio: qué evidencia subir, cómo facturarlo, tiempos u operaciones, o qué dice el manual de GM.'+(fs&&fs.etapa!=='cerrado'?'\n\nVa en **'+FL.nom(fs.etapa)+'**: '+String(fs.siguiente||'').toLowerCase()+'.':fs?'\n\nEste servicio ya está cobrado.':'');
+      $('.ai-body',last).innerHTML=md(hi,false);last._text=hi;$('.ai-actions',last).hidden=false}
+    if(GP.srv){var tg=last||[].slice.call(document.querySelectorAll('#threadIn .msg-ai')).pop();if(tg)GP.suggest(tg,[{t:'Volver al expediente del servicio',srv:GP.srv.id},{t:'¿Qué evidencia debo subir?',q:'¿Qué evidencia debo subir para este servicio?'},{t:'¿Cómo lo facturo?',q:'¿Cómo facturo este servicio?'}])}
+    S.last=null;toBottom(true);GP.render();return;
+  }
   if(!cob&&rows.length){
     last=addAssistant();hideRegen(last);$('.ai-body',last).innerHTML=md(rows.length>1?'Estas son las PREAs de esta conversación.':'Esta es la PREA de esta conversación.',false);
     var box=document.createElement('div');box.className='mi-wrap';box.innerHTML=rows.map(GP.prea).join('');$('.ai-col',last).insertBefore(box,$('.ai-actions',last));$('.ai-actions',last).hidden=false;
@@ -5580,7 +5590,8 @@ GP.think=async function(text,my){
   if(!SB.aiOff&&SB.entered){
     try{
       if(S.convP)await S.convP;if(GP.lastExpP)await GP.lastExpP;
-      var r=await SB.ai({rol_agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:text}]),ahora:MI.nowInfo()},'manual');
+      var fx=GP.tipo==='Servicio'&&GP.srv?GP.srv.flujo:null,ctxS=GP.tipo==='Servicio'?'[Contexto: la orden '+(GP.cur||'')+' es un SERVICIO de garantía, no lleva PREA; su ciclo es abrir la orden, hacer el servicio y subir la evidencia, facturar y cobrar, en un día'+(fx?'; va en la etapa «'+FL.nom(fx.etapa)+'» y lo siguiente es: '+fx.siguiente:'')+'. No propongas armar una PREA.]\n':'';
+      var r=await SB.ai({rol_agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:GP.srv?GP.srv.folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:ctxS+text}]),ahora:MI.nowInfo()},'manual');
       if(r&&r.text)return {md:r.text};
     }catch(e){SB.aiFail(e)}
   }
@@ -5616,6 +5627,7 @@ async function runConv(text){
   $('#gpNew').addEventListener('click',function(){document.getElementById('newChat').click()});
   document.addEventListener('click',function(e){
     var c=e.target.closest&&e.target.closest('[data-gpcopy]');if(c){copyText(c.dataset.gpcopy).then(function(){toast('Copiado')});return}
+    var sv=e.target.closest&&e.target.closest('[data-gpsrv]');if(sv){var sid=sv.dataset.gpsrv;EX.f='srv';EX.q='';$('#exQ').value='';showView('exp');EX.load().then(function(){if(GP.srv&&!EX.rows.some(function(r){return r.id===sid}))EX.rows.unshift(GP.srv);XD.open(sid)});return}
     var am=e.target.closest&&e.target.closest('[data-gparm]');if(am){if(XA.busy)toast('Espera a que termine el armado anterior');else $('#gpArmIn').click();return}
     var ap=e.target.closest&&e.target.closest('[data-gparmpdf]');if(ap){XA.pdf(ap.dataset.gparmpdf,ap);return}
     var x=e.target.closest&&e.target.closest('[data-gpexp]');if(x){EX.q=x.dataset.gpexp;$('#exQ').value=EX.q;EX.f='prea';showView('exp');return}
@@ -6114,7 +6126,7 @@ XD.SRV=[['evidencia','Evidencia del servicio','Fotos y documentos del trabajo re
 XD.openSrv=function(x,el){
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Servicios</button>'+
     '<div><h2>'+esc(x.wo||x.folio)+'</h2><p>'+esc(['Servicio',x.queja].filter(Boolean).join(' · '))+'</p></div>'+
-    (XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</div>'+
+    '<div class="xd-acts"><button class="bt pri" type="button" data-xdchat>Chatear con el agente</button>'+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</div></div>'+
     FL.html(x)+'<div class="xd-grid">'+XD.SRV.map(XD.secBox).join('')+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;$('.xd-back',el).focus();
   XD.SRV.forEach(function(d){XD.load(x.id,d[0])});
@@ -6707,6 +6719,7 @@ XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k
 document.addEventListener('click',function(e){
   var t=e.target;if(!t.closest)return;
   if(t.closest('[data-xdclose]')){XD.close();return}
+  if(t.closest('[data-xdchat]')&&XD.cur){var sx=XD.cur;if(!sx.conversation_id){toast('Este servicio no tiene conversación');return}XD.close();GP.open(sx.conversation_id,{chat:true});return}
   if(t.closest('[data-xddel]')&&XD.cur){var cx=XD.cur;XDEL.uno(cx).then(function(ok){if(ok){XD.close();if(S.view==='exp')EX.load()}});return}
   if(t.closest('[data-xdsave]')){XD.qSave();return}
   var o=t.closest('[data-xdopen]');
