@@ -6396,7 +6396,7 @@ SVC.html=function(x){
     (XDEL.puede(x)?'<div class="xd-acts"><button class="xd-del" type="button" data-xddel>Eliminar servicio</button></div>':'')+'</div>'+
     '<div class="svc-g"><section class="svc-chat" aria-label="Agente del servicio"><div class="svc-th" id="svcTh" aria-live="polite"><div class="svc-thi" id="svcThi"></div></div>'+
       '<form class="svc-dock" id="svcForm"><div class="composer svc-comp"><div class="card">'+
-      '<textarea id="svcTa" rows="2" placeholder="Escríbele al agente o arrastra aquí la orden, fotos, factura o comprobante…" aria-label="Mensaje para el agente del servicio"></textarea>'+
+      '<textarea id="svcTa" rows="2" placeholder="Escríbele al cerebro o arrastra aquí la orden, fotos, factura o comprobante…" aria-label="Mensaje para el cerebro del servicio"></textarea>'+
       '<div class="c-foot"><button type="button" class="fb" data-svcclip aria-label="Subir archivos" title="Subir orden, fotos, factura o comprobante">'+svg('plus')+'</button><span class="sp"></span>'+
       '<button class="send" id="svcSend" type="submit" aria-label="Enviar" disabled>'+svg('up')+'</button></div></div></div>'+
       '<input type="file" id="svcFile" multiple hidden accept=".pdf,image/*,.xml"></form><div class="svc-drop" aria-hidden="true">Suéltalo y el agente lo revisa</div></section>'+
@@ -6417,19 +6417,23 @@ SVC.pensando=function(t){var d=document.createElement('div');d.className='msg-ai
 SVC.on=function(){var t=$('#svcTa'),b=$('#svcSend');if(!t||!b)return;var on=!!t.value.trim()&&!SVC.busy;b.classList.toggle('on',on);b.disabled=!on;
   t.style.height='auto';t.style.height=Math.min(200,t.scrollHeight)+'px'};
 SVC.chips=function(){};
+/* un solo recibimiento: el cerebro, con todos los agentes, en este chat */
 SVC.saludo=function(x){
-  var f=x.flujo,e=f&&f.etapa;
-  return 'Soy el agente del servicio **'+(x.wo||'')+'**. '+(e==='cerrado'?'Este servicio ya está cobrado: si quieres, te hago el resumen.':
-    e==='factura'?'Ya tengo la evidencia. Sigue **facturarlo**: arrástrame aquí la factura (PDF, foto o XML) y yo saco el monto.':
-    e==='cobro'?'Ya está facturado. Cuando te paguen, mándame el **comprobante de pago** y lo cierro.':
-    'Arrástrame aquí la **orden o las fotos del trabajo** y yo saco qué servicio fue, el vehículo, el kilometraje y cuánto se cobra en tu grupo.')+' También puedes preguntarme lo que quieras de este servicio.';
+  var o='**'+(x.wo||'')+'**';
+  if(x.flujo&&x.flujo.etapa==='cerrado')return 'Hola, soy el cerebro de Ax. El servicio '+o+' ya quedó **cerrado**: facturado, cobrado y con su evidencia.\n\nSi quieres, te hago el resumen o te digo cómo se compara con lo que cobran las otras agencias de tu grupo.';
+  return 'Hola, soy el cerebro de Ax. En este chat están conectados todos tus agentes (garantías, servicios y cobros) con lo que ya aprendió tu grupo, trabajando el servicio '+o+'.\n\n'+
+    'Para cerrarlo hay que **facturarlo, cobrarlo y subir la evidencia completa**. Mándame aquí la orden, las fotos, la factura o el comprobante: los leo, los guardo en el expediente y voy palomeando la lista.\n\n'+
+    'Pregúntame lo que necesites, por ejemplo cuánto se cobra este servicio en tu grupo.';
 };
+/* los mensajes automáticos con que antes se abría la orden ya no se muestran */
+SVC.viejo=function(m){var c=String(m&&m.content||'');return m&&(m.role==='user'?/^Abrir la orden \S+ · /.test(c):/^Listo: abrí la orden /.test(c))};
 SVC.abrir=async function(x){
   SVC.x=x;SVC.msgs=[];SVC.conv=x.conversation_id||null;SVC.busy=false;
   if(SVC.conv){try{var c=await SB.c.from('conversations').select('messages').eq('id',SVC.conv).single();SVC.msgs=(c.data&&Array.isArray(c.data.messages))?c.data.messages.slice():[]}catch(_){}}
   if(!XD.cur||XD.cur.id!==x.id)return;
-  $('#svcThi').innerHTML='';SVC.msgs.slice(-30).forEach(SVC.burb);
-  if(!SVC.msgs.some(function(m){return m.role==='user'&&!/^Abrir la orden /.test(m.content)}))SVC.burb({role:'assistant',content:SVC.saludo(x)});
+  $('#svcThi').innerHTML='';
+  SVC.burb({role:'assistant',content:SVC.saludo(x)});
+  SVC.msgs.filter(function(m){return !SVC.viejo(m)}).slice(-30).forEach(SVC.burb);
 };
 SVC.guardar=async function(){if(!SVC.conv)return;try{await SB.c.from('conversations').update({messages:SVC.msgs.slice(-60)}).eq('id',SVC.conv)}catch(e){console.warn('[servicio chat]',e)}};
 SVC.decir=function(role,txt){var m={role:role,content:String(txt).slice(0,3000)};SVC.msgs.push(m);return m};
@@ -6448,7 +6452,7 @@ SVC.enviar=async function(text){
   SVC.burb(SVC.decir('user',text));SVC.on();var w=SVC.pensando('Revisando lo que sé de este servicio');
   var resp='';
   try{var ctx=await SVR.ctx(x,text);
-    var r=await SB.ai({rol_agente:'garantias',orden:x.wo||null,conversation_id:SVC.conv,folio:x.folio,messages:SVC.msgs.slice(-12,-1).concat([{role:'user',content:ctx+text}]),ahora:MI.nowInfo()},'manual');
+    var r=await SB.ai({rol_agente:'garantias',orden:x.wo||null,conversation_id:SVC.conv,folio:x.folio,messages:SVC.msgs.filter(function(m){return !SVC.viejo(m)}).slice(-12,-1).concat([{role:'user',content:ctx+text}]),ahora:MI.nowInfo()},'manual');
     resp=(r&&r.text)||'No encontré esa respuesta en lo que sé de este servicio.';
   }catch(e){resp='No pude contestar ahorita ('+TR.errTxt(e)+'). Inténtalo otra vez en un momento.'}
   w.remove();SVC.burb(SVC.decir('assistant',resp));SVC.busy=false;SVC.on();SVC.guardar();
