@@ -1990,7 +1990,11 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .exmv-b i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--fill-slab);font-style:normal;font-size:11.5px}.exmv-b:hover{border-color:#2231dd}.exmv-b.on{background:var(--fill-on,#111);color:var(--bg,#fff);border-color:transparent}.exmv-b.on i{background:rgba(255,255,255,.2)}
 .exp-all{margin-top:8px;padding:0;border:0;background:none;color:var(--muted);font:500 12.5px var(--f-ui,inherit);cursor:pointer;text-decoration:underline}
 @media(max-width:760px){.exp-p{grid-template-columns:repeat(4,minmax(0,1fr))}.exp-s span{white-space:normal;font-size:11px}.exp-s b{font-size:18px}.exp-s,.exp-s:first-child,.exp-s:last-child{padding:10px;clip-path:none;border-radius:10px}}
-.nav[data-view="cobros"],.nav[data-view="cartera"],.nav[data-view="bitacora"],.nav[data-view="mi"]{display:none!important}
+.nav[data-view="cobros"],.nav[data-view="cartera"],.nav[data-view="bitacora"],.nav[data-view="mi"],.nav[data-view="red"]{display:none!important}
+.bx-tabs{display:flex;gap:4px;margin:0 0 16px;border-bottom:1px solid var(--card-line)}
+.bx-tabs button{position:relative;display:flex;align-items:center;gap:6px;padding:10px 14px;border:0;background:none;color:var(--muted);font:500 14px var(--f-ui,inherit);cursor:pointer;margin-bottom:-1px;border-bottom:2px solid transparent}
+.bx-tabs button:hover{color:var(--fg,inherit)}.bx-tabs button.on{color:var(--fg,inherit);border-bottom-color:var(--fg,#111)}
+.bx-tabs b{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c58a1a;color:#fff;font-size:11px;display:grid;place-items:center}.bx-tabs b:empty{display:none}
 .xd-acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-self:center}.xd-acts .xd-del{margin-left:0}
 .xd-del{margin-left:auto;align-self:center;padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,#d6453b 40%,transparent);background:transparent;color:#b4372b;font:500 12.5px var(--f-ui,inherit);cursor:pointer}
 .xd-del:hover{background:color-mix(in srgb,#d6453b 10%,transparent)}
@@ -2405,13 +2409,15 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
     <section class="admin" id="viewBx" hidden>
       <div class="ad-in">
         <div class="ad-head"><div><h2>Bandeja</h2><p id="bxSub">Las decisiones que te tocan, con el riesgo de débito que calcula Ax AI</p></div></div>
+        <div class="bx-tabs" role="tablist" aria-label="Bandeja"><button type="button" role="tab" data-bxtab="bx">Decisiones<b data-bxn="bx"></b></button><button type="button" role="tab" data-bxtab="alertas">Alertas<b data-bxn="alertas"></b></button><button type="button" role="tab" data-bxtab="reglas">Reglas</button></div>
         <div id="bxBody"></div>
       </div>
     </section>
     <section class="admin" id="viewRed" hidden>
       <div class="ad-in">
-        <div class="ad-head"><div><h2>Alertas y reglas</h2><p id="redSub">Lo que la red aprendió de los manuales de GM y de cada débito real</p></div>
+        <div class="ad-head"><div><h2>Bandeja</h2><p id="redSub">Lo que la red aprendió de los manuales de GM y de cada débito real</p></div>
           <input type="search" id="redQ" placeholder="Buscar regla, tema o sección" aria-label="Buscar reglas"></div>
+        <div class="bx-tabs" role="tablist" aria-label="Bandeja"><button type="button" role="tab" data-bxtab="bx">Decisiones<b data-bxn="bx"></b></button><button type="button" role="tab" data-bxtab="alertas">Alertas<b data-bxn="alertas"></b></button><button type="button" role="tab" data-bxtab="reglas">Reglas</button></div>
         <div id="redBody"></div>
       </div>
     </section>
@@ -2628,14 +2634,15 @@ mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)}
 $('#bell').addEventListener('click',function(){RED.f='alertas';showView('red')});
 
 /* secciones ocultas del menú lateral y del buscador (siguen existiendo; se pueden volver a mostrar quitándolas de aquí) */
-var OCULTAS=['cobros','cartera','bitacora','mi'];
-var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',bx:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
+var OCULTAS=['cobros','cartera','bitacora','mi','red'];
+var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Bandeja',bx:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
   S.view=id;var main=isMain(id);
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
-  $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():v===id;b.setAttribute('aria-current',on?'true':'false')});
+  $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():(v===id||(id==='red'&&v==='bx'));b.setAttribute('aria-current',on?'true':'false')});
+  if(typeof BXT!=='undefined')BXT.sync(id);
   var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros');$('#gp').hidden=!gpOn;if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='agv'||id==='cg'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewAgv').hidden=id!=='agv';$('#viewCg').hidden=id!=='cg';$('#viewDueno').hidden=id!=='dueno';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
@@ -7543,7 +7550,7 @@ AL.load=async function(){
   if(S.view==='red'&&RED.f==='alertas')RED.render();if(S.view==='inicio')HM.render();
 };
 AL.unread=function(){return AL.rows.filter(function(a){return !AL.read[a.id]})};
-AL.badge=function(){var b=$('#bell');if(b)b.dataset.n=String(AL.unread().length+(typeof MI!=='undefined'&&MI.due?MI.due().length:0))};
+AL.badge=function(){if(typeof BXT!=='undefined')BXT.cuentas();var b=$('#bell');if(b)b.dataset.n=String(AL.unread().length+(typeof MI!=='undefined'&&MI.due?MI.due().length:0))};
 AL.markAll=async function(){
   var L=AL.unread();if(!L.length)return;L.forEach(function(a){AL.read[a.id]=1});AL.badge();
   var r=await SB.c.from('alertas_leidas').upsert(L.map(function(a){return {alerta_id:a.id}}),{onConflict:'alerta_id,user_id',ignoreDuplicates:true});if(r.error)console.warn('[alertas]',r.error.message);
@@ -7644,6 +7651,21 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
    (lo que falta, lo que la revisión contra el manual marcó, lo que no cuadra, plazos y débitos o rechazos
    parecidos en el grupo) y tres decisiones: Enviar, Corregir o Pedir al técnico. Cada decisión queda registrada
    (tabla decisiones) con el riesgo y sus motivos, para medir después qué tan bien predijo. */
+/* pestañas de la bandeja: Decisiones · Alertas · Reglas */
+var BXT={};
+BXT.sync=function(id){
+  var t=id==='bx'?'bx':id==='red'?(RED.f==='alertas'?'alertas':'reglas'):null;if(!t)return;
+  document.querySelectorAll('.bx-tabs [data-bxtab]').forEach(function(b){var on=b.dataset.bxtab===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',String(on))});
+  BXT.cuentas();
+};
+BXT.cuentas=function(){
+  var n=(typeof BX!=='undefined'&&BX.rows||[]).length,a=(typeof AL!=='undefined'&&AL.unread)?AL.unread().length:0;
+  document.querySelectorAll('[data-bxn="bx"]').forEach(function(e){e.textContent=n||''});
+  document.querySelectorAll('[data-bxn="alertas"]').forEach(function(e){e.textContent=a||''});
+  var rq=$('#redQ');if(rq)rq.hidden=RED.f==='alertas';
+};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-bxtab]');if(!b)return;var t=b.dataset.bxtab;
+  if(t==='bx'){showView('bx');return}RED.f=t==='alertas'?'alertas':'debito';showView('red')});
 var BX={rows:[],f:'todas',as:'',ag:'',busy:false,
   TEC:{recepcion:'Toma foto del VIN, del odómetro (que se lea bien el kilometraje) y una foto completa del vehículo.',
     diagnostico:'Mándame el reporte del escáner con los códigos de falla y tu hoja con las lecturas que tomaste.',
@@ -7711,7 +7733,7 @@ BX.load=async function(){
   }catch(e){SB.fail(e)}
   BX.busy=false;BX.badge();AGV.sideRender();if(S.view==='bx')BX.render();if(S.view==='agv'&&AGV.d)AGV.render();if(S.view==='inicio')HM.render();
 };
-BX.badge=function(){var b=$('#bxBadge');if(b){var n=BX.rows.length;b.hidden=!n;b.textContent=String(n)}document.querySelectorAll('[data-bxban]').forEach(function(e){e.innerHTML=HM.cardBx()})};
+BX.badge=function(){if(typeof BXT!=='undefined')BXT.cuentas();var b=$('#bxBadge');if(b){var n=BX.rows.length;b.hidden=!n;b.textContent=String(n)}document.querySelectorAll('[data-bxban]').forEach(function(e){e.innerHTML=HM.cardBx()})};
 BX.tipo=function(it){var x=it.x,f=x.flujo||{};
   if(!BX.mio(x))return x.status==='rechazada'&&!x.pra_corregida_at?'Planta rechazó la PREA y espera corrección':it.r.pct>=50?'Tiene riesgo alto: conviene que la agencia lo corrija antes de enviar':'Listo para que el asesor decida';
   if(x.status==='rechazada'&&!x.pra_corregida_at)return 'Planta rechazó la PREA. ¿Corriges y la reenvías?';
@@ -8106,10 +8128,10 @@ RED.render=function(){
   var tot=D.reduce(function(a,r){return a+Number(r.monto_debitado||0)},0),ag=D.reduce(function(a,r){return a+Number(r.agencias||0)},0);
   $('#redSub').textContent=RED.f==='alertas'?'Lo que pasa en tu grupo y en GM, en el momento, y a cuáles de tus casos les aplica':RED.rows.length+' reglas: '+M.length+' del manual de GM y '+D.length+' aprendidas de débitos reales'+(tot?' ('+DEB.mx(tot)+' debitados que ya no deben repetirse)':'');
   el.innerHTML=(RED.f==='alertas'?'':'<div class="ad-kpi"><div class="kp"><span>Reglas aprendidas de débitos</span><b>'+D.length+'</b><small>'+RED.nuevas(14).length+' en las últimas 2 semanas</small></div><div class="kp"><span>Débitos que las originaron</span><b>'+D.reduce(function(a,r){return a+Number(r.veces||0)},0)+'</b><small>'+ag+(ag===1?' agencia afectada':' casos por agencia')+'</small></div><div class="kp bad"><span>Monto debitado en la red</span><b>'+DEB.mx(tot)+'</b><small>la revisión de cada expediente ya los vigila</small></div><div class="kp"><span>Reglas del manual de GM</span><b>'+M.length+'</b><small>Manual 2026 y curso de garantías</small></div></div>')+
-    '<div class="ad-bar"><label>Ver <select id="redF"><option value="alertas"'+(RED.f==='alertas'?' selected':'')+'>Alertas</option><option value="debito"'+(RED.f==='debito'?' selected':'')+'>Reglas aprendidas de débitos</option><option value="manual"'+(RED.f==='manual'?' selected':'')+'>Reglas del manual y boletines de GM</option></select></label><span class="sp"></span></div>'+
+    (RED.f==='alertas'?'':'<div class="ad-bar"><label>Ver <select id="redF"><option value="debito"'+(RED.f==='debito'?' selected':'')+'>Reglas aprendidas de débitos</option><option value="manual"'+(RED.f==='manual'?' selected':'')+'>Reglas del manual y boletines de GM</option></select></label><span class="sp"></span></div>')+
     (RED.f==='alertas'?AL.html():'<div class="ad-card">'+(L.length?L.map(function(r){return '<div class="red-r"><div class="red-h"><b>'+esc(r.id)+'</b><span>'+esc(RED.SEC[r.seccion_expediente]||r.seccion_expediente)+' · '+esc(r.tema)+'</span>'+(r.origen==='debito'?'<em>'+r.veces+(r.veces===1?' débito':' débitos')+' · '+r.agencias+(r.agencias===1?' agencia':' agencias')+' · '+DEB.mx(r.monto_debitado)+'</em>':'')+'</div><p>'+esc(r.regla)+'</p><small>Cómo se revisa: '+esc(r.como_verificar||'—')+' · Si no se cumple: '+esc(r.consecuencia||'—')+' · '+esc(r.fuente)+(r.pagina?', pág. '+r.pagina:'')+'</small></div>'}).join(''):'<div class="pv-empty">'+(RED.f==='debito'?'Todavía no hay débitos registrados. Cuando una agencia suba un débito de GM, aquí aparece la regla que protege a todas las demás.':'Sin resultados.')+'</div>')+'</div>');
 };
-document.addEventListener('change',function(e){if(e.target&&e.target.id==='redF'){RED.f=e.target.value;RED.render();if(RED.f==='alertas')AL.load().then(function(){setTimeout(AL.markAll,2500)})}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='redF'){RED.f=e.target.value;RED.render();BXT.sync('red');if(RED.f==='alertas')AL.load().then(function(){setTimeout(AL.markAll,2500)})}});
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#viewRed [data-exp]');if(b){EX.q=b.dataset.exp;$('#exQ').value=EX.q;EX.f='prea';showView('exp')}});
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='redQ'){RED.q=e.target.value;RED.render()}});
 
