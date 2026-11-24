@@ -1990,7 +1990,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .exmv-b i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--fill-slab);font-style:normal;font-size:11.5px}.exmv-b:hover{border-color:#2231dd}.exmv-b.on{background:var(--fill-on,#111);color:var(--bg,#fff);border-color:transparent}.exmv-b.on i{background:rgba(255,255,255,.2)}
 .exp-all{margin-top:8px;padding:0;border:0;background:none;color:var(--muted);font:500 12.5px var(--f-ui,inherit);cursor:pointer;text-decoration:underline}
 @media(max-width:760px){.exp-p{grid-template-columns:repeat(4,minmax(0,1fr))}.exp-s span{white-space:normal;font-size:11px}.exp-s b{font-size:18px}.exp-s,.exp-s:first-child,.exp-s:last-child{padding:10px;clip-path:none;border-radius:10px}}
-.nav[data-view="cobros"],.nav[data-view="cartera"],.nav[data-view="bitacora"],.nav[data-view="mi"],.nav[data-view="red"]{display:none!important}
+.nav[data-view="cobros"],.nav[data-view="cartera"],.nav[data-view="bitacora"],.nav[data-view="mi"],.nav[data-view="red"],.nav[data-view="pres"],.grp.grp-ax{display:none!important}
 .bx-tabs{display:flex;gap:4px;margin:0 0 16px;border-bottom:1px solid var(--card-line)}
 .bx-tabs button{position:relative;display:flex;align-items:center;gap:6px;padding:10px 14px;border:0;background:none;color:var(--muted);font:500 14px var(--f-ui,inherit);cursor:pointer;margin-bottom:-1px;border-bottom:2px solid transparent}
 .bx-tabs button:hover{color:var(--fg,inherit)}.bx-tabs button.on{color:var(--fg,inherit);border-bottom-color:var(--fg,#111)}
@@ -2215,7 +2215,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <button class="nav" data-mr-nav data-view="prueba" data-i="chat" hidden>Agente de pruebas</button>
         <div class="grp" data-nm style="margin-top:22px">Administración</div>
         <button class="nav" data-nm data-view="admin" data-i="chart">Tablero de agencia<span class="nbadge" id="adBadge" hidden></span></button>
-        <div class="grp" data-nm style="margin-top:22px">Ax AI</div>
+        <div class="grp grp-ax" data-nm style="margin-top:22px">Ax AI</div>
         <button class="nav" data-nm data-view="pres" data-i="present">Presentación</button>
       </div>
       <div class="sb-foot">
@@ -2634,7 +2634,7 @@ mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)}
 $('#bell').addEventListener('click',function(){RED.f='alertas';showView('red')});
 
 /* secciones ocultas del menú lateral y del buscador (siguen existiendo; se pueden volver a mostrar quitándolas de aquí) */
-var OCULTAS=['cobros','cartera','bitacora','mi','red'];
+var OCULTAS=['cobros','cartera','bitacora','mi','red','pres'];
 var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Bandeja',bx:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
@@ -6992,7 +6992,8 @@ SB.loadAdvisors=async function(){
     MR.nav(!!me.marca);PV.nav(me.gerente);$$('[data-dir-nav]').forEach(function(e){e.hidden=!me.director;e.style.display=me.director?'':'none'});DN.nav(me.dueno);AGV.side();CG.nav();CG.load();VW.load();
     var nv=$('[data-view="admin"]');for(var ni=0;ni<nv.childNodes.length;ni++){if(nv.childNodes[ni].nodeType===3){nv.childNodes[ni].nodeValue=me.marca?'Tablero de marca':'Tablero de agencia';break}}
     $('#userBtn').innerHTML='<span class="avatar">'+esc(me.name.charAt(0).toUpperCase())+'</span>'+esc(me.name);
-    $('[data-view="admin"]').style.display=me.role==='admin'?'':'none'}
+    $('[data-view="admin"]').style.display=me.role==='admin'?'':'none';
+    document.querySelectorAll('.sb-scroll .grp[data-nm]').forEach(function(g){if(g.textContent.trim()==='Administración')g.style.display=me.role==='admin'?'':'none'})}
 };
 SB.enter=async function(user){
   if(SB.entered===user.id)return;SB.entered=user.id;ME=user.id;
