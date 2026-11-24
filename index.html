@@ -1990,7 +1990,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .exmv-b i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--fill-slab);font-style:normal;font-size:11.5px}.exmv-b:hover{border-color:#2231dd}.exmv-b.on{background:var(--fill-on,#111);color:var(--bg,#fff);border-color:transparent}.exmv-b.on i{background:rgba(255,255,255,.2)}
 .exp-all{margin-top:8px;padding:0;border:0;background:none;color:var(--muted);font:500 12.5px var(--f-ui,inherit);cursor:pointer;text-decoration:underline}
 @media(max-width:760px){.exp-p{grid-template-columns:repeat(4,minmax(0,1fr))}.exp-s span{white-space:normal;font-size:11px}.exp-s b{font-size:18px}.exp-s,.exp-s:first-child,.exp-s:last-child{padding:10px;clip-path:none;border-radius:10px}}
-.nav[data-view="cobros"],.nav[data-view="cartera"],.nav[data-view="bitacora"]{display:none!important}
+.nav[data-view="cobros"],.nav[data-view="cartera"],.nav[data-view="bitacora"],.nav[data-view="mi"]{display:none!important}
 .xd-acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-self:center}.xd-acts .xd-del{margin-left:0}
 .xd-del{margin-left:auto;align-self:center;padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,#d6453b 40%,transparent);background:transparent;color:#b4372b;font:500 12.5px var(--f-ui,inherit);cursor:pointer}
 .xd-del:hover{background:color-mix(in srgb,#d6453b 10%,transparent)}
@@ -2625,10 +2625,10 @@ $('#sbClose').addEventListener('click',function(){setSb(false)});
 $('#sbOpen').addEventListener('click',function(){setSb(true)});
 $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
-$('#bell').addEventListener('click',function(){if(MI.due().length&&!AL.unread().length){showView('mi');MI.send('¿Qué tengo pendiente?');return}RED.f='alertas';showView('red')});
+$('#bell').addEventListener('click',function(){RED.f='alertas';showView('red')});
 
 /* secciones ocultas del menú lateral y del buscador (siguen existiendo; se pueden volver a mostrar quitándolas de aquí) */
-var OCULTAS=['cobros','cartera','bitacora'];
+var OCULTAS=['cobros','cartera','bitacora','mi'];
 var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',bx:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
@@ -4621,7 +4621,7 @@ HM.rHome=function(){
   var A=HM.actions(),tot=A.reduce(function(a,x){return a+x.n},0);
   return '<div class="hm-bar"><label class="hm-sw"><input type="checkbox" id="hmCmp"'+(HM.cmp?' checked':'')+'><i></i>Comparar</label>'+
     '<button class="hm-btn" type="button" data-nav="'+(SB.user&&SB.user.role==='admin'?'admin':'exp')+'">Ver todas las analíticas</button>'+
-    '<button class="hm-btn dark" type="button" data-nav="mi"><span class="hm-mk">A</span> Preguntar a Ax AI</button></div>'+
+    '<button class="hm-btn dark" type="button" data-nav="agent"><span class="hm-mk">A</span> Preguntar a Ax AI</button></div>'+
     '<button class="hm-acts" type="button" id="hmActs" aria-expanded="false"><span class="hm-ico">'+ORB+'</span><span>'+(tot?'Hay '+tot+(tot===1?' acción recomendada':' acciones recomendadas')+' para aumentar tu uso de Ax AI':'Estás al día: no hay acciones pendientes')+'</span>'+(tot?'<span class="hm-chev">⌄</span>':'')+'</button>'+
     '<div class="hm-actlist" id="hmActList" hidden>'+A.map(function(x){return '<button type="button" data-nav="'+x.go+'"><b>'+x.n+'</b><span>'+esc(x.t)+'</span></button>'}).join('')+'</div><div class="hm-gap"></div>'+
     HM.cardBx()+HM.cardAlertas()+HM.cardFlujo()+HM.cardArm()+'<div class="hm-grid">'+HM.cardPre()+HM.cardPie()+HM.cardCam()+HM.cardSrv()+'</div>';
