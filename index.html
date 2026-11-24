@@ -1970,6 +1970,12 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .vw-ped{margin:0;font-size:11px;color:var(--muted)}.vw-empty{margin:12px 2px 0}
 @media(max-width:640px){.vw-g{grid-template-columns:1fr}.vw-q form{flex-direction:column}.vw-ask .xa-mk{display:none}}
 .fl-st.srv{grid-template-columns:repeat(5,minmax(0,1fr))}
+.sv-d{margin:0 0 16px;padding:16px 18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
+.sv-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}.sv-h h3{margin:0;font-size:15px}
+.sv-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.sv-g label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+.sv-g input,.sv-g select{padding:9px 11px;border-radius:10px;border:1px solid var(--card-line);background:var(--fill-slab);color:var(--fg,inherit);font:13.5px var(--f-ui,inherit)}
+.sv-ref{margin-top:12px}.sv-ref .xz-mut{margin:0}.sv-rb{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,#2231dd 7%,transparent);font-size:13px}.sv-rb p{margin:6px 0}.sv-rb ul{margin:4px 0 10px;padding-left:18px;font-size:12.5px}.sv-rb small{color:var(--muted)}
+.sv-a{margin-top:12px}
 .xd-acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-self:center}.xd-acts .xd-del{margin-left:0}
 .xd-del{margin-left:auto;align-self:center;padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,#d6453b 40%,transparent);background:transparent;color:#b4372b;font:500 12.5px var(--f-ui,inherit);cursor:pointer}
 .xd-del:hover{background:color-mix(in srgb,#d6453b 10%,transparent)}
@@ -5590,7 +5596,14 @@ GP.think=async function(text,my){
   if(!SB.aiOff&&SB.entered){
     try{
       if(S.convP)await S.convP;if(GP.lastExpP)await GP.lastExpP;
-      var fx=GP.tipo==='Servicio'&&GP.srv?GP.srv.flujo:null,ctxS=GP.tipo==='Servicio'?'[Contexto: la orden '+(GP.cur||'')+' es un SERVICIO de garantía, no lleva PREA; su ciclo es abrir la orden, hacer el servicio y subir la evidencia, facturar y cobrar, en un día'+(fx?'; va en la etapa «'+FL.nom(fx.etapa)+'» y lo siguiente es: '+fx.siguiente:'')+'. No propongas armar una PREA.]\n':'';
+      var fx=GP.tipo==='Servicio'&&GP.srv?GP.srv.flujo:null,ctxS='';
+      if(GP.tipo==='Servicio'){
+        var sv=GP.srv||{},tq=SVR.tipoDe(text)||sv.sys||null,ref=tq?await SVR.ref(tq):null;
+        ctxS='[Contexto: la orden '+(GP.cur||'')+' es un SERVICIO, no lleva PREA; su ciclo es abrir la orden, hacer el servicio y subir la evidencia, facturar y cobrar, en un día'+(fx?'; va en la etapa «'+FL.nom(fx.etapa)+'» y lo siguiente es: '+fx.siguiente:'')+
+          (sv.sys?'. Tipo de servicio: '+sv.sys:'. Aún no tiene tipo de servicio capturado')+(sv.vehicle?'; vehículo '+sv.vehicle:'')+(sv.km?'; '+sv.km+' km':'')+(Number(sv.labor)?'; se capturó un cobro de '+DEB.mx(sv.labor):'')+
+          '. Cerebro de servicios'+(tq?' para «'+tq+'»: '+(SVR.txt(ref)||'todavía no hay cobros registrados de este tipo en las agencias de la marca').replace(/\.$/,''):': pide el tipo de servicio (por ejemplo 6,000 km) para dar el precio de referencia')+
+          '. Si preguntan cuánto cobrar, responde con esa referencia del grupo y la red. No propongas armar una PREA.]\n';
+      }
       var r=await SB.ai({rol_agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:GP.srv?GP.srv.folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:ctxS+text}]),ahora:MI.nowInfo()},'manual');
       if(r&&r.text)return {md:r.text};
     }catch(e){SB.aiFail(e)}
@@ -6123,12 +6136,54 @@ XD.gridHtml=function(){
     '<div class="xd-grid">'+opt.map(XD.secBox).join('')+'</div></details>'+
     '<div class="xd-gh"><h3>Cobranza</h3></div><div class="xd-grid">'+g('cob').map(XD.secBox).join('')+'</div>'};
 XD.SRV=[['evidencia','Evidencia del servicio','Fotos y documentos del trabajo realizado'],['factura','Factura','La factura del servicio'],['planta','Comprobante de cobro','El pago recibido del servicio']];
+/* ── el cerebro de los servicios: cuánto se cobra ese tipo de servicio en tu grupo y en la red ── */
+var SVR={TIPOS:['Servicio 6,000 km','Servicio 12,000 km','Servicio 18,000 km','Servicio 24,000 km','Servicio 30,000 km','Servicio 36,000 km','Servicio 42,000 km','Servicio 48,000 km','Servicio 60,000 km']};
+/* «6 mil km», «servicio de 6000» → «Servicio 6,000 km» */
+SVR.tipoDe=function(t){t=String(t||'');var m=/(\d+)\s*mil\b/i.exec(t),d=/(?:^|[^A-Za-z\d])(\d[\d,\.]*)\s*(?:km|kil)/i.exec(t)||/(?:^|[^A-Za-z\d])(\d[\d,\.]*)/.exec(t),n=m?Number(m[1])*1000:d?Number(d[1].replace(/[^0-9]/g,'')):0;
+  if(n>=1000&&(/km|kil|mil/i.test(t)||n%1000===0))return 'Servicio '+n.toLocaleString('en-US')+' km';return null};
+SVR.ref=async function(tipo){if(!tipo)return null;try{var r=await SB.c.rpc('servicios_referencia',{p_tipo:tipo,p_marca:null});return r.error?null:r.data}catch(_){return null}};
+SVR.txt=function(R){
+  if(!R)return '';var g=R.grupo||{},w=R.red||{},L=[];
+  if(g.n)L.push('En tu grupo ('+(R.marca||'tu marca')+') se ha cobrado en '+g.n+(g.n===1?' servicio':' servicios')+': mediana '+DEB.mx(g.mediana)+(g.n>1?' (de '+DEB.mx(g.min)+' a '+DEB.mx(g.max)+')':'')+'. Por agencia: '+(g.por_agencia||[]).map(function(a){return a.agencia+' '+DEB.mx(a.mediana)+' ('+a.n+')'}).join('; ')+'.');
+  if(w.n)L.push('En otras '+w.agencias+(w.agencias===1?' agencia':' agencias')+' '+(R.marca||'')+' de la red: mediana '+DEB.mx(w.mediana)+' en '+w.n+' servicios (de '+DEB.mx(w.min)+' a '+DEB.mx(w.max)+').');
+  return L.join(' ');
+};
+SVR.box=function(x){
+  var t=x.sys||'',otro=t&&SVR.TIPOS.indexOf(t)<0;
+  return '<section class="sv-d" id="svDatos"><div class="sv-h"><h3>Datos del servicio</h3><span class="xz-mut" id="svMsg"></span></div><div class="sv-g">'+
+    '<label><span>Tipo de servicio</span><select id="svTipo"><option value="">Elige…</option>'+SVR.TIPOS.map(function(o){return '<option'+(o===t?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'<option value="otro"'+(otro?' selected':'')+'>Otro…</option></select>'+
+      '<input id="svOtro" placeholder="Ej. Afinación mayor" value="'+ea(otro?t:'')+'"'+(otro?'':' hidden')+'></label>'+
+    '<label><span>Vehículo</span><input id="svVeh" placeholder="Ej. Aveo 2025" value="'+ea(x.vehicle||'')+'"></label>'+
+    '<label><span>Kilometraje</span><input id="svKm" type="number" min="0" placeholder="6000" value="'+ea(x.km||'')+'"></label>'+
+    '<label><span>Monto cobrado (antes de IVA)</span><input id="svMonto" type="number" min="0" step="0.01" placeholder="0.00" value="'+ea(Number(x.labor||0)+Number(x.parts_total||0)||'')+'"></label></div>'+
+    '<div class="sv-ref" id="svRef"></div><div class="sv-a"><button class="bt pri" type="button" data-svsave>Guardar datos</button></div></section>';
+};
+SVR.tipoForm=function(){var v=$('#svTipo').value;return v==='otro'?($('#svOtro').value||'').trim():v};
+SVR.pintarRef=async function(){
+  var el=$('#svRef');if(!el)return;var t=SVR.tipoForm();
+  if(!t){el.innerHTML='<p class="xz-mut">Elige el tipo de servicio y el cerebro te dice cuánto se cobra en las agencias de tu marca.</p>';return}
+  el.innerHTML='<p class="xz-mut">Consultando el cerebro…</p>';var R=await SVR.ref(t);if(SVR.tipoForm()!==t)return;
+  var g=R&&R.grupo||{},w=R&&R.red||{};
+  if(!g.n&&!w.n){el.innerHTML='<p class="xz-mut">Todavía no hay cobros registrados de «'+esc(t)+'» en '+(R&&R.marca?'agencias '+esc(R.marca):'tu marca')+'. Con este servicio empieza la referencia.</p>';return}
+  var sug=g.n?g.mediana:w.mediana;
+  el.innerHTML='<div class="sv-rb"><b>Lo que sabe el cerebro de «'+esc(t)+'»</b>'+
+    (g.n?'<p>En tu grupo ('+esc(R.marca||'')+'): <b>'+DEB.mx(g.mediana)+'</b> típico · '+g.n+(g.n===1?' servicio':' servicios')+(g.n>1?' · de '+DEB.mx(g.min)+' a '+DEB.mx(g.max):'')+'</p><ul>'+(g.por_agencia||[]).map(function(a){return '<li>'+esc(a.agencia)+': '+DEB.mx(a.mediana)+' <small>('+a.n+')</small></li>'}).join('')+'</ul>':'')+
+    (w.n?'<p>Otras '+w.agencias+' agencias '+esc(R.marca||'')+' de la red: <b>'+DEB.mx(w.mediana)+'</b> típico · '+w.n+' servicios</p>':'')+
+    '<button class="bt" type="button" data-svusar="'+sug+'">Usar '+DEB.mx(sug)+'</button></div>';
+};
+SVR.guardar=async function(){
+  var x=XD.cur;if(!x)return;var t=SVR.tipoForm(),p={sys:t||null,vehicle:($('#svVeh').value||'').trim()||null,km:Number($('#svKm').value)||null,labor:Number($('#svMonto').value)||0,parts_total:0};
+  var r=await SB.c.from('expedientes').update(p).eq('id',x.id);if(r.error){SB.fail(r.error);toast('No se pudo guardar');return}
+  Object.assign(x,p);$('#svMsg').textContent='Guardado';toast('Datos del servicio guardados');SVR.pintarRef();
+};
+document.addEventListener('change',function(e){var t=e.target;if(!t||!t.id)return;if(t.id==='svTipo'){var o=$('#svOtro');if(o){o.hidden=t.value!=='otro';if(!o.hidden)o.focus()}SVR.pintarRef()}if(t.id==='svOtro')SVR.pintarRef()});
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;if(t.closest('[data-svsave]')){SVR.guardar();return}var u=t.closest('[data-svusar]');if(u){$('#svMonto').value=u.dataset.svusar;$('#svMsg').textContent='Precio de referencia puesto: guarda para confirmar'}});
 XD.openSrv=function(x,el){
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Servicios</button>'+
     '<div><h2>'+esc(x.wo||x.folio)+'</h2><p>'+esc(['Servicio',x.queja].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts"><button class="bt pri" type="button" data-xdchat>Chatear con el agente</button>'+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</div></div>'+
-    FL.html(x)+'<div class="xd-grid">'+XD.SRV.map(XD.secBox).join('')+'</div></div>';
-  $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;$('.xd-back',el).focus();
+    FL.html(x)+SVR.box(x)+'<div class="xd-grid">'+XD.SRV.map(XD.secBox).join('')+'</div></div>';
+  $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;$('.xd-back',el).focus();SVR.pintarRef();
   XD.SRV.forEach(function(d){XD.load(x.id,d[0])});
   FL.refresh(x);
 };
