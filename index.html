@@ -1990,6 +1990,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .exmv-b i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--fill-slab);font-style:normal;font-size:11.5px}.exmv-b:hover{border-color:#2231dd}.exmv-b.on{background:var(--fill-on,#111);color:var(--bg,#fff);border-color:transparent}.exmv-b.on i{background:rgba(255,255,255,.2)}
 .exp-all{margin-top:8px;padding:0;border:0;background:none;color:var(--muted);font:500 12.5px var(--f-ui,inherit);cursor:pointer;text-decoration:underline}
 @media(max-width:760px){.exp-p{grid-template-columns:repeat(4,minmax(0,1fr))}.exp-s span{white-space:normal;font-size:11px}.exp-s b{font-size:18px}.exp-s,.exp-s:first-child,.exp-s:last-child{padding:10px;clip-path:none;border-radius:10px}}
+.nav[data-view="cobros"],.nav[data-view="cartera"],.nav[data-view="bitacora"]{display:none!important}
 .xd-acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-self:center}.xd-acts .xd-del{margin-left:0}
 .xd-del{margin-left:auto;align-self:center;padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,#d6453b 40%,transparent);background:transparent;color:#b4372b;font:500 12.5px var(--f-ui,inherit);cursor:pointer}
 .xd-del:hover{background:color-mix(in srgb,#d6453b 10%,transparent)}
@@ -2626,6 +2627,8 @@ $('#sbScrim').addEventListener('click',function(){setSb(false)});
 mq.addEventListener&&mq.addEventListener('change',function(e){setSb(!e.matches)});
 $('#bell').addEventListener('click',function(){if(MI.due().length&&!AL.unread().length){showView('mi');MI.send('¿Qué tengo pendiente?');return}RED.f='alertas';showView('red')});
 
+/* secciones ocultas del menú lateral y del buscador (siguen existiendo; se pueden volver a mostrar quitándolas de aquí) */
+var OCULTAS=['cobros','cartera','bitacora'];
 var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Alertas y reglas',bx:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
@@ -9865,7 +9868,7 @@ var SK=(function(){
   var ICON={dueno:'chart',notas:'note',cfg:'settings',agent:'file',mi:'chat',bitacora:'clip',exp:'folderopen',cobros:'dollar',cartera:'wallet',pres:'present'};
   function results(){
     var v=norm(field.value.trim());
-    list=Object.keys(VIEWS).filter(function(k){if(DN.is())return (k==='dueno'||k==='cfg')&&norm(VIEWS[k]).indexOf(v)>-1;return k==='cfg'||(MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&norm(VIEWS[k]).indexOf(v)>-1});
+    list=Object.keys(VIEWS).filter(function(k){if(OCULTAS.indexOf(k)>=0)return false;if(DN.is())return (k==='dueno'||k==='cfg')&&norm(VIEWS[k]).indexOf(v)>-1;return k==='cfg'||(MR.is()?k.indexOf('m_')===0:k.indexOf('m_')!==0)&&k!=='inicio'&&norm(VIEWS[k]).indexOf(v)>-1});
     if(sel>=list.length)sel=0;
     res.innerHTML='';
     if(!open){res.hidden=true;return}
