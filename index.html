@@ -2032,12 +2032,22 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .ap-ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--fill-slab)}.ap-ic .ic{width:18px;height:18px}
 .ap-num{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .ap-meta{font-size:12.5px;color:var(--muted)}.ap-go{font-size:13px;font-weight:600;margin-top:4px}
-.ap-top{display:flex;align-items:center;gap:12px;max-width:672px;width:100%;margin:0 auto;padding:8px 16px}.ap-top b{flex:1;font-weight:600}.ap-top span{color:var(--muted);font-size:13px}
+.ap-run{max-width:640px;margin:0 auto;padding:16px 20px 48px}
+.ap-top{display:flex;align-items:center;gap:14px}.ap-top>div{display:flex;flex-direction:column;min-width:0}.ap-top b{font-weight:600}.ap-top span{color:var(--muted);font-size:13px}
+.ap-segs{display:flex;gap:6px;margin:22px 0 26px}.ap-segs i{flex:1;height:5px;border-radius:99px;background:color-mix(in srgb,var(--fg,#111) 9%,transparent);transition:background .3s}
+.ap-segs i.ok{background:#1f8a4c}.ap-segs i.now{background:var(--fg,#111)}
+.ap-card{padding:30px 28px;border:1px solid var(--card-line);border-radius:20px;background:var(--card)}.ap-card.ap-anim{animation:rise .35s cubic-bezier(.2,.8,.2,1) both}
+.ap-tx{font-size:20px;line-height:1.55;margin:0 0 26px;letter-spacing:-.005em}.ap-tx strong,.ap-tx b{font-weight:600}
+.ap-k{display:inline-block;margin-bottom:12px;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.ap-ops2{display:flex;flex-direction:column;gap:10px;margin:-8px 0 18px}
+.ap-op{text-align:left;padding:14px 16px;border:1.5px solid var(--card-line);border-radius:14px;background:var(--bg);color:inherit;font:inherit;font-size:16px;cursor:pointer;transition:border-color .15s}
+.ap-op:hover:not(:disabled){border-color:var(--fg)}.ap-op.ok{border-color:#1f8a4c;background:rgba(31,138,76,.08)}.ap-op.mal{border-color:#d9534f;background:rgba(217,83,79,.07)}.ap-op:disabled{cursor:default}
+.ap-fb{margin:0 0 18px;font-size:15px}.ap-fb.ok{color:#1f8a4c}.ap-fb.mal{color:#b0413d}
+.ap-btns{display:flex;justify-content:space-between;gap:10px}.ap-btns .bt{height:auto;min-height:40px;line-height:1.2;padding:10px 18px;font-size:14.5px}
+.ap-done{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#1f8a4c;color:#fff;margin-bottom:12px}.ap-done .ic{width:24px;height:24px;stroke-width:3}
+.ap-card h3{font-family:var(--f-display);font-weight:500;font-size:28px;margin:0 0 8px}
+@media(max-width:640px){.ap-card{padding:22px 18px}.ap-tx{font-size:18px}}
 @media(max-width:640px){.ap-tot{flex-direction:column;align-items:stretch}}
-.ap-chat{display:flex;flex-direction:column;height:calc(100vh - 64px)}
-.ap-sc{flex:1;min-height:0;overflow-y:auto;padding:8px 0 16px}
-.ap-ops{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:672px;width:100%;margin:0 auto;padding:6px 16px max(22px,env(safe-area-inset-bottom,0px));min-height:56px}
-.ap-ops .gp-chip{font-size:14px;padding:8px 14px;background:var(--card)}.ap-ops .gp-chip.arm{background:var(--signal,#2231dd);color:#fff}
 .gp-ap .gp-api{display:grid;place-items:center;width:18px;height:18px;border-radius:5px;background:#2231dd;color:#fff}.gp-ap .gp-api .ic{width:12px;height:12px}
 .gp-ap{border:1px solid color-mix(in srgb,#2231dd 25%,var(--card-line));margin-bottom:6px}
 .act{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
@@ -6651,94 +6661,94 @@ SVC.ckHtml=function(x){
 /* ══ Aprende Ax AI: cursos de la plataforma para asesores de garantías ══
    Cursos con lecciones cortas, un «Pruébalo» que te lleva al lugar de la plataforma y una pregunta de repaso.
    El avance queda por usuario en aprendizaje_progreso (y en este navegador si no hay conexión). */
-var AP={hecho:{},cargado:false,run:0};
-/* cada lección es una plática corta: frases de Ax, una pregunta y, si aplica, «pruébalo» */
+var AP={hecho:{},cargado:false,run:0,c:null,li:0,si:0,r:null,mal:0};
+/* cada lección: pasos de texto corto, una pregunta y, si aplica, «pruébalo» */
 AP.CURSOS=[
  {id:'inicio',t:'Primeros pasos en Ax AI',d:'Qué es Ax AI, cómo está hecha tu pantalla y cómo abrir tu primera orden.',ic:'home',L:[
   {id:'inicio-1',t:'Qué es Ax AI',s:[
-   'Hola, soy **Ax**. En Ax AI no trabajas solo: tienes un equipo de agentes de garantías.',
+   'En Ax AI no trabajas solo: tienes un **equipo de agentes** de garantías.',
    'Todos comparten un mismo **cerebro**. Lo que aprende una agencia de tu marca, lo saben todos al instante.',
-   'Por ejemplo: si planta rechaza una PREA de motor en otra agencia, tu agente ya lo toma en cuenta en la tuya.',
+   'Si planta rechaza una PREA de motor en otra agencia, tu agente **ya lo toma en cuenta** en la tuya.',
    {p:'Si otra agencia recibe un rechazo, ¿qué pasa contigo?',o:['Nada, cada quien aprende solo','Tu agente ya lo sabe'],ok:1,por:'El cerebro es uno solo para toda la marca.'}]},
   {id:'inicio-2',t:'Tu pantalla',s:[
-   'Tu pantalla es simple: a la izquierda tus **órdenes**, al centro el **chat** de la orden.',
-   'Cada PREA, servicio o campaña tiene su propio chat. Ahí platicas, mandas archivos y ves a los agentes trabajar.',
-   '¿Quieres más espacio? Oculta la lista con la **✕** y vuelve a abrirla con el botón de arriba a la izquierda.',
-   {try:'sim',tx:'Abre la orden de prueba GA9999 para ver un chat'},
+   'A la izquierda están tus **órdenes**. Al centro, el **chat** de la orden.',
+   'Cada PREA, servicio o campaña tiene su propio chat: ahí platicas, mandas archivos y ves a los agentes trabajar.',
+   'Para tener más espacio, oculta la lista con la **✕** y ábrela de nuevo con el botón de arriba a la izquierda.',
+   {try:'sim',tx:'Abre la orden de prueba GA9999 para ver un chat.'},
    {p:'¿Dónde está el chat de una orden?',o:['En Configuración','En tu lista de órdenes'],ok:1,por:'Toca cualquier orden de la izquierda y se abre su chat.'}]},
   {id:'inicio-3',t:'Abrir una orden',s:[
    'Con **+ Nueva** eliges qué vas a trabajar y escribes el número de orden, por ejemplo GA4043.',
    '**PREA** es una reparación por garantía. **Servicio** y **Campaña** no llevan PREA.',
-   'Al dar Continuar, Ax crea la conversación y el expediente aunque estén en blanco.',
+   'Al dar **Continuar**, Ax AI crea la conversación y el expediente, aunque estén en blanco.',
    {p:'¿Cuál de estas NO lleva PREA?',o:['Una falla de motor en garantía','Un servicio de 6,000 km'],ok:1,por:'Servicios y campañas se abren sin PREA.'}]}
  ]},
  {id:'prea',t:'Armar una PREA con el agente',d:'Sube todo de una vez y deja que el agente arme la PREA y el expediente según el manual de GM.',ic:'file',L:[
   {id:'prea-1',t:'Sube todo de una vez',s:[
-   'Para una PREA no separes documentos: **arrastra todo junto** al chat.',
-   'Orden, fotos, diagnóstico, escáner, pedido de piezas… yo leo cada archivo y lo pongo en su sección del expediente.',
-   'Mientras trabajo ves en vivo qué estoy haciendo, paso por paso.',
-   {p:'¿Cómo conviene mandar la evidencia?',o:['Toda junta en el chat','Un archivo por día'],ok:0,por:'Entre más mandes al inicio, menos te pregunto después.'}]},
+   'Para una PREA no separes documentos: **arrastra todo junto** al chat de la orden.',
+   'El agente lee cada archivo (orden, fotos, diagnóstico, escáner, piezas) y lo pone en **su sección del expediente**.',
+   'Mientras trabaja, ves en vivo qué está haciendo, paso por paso.',
+   {p:'¿Cómo conviene mandar la evidencia?',o:['Toda junta en el chat','Un archivo por día'],ok:0,por:'Entre más mandes al inicio, menos preguntas te hará el agente.'}]},
   {id:'prea-2',t:'Revisa antes de enviar',s:[
-   'Armo la PREA con códigos, operación, horas y piezas, usando lo que aprendió el cerebro.',
-   'Si algo no cuadra, **dímelo en el chat**: "la pieza es la bobina 2". Lo corrijo.',
+   'El agente arma la PREA con **códigos, operación, horas y piezas**, usando lo que aprendió el cerebro.',
+   'Si algo no cuadra, **escríbelo en el chat**: "la pieza es la bobina 2". El agente lo corrige.',
    'Si cambió todo el caso, escribe **"arma la PREA otra vez"**.',
-   {p:'La PREA trae un dato mal. ¿Qué haces?',o:['La borras y empiezas de cero','Me dices qué corregir'],ok:1,por:'Se corrige platicando, sin volver a empezar.'}]},
+   {p:'La PREA trae un dato mal. ¿Qué haces?',o:['La borras y empiezas de cero','Le dices al agente qué corregir'],ok:1,por:'Se corrige en el chat, sin volver a empezar.'}]},
   {id:'prea-3',t:'Quién envía',s:[
-   'Solo **tú, el asesor**, envías la PREA.',
-   'El dueño y el director pueden **pedirte avance**, pero no envían por ti.',
-   {p:'¿Quién puede enviar la PREA?',o:['El director','El asesor'],ok:1,por:'Tú envías; ellos te piden avance.'}]}
+   'Solo **el asesor** envía la PREA.',
+   'El dueño y el director pueden **pedir avance**, pero no envían por ti.',
+   {p:'¿Quién puede enviar la PREA?',o:['El director','El asesor'],ok:1,por:'El asesor envía; dueño y director piden avance.'}]}
  ]},
  {id:'servicios',t:'Servicios en un día',d:'Abre un servicio, manda la evidencia y ciérralo: facturado, cobrado y con su lista palomeada.',ic:'dollar',L:[
   {id:'srv-1',t:'Abrir un servicio',s:[
    'Un servicio es rápido: **se hace, se factura y se cobra**, casi siempre el mismo día.',
-   'Elige Servicio, pon la orden y listo. No te pido texto ni evidencia para abrirlo.',
-   {p:'¿Qué necesitas para abrir un servicio?',o:['Solo el número de orden','La factura'],ok:0,por:'Lo demás me lo mandas después en el chat.'}]},
+   'Elige **Servicio**, escribe la orden y listo. No pide texto ni evidencia para abrirlo.',
+   {p:'¿Qué necesitas para abrir un servicio?',o:['Solo el número de orden','La factura'],ok:0,por:'Lo demás se manda después en el chat.'}]},
   {id:'srv-2',t:'La lista del servicio',s:[
-   'En el chat del servicio mándame la orden, fotos, factura o comprobante.',
-   'Yo saco el tipo de servicio, el vehículo, los km y el monto, y lo guardo solo.',
-   'A la derecha está la **lista**: facturarlo, cobrarlo, evidencia completa y cerrado. Se palomea sola.',
-   {try:'sim',tx:'Corre la simulación GA9999 y mira cómo se palomea'},
-   {p:'¿Quién palomea la lista?',o:['Tú, a mano','Se palomea sola'],ok:1,por:'Cada archivo que guardo palomea su punto.'}]},
+   'En el chat del servicio manda la **orden, fotos, factura o comprobante**.',
+   'El cerebro saca el tipo de servicio, el vehículo, los km y el monto, y lo guarda solo.',
+   'A la derecha está la **lista**: facturarlo, cobrarlo, evidencia completa y cerrado. **Se palomea sola.**',
+   {try:'sim',tx:'Corre la simulación GA9999 y mira cómo se palomea la lista.'},
+   {p:'¿Quién palomea la lista?',o:['Tú, a mano','Se palomea sola'],ok:1,por:'Cada archivo guardado palomea su punto.'}]},
   {id:'srv-3',t:'¿Cuánto cobro?',s:[
-   'Pregúntame **"¿cuánto se cobra este servicio?"**.',
-   'Te digo el precio típico en tu grupo, por agencia, y en la red de la marca.',
+   'Pregunta en el chat: **"¿cuánto se cobra este servicio?"**',
+   'El cerebro te da el precio típico **en tu grupo**, por agencia, y **en la red** de la marca.',
    'Tus datos no se ven en otros grupos: solo se comparte lo aprendido.',
-   {p:'¿De dónde sale el precio que te doy?',o:['De lo que se cobra en tu grupo y la red','De una lista fija'],ok:0,por:'Aprendo de cada servicio que se cobra.'}]}
+   {p:'¿De dónde sale el precio de referencia?',o:['De lo que se cobra en tu grupo y la red','De una lista fija'],ok:0,por:'El cerebro aprende de cada servicio que se cobra.'}]}
  ]},
  {id:'cerebro',t:'Platicar con el cerebro',d:'Pregunta como a un compañero y aprovecha sus referencias: manual, reglas, casos, fotos y precios.',ic:'chat',L:[
   {id:'cer-1',t:'Cómo preguntar',s:[
-   'Pregúntame como a un compañero con experiencia.',
-   '"¿Qué evidencia pide planta para esta falla?" o "¿cuántas horas lleva cambiar la bobina?"',
-   'Dame modelo, año, km y pieza. **No hace falta** ningún dato personal del cliente.',
-   {p:'¿Qué NO debes escribirme?',o:['El kilometraje','Los datos personales del cliente'],ok:1,por:'Trabajo con la falla y la evidencia, no con datos personales.'}]},
+   'Pregunta como a un compañero con experiencia.',
+   'Por ejemplo: **"¿Qué evidencia pide planta para esta falla?"** o **"¿cuántas horas lleva cambiar la bobina?"**',
+   'Da modelo, año, km y pieza. **No hace falta** ningún dato personal del cliente.',
+   {p:'¿Qué NO debes escribir en el chat?',o:['El kilometraje','Los datos personales del cliente'],ok:1,por:'El cerebro trabaja con la falla y la evidencia, no con datos personales.'}]},
   {id:'cer-2',t:'Ver qué hacen los agentes',s:[
-   'Mientras contesto ves **"Trabajando · Manual GM · 8s"** y la lista de pasos.',
-   'Al terminar se pliega en "Revisó 5 fuentes con 3 agentes". Tócalo para ver todo lo que revisé.',
-   {p:'¿Para qué sirve esa lista?',o:['Para saber de dónde salió la respuesta','Para borrar la orden'],ok:0,por:'Así sabes en qué me basé.'}]},
+   'Mientras el cerebro contesta ves **"Trabajando · Manual GM · 8s"** y la lista de pasos.',
+   'Al terminar se pliega en **"Revisó 5 fuentes con 3 agentes"**. Tócalo para ver todo lo que revisó.',
+   {p:'¿Para qué sirve esa lista?',o:['Para saber de dónde salió la respuesta','Para borrar la orden'],ok:0,por:'Así sabes en qué se basó la respuesta.'}]},
   {id:'cer-3',t:'Referencias y fotos',s:[
-   'Debajo de mis respuestas pongo lo que cité: **manual GM** con sección y página, reglas, casos reales, fotos y precios.',
+   'Debajo de cada respuesta salen tarjetas con lo citado: **manual GM** (sección y página), reglas, casos reales, fotos y precios.',
    'Toca una tarjeta para abrirla y una foto para verla grande.',
    {p:'¿Qué te dice una tarjeta del manual?',o:['La sección y página citada','El teléfono de planta'],ok:0,por:'Puedes abrirla y leer el fragmento.'}]}
  ]},
  {id:'expedientes',t:'Expedientes y etapas',d:'Sigue cada PREA desde que se sube hasta que se cobra, como en un tablero.',ic:'folderopen',L:[
   {id:'exp-1',t:'Las etapas',s:[
-   'Cada PREA avanza por etapas: por subir, en proceso, aceptada, esperando pieza, cambiando pieza, facturada y cobrada.',
+   'Cada PREA avanza por etapas: **por subir, en proceso, aceptada, esperando pieza, cambiando pieza, facturada y cobrada**.',
    'En **Expedientes** puedes arrastrarla a otra etapa o moverla con su menú.',
-   {try:'exp',tx:'Abre Expedientes'},
+   {try:'exp',tx:'Abre Expedientes y mira las etapas.'},
    {p:'Aceptada pero sin refacción, ¿a dónde va?',o:['Cobrada','Esperando pieza'],ok:1,por:'Mientras no llega la pieza, va en Esperando pieza.'}]},
   {id:'exp-2',t:'Servicios y campañas',s:[
-   'Los servicios y campañas tienen su propia pestaña en Expedientes.',
+   'Los servicios y las campañas tienen **su propia pestaña** en Expedientes.',
    'Si abriste una orden por error, puedes **eliminarla** desde su pantalla.',
    {p:'¿Dónde quedan los servicios?',o:['En Expedientes → Servicios','No se guardan'],ok:0,por:'Cada servicio guarda su expediente ahí.'}]}
  ]},
  {id:'bandeja',t:'Bandeja, alertas y reglas',d:'Lo que te toca decidir, los avisos del cerebro y lo que pide tu dueño o director.',ic:'inbox',L:[
   {id:'bx-1',t:'La bandeja',s:[
-   'La **Bandeja** junta lo que te toca decidir, con el riesgo de débito que calculo.',
-   'La ven contigo posventa, el director y el dueño. Cuando te piden avance, te llega ahí.',
-   {try:'bx',tx:'Abre tu Bandeja'},
+   'La **Bandeja** junta lo que te toca decidir, con el **riesgo de débito** que calcula Ax AI.',
+   'La ven también posventa, el director y el dueño. Cuando te piden avance, te llega ahí.',
+   {try:'bx',tx:'Abre tu Bandeja.'},
    {p:'¿Quién ve la bandeja?',o:['Solo tú','Tú, posventa, director y dueño'],ok:1,por:'Es compartida para que todos sepan cómo va cada orden.'}]},
   {id:'bx-2',t:'Alertas',s:[
-   'Las **alertas** te avisan antes del problema: un rechazo parecido, una PREA atorada o un plazo que vence.',
+   'Las **alertas** avisan antes del problema: un rechazo parecido, una PREA atorada o un plazo que vence.',
    'Están en la Bandeja y en la campanita.',
    {p:'¿Para qué sirven las alertas?',o:['Para avisarte a tiempo','Para crear campañas'],ok:0,por:'Te dan tiempo de actuar antes de un débito.'}]}
  ]}
@@ -6757,27 +6767,10 @@ AP.marcar=async function(l,c){
   if(SB.c&&SB.entered){try{await SB.c.from('aprendizaje_progreso').upsert({leccion:l.id,curso:c.id,quiz_ok:true},{onConflict:'user_id,leccion'})}catch(e){console.warn('[aprende]',e)}}
   if(typeof GP!=='undefined'&&GP.render)GP.render();
 };
-/* ── la plática ── */
-AP.th=function(){return $('#apTh')};
-AP.baja=function(){var c=$('#apSc');if(c)c.scrollTop=c.scrollHeight};
-AP.di=async function(txt,rapido){
-  var my=AP.run,th=AP.th();if(!th)return;var d=document.createElement('div');d.className='msg-ai';
-  d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"><span class="typing" aria-label="Escribiendo"><i></i><i></i><i></i></span></div></div>';
-  th.appendChild(d);AP.baja();await SVC.dormir(rapido?250:500+Math.min(700,txt.length*6));if(my!==AP.run)return;
-  var body=$('.ai-body',d),p=String(txt).split(/(\s+)/),out='';
-  for(var i=0;i<p.length;i++){out+=p[i];if(i%2)continue;if(my!==AP.run)return;body.innerHTML=md(out,false);AP.baja();await SVC.dormir(14+Math.random()*22)}
-  body.innerHTML=md(txt,false);AP.baja();
-};
-AP.yo=function(txt){var th=AP.th();if(!th)return;var d=document.createElement('div');d.className='msg-user';d.innerHTML='<div class="bubble">'+esc(txt)+'</div>';th.appendChild(d);AP.baja()};
-/* opciones como botones de respuesta; devuelve la que toque el asesor */
-AP.opciones=function(L){var my=AP.run;return new Promise(function(res){var o=$('#apOps');if(!o)return;
-  o.innerHTML=L.map(function(t,i){return '<button type="button" class="gp-chip'+(t.pri?' arm':'')+'" data-apo="'+i+'">'+esc(t.t||t)+'</button>'}).join('');
-  o.onclick=function(e){var b=e.target.closest('[data-apo]');if(!b||my!==AP.run)return;o.innerHTML='';o.onclick=null;var k=+b.dataset.apo;AP.yo(L[k].t||L[k]);res(k)};AP.baja();
-  var f=o.querySelector('button');if(f)f.focus({preventScroll:true})})};
 AP.min=function(l){return Math.max(1,Math.round(l.s.length*.7))};
 AP.barra=function(h,n){var p=n?Math.round(h*100/n):0;return '<span class="ap-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+p+'"><i style="width:'+p+'%"></i></span>'};
 AP.catalogo=function(){
-  AP.run++;var el=$('#apIn');if(!el)return;var T=AP.total(),fin=T.h===T.n;
+  AP.run++;AP.c=null;var el=$('#apIn');if(!el)return;var T=AP.total(),fin=T.h===T.n;
   el.innerHTML='<div class="ap-cat"><div class="ad-head"><div><h2>Aprende Ax AI</h2><p>Cursos cortos para sacarle todo el provecho a tus agentes. Cada curso es una plática corta con Ax, con preguntas de repaso.</p></div></div>'+
     '<div class="ap-tot"><div><b>'+T.h+' de '+T.n+' lecciones</b><span>'+(fin?'¡Completaste todos los cursos!':'Tu avance se guarda solo')+'</span></div>'+AP.barra(T.h,T.n)+'</div>'+
     (fin?'<div class="ap-cert"><b>Asesor certificado en Ax AI</b><span>'+esc((SB.user&&SB.user.name)||'')+' · '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+'</span></div>':'')+
@@ -6785,30 +6778,32 @@ AP.catalogo=function(){
       return '<button type="button" class="ap-c" data-apc="'+c.id+'"><span class="ap-ic">'+svg(c.ic)+'</span><span class="ap-num">Curso '+(i+1)+'</span><b>'+esc(c.t)+'</b><span class="ap-d">'+esc(c.d)+'</span>'+
         '<span class="ap-meta">'+n+' lecciones · '+min+' min</span>'+(h?AP.barra(h,n):'')+'<span class="ap-go">'+(h===n?'Repasar':h?'Continuar ('+h+'/'+n+')':'Empezar')+' →</span></button>'}).join('')+'</div></div>';
 };
-AP.platica=function(c){
-  AP.run++;var el=$('#apIn');if(!el)return;
-  el.innerHTML='<div class="ap-chat"><div class="ap-top"><button type="button" class="xd-back" data-apback>← Cursos</button><b>'+esc(c.t)+'</b><span id="apProg">'+AP.n(c)+'/'+c.L.length+'</span></div>'+
-    '<div class="ap-sc" id="apSc"><div class="svc-thi" id="apTh"></div></div><div class="ap-ops" id="apOps" aria-live="polite"></div></div>';
-  AP.curso(c);
-};
-AP.curso=async function(c){
-  var my=AP.run,i=c.L.findIndex(function(l){return !AP.hecho[l.id]});if(i<0)i=0;
-  for(;i<c.L.length;i++){
-    var l=c.L[i];await AP.di('**'+c.t+' · '+(i+1)+'/'+c.L.length+': '+l.t+'**',true);if(my!==AP.run)return;
-    for(var j=0;j<l.s.length;j++){var x=l.s[j];if(my!==AP.run)return;
-      if(typeof x==='string'){await AP.di(x);if(my!==AP.run)return;
-        var sig=l.s[j+1];if(sig&&typeof sig==='string'){await AP.opciones([{t:'Sigue',pri:1}]);if(my!==AP.run)return}}
-      else if(x.try){await AP.di('¿Lo pruebas? '+x.tx+'.',true);if(my!==AP.run)return;var a=await AP.opciones([{t:'Lo pruebo después',pri:1},'Ir ahora']);if(a===1){AP.ir(x.try);return}}
-      else if(x.p){var mal=0;await AP.di(x.p);if(my!==AP.run)return;
-        for(;;){var r=await AP.opciones(x.o);if(my!==AP.run)return;
-          if(r===x.ok){await AP.di('¡Eso! '+x.por,true);break}
-          mal=(mal||0)+1;await AP.di(mal>1?'Te doy una pista: '+x.por+' ¿Cuál es?':'Mmm, no exactamente. Intenta otra vez.',true);if(my!==AP.run)return}}
-    }
-    await AP.marcar(l,c);if(my!==AP.run)return;var pg=$('#apProg');if(pg)pg.textContent=AP.n(c)+'/'+c.L.length;
-    if(i<c.L.length-1){var g=await AP.opciones([{t:'Siguiente lección',pri:1},'Volver a los cursos']);if(my!==AP.run)return;if(g===1){AP.catalogo();return}}
+/* ── el curso: un paso a la vez ── */
+AP.empezar=function(c){AP.anim=true;var i=c.L.findIndex(function(l){return !AP.hecho[l.id]});AP.c=c;AP.li=i<0?0:i;AP.si=0;AP.r=null;AP.mal=0;AP.fin=false;AP.paso()};
+AP.paso=function(){
+  var el=$('#apIn'),c=AP.c;if(!el||!c)return;var l=c.L[AP.li],x=l.s[AP.si],n=l.s.length;
+  var segs='<div class="ap-segs" aria-hidden="true">'+l.s.map(function(_,k){return '<i class="'+(AP.fin||k<AP.si?'ok':k===AP.si?'now':'')+'"></i>'}).join('')+'</div>';
+  var h='<div class="ap-run"><div class="ap-top"><button type="button" class="xd-back" data-apback>← Cursos</button><div><b>'+esc(c.t)+'</b><span>Lección '+(AP.li+1)+' de '+c.L.length+' · '+esc(l.t)+'</span></div></div>'+segs+'<div class="ap-card'+(AP.anim?' ap-anim':'')+'" aria-live="polite">';AP.anim=false;
+  if(AP.fin){var T=AP.total(),ult=AP.li===c.L.length-1;
+    h+='<span class="ap-done">'+svg('check')+'</span><h3>Lección completada</h3><p class="ap-tx">'+esc(l.t)+(ult?' · terminaste el curso «'+esc(c.t)+'».':'.')+' Llevas '+T.h+' de '+T.n+' lecciones.'+(T.h===T.n?' Eres <b>asesor certificado en Ax AI</b>.':'')+'</p>'+
+      '<div class="ap-btns">'+(ult?'':'<button type="button" class="bt" data-apcat>Volver a los cursos</button>')+'<button type="button" class="bt pri" data-apnext>'+(ult?'Volver a los cursos':'Siguiente lección →')+'</button></div>';
+  }else if(typeof x==='string'){
+    h+='<p class="ap-tx">'+md(x,false).replace(/^<p>|<\/p>$/g,'')+'</p><div class="ap-btns">'+(AP.si?'<button type="button" class="bt" data-apprev>Atrás</button>':'<span></span>')+'<button type="button" class="bt pri" data-apnext>Continuar</button></div>';
+  }else if(x.try){
+    h+='<span class="ap-k">Pruébalo</span><p class="ap-tx">'+esc(x.tx)+'</p><div class="ap-btns"><button type="button" class="bt" data-aptry="'+x.try+'">Ir ahora</button><button type="button" class="bt pri" data-apnext>Continuar</button></div>';
+  }else{
+    var r=AP.r,bien=r===x.ok;
+    h+='<span class="ap-k">Repaso</span><p class="ap-tx">'+esc(x.p)+'</p><div class="ap-ops2">'+x.o.map(function(o,k){var cl=r==null?'':k===r?(bien?' ok':' mal'):(bien&&k===x.ok?' ok':'');return '<button type="button" class="ap-op'+cl+'" data-apr="'+k+'"'+(bien?' disabled':'')+'>'+esc(o)+'</button>'}).join('')+'</div>'+
+      (r==null?'':'<p class="ap-fb '+(bien?'ok':'mal')+'">'+(bien?'¡Correcto! '+esc(x.por):AP.mal>1?'Pista: '+esc(x.por):'No exactamente. Intenta otra vez.')+'</p>')+
+      '<div class="ap-btns">'+(AP.si?'<button type="button" class="bt" data-apprev>Atrás</button>':'<span></span>')+'<button type="button" class="bt pri" data-apnext'+(bien?'':' disabled')+'>Continuar</button></div>';
   }
-  var T=AP.total();await AP.di('Terminaste **'+c.t+'** ✓ Llevas '+T.h+' de '+T.n+' lecciones.'+(T.h===T.n?' ¡Completaste todo! Eres **asesor certificado en Ax AI**. 🎓':''),true);
-  if(my!==AP.run)return;var z=await AP.opciones([{t:'Volver a los cursos',pri:1}]);if(my===AP.run)AP.catalogo();
+  el.innerHTML=h+'</div></div>';var f=el.querySelector('[data-apnext]:not([disabled]),.ap-op:not([disabled])');if(f)f.focus({preventScroll:true});
+};
+AP.sig=async function(){
+  var c=AP.c,l=c.L[AP.li];AP.anim=true;
+  if(AP.fin){if(AP.li<c.L.length-1){AP.li++;AP.si=0;AP.r=null;AP.mal=0;AP.fin=false;AP.paso()}else AP.catalogo();return}
+  if(AP.si<l.s.length-1){AP.si++;AP.r=null;AP.mal=0;AP.paso();return}
+  await AP.marcar(l,c);AP.fin=true;AP.paso();
 };
 AP.abrir=async function(){
   var el=$('#apIn');if(!el)return;
@@ -6825,8 +6820,12 @@ AP.ir=function(a){
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
   var n=t.closest('[data-apnav]');if(n){e.stopPropagation();showView('aprende');if(typeof AS!=='undefined')AS.drawer(false);return}
   if(!t.closest('#viewAp'))return;
-  var c=t.closest('[data-apc]');if(c){AP.platica(AP.CURSOS.filter(function(x){return x.id===c.dataset.apc})[0]);return}
-  if(t.closest('[data-apback]')){AP.catalogo();return}
+  var c=t.closest('[data-apc]');if(c){AP.empezar(AP.CURSOS.filter(function(x){return x.id===c.dataset.apc})[0]);return}
+  if(t.closest('[data-apback]')||t.closest('[data-apcat]')){AP.catalogo();return}
+  if(t.closest('[data-apnext]')){AP.sig();return}
+  if(t.closest('[data-apprev]')){AP.anim=true;AP.si=Math.max(0,AP.si-1);AP.r=null;AP.mal=0;AP.paso();return}
+  var y=t.closest('[data-aptry]');if(y){AP.ir(y.dataset.aptry);return}
+  var r=t.closest('[data-apr]');if(r&&AP.c){var x=AP.c.L[AP.li].s[AP.si];AP.r=+r.dataset.apr;if(AP.r!==x.ok)AP.mal++;AP.paso();return}
 },true);
 /* ══ Simulación: una orden de prueba (GA9999) que se juega sola, sin tocar la base ══ */
 var SIM={on:false};
