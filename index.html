@@ -2005,13 +2005,15 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .svc-st li i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--card-line);background:var(--card)}.svc-st li.done{color:var(--fg,inherit)}.svc-st li.done i{background:#1f8a4c;border-color:#1f8a4c}
 .svc-st li.now{background:var(--fill-on,#111);color:var(--bg,#fff)}.svc-st li.now i{background:#6b79ff;border-color:#6b79ff}
 .svc-g{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
-.svc-chat{position:relative;display:flex;flex-direction:column;height:calc(100vh - 190px);min-height:460px}
+#exDoc>.xd-in.svc{padding-top:0;padding-bottom:0;max-width:none}
+.svc-chat{position:relative;display:flex;flex-direction:column;height:calc(100vh - 64px);min-height:460px}
 .svc-th{flex:1;min-height:0;overflow-y:auto;padding:8px 4px 24px}
-.svc-thi{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
-.svc-dock{position:relative;max-width:752px;width:100%;margin:0 auto;padding:0 0 6px}
+.svc-thi{max-width:672px;margin:0 auto;display:flex;flex-direction:column;gap:26px;padding:8px 16px 0}
+.svc-dock{position:relative;max-width:704px;width:100%;margin:0 auto;padding:0 16px max(18px,env(safe-area-inset-bottom,0px))}
 .svc-dock::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:28px;background:linear-gradient(to top,var(--bg),transparent);pointer-events:none}
-.svc-comp .card{border-radius:14px}
-#svcTa{display:block;width:100%;min-height:52px;max-height:200px;resize:none;border:0;outline:0;background:transparent;padding:14px 18px 2px;font:inherit;font-size:15px;line-height:1.55;color:inherit}
+.svc-dd{cursor:default}.svc-dd:hover{background:none;color:var(--muted)}.svc-dd .ic{width:15px;height:15px}
+.svc-ck .svc-sim,.svc-ck .svc-del{width:100%;margin-top:14px;justify-content:center}
+#svcTa{display:block;width:100%;min-height:46px;max-height:220px;resize:none;border:0;outline:0;background:transparent;padding:14px 20px 4px;font:inherit;font-size:15px;line-height:1.55;color:inherit}
 #svcTa::placeholder{color:var(--faint)}
 .svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1.5px dashed var(--fg);border-radius:16px;font-weight:500;pointer-events:none;z-index:4}.svc-chat.over .svc-drop{display:grid}
 .svc-g{grid-template-columns:minmax(0,1fr) 260px!important}
@@ -2058,7 +2060,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .rf-lb img{max-width:100%;max-height:84vh;border-radius:10px}.rf-lb p{margin:0;color:#ddd;font-size:13px}
 .rf-lb button{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font-size:16px;cursor:pointer}
 .svc-sim{white-space:nowrap}.gp-demo{border:1px dashed var(--card-line);margin-bottom:6px}
-.svc-ck{position:sticky;top:12px;padding:18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
+.svc-ck{position:sticky;top:12px;margin-top:12px;padding:18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
 .svc-ck h4{margin:0 0 12px;font-size:13px;font-weight:600;color:var(--muted)}
 .svc-ck ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .svc-ck li{display:flex;align-items:flex-start;gap:10px;padding:8px 6px;border-radius:10px;font-size:14px;line-height:1.4}
@@ -6553,16 +6555,18 @@ var SVC={x:null,msgs:[],conv:null,busy:false};
 SVC.pasos=function(f){var L=FL.ES,i=f?FL.idx(f):0;return '<ol class="svc-st" aria-label="Ciclo del servicio">'+L.map(function(e,k){return '<li class="'+((f&&f.etapa==='cerrado')||k<i?'done':k===i?'now':'')+'"><i></i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'};
 SVC.cab=function(x){var f=x.flujo;return '<p class="svc-sig">'+(f?(f.etapa==='cerrado'?'Servicio cobrado. Todo listo.':'<b>Siguiente:</b> '+esc(f.siguiente||'')+(f.vence?' · '+esc(FL.vence(f.vence)):'')):'Calculando…')+'</p>'+SVC.pasos(f)};
 SVC.html=function(x){
-  return '<div class="xd-in svc"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Servicios</button>'+
-    '<div class="svc-t"><h2>'+esc(x.wo||x.folio)+' <small>Servicio</small></h2></div>'+
-    (x.demo?'<div class="xd-acts"><button class="bt pri svc-sim" type="button" data-svcsim>▶ Iniciar simulación</button></div>':XDEL.puede(x)?'<div class="xd-acts"><button class="xd-del" type="button" data-xddel>Eliminar servicio</button></div>':'')+'</div>'+
+  var marca=($('#brandLabel')&&$('#brandLabel').textContent)||'General Motors';
+  return '<div class="xd-in svc">'+
     '<div class="svc-g"><section class="svc-chat" aria-label="Agente del servicio"><div class="svc-th" id="svcTh" aria-live="polite"><div class="svc-thi" id="svcThi"></div></div>'+
-      '<form class="svc-dock" id="svcForm"><div class="composer svc-comp"><div class="card">'+
-      '<textarea id="svcTa" rows="2" placeholder="Escríbele al cerebro o arrastra aquí la orden, fotos, factura o comprobante…" aria-label="Mensaje para el cerebro del servicio"></textarea>'+
+      '<form class="svc-dock" id="svcForm"><div class="composer svc-comp">'+
+      '<div class="c-head"><span class="dd svc-dd">'+svg('folder')+'<span>Servicio · '+esc(x.wo||x.folio)+'</span></span><span class="dd svc-dd">'+esc(marca)+'</span></div>'+
+      '<div class="card"><textarea id="svcTa" rows="3" placeholder="Escríbele al cerebro o arrastra aquí la orden, fotos, factura o comprobante…" aria-label="Mensaje para el cerebro del servicio"></textarea>'+
       '<div class="c-foot"><button type="button" class="fb" data-svcclip aria-label="Subir archivos" title="Subir orden, fotos, factura o comprobante">'+svg('plus')+'</button><span class="sp"></span>'+
-      '<button class="send" id="svcSend" type="submit" aria-label="Enviar" disabled>'+svg('up')+'</button></div></div></div>'+
+      '<button type="button" class="fb" data-svcclr aria-label="Limpiar">'+svg('x')+'</button>'+
+      '<button class="send" id="svcSend" type="submit" aria-label="Enviar" disabled></button></div></div></div>'+
       '<input type="file" id="svcFile" multiple hidden accept=".pdf,image/*,.xml"></form><div class="svc-drop" aria-hidden="true">Suéltalo y el agente lo revisa</div></section>'+
-    '<aside class="svc-ck" aria-label="Lista del servicio"><h4>Lista del servicio</h4><ol id="svcCk">'+SVC.ckHtml(x)+'</ol></aside>'+
+    '<aside class="svc-ck" aria-label="Lista del servicio"><h4>Lista del servicio</h4><ol id="svcCk">'+SVC.ckHtml(x)+'</ol>'+
+      (x.demo?'<button class="bt pri svc-sim" type="button" data-svcsim>▶ Iniciar simulación</button>':XDEL.puede(x)?'<button class="xd-del svc-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</aside>'+
     '<aside class="svc-side"><h4>Lo que sé de este servicio</h4>'+SVR.box(x)+
       '<div class="svc-docs">'+XD.SRV.map(function(d){return '<section class="xd-sec svc-sec" data-k="'+d[0]+'"><h3>'+esc(d[1])+'</h3><div class="xd-list"></div></section>'}).join('')+'</div></aside></div></div>';
 };
@@ -6570,7 +6574,7 @@ SVC.burb=function(m){
   var d=document.createElement('div'),c=String(m.content||'');
   if(m.role==='user'){d.className='msg-user';var a=/^📎 (.+)$/.exec(c);
     d.innerHTML=a?'<div class="files"><span class="file">'+svg('file','sm')+'<b>'+esc(a[1])+'</b></span></div>':'<div class="bubble">'+esc(c)+'</div>'}
-  else{d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body">'+md(c,false)+'</div></div>'}
+  else{d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body">'+md(c,false)+'</div>'+SVC.ACC+'</div>';d._text=c}
   var th=$('#svcThi');th.appendChild(d);if(m.pasos&&m.role!=='user')ACT.estatico($('.ai-col',d),$('.ai-body',d),m.pasos,m.res);if(m.refs)REFS.poner(d,m.refs);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;return d;
 };
 SVC.pensando=function(t){var d=document.createElement('div');d.className='msg-ai';
@@ -6584,7 +6588,7 @@ SVC.tipear=async function(txt,piensa,ms,w){
   for(var i=0;i<p.length;i++){out+=p[i];if(i%2)continue;if(SVC.x!==x)break;
     body.innerHTML=md(out,false);var l=body.lastElementChild||body;l.insertAdjacentHTML('beforeend','<span class="caret"></span>');
     if(sc)sc.scrollTop=sc.scrollHeight;await SVC.dormir(22+Math.random()*38)}
-  body.innerHTML=md(txt,false);if(sc)sc.scrollTop=sc.scrollHeight;return w;
+  body.innerHTML=md(txt,false);w._text=txt;var ac=$('.ai-actions',w);if(!ac){$('.ai-col',w).insertAdjacentHTML('beforeend',SVC.ACC);ac=$('.ai-actions',w)}ac.hidden=false;if(sc)sc.scrollTop=sc.scrollHeight;return w;
 };
 SVC.on=function(){var t=$('#svcTa'),b=$('#svcSend');if(!t||!b)return;var on=!!t.value.trim()&&!SVC.busy;b.classList.toggle('on',on);b.disabled=!on;
   t.style.height='auto';t.style.height=Math.min(200,t.scrollHeight)+'px'};
@@ -6682,7 +6686,8 @@ document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' '
 (function(){var r0=GP.render;GP.render=function(){r0.apply(this,arguments);var b=$('#gpList');if(!b||GP.ag()==='cobros')return;
   b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>')}})();
 SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x)};
-SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div></div>';$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
+SVC.ACC='<div class="ai-actions"><button class="fb" type="button" data-sva="copy" aria-label="Copiar">'+svg('copy','sm')+'</button><button class="fb" type="button" data-sva="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button><button class="fb" type="button" data-sva="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button></div>';
+SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div>'+SVC.ACC+'</div>';$('.ai-actions',d).hidden=true;$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
 SVC.enviar=async function(text){
   var x=SVC.x;text=String(text||'').trim();if(!x||!text||SVC.busy||SIM.on)return;SVC.busy=true;
   SVC.burb(SVC.decir('user',text));SVC.on();
@@ -6744,11 +6749,19 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   if(t.closest('[data-svcclip]')){var fi=$('#svcFile');if(fi)fi.click();return}
 });
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='svcFile'){SVC.subir(e.target.files);e.target.value=''}});
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+  if(t.closest('[data-svcclr]')){var a=$('#svcTa');if(a){a.value='';SVC.on();a.focus()}return}
+  var b=t.closest('#svcThi [data-sva]');if(!b)return;var w=b.closest('.msg-ai'),k=b.dataset.sva;
+  if(k==='copy'){var tx=String(w._text||$('.ai-body',w).innerText||'').replace(/\*\*/g,'');try{navigator.clipboard.writeText(tx).then(function(){toast('Respuesta copiada')},function(){toast('No se pudo copiar')})}catch(_){toast('No se pudo copiar')}}
+  else{var o=$('[data-sva="'+(k==='up'?'down':'up')+'"]',w);if(o)o.classList.remove('act');b.classList.toggle('act')}
+});
 ['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#exDoc .svc-chat');if(!z)return;e.preventDefault();z.classList.add('over')})});
 document.addEventListener('dragleave',function(e){var z=e.target.closest&&e.target.closest('#exDoc .svc-chat');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
 document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.closest('#exDoc .svc-chat');if(!z)return;e.preventDefault();z.classList.remove('over');SVC.subir(e.dataTransfer.files)});
 XD.openSrv=function(x,el){
   el.innerHTML=SVC.html(x);
+  crumb.textContent='Agente de Garantías';crumbSep.hidden=false;crumb2.hidden=false;crumb2.textContent=(x.wo||x.folio)+' · Servicio';
+  var sb=$('#svcSend');if(sb&&typeof EYE!=='undefined')EYE.mount(sb);
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   SVR.bloquear(true);SVR.pintarRef();if(!x.demo)XD.SRV.forEach(function(d){XD.load(x.id,d[0])});
   SVC.abrir(x);if(!x.demo)FL.refresh(x).then(function(){if(XD.cur&&XD.cur.id===x.id)SVC.ck()});
@@ -6784,7 +6797,7 @@ XD.open=function(id){
   FL.refresh(x);
   XD.formInit(x);
 };
-XD.close=function(){if(!XD.cur)return;var car=XD.mode==='cartera',pv=XD.from==='pv',bx=XD.from==='bx',agv=XD.from==='agv';$('#exDoc').hidden=true;$(agv?'#viewAgv':bx?'#viewBx':pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true);if(bx)BX.load();if(agv)AGV.load()};
+XD.close=function(){if(!XD.cur)return;if(XD.cur.tipo==='Servicio'&&S.view==='exp'){crumb.textContent=VIEWS.exp;crumbSep.hidden=true;crumb2.hidden=true}var car=XD.mode==='cartera',pv=XD.from==='pv',bx=XD.from==='bx',agv=XD.from==='agv';$('#exDoc').hidden=true;$(agv?'#viewAgv':bx?'#viewBx':pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true);if(bx)BX.load();if(agv)AGV.load()};
 XD.sec=function(k){return $('#exDoc .xd-sec[data-k="'+k+'"]')};
 /* lo ya subido */
 XD.load=async function(id,k){
