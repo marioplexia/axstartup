@@ -2015,6 +2015,31 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 #svcTa::placeholder{color:var(--faint)}
 .svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1.5px dashed var(--fg);border-radius:16px;font-weight:500;pointer-events:none;z-index:4}.svc-chat.over .svc-drop{display:grid}
 .svc-g{grid-template-columns:minmax(0,1fr) 260px!important}
+.act{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
+.act-h{display:inline-flex;align-items:center;gap:8px;max-width:100%;background:none;border:0;padding:3px 0;color:var(--muted);font:inherit;text-align:left;cursor:default}
+.act.fin .act-h{cursor:pointer}.act.fin .act-h:hover{color:var(--fg)}
+.act-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.act-t b{font-weight:500;color:var(--fg)}
+.act-time{color:var(--faint);font-variant-numeric:tabular-nums}
+.act-sp{display:inline-flex;gap:3px}.act-sp i{width:5px;height:5px;border-radius:50%;background:#e8743b;animation:actb 1.1s ease-in-out infinite both}
+.act-sp i:nth-child(2){animation-delay:.15s}.act-sp i:nth-child(3){animation-delay:.3s}
+.act.fin .act-sp{display:none}
+@keyframes actb{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.act-ch{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:2;display:none;transition:transform .2s}
+.act.fin .act-ch{display:block}.act[data-open="true"] .act-ch{transform:rotate(90deg)}
+.act-l{list-style:none;margin:6px 0 2px;padding:0;border:1px solid var(--card-line);border-radius:12px;overflow:hidden;background:var(--card)}
+.act[data-open="false"] .act-l{display:none}
+.act-l li{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--card-line);font-size:13px;color:var(--fg);animation:fadein .3s both}
+.act-l li:first-child{border-top:0}
+.act-l li.nota{color:var(--muted);font-style:italic}
+.act-i{flex:none;width:14px;height:14px;border-radius:50%;border:2px solid var(--card-line);border-top-color:#e8743b;animation:actr .8s linear infinite}
+.act-l li.ok .act-i{animation:none;border:0;background:#1f8a4c url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/10px no-repeat}
+.act-l li.err .act-i{animation:none;border:0;background:#d9534f}
+@keyframes actr{to{transform:rotate(360deg)}}
+.act-ag{flex:none;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--fill-slab);color:var(--muted);white-space:nowrap}
+.act-tx{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.act-res{flex:none;max-width:40%;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:640px){.act-ag{display:none}.act-res{max-width:45%}}
+@media(prefers-reduced-motion:reduce){.act-sp i,.act-i{animation:none}}
 .rf{margin-top:12px;display:flex;flex-direction:column;gap:10px}
 .rf-fs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
 .rf-f{flex:none;width:148px;border:1px solid var(--card-line);border-radius:12px;overflow:hidden;background:var(--card);padding:0;cursor:zoom-in;text-align:left;color:inherit}
@@ -5693,6 +5718,87 @@ GP.answerCobros=async function(text){
     return {md:'De mano de obra reclamaste '+mo(c.lc)+' y esperaría '+mo(c.estL)+' ('+Math.round(c.rl*100)+'%). De piezas reclamaste '+mo(c.pc)+' y esperaría '+mo(c.estP)+' ('+Math.round(c.rp*100)+'%).'};
   return null;
 };
+/* ══ Actividad en vivo: qué está haciendo cada agente mientras contesta ══
+   Encabezado con reloj ("Trabajando · Manual GM · 8s") y la lista de pasos; al terminar se pliega
+   ("Revisó 5 fuentes con 3 agentes · 12s ›") y se puede volver a abrir. */
+var ACT={};
+ACT.T={
+  contexto:function(a){return ['Agente de garantías','Revisó la orden'+(a.orden?' '+a.orden:'')+' y su expediente']},
+  buscar_todo:function(a){return ['Cerebro','Buscó en todo el manual «'+(a.texto||'')+'»']},
+  buscar_politicas:function(a){return ['Manual GM','Buscó en la política de GM «'+(a.texto||'')+'»']},
+  ver_politica:function(a){return ['Manual GM',a.seccion?'Leyó la sección '+a.seccion:'Revisó el índice del manual']},
+  manual_resumen:function(){return ['Cerebro','Revisó el panorama de lo aprendido']},
+  buscar_reglas:function(a){return ['Reglas','Buscó reglas'+(a.texto?' «'+a.texto+'»':'')+(a.sistema?' de '+a.sistema:'')]},
+  ver_regla:function(a){return ['Reglas','Abrió la regla '+(a.id||'')]},
+  buscar_lecciones:function(a){return ['Cerebro','Buscó lo aprendido'+(a.texto?' «'+a.texto+'»':'')]},
+  casos_planta:function(a){return ['Casos de planta','Revisó casos'+(a.texto?' «'+a.texto+'»':'')+(a.estado?' '+a.estado+'s':'')]},
+  pagos_planta:function(){return ['Agente de cobros','Revisó lo que ha pagado planta']},
+  catalogo_operaciones:function(a){return ['Reglas','Revisó el catálogo de operaciones'+(a.sistema?' de '+a.sistema:'')]},
+  actividad_reciente:function(){return ['Cerebro','Revisó lo que aprendió recién']},
+  buscar_ejemplos:function(a){return ['Ejemplos','Buscó documentos enseñados «'+(a.texto||'')+'»']},
+  ver_ejemplo:function(){return ['Ejemplos','Abrió un documento enseñado']},
+  fotos_ejemplo:function(a){return ['Fotos','Buscó fotos de ejemplo'+((a.tipo_servicio||a.sistema)?' de '+(a.tipo_servicio||a.sistema):'')]},
+  precio_servicio:function(a){return ['Cerebro de servicios','Buscó cuánto se cobra «'+(a.tipo||'')+'» en tu grupo']}
+};
+ACT.seg=function(ms){var s=Math.max(0,Math.round(ms/1000));return s<60?s+'s':Math.floor(s/60)+'m '+(s%60)+'s'};
+ACT.nuevo=function(col,antes){
+  var el=document.createElement('div');el.className='act';el.dataset.open='true';
+  el.innerHTML='<button type="button" class="act-h" aria-expanded="true"><span class="act-sp" aria-hidden="true"><i></i><i></i><i></i></span><span class="act-t"><b>Pensando</b></span><span class="act-time">0s</span><svg class="act-ch" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button><ol class="act-l" aria-live="polite"></ol>';
+  if(antes)col.insertBefore(el,antes);else col.appendChild(el);
+  var a={el:el,t0:Date.now(),li:{},lista:[],ag:{},vivo:true};
+  a.tm=setInterval(function(){if(!el.isConnected){clearInterval(a.tm);return}el.querySelector('.act-time').textContent=ACT.seg(Date.now()-a.t0)},1000);
+  return a;
+};
+ACT.titulo=function(a,ag){if(!a.vivo)return;a.el.querySelector('.act-t').innerHTML='<b>Trabajando</b>'+(ag?' · '+esc(ag):'')};
+ACT.fila=function(a,id,ag,tx){
+  var li=document.createElement('li');li.className='run';li.innerHTML='<span class="act-i" aria-hidden="true"></span><span class="act-ag">'+esc(ag)+'</span><span class="act-tx">'+esc(tx)+'</span><span class="act-res"></span>';
+  a.el.querySelector('.act-l').appendChild(li);a.li[id]={li:li,o:{ag:ag,tx:tx,res:'',ok:null}};a.lista.push(a.li[id].o);a.ag[ag]=1;ACT.titulo(a,ag);ACT.baja(a);return li;
+};
+ACT.listo=function(a,id,res,mal){var f=a.li[id];if(!f)return;f.li.className=mal?'err':'ok';f.o.ok=!mal;f.o.res=res||'';f.li.querySelector('.act-res').textContent=res||''};
+ACT.baja=function(a){var th=a.el.closest('#svcTh,.thread');if(th)th.scrollTop=th.scrollHeight};
+/* un paso local (subir, guardar, comparar…): se marca solo cuando termina la promesa */
+ACT.paso=async function(a,ag,tx,fn){var id='l'+Math.random().toString(36).slice(2);ACT.fila(a,id,ag,tx);try{var r=await fn();ACT.listo(a,id,typeof r==='string'&&r.length<60?r:(r&&r.toString!==Object.prototype.toString&&typeof r==='object'?String(r):''));return r}catch(e){ACT.listo(a,id,'no se pudo',true);throw e}};
+/* eventos que manda el cerebro en vivo */
+ACT.ev=function(a,ev){
+  if(!a||!ev)return;
+  if(ev.e==='pensando'){ACT.titulo(a,ev.n?'pensando la respuesta':'');return}
+  if(ev.e==='nota'&&ev.text){var li=document.createElement('li');li.className='nota';li.textContent=ev.text;a.el.querySelector('.act-l').appendChild(li);a.lista.push({nota:ev.text});ACT.baja(a);return}
+  if(ev.e==='paso'){
+    if(ev.estado==='inicio'){var t=(ACT.T[ev.tool]||function(){return ['Cerebro',ev.tool]})(ev.input||{});ACT.fila(a,ev.id,t[0],t[1])}
+    else ACT.listo(a,ev.id,String(ev.resumen||'').replace(/^[^·]*·\s*/,''),ev.estado==='error');
+  }
+};
+ACT.cerrar=function(a){
+  if(!a||!a.vivo)return;a.vivo=false;clearInterval(a.tm);
+  var n=a.lista.filter(function(o){return !o.nota}).length,g=Object.keys(a.ag).length,t=ACT.seg(Date.now()-a.t0);
+  if(!n&&!a.lista.length){a.el.remove();return}
+  a.resumen=(n?'Revisó '+n+(n===1?' fuente':' fuentes'):'Pensó')+(g>1?' con '+g+' agentes':'')+(Date.now()-a.t0>=1000?' · '+t:'');
+  a.el.querySelector('.act-t').textContent=a.resumen;a.el.querySelector('.act-time').textContent='';
+  a.el.classList.add('fin');ACT.abrir(a.el,false);
+};
+ACT.abrir=function(el,on){el.dataset.open=on?'true':'false';el.querySelector('.act-h').setAttribute('aria-expanded',on?'true':'false')};
+/* lo que quedó guardado en la plática: plegado */
+ACT.estatico=function(col,antes,L,res){
+  if(!L||!L.length)return;var el=document.createElement('div');el.className='act fin';
+  el.innerHTML='<button type="button" class="act-h" aria-expanded="false"><span class="act-sp" aria-hidden="true"><i></i><i></i><i></i></span><span class="act-t">'+esc(res||('Revisó '+L.filter(function(o){return !o.nota}).length+' fuentes'))+'</span><span class="act-time"></span><svg class="act-ch" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button><ol class="act-l">'+
+    L.map(function(o){return o.nota?'<li class="nota">'+esc(o.nota)+'</li>':'<li class="'+(o.ok===false?'err':'ok')+'"><span class="act-i" aria-hidden="true"></span><span class="act-ag">'+esc(o.ag)+'</span><span class="act-tx">'+esc(o.tx)+'</span><span class="act-res">'+esc(o.res||'')+'</span></li>'}).join('')+'</ol>';
+  el.dataset.open='false';if(antes)col.insertBefore(el,antes);else col.appendChild(el);
+};
+document.addEventListener('click',function(e){var h=e.target.closest&&e.target.closest('.act.fin .act-h');if(!h)return;var el=h.parentNode;ACT.abrir(el,el.dataset.open!=='true')});
+/* el cerebro en vivo: una línea JSON por evento; si la función no manda eventos, se usa la respuesta normal */
+SB.aiStream=async function(body,fn,onEv){
+  if(!SB.c||!SB.entered)throw new Error('sin sesión');
+  var ss=await SB.c.auth.getSession(),tk=ss&&ss.data&&ss.data.session&&ss.data.session.access_token;
+  var r=await fetch(SB.url+'/functions/v1/'+(fn||'manual'),{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+(tk||SB.key),apikey:SB.key},body:JSON.stringify(Object.assign({},body,{stream:true}))});
+  if(!r.ok){var m='HTTP '+r.status;try{var j=await r.json();m=(j.error||m)+(j.detalle?' :: '+j.detalle:'')}catch(_){}throw new Error(m)}
+  if(!/ndjson/.test(r.headers.get('content-type')||'')||!r.body||!r.body.getReader)return await r.json();
+  var rd=r.body.getReader(),dec=new TextDecoder(),buf='',fin=null;
+  var linea=function(l){l=l.trim();if(!l)return;var ev;try{ev=JSON.parse(l)}catch(_){return}if(ev.e==='fin'||ev.e==='error')fin=ev;else{try{onEv&&onEv(ev)}catch(_){}}};
+  for(;;){var c=await rd.read();if(c.done)break;buf+=dec.decode(c.value,{stream:true});var p=buf.split('\n');buf=p.pop();p.forEach(linea)}
+  linea(buf);
+  if(!fin)throw new Error('sin respuesta');if(fin.e==='error')throw new Error(fin.error||'error');
+  return fin;
+};
 /* ══ Referencias debajo de cada respuesta del cerebro: fotos, manual, reglas, casos, ejemplos y precios ══ */
 var REFS={};
 REFS.K={manual:'Manual GM',regla:'Regla',caso:'Caso real',ejemplo:'Ejemplo',precio:'Cerebro de servicios'};
@@ -5727,7 +5833,7 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   var o=document.createElement('div');o.className='rf-lb';o.setAttribute('role','dialog');o.setAttribute('aria-label','Foto de ejemplo');o.innerHTML='<img alt=""><button type="button" aria-label="Cerrar">✕</button><p></p>';
   o.querySelector('img').src=im.src;o.querySelector('p').textContent=b.textContent;document.body.appendChild(o);
   var cierra=function(){o.remove();document.removeEventListener('keydown',k,true);b.focus()},k=function(ev){if(ev.key==='Escape'){ev.preventDefault();ev.stopImmediatePropagation();cierra()}};o.addEventListener('click',cierra);document.addEventListener('keydown',k,true);o.querySelector('button').focus()});
-GP.think=async function(text,my){
+GP.think=async function(text,my,act){
   await nap(380,my);
   var st=MI.smalltalk(text);if(st)return {md:st};
   var ag=GP.ag();
@@ -5735,7 +5841,8 @@ GP.think=async function(text,my){
     try{
       if(S.convP)await S.convP;if(GP.lastExpP)await GP.lastExpP;
       var ctxS=GP.tipo==='Servicio'?await SVR.ctx(GP.srv||{wo:GP.cur},text):'';
-      var r=await SB.ai({rol_agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:GP.srv?GP.srv.folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:ctxS+text}]),ahora:MI.nowInfo()},'manual');
+      var bq={rol_agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:GP.srv?GP.srv.folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:ctxS+text}]),ahora:MI.nowInfo()},r;
+      if(act){try{r=await SB.aiStream(bq,'manual',function(ev){ACT.ev(act,ev)})}catch(e1){if(act.lista.length)throw e1;r=await SB.ai(bq,'manual')}}else r=await SB.ai(bq,'manual');
       if(r&&r.text)return {md:r.text,refs:r.refs};
     }catch(e){SB.aiFail(e)}
   }
@@ -5747,9 +5854,11 @@ GP.think=async function(text,my){
 async function runConv(text){
   var my={aborted:false};S.ctrl=my;S.streaming=true;S.last={text:text,files:[]};updateSend();
   var w=addAssistant();hideRegen(w);w._noThink=true;
-  var body=$('.ai-body',w),col=$('.ai-col',w);body.innerHTML='<span class="typing" aria-label="Escribiendo"><i></i><i></i><i></i></span>';
+  var body=$('.ai-body',w),col=$('.ai-col',w);
+  var act=MI.smalltalk(text)?null:ACT.nuevo(col,body);if(!act)body.innerHTML='<span class="typing" aria-label="Escribiendo"><i></i><i></i><i></i></span>';
   var out;
-  try{out=await GP.think(text,my)}catch(e){console.error(e);SB.fail(e);out={md:'Uy, algo falló al procesar eso. ¿Me lo dices otra vez?'}}
+  try{out=await GP.think(text,my,act)}catch(e){console.error(e);SB.fail(e);out={md:'Uy, algo falló al procesar eso. ¿Me lo dices otra vez?'}}
+  if(act)ACT.cerrar(act);
   if(my.aborted){body.innerHTML='<p class="muted">Respuesta detenida.</p>';$('.ai-actions',w).hidden=false;finish(my);return}
   var plain='';
   if(out.md)plain=await stream(body,out.md,my);else body.innerHTML='';
@@ -6462,15 +6571,15 @@ SVC.burb=function(m){
   if(m.role==='user'){d.className='msg-user';var a=/^📎 (.+)$/.exec(c);
     d.innerHTML=a?'<div class="files"><span class="file">'+svg('file','sm')+'<b>'+esc(a[1])+'</b></span></div>':'<div class="bubble">'+esc(c)+'</div>'}
   else{d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body">'+md(c,false)+'</div></div>'}
-  var th=$('#svcThi');th.appendChild(d);if(m.refs)REFS.poner(d,m.refs);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;return d;
+  var th=$('#svcThi');th.appendChild(d);if(m.pasos&&m.role!=='user')ACT.estatico($('.ai-col',d),$('.ai-body',d),m.pasos,m.res);if(m.refs)REFS.poner(d,m.refs);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;return d;
 };
 SVC.pensando=function(t){var d=document.createElement('div');d.className='msg-ai';
   d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"><span class="thinking">'+esc(t||'Pensando')+'<span class="dots"><i></i><i></i><i></i></span></span><span class="typing" hidden></span></div></div>';
   $('#svcThi').appendChild(d);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;return d};
 SVC.dormir=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
 /* el cerebro "escribe": primero piensa un momento y luego aparece el texto palabra por palabra */
-SVC.tipear=async function(txt,piensa,ms){
-  var x=SVC.x,w=SVC.pensando(piensa||'Escribiendo');await SVC.dormir(ms||(700+Math.random()*700));
+SVC.tipear=async function(txt,piensa,ms,w){
+  var x=SVC.x;if(!w)w=SVC.pensando(piensa||'Escribiendo');await SVC.dormir(ms||(700+Math.random()*700));
   var body=$('.ai-body',w),sc=$('#svcTh'),p=String(txt).split(/(\s+)/),out='';
   for(var i=0;i<p.length;i++){out+=p[i];if(i%2)continue;if(SVC.x!==x)break;
     body.innerHTML=md(out,false);var l=body.lastElementChild||body;l.insertAdjacentHTML('beforeend','<span class="caret"></span>');
@@ -6525,6 +6634,13 @@ SIM.archivos=async function(L){var d=document.createElement('div');d.className='
   d.innerHTML='<div class="files">'+L.map(function(n){return '<span class="file">'+svg('file','sm')+'<b>'+esc(n)+'</b></span>'}).join('')+'</div>';
   $('#svcThi').appendChild(d);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;await SVC.dormir(400)};
 SIM.fila=function(k,L){var l=document.querySelector('#exDoc .svc-sec[data-k="'+k+'"] .xd-list');if(l)L.forEach(function(n){l.insertAdjacentHTML('beforeend','<div class="xd-row"><span class="xd-name">'+esc(n)+'</span><span class="xd-tick">✓</span></div>')});SVC.ck()};
+SIM.trabaja=async function(L,txt,refs){
+  var x=SVC.x,w=SVC.msgAI(),act=ACT.nuevo($('.ai-col',w),$('.ai-body',w));
+  await SVC.dormir(500);
+  for(var i=0;i<L.length;i++){if(SVC.x!==x)return w;var p=L[i];if(p.nota){ACT.ev(act,{e:'nota',text:p.nota});await SVC.dormir(600);continue}
+    await ACT.paso(act,p[0],p[1],function(){return SVC.dormir(p[3]||(650+Math.random()*700)).then(function(){if(p[4])p[4]();return p[2]||''})})}
+  ACT.cerrar(act);await SVC.tipear(txt,null,150,w);if(refs){REFS.poner(w,refs);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight}return w;
+};
 SIM.boton=function(t,dis){var b=$('[data-svcsim]');if(b){b.textContent=t;b.disabled=!!dis}};
 SIM.run=async function(){
   var x=SVC.x;if(!x||!x.demo||SIM.on)return;SIM.on=true;
@@ -6536,19 +6652,23 @@ SIM.run=async function(){
     var paso=async function(f){if(!ok())throw 0;await f()};
     await paso(function(){return SVC.dormir(1200)});
     await paso(function(){return SIM.yo('Buenas, ya terminamos el servicio del Aveo')});
-    await paso(function(){return SVC.tipear('¡Qué bien! Mándame la orden o unas fotos y lo reviso.')});
+    await paso(function(){return SIM.trabaja([['Agente de garantías','Revisó la orden GA9999 y su expediente','servicio · sin PREA']],'¡Qué bien! Mándame la orden o unas fotos y lo reviso.')});
     await paso(function(){return SIM.archivos(['orden_GA9999.pdf'])});
-    await paso(async function(){await SVC.tipear('Ya revisé la orden. Es el **servicio de 6,000 km** de un **Aveo 2025** con 6,012 km. En tu grupo ese servicio se cobra en **$1,950** antes de IVA.\n\nMándame unas fotos del trabajo terminado para completar la evidencia.','Leyendo la orden',2200);Object.assign(x,{sys:'Servicio 6,000 km',vehicle:'Aveo 2025',km:6012});SIM.fila('evidencia',['orden_GA9999.pdf'])});
+    await paso(function(){return SIM.trabaja([['Agente de servicios','Recibió «orden_GA9999.pdf»','PDF · 1 página'],['Cerebro','Leyendo «orden_GA9999.pdf»','la orden de servicio · llenó 3 datos',1900,function(){Object.assign(x,{sys:'Servicio 6,000 km',vehicle:'Aveo 2025',km:6012})}],['Expediente','Guardando en Evidencia del servicio','listo',700,function(){SIM.fila('evidencia',['orden_GA9999.pdf'])}],['Cerebro de servicios','Buscó cuánto se cobra «Servicio 6,000 km» en tu grupo','9 servicios · $1,950 típico'],['Agente de servicios','Revisando el ciclo del servicio','1 de 3 listos']],
+      'Ya revisé la orden. Es el **servicio de 6,000 km** de un **Aveo 2025** con 6,012 km. En tu grupo ese servicio se cobra en **$1,950** antes de IVA.\n\nMándame unas fotos del trabajo terminado para completar la evidencia.')});
     await paso(function(){return SIM.archivos(['foto_odometro.jpg','foto_motor.jpg'])});
-    await paso(async function(){SIM.fila('evidencia',['foto_odometro.jpg','foto_motor.jpg']);await SVC.tipear('Perfecto, con las fotos ya quedó completa la evidencia.\n\nAhora sí, a facturarlo: mándame la factura en cuanto la tengas.','Revisando las fotos',1800)});
+    await paso(function(){return SIM.trabaja([['Cerebro','Leyendo «foto_odometro.jpg»','odómetro · 6,012 km',1200],['Cerebro','Leyendo «foto_motor.jpg»','foto del trabajo terminado',1100],['Manual GM','Revisó qué evidencia pide un mantenimiento','completa'],['Expediente','Guardando en Evidencia del servicio','2 fotos',700,function(){SIM.fila('evidencia',['foto_odometro.jpg','foto_motor.jpg'])}]],
+      'Perfecto, con las fotos ya quedó completa la evidencia.\n\nAhora sí, a facturarlo: mándame la factura en cuanto la tengas.')});
     await paso(function(){return SIM.yo('¿Cuánto le cobro?')});
-    await paso(async function(){var w=await SVC.tipear('Cóbrale **$1,950 + IVA**, o sea **$2,262** en total. Es lo típico en tu grupo: las otras agencias lo cobran entre $1,900 y $2,000. Te dejo abajo el detalle y un servicio igual que ya se cerró.','Revisando lo que cobra tu grupo',1500);
-      REFS.poner(w,[{tipo:'precio',tipo_label:'Servicio 6,000 km',grupo:{n:9,mediana:1950,min:1790,max:2150,por_agencia:[{agencia:'Agencia A del grupo',n:4,mediana:1900},{agencia:'Agencia B del grupo',n:5,mediana:2000}]},red:{n:31,mediana:1880}},{tipo:'ejemplo',folio:'SRV-GA9990',vehiculo:'Aveo 2025',sistema:'Servicio 6,000 km',resultado:'cerrado',resumen:'Ejemplo de la simulación: facturado en $1,950 antes de IVA y cobrado el mismo día, con orden, foto del odómetro y foto del motor.'}]);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight});
+    await paso(function(){return SIM.trabaja([{nota:'Voy a revisar cuánto se cobra este servicio en tu grupo y en la red.'},['Cerebro de servicios','Buscó cuánto se cobra «Servicio 6,000 km» en tu grupo','2 agencias · 9 servicios',1300],['Cerebro de servicios','Comparó con la red de la marca','31 servicios · $1,880'],['Ejemplos','Buscó un servicio igual ya cerrado','SRV-GA9990']],
+      'Cóbrale **$1,950 + IVA**, o sea **$2,262** en total. Es lo típico en tu grupo: las otras agencias lo cobran entre $1,900 y $2,000. Te dejo abajo el detalle y un servicio igual que ya se cerró.',[{tipo:'precio',tipo_label:'Servicio 6,000 km',grupo:{n:9,mediana:1950,min:1790,max:2150,por_agencia:[{agencia:'Agencia A del grupo',n:4,mediana:1900},{agencia:'Agencia B del grupo',n:5,mediana:2000}]},red:{n:31,mediana:1880}},{tipo:'ejemplo',folio:'SRV-GA9990',vehiculo:'Aveo 2025',sistema:'Servicio 6,000 km',resultado:'cerrado',resumen:'Ejemplo de la simulación: facturado en $1,950 antes de IVA y cobrado el mismo día, con orden, foto del odómetro y foto del motor.'}])});
     await paso(function(){return SIM.archivos(['factura_A1234.xml'])});
-    await paso(async function(){x.labor=1950;SIM.fila('factura',['factura_A1234.xml']);await SVC.tipear('Recibí la factura por **$1,950** antes de IVA. Va justo en lo que cobra tu grupo.\n\nCuando te paguen, mándame el comprobante y lo cierro.','Leyendo la factura',1800)});
+    await paso(function(){return SIM.trabaja([['Agente de servicios','Recibió «factura_A1234.xml»','CFDI'],['Cerebro','Leyendo «factura_A1234.xml»','la factura · $1,950 antes de IVA',1500,function(){x.labor=1950}],['Cerebro de servicios','Comparando con lo que cobra tu grupo','en línea'],['Expediente','Guardando en Factura','listo',700,function(){SIM.fila('factura',['factura_A1234.xml'])}],['Agente de cobros','Abrió el cobro del servicio','$2,262 por cobrar']],
+      'Recibí la factura por **$1,950** antes de IVA. Va justo en lo que cobra tu grupo.\n\nCuando te paguen, mándame el comprobante y lo cierro.')});
     await paso(function(){return SVC.dormir(900)});
     await paso(function(){return SIM.archivos(['comprobante_pago.pdf'])});
-    await paso(async function(){SIM.fila('planta',['comprobante_pago.pdf']);x.flujo={etapa:'cerrado'};SVC.ck();await SVC.tipear('Ya vi el comprobante, quedó pagado.\n\nCon esto la orden **GA9999** queda **cerrada**: facturada, cobrada y con su evidencia completa, todo el mismo día. ¡Buen trabajo!','Revisando el pago',1500)});
+    await paso(function(){return SIM.trabaja([['Cerebro','Leyendo «comprobante_pago.pdf»','pago por $2,262',1300],['Agente de cobros','Cruzó el pago con la factura','coincide'],['Expediente','Guardando en Comprobante de cobro','listo',700,function(){SIM.fila('planta',['comprobante_pago.pdf'])}],['Agente de servicios','Cerró el servicio','3 de 3 listos',700,function(){x.flujo={etapa:'cerrado'};SVC.ck()}]],
+      'Ya vi el comprobante, quedó pagado.\n\nCon esto la orden **GA9999** queda **cerrada**: facturada, cobrada y con su evidencia completa, todo el mismo día. ¡Buen trabajo!')});
     SIM.hecho=true;SIM.boton('Repetir simulación');
   }catch(e){if(e)console.warn('[simulación]',e)}
   var t=$('#svcTa');if(t)t.readOnly=false;SIM.on=false;
@@ -6562,37 +6682,42 @@ document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' '
 (function(){var r0=GP.render;GP.render=function(){r0.apply(this,arguments);var b=$('#gpList');if(!b||GP.ag()==='cobros')return;
   b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>')}})();
 SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x)};
+SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div></div>';$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
 SVC.enviar=async function(text){
   var x=SVC.x;text=String(text||'').trim();if(!x||!text||SVC.busy||SIM.on)return;SVC.busy=true;
-  SVC.burb(SVC.decir('user',text));SVC.on();var w=SVC.pensando('Revisando lo que sé de este servicio');
-  var resp='',refs=null;
+  SVC.burb(SVC.decir('user',text));SVC.on();
+  var w=SVC.msgAI(),col=$('.ai-col',w),act=ACT.nuevo(col,$('.ai-body',w)),resp='',refs=null;
   try{var ctx=await SVR.ctx(x,text);
-    var r=await SB.ai({rol_agente:'garantias',orden:x.wo||null,conversation_id:SVC.conv,folio:x.folio,messages:SVC.msgs.filter(function(m){return !SVC.viejo(m)}).slice(-12,-1).concat([{role:'user',content:ctx+text}]),ahora:MI.nowInfo()},'manual');
+    var body={rol_agente:'garantias',orden:x.wo||null,conversation_id:SVC.conv,folio:x.folio,messages:SVC.msgs.filter(function(m){return !SVC.viejo(m)}).slice(-12,-1).concat([{role:'user',content:ctx+text}]),ahora:MI.nowInfo()};
+    var r;try{r=await SB.aiStream(body,'manual',function(ev){ACT.ev(act,ev)})}catch(e1){if(act.lista.length)throw e1;r=await SB.ai(body,'manual')}
     resp=(r&&r.text)||'No encontré esa respuesta en lo que sé de este servicio.';refs=r&&r.refs||null;
   }catch(e){resp='No pude contestar ahorita ('+TR.errTxt(e)+'). Inténtalo otra vez en un momento.'}
-  w.remove();SVC.decir('assistant',resp,refs);var wr=await SVC.tipear(resp,null,200);if(refs&&refs.length){REFS.poner(wr,refs);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight}SVC.busy=false;SVC.on();SVC.guardar();
+  ACT.cerrar(act);
+  var m=SVC.decir('assistant',resp,refs);if(act.lista.length){m.pasos=act.lista.slice(0,30);m.res=act.resumen}
+  await SVC.tipear(resp,null,120,w);if(refs&&refs.length){REFS.poner(w,refs);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight}SVC.busy=false;SVC.on();SVC.guardar();
 };
 SVC.NOM={orden:'la orden de servicio',factura:'la factura',comprobante_pago:'el comprobante de pago',foto_odometro:'la foto del odómetro',foto_trabajo:'una foto del trabajo',otro:'un documento'};
 SVC.subir=async function(files){
   var x=SVC.x;files=[].slice.call(files||[]);if(!x||!files.length)return;
   if(x.demo){toast('Esta es la orden de simulación: dale «Iniciar simulación»');return}
+  var DOND={evidencia:'Evidencia del servicio',factura:'Factura',planta:'Comprobante de cobro'};
   for(var i=0;i<files.length;i++){var file=files[i];
     SVC.burb(SVC.decir('user','📎 '+file.name));
     if(file.size>XD.MAX*1e6){SVC.burb(SVC.decir('assistant','«'+file.name+'» pesa más de '+XD.MAX+' MB; mándamelo más ligero.'));continue}
-    var w=SVC.pensando('Revisando «'+file.name+'»'),k='evidencia',r=null,txt='';
-    try{var f=/\.(xml|txt)$/i.test(file.name)?{name:file.name,text:await file.text()}:await TR.prep(file);
-      r=await SB.ai({expediente_id:x.id,file:f},'servicio');if(r&&r.expediente)Object.assign(x,r.expediente);
+    var w=SVC.msgAI(),act=ACT.nuevo($('.ai-col',w),$('.ai-body',w)),k='evidencia',r=null,txt='',f=null,m='';
+    try{
+      f=await ACT.paso(act,'Agente de servicios','Recibió «'+file.name+'»',async function(){var o=/\.(xml|txt)$/i.test(file.name)?{name:file.name,text:await file.text()}:await TR.prep(file);return o});
+      r=await ACT.paso(act,'Cerebro','Leyendo «'+file.name+'»',async function(){var rr=await SB.ai({expediente_id:x.id,file:f},'servicio');rr.toString=function(){return (SVC.NOM[rr.leido&&rr.leido.que_es]||'un documento')+(rr.llenado&&rr.llenado.length?' · llenó '+rr.llenado.length+' datos':'')};return rr});
+      if(r&&r.expediente)Object.assign(x,r.expediente);
       k=SVR.DONDE[r&&r.leido&&r.leido.que_es]||(/cfdi:Comprobante|<Comprobante/i.test(f.text||'')?'factura':'evidencia');
       txt=r&&r.llenado&&r.llenado.length?'llené '+r.llenado.join(', '):'revisado';
     }catch(e){console.warn('[servicio]',e);txt='se guardó';r=null}
-    await XD.send(k,file,{leido:true,txt:txt});
-    await FL.refresh(x);
-    var L=r&&r.leido||{},dond={evidencia:'Evidencia del servicio',factura:'Factura',planta:'Comprobante de cobro'}[k],f2=x.flujo;
-    var m=r?('Recibí **'+file.name+'**: es '+(SVC.NOM[L.que_es]||'un documento')+'. Quedó en **'+dond+'**.'+
-        (r.llenado&&r.llenado.length?' Llené: '+r.llenado.join(', ')+(x.sys?' (**'+x.sys+'**'+(Number(x.labor)?', '+DEB.mx(x.labor)+' antes de IVA':'')+')':'')+'.':'')+
-        (f2?(f2.etapa==='cerrado'?' Con esto el servicio queda **cerrado**.':' Ahora sigue: **'+String(f2.siguiente||'').toLowerCase()+'**.'):'')):
-      'Guardé **'+file.name+'** en **'+dond+'**, pero no pude leerlo. Si es la factura o el comprobante, revisa que se vea bien.';
-    w.remove();await SVC.dormir(420);SVC.pintar(x);m=await SVC.natural(x,r,file,k);SVC.decir('assistant',m);await SVC.tipear(m,null,250);
+    try{await ACT.paso(act,'Expediente','Guardando en '+DOND[k],async function(){await XD.send(k,file,{leido:true,txt:txt});await SVC.dormir(420);return 'listo'})}catch(_){}
+    try{await ACT.paso(act,'Agente de servicios','Revisando el ciclo del servicio',async function(){await FL.refresh(x);SVC.pintar(x);var hz=SVC.CK.filter(function(c){return c[0]!=='cerrado'&&SVC.hecho(c[0])}).length;return hz+' de 3 listos'})}catch(_){}
+    try{m=await ACT.paso(act,x.sys?'Cerebro de servicios':'Agente de servicios',x.sys?'Comparando con lo que cobra tu grupo':'Preparando la respuesta',async function(){return SVC.natural(x,r,file,k)});m=String(m)}catch(_){m='Guardé **'+file.name+'**.'}
+    ACT.cerrar(act);
+    var mm=SVC.decir('assistant',m);mm.pasos=act.lista.slice(0,30);mm.res=act.resumen;
+    await SVC.tipear(m,null,150,w);
   }
   SVC.guardar();
 };

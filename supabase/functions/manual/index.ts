@@ -330,7 +330,7 @@ function resumenPaso(name, out) {
   if (name === "actividad_reciente") return "actividad reciente · " + n(out.lecciones) + " lecciones";
   if (name === "manual_resumen") return "resumen del manual";
   if (name === "buscar_ejemplos") return "ejemplos · " + n(out.ejemplos);
-  if (name === "fotos_ejemplo") return "fotos de ejemplo · " + n(out.fotos);
+  if (name === "fotos_ejemplo") return "fotos de ejemplo · " + n(out.fotos) + (n(out.fotos) === 1 ? " foto" : " fotos");
   if (name === "precio_servicio") return "precio del servicio";
   return name;
 }
@@ -369,7 +369,7 @@ function refsCitadas(R, text) {
   return refs.slice(0, 14);
 }
 
-async function conversar(sb, body, rol, marca, run) {
+async function conversar(sb, body, rol, marca, run, emit = (_e) => {}) {
   const t0 = Date.now();
   const msgs = (Array.isArray(body.messages) ? body.messages : [])
     .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim())
@@ -377,7 +377,10 @@ async function conversar(sb, body, rol, marca, run) {
   if (!msgs.length || msgs[msgs.length - 1].role !== "user") return { status: 400, body: { error: "bad_request" } };
   const adj = (Array.isArray(body.attachments) ? body.attachments : []).slice(0, 4).map(fileBlock).filter(Boolean);
   const ahora = body.ahora && typeof body.ahora === "object" ? body.ahora : {};
-  const ctxOrden = rol === "prueba" ? "" : "\n\n<orden>\n" + JSON.stringify(await contextoOrden(sb, body, rol)).slice(0, 30000) + "\n</orden>";
+  if (rol !== "prueba") emit({ e: "paso", id: "ctx", tool: "contexto", estado: "inicio", input: { orden: clip(body.orden, 24) } });
+  const ctxObj = rol === "prueba" ? null : await contextoOrden(sb, body, rol);
+  if (ctxObj) emit({ e: "paso", id: "ctx", tool: "contexto", estado: "ok", resumen: ctxObj.preas.length ? "orden " + (ctxObj.orden || "") + " · " + ctxObj.preas.length + (ctxObj.preas.length === 1 ? " expediente" : " expedientes") : "orden " + (ctxObj.orden || "") });
+  const ctxOrden = ctxObj ? "\n\n<orden>\n" + JSON.stringify(ctxObj).slice(0, 30000) + "\n</orden>" : "";
   const system = (INTROS[rol] || INTRO_PRUEBA) + CUERPO + ctxOrden + "\n\nAHORA: " + clip(ahora.texto || new Date().toISOString(), 120) + " (hora del servidor " + new Date().toISOString() + ")";
   const messages = msgs.map((m) => ({ ...m }));
   if (adj.length) {
@@ -388,6 +391,7 @@ async function conversar(sb, body, rol, marca, run) {
   const R = { manual: new Map(), regla: new Map(), caso: [], ejemplo: new Map(), fotos: [], precio: null };
   for (let i = 0; i < 8; i++) {
     const ti = Date.now();
+    emit({ e: "pensando", n: i });
     /* los reintentos no pasan de ~110 s en total: la función tiene un límite de tiempo */
     const r = await claude({ max_tokens: 3000, system, tools: TOOLS, messages }, { presupuestoMs: Math.max(0, 110000 - (Date.now() - t0)) });
     run.intentos += r.intentos || 0;
@@ -397,13 +401,17 @@ async function conversar(sb, body, rol, marca, run) {
     const uses = content.filter((b) => b.type === "tool_use");
     if (r.data.stop_reason !== "tool_use" || !uses.length) { const text = content.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim(); return { status: 200, body: { text, pasos, refs: refsCitadas(R, text) } }; }
     messages.push({ role: "assistant", content });
+    const nota = content.filter((b) => b.type === "text" && b.text && b.text.trim()).map((b) => b.text.trim()).join(" ");
+    if (nota) emit({ e: "nota", text: clip(nota, 300) });
     const results = [];
     for (const u of uses) {
       let out;
       const tt = Date.now();
+      emit({ e: "paso", id: u.id, tool: u.name, estado: "inicio", input: u.input || {} });
       try { out = await tool(sb, u.name, u.input, marca); } catch (e) { out = { error: String((e && e.message) || e) }; }
       run.anotar("herramienta:" + u.name, out && out.error ? "error" : "ok", Date.now() - tt, out && out.error ? { error: clip(typeof out.error === "string" ? out.error : JSON.stringify(out.error), 120) } : {});
       pasos.push(resumenPaso(u.name, out));
+      emit({ e: "paso", id: u.id, tool: u.name, estado: out && out.error ? "error" : "ok", resumen: resumenPaso(u.name, out), ms: Date.now() - tt });
       try { juntarRefs(R, u.name, out); } catch (_) { /* las referencias son un extra */ }
       if (out && out._fotos) out = { ...out, _fotos: undefined };
       results.push({ type: "tool_result", tool_use_id: u.id, content: JSON.stringify(out).slice(0, 18000) });
@@ -434,6 +442,21 @@ Deno.serve(async (req) => {
   }
   /* cada pregunta es una corrida en agent_runs: con sus llamadas a la IA y las herramientas que usó */
   const run = await Run.iniciar(sb, u.user.id, "manual:" + rol, { rol, orden: clip(body.orden, 24), mensajes: Array.isArray(body.messages) ? body.messages.length : 0, adjuntos: Array.isArray(body.attachments) ? body.attachments.length : 0 });
+  if (body.stream) {
+    /* en vivo: una línea JSON por evento (lo que va haciendo el cerebro) y al final la respuesta */
+    const enc = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(ctrl) {
+        const emit = (ev) => { try { ctrl.enqueue(enc.encode(JSON.stringify(ev) + "\n")); } catch (_) { /* el cliente se fue */ } };
+        let r;
+        try { r = await conversar(sb, body, rol, marca, run, emit); } catch (e) { r = { status: 500, body: { error: String((e && e.message) || e) } }; }
+        await run.cerrar(r.status === 200, { status: r.status, pasos: (r.body.pasos || []).length }, r.status === 200 ? undefined : String(r.body.error || "error"));
+        emit({ e: r.status === 200 ? "fin" : "error", status: r.status, ...r.body, run_id: run.id });
+        try { ctrl.close(); } catch (_) { /* cerrado */ }
+      },
+    });
+    return new Response(stream, { headers: { ...cors, "Content-Type": "application/x-ndjson", "Cache-Control": "no-cache" } });
+  }
   const r = await conversar(sb, body, rol, marca, run);
   await run.cerrar(r.status === 200, { status: r.status, pasos: (r.body.pasos || []).length }, r.status === 200 ? undefined : String(r.body.error || "error"));
   return json({ ...r.body, run_id: run.id }, r.status);
