@@ -2014,7 +2014,17 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 #svcTa{display:block;width:100%;min-height:52px;max-height:200px;resize:none;border:0;outline:0;background:transparent;padding:14px 18px 2px;font:inherit;font-size:15px;line-height:1.55;color:inherit}
 #svcTa::placeholder{color:var(--faint)}
 .svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1.5px dashed var(--fg);border-radius:16px;font-weight:500;pointer-events:none;z-index:4}.svc-chat.over .svc-drop{display:grid}
-.svc-g{grid-template-columns:minmax(0,1fr)!important}.svc-side{display:none!important}.svc-side--{display:flex;flex-direction:column;gap:12px}.svc-side>h4{margin:0;font-size:13px;color:var(--muted);font-weight:600}
+.svc-g{grid-template-columns:minmax(0,1fr) 260px!important}
+.svc-ck{position:sticky;top:12px;padding:18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
+.svc-ck h4{margin:0 0 12px;font-size:13px;font-weight:600;color:var(--muted)}
+.svc-ck ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.svc-ck li{display:flex;align-items:flex-start;gap:10px;padding:8px 6px;border-radius:10px;font-size:14px;line-height:1.4}
+.svc-cb{flex:none;width:20px;height:20px;border-radius:6px;border:1.5px solid var(--card-line);display:grid;place-items:center;margin-top:-1px}
+.svc-cb .ic{width:13px;height:13px;stroke-width:3}
+.svc-ck .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.svc-ck li.ok{color:var(--muted)}.svc-ck li.ok>span:nth-child(2){text-decoration:line-through;text-decoration-thickness:1.5px}
+.svc-ck li.ok .svc-cb{background:#1f8a4c;border-color:#1f8a4c;color:#fff}
+@media(max-width:980px){.svc-g{grid-template-columns:1fr!important}.svc-ck{position:static;order:-1}}
+.svc-side{display:none!important}.svc-side--{display:flex;flex-direction:column;gap:12px}.svc-side>h4{margin:0;font-size:13px;color:var(--muted);font-weight:600}
 .svc-side .sv-d{margin:0;padding:14px}.svc-side .sv-g{grid-template-columns:1fr 1fr}.svc-side .sv-h{gap:6px}.svc-side .sv-h h3{font-size:14px}.svc-side .sv-hb .bt{padding:5px 10px;font-size:12px}
 .svc-docs{display:flex;flex-direction:column;gap:10px}.svc-sec{padding:12px 14px;gap:8px}.svc-sec h3{font-size:13px}
 #exDoc .svc-sec .xd-list:empty::before{content:'Aún nada';display:block;font-size:12px;color:var(--muted)}
@@ -6382,7 +6392,7 @@ SVC.pasos=function(f){var L=FL.ES,i=f?FL.idx(f):0;return '<ol class="svc-st" ari
 SVC.cab=function(x){var f=x.flujo;return '<p class="svc-sig">'+(f?(f.etapa==='cerrado'?'Servicio cobrado. Todo listo.':'<b>Siguiente:</b> '+esc(f.siguiente||'')+(f.vence?' · '+esc(FL.vence(f.vence)):'')):'Calculando…')+'</p>'+SVC.pasos(f)};
 SVC.html=function(x){
   return '<div class="xd-in svc"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Servicios</button>'+
-    '<div class="svc-t"><h2>'+esc(x.wo||x.folio)+' <small>Servicio</small></h2><div id="svcCab">'+SVC.cab(x)+'</div></div>'+
+    '<div class="svc-t"><h2>'+esc(x.wo||x.folio)+' <small>Servicio</small></h2></div>'+
     (XDEL.puede(x)?'<div class="xd-acts"><button class="xd-del" type="button" data-xddel>Eliminar servicio</button></div>':'')+'</div>'+
     '<div class="svc-g"><section class="svc-chat" aria-label="Agente del servicio"><div class="svc-th" id="svcTh" aria-live="polite"><div class="svc-thi" id="svcThi"></div></div>'+
       '<form class="svc-dock" id="svcForm"><div class="composer svc-comp"><div class="card">'+
@@ -6390,6 +6400,7 @@ SVC.html=function(x){
       '<div class="c-foot"><button type="button" class="fb" data-svcclip aria-label="Subir archivos" title="Subir orden, fotos, factura o comprobante">'+svg('plus')+'</button><span class="sp"></span>'+
       '<button class="send" id="svcSend" type="submit" aria-label="Enviar" disabled>'+svg('up')+'</button></div></div></div>'+
       '<input type="file" id="svcFile" multiple hidden accept=".pdf,image/*,.xml"></form><div class="svc-drop" aria-hidden="true">Suéltalo y el agente lo revisa</div></section>'+
+    '<aside class="svc-ck" aria-label="Lista del servicio"><h4>Lista del servicio</h4><ol id="svcCk">'+SVC.ckHtml(x)+'</ol></aside>'+
     '<aside class="svc-side"><h4>Lo que sé de este servicio</h4>'+SVR.box(x)+
       '<div class="svc-docs">'+XD.SRV.map(function(d){return '<section class="xd-sec svc-sec" data-k="'+d[0]+'"><h3>'+esc(d[1])+'</h3><div class="xd-list"></div></section>'}).join('')+'</div></aside></div></div>';
 };
@@ -6422,7 +6433,16 @@ SVC.abrir=async function(x){
 };
 SVC.guardar=async function(){if(!SVC.conv)return;try{await SB.c.from('conversations').update({messages:SVC.msgs.slice(-60)}).eq('id',SVC.conv)}catch(e){console.warn('[servicio chat]',e)}};
 SVC.decir=function(role,txt){var m={role:role,content:String(txt).slice(0,3000)};SVC.msgs.push(m);return m};
-SVC.pintar=function(x){var c=$('#svcCab');if(c)c.innerHTML=SVC.cab(x);SVR.pintar(x);SVC.chips()};
+SVC.pintar=function(x){SVR.pintar(x);SVC.ck()};
+/* la lista fija: se marca sola con lo que ya está en el expediente */
+SVC.CK=[['factura','Facturarlo'],['planta','Cobrarlo'],['evidencia','Subir la evidencia completa del expediente'],['cerrado','Cerrado']];
+SVC.hecho=function(k){var l=document.querySelector('#exDoc .svc-sec[data-k="'+k+'"] .xd-list');return !!(l&&l.querySelector('.xd-row .xd-name[data-xdopen],.xd-row .xd-tick'))};
+SVC.ckHtml=function(x){
+  var h={};SVC.CK.forEach(function(c){if(c[0]!=='cerrado')h[c[0]]=SVC.hecho(c[0])});
+  h.cerrado=(x&&x.flujo&&x.flujo.etapa==='cerrado')||(h.factura&&h.planta&&h.evidencia);
+  return SVC.CK.map(function(c){var ok=h[c[0]];return '<li class="'+(ok?'ok':'')+'"><span class="svc-cb" aria-hidden="true">'+(ok?svg('check'):'')+'</span><span>'+esc(c[1])+'</span><span class="sr-only">'+(ok?' (hecho)':' (pendiente)')+'</span></li>'}).join('');
+};
+SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x)};
 SVC.enviar=async function(text){
   var x=SVC.x;text=String(text||'').trim();if(!x||!text||SVC.busy)return;SVC.busy=true;
   SVC.burb(SVC.decir('user',text));SVC.on();var w=SVC.pensando('Revisando lo que sé de este servicio');
@@ -6470,7 +6490,8 @@ XD.openSrv=function(x,el){
   el.innerHTML=SVC.html(x);
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   SVR.bloquear(true);SVR.pintarRef();XD.SRV.forEach(function(d){XD.load(x.id,d[0])});
-  SVC.abrir(x);FL.refresh(x).then(function(){if(XD.cur&&XD.cur.id===x.id){var c=$('#svcCab');if(c)c.innerHTML=SVC.cab(x);SVC.chips()}});
+  SVC.abrir(x);FL.refresh(x).then(function(){if(XD.cur&&XD.cur.id===x.id)SVC.ck()});
+  var dk=$('#exDoc .svc-docs');if(dk&&window.MutationObserver){if(SVC.mo)SVC.mo.disconnect();SVC.mo=new MutationObserver(function(){clearTimeout(SVC.mt);SVC.mt=setTimeout(SVC.ck,120)});SVC.mo.observe(dk,{childList:true,subtree:true})}
   var ta=$('#svcTa');if(ta)ta.focus();
 };
 XD.openSrvViejo=function(x,el){
