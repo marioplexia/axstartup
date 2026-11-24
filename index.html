@@ -1801,6 +1801,22 @@ button.dn-mk{width:100%;border:0;border-top:1px solid var(--card-line);backgroun
 .xd-mas{margin-top:16px;border:1px solid var(--line,#e5e7eb);border-radius:16px;padding:12px 16px}
 .xd-mas>summary{cursor:pointer;font-weight:600;font-size:14px;list-style:revert}.xd-mas>summary span{font-weight:400;color:var(--mut,#6b7280);font-size:12.5px;margin-left:6px}
 .xd-mas[open]>summary{margin-bottom:14px}
+.xd-body{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
+.xd-main{min-width:0}
+.xd-oculto{display:none}
+.xd-cont{position:sticky;top:12px;padding:18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
+.xd-cont h4{margin:0;font-size:15px;font-weight:600}.xd-cont-s{margin:4px 0 12px;font-size:12.5px;color:var(--muted);line-height:1.45}
+.xd-cont h5{margin:14px 0 6px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.xd-cont ul{list-style:none;margin:0;padding:0}
+.xd-ci summary{display:flex;align-items:flex-start;gap:10px;padding:7px 6px;border-radius:9px;cursor:pointer;list-style:none;font-size:13.5px}
+.xd-ci summary::-webkit-details-marker{display:none}.xd-ci summary:hover{background:var(--hover)}.xd-ci details.vacio summary{cursor:default}
+.xd-cb{flex:none;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--card-line);display:grid;place-items:center;margin-top:1px}
+.xd-ci.ok .xd-cb{background:#1f8a4c;border-color:#1f8a4c;color:#fff}.xd-cb .ic{width:11px;height:11px;stroke-width:3}
+.xd-cn{display:flex;flex-direction:column;min-width:0}.xd-cn small{color:var(--muted);font-size:11.5px}
+.xd-ci.falta .xd-cn small{color:#b07400}
+.xd-cf{padding:0 6px 6px 34px!important;display:flex;flex-direction:column;gap:2px}.xd-cf .xd-name{font-size:12.5px;text-align:left;background:none;border:0;padding:2px 0;color:var(--signal,#2231dd);cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.xd-cont-m{margin:10px 0 0;font-size:12px;color:var(--muted);line-height:1.45}
+@media(max-width:1000px){.xd-body{grid-template-columns:1fr}.xd-cont{position:static}}
 .xd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .xd-sec{display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
 .xd-sec h3{margin:0;font-size:14px;font-weight:600}
@@ -6993,7 +7009,7 @@ XD.open=function(id){
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts"><button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>'+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
-    FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
+    '<div class="xd-body"><div class="xd-main">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+XD.contHtml()+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
@@ -7002,6 +7018,34 @@ XD.open=function(id){
   XA.show(x.armado||null);
   FL.refresh(x);
   XD.formInit(x);
+  XD.contVer();
+};
+/* ══ Lo que contiene el expediente: una lista al lado, en vez de un apartado por sección ══
+   Las secciones siguen existiendo por dentro (ahí acomoda el agente cada documento); aquí solo se listan. */
+XD.contHtml=function(){
+  return '<aside class="xd-cont" aria-label="Contenido del expediente"><h4>Contenido del expediente</h4><p class="xd-cont-s" id="xdContS"></p><div id="xdCont"></div>'+
+    '<div class="xd-oculto" aria-hidden="true">'+XD.DOCS.map(function(d){return '<section class="xd-sec" data-k="'+d[0]+'"><div class="xd-list"></div></section>'}).join('')+'</div></aside>';
+};
+XD.contItem=function(d){
+  var sk=XD.sec(d[0]),rows=sk?[].slice.call(sk.querySelectorAll('.xd-row')):[],n=rows.length;
+  var arch=rows.map(function(r){var nm=r.querySelector('.xd-name');return nm?'<li>'+nm.outerHTML+'</li>':''}).join('');
+  var ref=String(d[2]||'').split(' · ')[0];
+  return '<li class="xd-ci '+(n?'ok':'falta')+'"><details'+(n?'':' class="vacio"')+'><summary><span class="xd-cb" aria-hidden="true">'+(n?svg('check'):'')+'</span><span class="xd-cn">'+esc(d[1])+'<small>'+(n?n+(n===1?' archivo':' archivos'):'Falta')+(ref?' · '+esc(ref):'')+'</small></span></summary>'+(n?'<ul class="xd-cf">'+arch+'</ul>':'')+'</details></li>';
+};
+XD.cont=function(){
+  var el=$('#xdCont');if(!el)return;
+  var g=function(t){return XD.DOCS.filter(function(d){return d[3]===t})},tiene=function(d){var sk=XD.sec(d[0]);return !!(sk&&sk.querySelector('.xd-row'))};
+  var req=g('req'),opt=g('opt'),cob=g('cob'),optSi=opt.filter(tiene),hechos=req.filter(tiene).length;
+  $('#xdContS').textContent=hechos===req.length?'Completo: tiene todo lo obligatorio del manual de GM.':'Lleva '+hechos+' de '+req.length+' documentos obligatorios. Sube todo junto a la izquierda: el agente lo acomoda.';
+  el.innerHTML='<h5>Obligatorios</h5><ul>'+req.map(XD.contItem).join('')+'</ul>'+
+    (optSi.length?'<h5>Según aplique</h5><ul>'+optSi.map(XD.contItem).join('')+'</ul>':'')+
+    '<p class="xd-cont-m">'+(opt.length-optSi.length)+' apartados más según aplique (PRA, batería, facturas de partes, TAC, mantenimientos, M2, WPC): aparecen aquí cuando el agente encuentra uno.</p>'+
+    '<h5>Cobranza</h5><ul>'+cob.map(XD.contItem).join('')+'</ul>';
+};
+XD.contVer=function(){
+  XD.cont();var oc=$('#exDoc .xd-oculto');if(!oc||!window.MutationObserver)return;
+  if(XD.contMo)XD.contMo.disconnect();XD.contMo=new MutationObserver(function(){clearTimeout(XD.contT);XD.contT=setTimeout(XD.cont,150)});
+  XD.contMo.observe(oc,{childList:true,subtree:true,characterData:true});
 };
 XD.close=function(){if(!XD.cur)return;if(XD.cur.tipo==='Servicio'&&S.view==='exp'){crumb.textContent=VIEWS.exp;crumbSep.hidden=true;crumb2.hidden=true}var car=XD.mode==='cartera',pv=XD.from==='pv',bx=XD.from==='bx',agv=XD.from==='agv';$('#exDoc').hidden=true;$(agv?'#viewAgv':bx?'#viewBx':pv?'#viewPv':car?'#viewCar':'#viewExp').hidden=false;XD.cur=null;XD.mode=null;XD.from=null;if(car)CAR.load();if(pv)PV.load(true);if(bx)BX.load();if(agv)AGV.load()};
 XD.sec=function(k){return $('#exDoc .xd-sec[data-k="'+k+'"]')};
@@ -7016,7 +7060,7 @@ XD.load=async function(id,k){
   if(ls.children.length){var op=ls.closest('details');if(op)op.open=true}
 };
 XD.refuse=function(k,msg){
-  var z=$('.xd-zone',XD.sec(k)),b=$('.xd-say b',z),old='Arrastra un archivo aquí';
+  var z=$('.xd-zone',XD.sec(k));if(!z){toast(msg);return}var b=$('.xd-say b',z),old='Arrastra un archivo aquí';
   z.removeAttribute('data-refuse');void z.offsetWidth;z.setAttribute('data-refuse','');b.textContent=msg;
   setTimeout(function(){z.removeAttribute('data-refuse');b.textContent=old},1800);
 };
