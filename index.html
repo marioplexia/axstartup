@@ -2017,6 +2017,41 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 #svcTa::placeholder{color:var(--faint)}
 .svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1.5px dashed var(--fg);border-radius:16px;font-weight:500;pointer-events:none;z-index:4}.svc-chat.over .svc-drop{display:grid}
 .svc-g{grid-template-columns:minmax(0,1fr) 260px!important}
+.ap .ad-head h2{font-family:var(--f-display);font-weight:500;font-size:clamp(28px,4vw,38px);letter-spacing:-.02em;margin:0}
+.ap .ad-head p{margin:6px 0 0;color:var(--muted);max-width:640px}
+.ap-tot{display:flex;align-items:center;gap:18px;padding:16px 18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);margin-bottom:16px}
+.ap-tot>div{display:flex;flex-direction:column;gap:2px;flex:none}.ap-tot span{color:var(--muted);font-size:13px}
+.ap-tot .ap-bar{flex:1}
+.ap-bar{display:block;height:6px;border-radius:99px;background:color-mix(in srgb,var(--fg,#111) 9%,transparent);overflow:hidden}.ap-bar i{display:block;height:100%;border-radius:99px;background:#1f8a4c;transition:width .4s}
+.ap-cert{display:flex;flex-direction:column;gap:2px;padding:16px 18px;border-radius:16px;margin-bottom:16px;background:linear-gradient(135deg,#2231dd,#6b79ff);color:#fff}.ap-cert span{opacity:.85;font-size:13px}
+.ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.ap-c{display:flex;flex-direction:column;gap:8px;text-align:left;padding:18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card);color:inherit;font:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.ap-c:hover{transform:translateY(-2px);box-shadow:0 10px 28px -16px rgba(0,0,0,.35)}
+.ap-c b{font-size:17px;line-height:1.3}.ap-d{color:var(--muted);font-size:13.5px;line-height:1.5;flex:1}
+.ap-ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--fill-slab)}.ap-ic .ic{width:18px;height:18px}
+.ap-num{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.ap-meta{font-size:12.5px;color:var(--muted)}.ap-go{font-size:13px;font-weight:600;margin-top:4px}
+.ap-back{margin:8px 0 16px}
+.ap-cur{display:grid;grid-template-columns:280px minmax(0,1fr);gap:28px;align-items:start}
+.ap-idx{position:sticky;top:12px;display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
+.ap-idx ol{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.ap-idx li button{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;padding:8px;border:0;border-radius:10px;background:none;color:inherit;font:inherit;font-size:13.5px;cursor:pointer}
+.ap-idx li button:hover{background:var(--hover)}.ap-idx li button[aria-current="true"]{background:var(--chip)}
+.ap-idx small{display:block;color:var(--muted);font-size:12px}
+.ap-ck{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:600;border:1.5px solid var(--card-line);color:var(--muted)}
+.ap-ck.ok{background:#1f8a4c;border-color:#1f8a4c;color:#fff}.ap-ck .ic{width:12px;height:12px;stroke-width:3}
+.ap-lec{max-width:720px}.ap-lec h2{font-family:var(--f-display);font-weight:500;font-size:clamp(26px,3.4vw,34px);letter-spacing:-.02em;margin:6px 0 16px}
+.ap-try{display:flex;align-items:center;gap:14px;margin:22px 0;padding:14px 16px;border-radius:14px;background:color-mix(in srgb,#2231dd 7%,var(--card));border:1px solid color-mix(in srgb,#2231dd 22%,var(--card-line))}
+.ap-try>span{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#2231dd;color:#fff}.ap-try>div{flex:1}.ap-try p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.ap-q{margin:22px 0;padding:18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}.ap-q>p{margin:6px 0 12px;font-size:15px}
+.ap-ops{display:flex;flex-direction:column;gap:8px}
+.ap-op{text-align:left;padding:11px 14px;border:1px solid var(--card-line);border-radius:12px;background:var(--bg);color:inherit;font:inherit;font-size:14px;cursor:pointer}
+.ap-op:hover:not(:disabled){border-color:var(--fg)}.ap-op.ok{border-color:#1f8a4c;background:rgba(31,138,76,.08)}.ap-op.mal{border-color:#d9534f;background:rgba(217,83,79,.07)}.ap-op:disabled{cursor:default}
+.ap-por{margin:12px 0 0;font-size:13.5px}.ap-por.ok{color:#1f8a4c}.ap-por.mal{color:#b0413d}
+.ap-nav{display:flex;justify-content:space-between;gap:10px;margin:8px 0 40px}
+.gp-ap .gp-api{display:grid;place-items:center;width:18px;height:18px;border-radius:5px;background:#2231dd;color:#fff}.gp-ap .gp-api .ic{width:12px;height:12px}
+.gp-ap{border:1px solid color-mix(in srgb,#2231dd 25%,var(--card-line));margin-bottom:6px}
+@media(max-width:860px){.ap-cur{grid-template-columns:1fr}.ap-idx{position:static}.ap-tot{flex-direction:column;align-items:stretch}}
 .act{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
 .act-h{display:inline-flex;align-items:center;gap:8px;max-width:100%;background:none;border:0;padding:3px 0;color:var(--muted);font:inherit;text-align:left;cursor:default}
 .act.fin .act-h{cursor:pointer}.act.fin .act-h:hover{color:var(--fg)}
@@ -2300,6 +2335,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <button class="nav" data-nm data-view="agent" data-i="file" aria-current="true">Agente de Garantías</button>
         <div class="grp" data-nm style="margin-top:22px">Sistema de registro</div>
         <button class="nav" data-nm data-view="inicio" data-i="home" aria-current="true">Inicio</button>
+        <button class="nav" data-nm data-view="aprende" data-i="present">Aprende Ax AI</button>
         <button class="nav" data-nm data-view="bx" data-i="inbox">Bandeja<span class="nbadge" id="bxBadge" hidden></span></button>
         <button class="nav" data-nm data-view="mi" data-i="chat">Mi Agente</button>
         <button class="nav" data-nm data-view="bitacora" data-i="clip">Bitácora</button>
@@ -2511,6 +2547,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div id="agvBody"></div>
       </div>
     </section>
+    <section class="admin ap" id="viewAp" hidden><div class="ad-in" id="apIn"></div></section>
     <section class="admin" id="viewBx" hidden>
       <div class="ad-in">
         <div class="ad-head"><div><h2>Bandeja</h2><p id="bxSub">Las decisiones que te tocan, con el riesgo de débito que calcula Ax AI</p></div></div>
@@ -2740,7 +2777,7 @@ $('#bell').addEventListener('click',function(){RED.f='alertas';showView('red')})
 
 /* secciones ocultas del menú lateral y del buscador (siguen existiendo; se pueden volver a mostrar quitándolas de aquí) */
 var OCULTAS=['cobros','cartera','bitacora','mi','red','pres'];
-var VIEWS={notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Bandeja',bx:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
+var VIEWS={aprende:'Aprende Ax AI',notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Bandeja',bx:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
@@ -2748,7 +2785,7 @@ function showView(id){
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():(v===id||(id==='red'&&v==='bx'));b.setAttribute('aria-current',on?'true':'false')});
   if(typeof BXT!=='undefined')BXT.sync(id);
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros')||document.body.classList.contains('asesor');$('#gp').hidden=!gpOn;if(typeof AS!=='undefined')AS.sync(id);if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='agv'||id==='cg'||id==='dueno';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewAgv').hidden=id!=='agv';$('#viewCg').hidden=id!=='cg';$('#viewDueno').hidden=id!=='dueno';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros')||document.body.classList.contains('asesor');$('#gp').hidden=!gpOn;if(typeof AS!=='undefined')AS.sync(id);if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='agv'||id==='cg'||id==='dueno'||id==='aprende';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewAgv').hidden=id!=='agv';$('#viewCg').hidden=id!=='cg';$('#viewAp').hidden=id!=='aprende';if(id==='aprende'&&typeof AP!=='undefined')AP.abrir();$('#viewDueno').hidden=id!=='dueno';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='pv'){crumb.textContent=VIEWS.pv;crumbSep.hidden=true;crumb2.hidden=true;PV.load()}
@@ -2756,6 +2793,7 @@ function showView(id){
   else if(id==='red'){crumb.textContent=VIEWS.red;crumbSep.hidden=true;crumb2.hidden=true;RED.load()}
   else if(id==='bx'){crumb.textContent=VIEWS.bx;crumbSep.hidden=true;crumb2.hidden=true;BX.render();BX.load()}
   else if(id==='agv'){crumb.textContent=VIEWS.agv;crumbSep.hidden=true;crumb2.hidden=true;AGV.load()}
+  else if(id==='aprende'){crumb.textContent=VIEWS.aprende;crumbSep.hidden=true;crumb2.hidden=true}
   else if(id==='cg'){crumb.textContent=VIEWS.cg;crumbSep.hidden=true;crumb2.hidden=true;CG.render();CG.load()}
   else if(id==='dueno'){crumb.textContent=VIEWS.dueno;crumbSep.hidden=true;crumb2.hidden=true;DN.load()}
   else if(id==='notas'){crumb.textContent=VIEWS.notas;crumbSep.hidden=true;crumb2.hidden=true;NT.open()}
@@ -6622,6 +6660,93 @@ SVC.ckHtml=function(x){
   h.cerrado=(x&&x.flujo&&x.flujo.etapa==='cerrado')||(h.factura&&h.planta&&h.evidencia);
   return SVC.CK.map(function(c){var ok=h[c[0]];return '<li class="'+(ok?'ok':'')+'"><span class="svc-cb" aria-hidden="true">'+(ok?svg('check'):'')+'</span><span>'+esc(c[1])+'</span><span class="sr-only">'+(ok?' (hecho)':' (pendiente)')+'</span></li>'}).join('');
 };
+/* ══ Aprende Ax AI: cursos de la plataforma para asesores de garantías ══
+   Cursos con lecciones cortas, un «Pruébalo» que te lleva al lugar de la plataforma y una pregunta de repaso.
+   El avance queda por usuario en aprendizaje_progreso (y en este navegador si no hay conexión). */
+var AP={c:null,l:null,hecho:{},cargado:false,resp:{}};
+AP.CURSOS=[
+ {id:'inicio',t:'Primeros pasos en Ax AI',d:'Qué es Ax AI, cómo está hecha tu pantalla y cómo abrir tu primera orden.',ic:'home',L:[
+  {id:'inicio-1',t:'Qué es Ax AI y el cerebro',min:3,md:'**Ax AI** es tu equipo de agentes de garantías. Todos comparten un mismo **cerebro**: lo que aprende una agencia de tu marca (reglas, rechazos de planta, pagos, precios de servicios) lo saben todos los agentes al instante.\n\n- El **Agente de Garantías** arma tus PREAs y su expediente.\n- El **cerebro de servicios** sabe cuánto se cobra cada servicio en tu grupo.\n- El **agente de cobros** sigue lo que planta paga.\n- Todos consultan el **manual de GM** y te citan la sección y la página.\n\nTu trabajo cambia: en lugar de llenar formatos, le platicas a tus agentes y les mandas la evidencia.',prueba:null,q:{p:'¿Qué pasa cuando otra agencia de tu marca recibe un rechazo de planta?',o:['Nada, cada agencia aprende sola','El cerebro lo aprende y tus agentes ya lo toman en cuenta','Te llega un correo para que lo copies'],ok:1,por:'El cerebro es compartido: lo que aprende una agencia lo usan todos los agentes de la marca.'}},
+  {id:'inicio-2',t:'Tu pantalla: órdenes y chat',min:3,md:'Tu pantalla tiene dos partes:\n\n1. **A la izquierda, tus órdenes.** Cada PREA, servicio o campaña es una orden con su propio chat. Búscalas por número o por queja.\n2. **Al centro, el chat de la orden.** Ahí platicas con los agentes, mandas archivos y ves lo que están haciendo en vivo.\n\nPuedes **ocultar la lista** con la ✕ y volver a abrirla con el botón de arriba a la izquierda. En celular la lista se abre como cajón.',prueba:{tx:'Abre la orden de simulación GA9999 y mira cómo se ve un chat',a:'sim'},q:{p:'¿Dónde encuentras el chat de una orden?',o:['En el menú de configuración','En la lista de órdenes de la izquierda','Solo en Expedientes'],ok:1,por:'Cada orden de la lista de la izquierda abre su propio chat.'}},
+  {id:'inicio-3',t:'Abrir una orden: PREA, servicio o campaña',min:4,md:'Con **+ Nueva** eliges qué vas a trabajar y escribes el **número de orden** (por ejemplo GA4043):\n\n- **PREA:** una reparación por garantía. El agente arma la PREA y su expediente con tu evidencia.\n- **Servicio:** mantenimiento o reparación sin garantía. No lleva PREA: se hace el servicio, se factura y se cobra, en un día.\n- **Campaña:** una campaña del fabricante. Tampoco lleva PREA.\n\nAl dar **Continuar**, Ax AI crea la conversación y el expediente de la orden, aunque estén en blanco.',prueba:{tx:'Abre una orden nueva',a:'nueva'},q:{p:'¿Qué tipo de orden NO lleva PREA?',o:['Una reparación por garantía','Un servicio de 6,000 km','Una falla de motor en garantía'],ok:1,por:'Los servicios y las campañas no llevan PREA; solo las reparaciones por garantía.'}}
+ ]},
+ {id:'prea',t:'Armar una PREA con el agente',d:'Sube todo de una vez y deja que el agente arme la PREA y el expediente según el manual de GM.',ic:'file',L:[
+  {id:'prea-1',t:'Sube todo de una vez',min:4,md:'No tienes que separar documentos. En el chat de la orden **arrastra todo junto**: orden de reparación, fotos, diagnóstico, cartas del escáner, pedido de piezas.\n\nEl agente **lee cada archivo**, separa las páginas y pone cada documento en su sección del expediente. Mientras trabaja ves la lista de pasos en vivo.\n\n> Consejo: entre más evidencia mandes al inicio, menos preguntas te hará el agente.',prueba:{tx:'Ve tus expedientes',a:'exp'},q:{p:'¿Cómo conviene mandar la evidencia de una PREA?',o:['Toda junta en el chat; el agente la acomoda','Un archivo por día','Escribirla a mano en el chat'],ok:0,por:'El agente lee y acomoda cada archivo en su sección; mándalo todo junto.'}},
+  {id:'prea-2',t:'Revisa la PREA antes de enviarla',min:4,md:'El agente arma la PREA con **códigos de queja, causa y corrección, operación, horas y piezas**, tomando lo que aprendió el cerebro.\n\nRevísala con calma:\n\n- Si algo no cuadra, **díselo en el chat** (por ejemplo: "la pieza es la bobina 2, no la 1").\n- Si cambió el caso, escribe **"arma la PREA otra vez"** con lo nuevo.\n- Fíjate en las **alertas de reglas**: te avisan qué ha rechazado planta en casos parecidos.',prueba:null,q:{p:'Si la PREA trae un dato mal, ¿qué haces?',o:['La borras y empiezas de cero','Le dices al agente qué corregir en el chat','La envías así y esperas a planta'],ok:1,por:'Corrígela platicando con el agente; si cambió todo, pídele que la arme otra vez.'}},
+  {id:'prea-3',t:'El expediente según el manual de GM',min:3,md:'Cada PREA lleva su **expediente** con las secciones que pide el manual de GM: orden firmada, recepción, diagnóstico, evidencia de la condición, refacciones, destrucción de partes y lo que aplique.\n\nEn **Expedientes** ves qué está completo y qué falta. El agente te avisa lo que falta antes de que planta lo pida.\n\nSolo **el asesor** envía. El dueño y el director pueden **pedir avance**, pero no enviar por ti.',prueba:{tx:'Abre Expedientes',a:'exp'},q:{p:'¿Quién puede enviar la PREA?',o:['El dueño del grupo','El director','El asesor de garantías'],ok:2,por:'Solo el asesor envía; dueño y director pueden pedir avance.'}}
+ ]},
+ {id:'servicios',t:'Servicios en un día',d:'Abre un servicio, manda la evidencia y ciérralo: facturado, cobrado y con su lista palomeada.',ic:'dollar',L:[
+  {id:'srv-1',t:'Abrir un servicio',min:2,md:'Elige **Servicio**, escribe la orden y da **Continuar**. No te pide texto ni evidencia: se abre directo el chat del servicio con su expediente en blanco.\n\nEl ciclo de un servicio es corto: **se hace el servicio, se factura y se cobra**, normalmente el mismo día.',prueba:{tx:'Abre una orden nueva',a:'nueva'},q:{p:'¿Qué necesitas para abrir un servicio?',o:['La PREA completa','Solo el número de orden','La factura'],ok:1,por:'Con el número de orden basta; lo demás se manda después en el chat.'}},
+  {id:'srv-2',t:'Manda archivos y mira la lista',min:4,md:'En el chat del servicio arrastra **la orden, las fotos, la factura o el comprobante de pago**. El cerebro los lee, saca el tipo de servicio, el vehículo, el kilometraje y el monto, y los guarda solo.\n\nA la derecha está la **Lista del servicio**:\n\n1. Facturarlo\n2. Cobrarlo\n3. Subir la evidencia completa del expediente\n4. Cerrado\n\nSe **palomea sola** con lo que vas mandando.',prueba:{tx:'Corre la simulación GA9999 completa',a:'sim'},q:{p:'¿Cómo se palomea la lista del servicio?',o:['La marcas tú a mano','Sola, con lo que el agente guarda en el expediente','La marca el director'],ok:1,por:'Cada archivo que el agente guarda palomea su punto de la lista.'}},
+  {id:'srv-3',t:'¿Cuánto cobro?',min:3,md:'Pregúntale al chat **"¿cuánto se cobra este servicio?"**. El cerebro de servicios te dice:\n\n- El precio **típico en tu grupo**, por agencia, con mínimo y máximo.\n- Lo que se cobra en **la red de la marca**.\n- Si tu factura quedó **arriba o abajo** de lo típico.\n\nSolo se comparten aprendizajes: los datos de tu grupo no se ven en otros grupos.',prueba:null,q:{p:'¿De dónde sale el precio de referencia?',o:['De lo que se ha cobrado en tu grupo y en la red','De una lista fija de GM','Del cliente'],ok:0,por:'El cerebro aprende de lo que se cobra en tu grupo y en la red de la marca.'}}
+ ]},
+ {id:'cerebro',t:'Platicar con el cerebro',d:'Pregunta como a un compañero y aprovecha sus referencias: manual, reglas, casos, fotos y precios.',ic:'chat',L:[
+  {id:'cer-1',t:'Cómo preguntar',min:3,md:'Pregunta como le preguntarías a un compañero con experiencia:\n\n- "¿Qué evidencia pide planta para esta falla?"\n- "¿Cuántas horas lleva el cambio de bobina?"\n- "¿Por qué rechazaron casos parecidos?"\n\nEntre más contexto (modelo, año, km, pieza), mejor la respuesta. **No escribas datos personales** del cliente: no hacen falta.',prueba:{tx:'Abre una orden y hazle una pregunta',a:'nueva'},q:{p:'¿Qué NO debes escribir en el chat?',o:['El modelo y el kilometraje','Los datos personales del cliente','La pieza que falló'],ok:1,por:'Los datos personales no hacen falta; el cerebro trabaja con la falla, el vehículo y la evidencia.'}},
+  {id:'cer-2',t:'Mira lo que hacen los agentes',min:2,md:'Mientras el cerebro contesta ves en vivo **"Trabajando · Manual GM · 8s"** y la lista de pasos: qué agente hace qué, qué buscó y qué encontró.\n\nAl terminar se pliega en **"Revisó 5 fuentes con 3 agentes"**. Dale clic para ver todo lo que revisó: así sabes de dónde salió la respuesta.',prueba:{tx:'Mira a los agentes trabajar en la simulación',a:'sim'},q:{p:'¿Para qué sirve la lista de pasos?',o:['Para saber de dónde salió la respuesta','Para cambiar de agencia','Para borrar la orden'],ok:0,por:'Te muestra qué revisó cada agente para que confíes en la respuesta.'}},
+  {id:'cer-3',t:'Referencias, fotos y ejemplos',min:3,md:'Debajo de cada respuesta aparecen tarjetas con lo que el cerebro **citó**:\n\n- **Manual GM:** sección y página; ábrela para leer el fragmento.\n- **Regla:** operación, horas, aceptadas y rechazos.\n- **Caso real:** qué dijo planta en un caso parecido.\n- **Fotos de ejemplo:** de expedientes de tu agencia o grupo; tócalas para verlas grandes.\n- **Cerebro de servicios:** el precio típico.',prueba:null,q:{p:'¿Qué muestra una tarjeta de Manual GM?',o:['El teléfono de planta','La sección y página del manual que se citó','El precio de la pieza'],ok:1,por:'Te dice la sección y página exacta, y puedes abrirla para leer el fragmento.'}}
+ ]},
+ {id:'expedientes',t:'Expedientes y etapas',d:'Sigue cada PREA desde que se sube hasta que se cobra, como en un tablero.',ic:'folderopen',L:[
+  {id:'exp-1',t:'Las etapas de una PREA',min:3,md:'En **Expedientes → PREAs** cada PREA va en una etapa:\n\n1. PREA por subir\n2. En proceso\n3. Aceptada\n4. Esperando pieza\n5. Cambiando pieza\n6. Facturada\n7. Cobrada\n\nPuedes **arrastrar** una PREA a otra etapa o usar su menú para moverla.',prueba:{tx:'Abre Expedientes',a:'exp'},q:{p:'¿Qué etapa sigue después de «Aceptada» si falta la refacción?',o:['Cobrada','Esperando pieza','PREA por subir'],ok:1,por:'Si la pieza no ha llegado, la PREA pasa a Esperando pieza.'}},
+  {id:'exp-2',t:'Servicios y campañas en Expedientes',min:2,md:'Las pestañas **Servicios** y **Campañas** guardan los expedientes que no llevan PREA. Al abrir uno llegas a su chat con la lista a la derecha.\n\nSi una orden se abrió por error, el asesor puede **eliminarla** desde su pantalla.',prueba:{tx:'Ve tus servicios',a:'srv'},q:{p:'¿Dónde quedan los expedientes de servicios?',o:['En Expedientes → Servicios','En Notas','No se guardan'],ok:0,por:'Cada servicio tiene su expediente en la pestaña Servicios.'}}
+ ]},
+ {id:'bandeja',t:'Bandeja, alertas y reglas',d:'Lo que te toca decidir, los avisos del cerebro y lo que pide tu dueño o director.',ic:'inbox',L:[
+  {id:'bx-1',t:'La bandeja compartida',min:3,md:'La **Bandeja** junta lo que te toca decidir, con el **riesgo de débito** que calcula Ax AI. La comparten el asesor, posventa, el director y el dueño: todos ven lo mismo.\n\nCuando el dueño o el director te piden **avance** de una orden, te llega ahí. Respóndeles desde la orden.',prueba:{tx:'Abre tu Bandeja',a:'bx'},q:{p:'¿Quién ve la bandeja?',o:['Solo el asesor','El asesor, posventa, el director y el dueño','Nadie más que planta'],ok:1,por:'La bandeja es compartida para que todos sepan cómo va cada orden.'}},
+  {id:'bx-2',t:'Alertas de reglas',min:2,md:'Las **alertas** te avisan antes de que pase algo: un rechazo de planta en un caso parecido, una PREA que se está atorando o un plazo que vence.\n\nLas encuentras en la pestaña **Alertas** de la Bandeja y en la campanita.',prueba:{tx:'Abre tu Bandeja',a:'bx'},q:{p:'¿Para qué sirven las alertas?',o:['Para avisarte antes de que haya un problema','Para cambiar tu contraseña','Para crear campañas'],ok:0,por:'Te avisan de riesgos y plazos antes de que se conviertan en un débito.'}}
+ ]}
+];
+AP.todas=function(){var L=[];AP.CURSOS.forEach(function(c){c.L.forEach(function(l){L.push(l)})});return L};
+AP.n=function(c){return c.L.filter(function(l){return AP.hecho[l.id]}).length};
+AP.total=function(){var t=AP.todas();return {h:t.filter(function(l){return AP.hecho[l.id]}).length,n:t.length}};
+AP.key=function(){return 'ax_aprende_'+(ME||'yo')};
+AP.cargar=async function(){
+  try{var j=JSON.parse(localStorage.getItem(AP.key())||'{}');Object.assign(AP.hecho,j)}catch(_){}
+  if(SB.c&&SB.entered){try{var r=await SB.c.from('aprendizaje_progreso').select('leccion');if(!r.error)(r.data||[]).forEach(function(x){AP.hecho[x.leccion]=true})}catch(_){}}
+  AP.cargado=true;
+};
+AP.marcar=async function(l,c){
+  AP.hecho[l.id]=true;try{localStorage.setItem(AP.key(),JSON.stringify(AP.hecho))}catch(_){}
+  if(SB.c&&SB.entered){try{await SB.c.from('aprendizaje_progreso').upsert({leccion:l.id,curso:c.id,quiz_ok:true},{onConflict:'user_id,leccion'})}catch(e){console.warn('[aprende]',e)}}
+  if(typeof GP!=='undefined'&&GP.render)GP.render();
+};
+AP.abrir=async function(){if(!AP.cargado)await AP.cargar();AP.pintar()};
+AP.barra=function(h,n){var p=n?Math.round(h*100/n):0;return '<span class="ap-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+p+'"><i style="width:'+p+'%"></i></span>'};
+AP.pintar=function(){var el=$('#apIn');if(!el)return;
+  if(!AP.c){var T=AP.total(),fin=T.h===T.n;
+    el.innerHTML='<div class="ad-head"><div><h2>Aprende Ax AI</h2><p>Cursos cortos para sacarle todo el provecho a tus agentes. Cada lección dura unos minutos y tiene una pregunta de repaso.</p></div></div>'+
+      '<div class="ap-tot"><div><b>'+T.h+' de '+T.n+' lecciones</b><span>'+(fin?'¡Completaste todos los cursos!':'Tu avance se guarda solo')+'</span></div>'+AP.barra(T.h,T.n)+'</div>'+
+      (fin?'<div class="ap-cert"><b>Asesor certificado en Ax AI</b><span>'+esc((SB.user&&SB.user.name)||'')+' · '+new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+'</span></div>':'')+
+      '<div class="ap-grid">'+AP.CURSOS.map(function(c,i){var h=AP.n(c),n=c.L.length,min=c.L.reduce(function(a,l){return a+l.min},0);
+        return '<button type="button" class="ap-c" data-apc="'+c.id+'"><span class="ap-ic">'+svg(c.ic)+'</span><span class="ap-num">Curso '+(i+1)+'</span><b>'+esc(c.t)+'</b><span class="ap-d">'+esc(c.d)+'</span>'+
+          '<span class="ap-meta">'+n+' lecciones · '+min+' min</span>'+AP.barra(h,n)+'<span class="ap-go">'+(h===n?'Repasar':h?'Continuar ('+h+'/'+n+')':'Empezar')+' →</span></button>'}).join('')+'</div>';
+    return}
+  var c=AP.c,l=AP.l||c.L.filter(function(x){return !AP.hecho[x.id]})[0]||c.L[0];AP.l=l;var i=c.L.indexOf(l),r=AP.resp[l.id];
+  el.innerHTML='<button type="button" class="xd-back ap-back" data-apback>← Cursos</button>'+
+    '<div class="ap-cur"><aside class="ap-idx"><span class="ap-num">'+esc(c.t)+'</span>'+AP.barra(AP.n(c),c.L.length)+'<ol>'+c.L.map(function(x,k){return '<li><button type="button" data-apl="'+x.id+'"'+(x===l?' aria-current="true"':'')+'><span class="ap-ck'+(AP.hecho[x.id]?' ok':'')+'">'+(AP.hecho[x.id]?svg('check'):(k+1))+'</span><span>'+esc(x.t)+'<small>'+x.min+' min</small></span></button></li>'}).join('')+'</ol></aside>'+
+    '<article class="ap-lec"><span class="ap-num">Lección '+(i+1)+' de '+c.L.length+' · '+l.min+' min</span><h2>'+esc(l.t)+'</h2><div class="ai-body ap-md">'+md(l.md,false)+'</div>'+
+    (l.prueba?'<div class="ap-try"><span>'+svg('chat')+'</span><div><b>Pruébalo en Ax AI</b><p>'+esc(l.prueba.tx)+'</p></div><button type="button" class="bt" data-aptry="'+l.prueba.a+'">Ir ahora</button></div>':'')+
+    '<div class="ap-q"><b>Repaso</b><p>'+esc(l.q.p)+'</p><div class="ap-ops" role="radiogroup">'+l.q.o.map(function(o,k){var cls=r==null?'':k===l.q.ok?' ok':k===r?' mal':'';return '<button type="button" role="radio" aria-checked="'+(r===k)+'" class="ap-op'+cls+'" data-apr="'+k+'"'+(r===l.q.ok?' disabled':'')+'>'+esc(o)+'</button>'}).join('')+'</div>'+
+      (r==null?'':'<p class="ap-por '+(r===l.q.ok?'ok':'mal')+'">'+(r===l.q.ok?'¡Correcto! ':'Casi. ')+esc(l.q.por)+'</p>')+'</div>'+
+    '<div class="ap-nav">'+(i>0?'<button type="button" class="bt" data-apl="'+c.L[i-1].id+'">← Anterior</button>':'<span></span>')+
+      '<button type="button" class="bt pri" data-apsig'+(r===l.q.ok||AP.hecho[l.id]?'':' disabled title="Contesta el repaso para seguir"')+'>'+(i<c.L.length-1?'Completar y seguir →':'Terminar curso ✓')+'</button></div></article></div>';
+};
+AP.ir=function(a){
+  if(a==='sim'){SIM.abrir(false);return}
+  if(a==='nueva'){showView('agent');var b=$('#gpNew')||$('#newChat');if(b)b.click();return}
+  if(a==='exp'){if(typeof EX!=='undefined')EX.f='prea';showView('exp');return}
+  if(a==='srv'){if(typeof EX!=='undefined')EX.f='srv';showView('exp');return}
+  if(a==='bx'){showView('bx');return}
+};
+document.addEventListener('click',async function(e){var t=e.target;if(!t.closest)return;
+  var n=t.closest('[data-apnav]');if(n){e.stopPropagation();AP.c=null;AP.l=null;showView('aprende');if(typeof AS!=='undefined')AS.drawer(false);return}
+  if(!t.closest('#viewAp'))return;
+  var c=t.closest('[data-apc]');if(c){AP.c=AP.CURSOS.filter(function(x){return x.id===c.dataset.apc})[0];AP.l=null;AP.pintar();$('#viewAp').scrollTop=0;window.scrollTo(0,0);return}
+  if(t.closest('[data-apback]')){AP.c=null;AP.l=null;AP.pintar();return}
+  var l=t.closest('[data-apl]');if(l&&AP.c){AP.l=AP.c.L.filter(function(x){return x.id===l.dataset.apl})[0];AP.pintar();return}
+  var r=t.closest('[data-apr]');if(r&&AP.l){AP.resp[AP.l.id]=+r.dataset.apr;AP.pintar();return}
+  var y=t.closest('[data-aptry]');if(y){AP.ir(y.dataset.aptry);return}
+  if(t.closest('[data-apsig]')&&AP.c&&AP.l){var cc=AP.c,ll=AP.l,k=cc.L.indexOf(ll);await AP.marcar(ll,cc);
+    if(k<cc.L.length-1){AP.l=cc.L[k+1];AP.pintar()}else{toast('Terminaste «'+cc.t+'»');AP.c=null;AP.l=null;AP.pintar()}}
+},true);
 /* ══ Simulación: una orden de prueba (GA9999) que se juega sola, sin tocar la base ══ */
 var SIM={on:false};
 SIM.x=function(){return {id:'sim-servicio',folio:'SRV-GA9999',wo:'GA9999',tipo:'Servicio',demo:true,status:'borrador',sys:null,vehicle:null,km:null,labor:0,parts_total:0,flujo:{etapa:'servicio',siguiente:'Hacer el servicio y subir la evidencia'}}};
@@ -6681,10 +6806,11 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   if(t.closest('[data-svcsim]')){SIM.run();return}
   if(t.closest('[data-svcdemo]')){e.stopPropagation();SIM.abrir(false)}
 },true);
-document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-svcdemo]')){e.preventDefault();e.stopPropagation();SIM.abrir(false)}},true);
+document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-apnav]')){e.preventDefault();e.target.closest('[data-apnav]').click();return}if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-svcdemo]')){e.preventDefault();e.stopPropagation();SIM.abrir(false)}},true);
 /* la orden de simulación, fija arriba de la lista de órdenes */
 (function(){var r0=GP.render;GP.render=function(){r0.apply(this,arguments);var b=$('#gpList');if(!b||GP.ag()==='cobros')return;
-  b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>')}})();
+  var T=AP.total();b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-ap" role="listitem" tabindex="0" data-apnav'+(S.view==='aprende'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('present','sm')+'</span><span>Aprende Ax AI</span><span class="gp-x">'+T.h+'/'+T.n+'</span></div><div class="gp-q">Cursos de la plataforma para asesores</div></div>');
+  b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild)}})();
 SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x)};
 SVC.ACC='<div class="ai-actions"><button class="fb" type="button" data-sva="copy" aria-label="Copiar">'+svg('copy','sm')+'</button><button class="fb" type="button" data-sva="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button><button class="fb" type="button" data-sva="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button></div>';
 SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div>'+SVC.ACC+'</div>';$('.ai-actions',d).hidden=true;$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
