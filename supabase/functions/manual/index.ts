@@ -20,7 +20,7 @@ function fileBlock(f) {
   return { type: f.media_type === "application/pdf" ? "document" : "image", source: { type: "base64", media_type: f.media_type, data: f.data } };
 }
 
-const norm = (t) => String(t ?? "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const norm = (t) => String(t ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 const STOP = new Set(["para", "como", "esta", "este", "esos", "unos", "unas", "pero", "tiene", "tengo", "sobre", "cuando", "donde", "porque", "algo", "quiero", "puedes", "dime", "prea", "que", "con", "los", "las", "del", "una", "por"]);
 const palabras = (t) => [...new Set(norm(t).split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !STOP.has(w)))].slice(0, 8);
 function hace(ts) {
@@ -64,6 +64,12 @@ CÓMO RESPONDES:
 - Si el manual no tiene algo, dilo con claridad ("todavía no he aprendido eso") y qué haría falta enseñarle. No inventes códigos, tiempos, piezas, precios, plazos, requisitos ni respuestas de planta.
 - Si adjuntan una PREA o captura, léela y compárala contra el manual y la política: qué coincide, qué difiere, qué falta del expediente y cómo corregirla.
 
+IMÁGENES, EJEMPLOS Y REFERENCIAS:
+- Debajo de tu respuesta se muestran solas, como tarjetas, las fuentes que CITES (sección y página del manual, regla R-0000, folio o archivo de un ejemplo, vehículo de un caso) y las fotos que traigas con "fotos_ejemplo". Cítalas con exactitud para que aparezcan; nunca pegues enlaces ni rutas.
+- Si una imagen ayuda (cómo debe verse la evidencia, el odómetro, la pieza, la recepción, la destrucción de partes, un servicio terminado), usa "fotos_ejemplo" y menciona en una línea qué muestran. Si no hay fotos, no lo menciones.
+- Para precios de un servicio de mantenimiento usa "precio_servicio" (lo que cobra el grupo y la red de la marca).
+- Cuando sirva, da un ejemplo concreto: un caso real parecido, cómo redactarlo o cómo se ve bien hecho.
+
 FORMATO DE LA RESPUESTA (para que se lea de un vistazo):
 - Empieza con la respuesta directa en 1 o 2 líneas, con lo más importante en **negritas**.
 - Luego ordena el detalle bajo mini subtítulos con "### " (de 2 a 4 palabras; máximo 4), por ejemplo "### Lo que pide GM", "### Lo que sé", "### Qué cuidar", "### Evidencia", "### Qué dijo planta", "### Siguiente paso". Usa solo los que hagan falta.
@@ -91,6 +97,8 @@ const TOOLS = [
   { name: "catalogo_operaciones", description: "Códigos de operación de mano de obra con su descripción y tiempo, por sistema, tomados de las reglas y de los documentos enseñados.", input_schema: { type: "object", properties: { sistema: { type: "string" }, texto: { type: "string" } } } },
   { name: "actividad_reciente", description: "Qué aprendió el cerebro en los últimos N minutos: lecciones nuevas, respuestas de planta, documentos enseñados, pagos, reglas tocadas y estado de la cola.", input_schema: { type: "object", properties: { minutos: { type: "integer", description: "por defecto 60" } } } },
   { name: "buscar_ejemplos", description: "Busca PREAs y pagos enseñados desde PDF/imagen (antecedentes) por texto: busca en el nombre del archivo, el resumen, las lecciones y todos los datos leídos. Devuelve resúmenes con su id.", input_schema: { type: "object", properties: { texto: { type: "string" }, tipo: { type: "string", enum: ["prea", "pago"] }, resultado: { type: "string", enum: ["aceptada", "rechazada", "pendiente", "pagada"] } }, required: ["texto"] } },
+  { name: "fotos_ejemplo", description: "Fotos reales de expedientes que el usuario puede ver (su agencia o su grupo) para mostrar como ejemplo: evidencia de la condición, recepción, odómetro, piezas, destrucción de partes o un servicio terminado. Filtra por sistema (Motor, Frenos…), tipo de servicio (\"Servicio 6,000 km\") o texto de la queja, y por sección del expediente. Las fotos se muestran debajo de tu respuesta.", input_schema: { type: "object", properties: { sistema: { type: "string" }, tipo_servicio: { type: "string" }, texto: { type: "string" }, seccion: { type: "string", enum: ["evidencia", "recepcion", "diagnostico", "piezas", "destruccion", "bateria", "mantenimiento", "tac"] }, limite: { type: "integer" } } } },
+  { name: "precio_servicio", description: "Lo que se cobra por un servicio de mantenimiento o reparación sin garantía (por ejemplo \"Servicio 6,000 km\", \"Afinación mayor\"): mediana, mínimo y máximo en el grupo por agencia y en la red de la marca.", input_schema: { type: "object", properties: { tipo: { type: "string" } }, required: ["tipo"] } },
   { name: "ver_ejemplo", description: "Detalle completo de un documento enseñado (campos, piezas, comentarios, errores, lecciones).", input_schema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] } },
 ];
 
@@ -232,6 +240,37 @@ async function tool(sb, name, a, marca = true) {
     }).filter((o) => o.s > 0).sort((p, q2) => q2.s - p.s).map((o) => o.d);
     return { total: rows.length, ejemplos: conHace(rows.slice(0, 8).map((d) => ({ id: d.id, tipo: d.kind, archivo: d.file_name, folio: d.folio, vehiculo: d.vehiculo, sistema: d.sys, operacion: d.op, resultado: d.resultado, resumen: clip(d.resumen, 400), lecciones: clip(d.lecciones, 300), created_at: d.created_at }))) };
   }
+  if (name === "fotos_ejemplo") {
+    /* solo expedientes que el usuario puede ver (RLS); las fotos se firman en la pantalla */
+    let q = sb.from("expedientes").select("id,folio,wo,tipo,sys,vehicle,queja").order("updated_at", { ascending: false }).limit(40);
+    if (a.tipo_servicio) q = q.eq("tipo", "Servicio").ilike("sys", "%" + clip(a.tipo_servicio, 40).replace(/[%_]/g, "") + "%");
+    else if (a.sistema) q = q.ilike("sys", "%" + clip(a.sistema, 40).replace(/[%_]/g, "") + "%");
+    const r = await q;
+    if (r.error) return { error: r.error.message };
+    const w = palabras(a.texto);
+    let exps = r.data || [];
+    if (w.length) exps = exps.map((e) => ({ e, s: w.filter((k) => norm([e.queja, e.sys, e.vehicle, e.folio].join(" ")).includes(k)).length })).sort((p, q2) => q2.s - p.s).map((o) => o.e);
+    const secs = a.seccion ? [a.seccion] : (a.tipo_servicio ? ["evidencia"] : ["evidencia", "recepcion", "piezas", "diagnostico"]);
+    const lim = Math.min(Math.max(parseInt(a.limite) || 4, 1), 6), fotos = [];
+    for (const e of exps.slice(0, 10)) {
+      for (const sec of secs) {
+        if (fotos.length >= lim) break;
+        const l = await sb.storage.from("expedientes-docs").list(e.id + "/" + sec, { limit: 20 });
+        for (const f of l.data || []) {
+          if (fotos.length >= lim) break;
+          if (!f.id || !/\.(jpe?g|png|webp|gif)$/i.test(f.name)) continue;
+          fotos.push({ path: e.id + "/" + sec + "/" + f.name, folio: e.folio || e.wo, seccion: sec, sistema: e.sys, vehiculo: e.vehicle });
+        }
+      }
+      if (fotos.length >= lim) break;
+    }
+    return { total: fotos.length, fotos: fotos.map((f) => ({ folio: f.folio, seccion: f.seccion, sistema: f.sistema, vehiculo: f.vehiculo })), _fotos: fotos, nota: fotos.length ? "Las fotos se muestran debajo de tu respuesta." : "No hay fotos de ejemplo todavía." };
+  }
+  if (name === "precio_servicio") {
+    const r = await sb.rpc("servicios_referencia", { p_tipo: clip(a.tipo, 80) });
+    if (r.error) return { error: r.error.message };
+    return { referencia: r.data };
+  }
   if (name === "ver_ejemplo") {
     if (!UUID_RE.test(String(a.id))) return { error: "id inválido" };
     const r = await sb.from("entrenamiento_docs").select("id,kind,folio,wo,vehiculo,sys,op,resultado,resumen,lecciones,datos,created_at").eq("id", a.id).single();
@@ -291,7 +330,43 @@ function resumenPaso(name, out) {
   if (name === "actividad_reciente") return "actividad reciente · " + n(out.lecciones) + " lecciones";
   if (name === "manual_resumen") return "resumen del manual";
   if (name === "buscar_ejemplos") return "ejemplos · " + n(out.ejemplos);
+  if (name === "fotos_ejemplo") return "fotos de ejemplo · " + n(out.fotos);
+  if (name === "precio_servicio") return "precio del servicio";
   return name;
+}
+
+/* ── referencias que se muestran debajo de la respuesta ── */
+function juntarRefs(R, name, out) {
+  if (!out || out.error) return;
+  const man = (p) => p && R.manual.set(p.seccion + "|" + p.fuente, { tipo: "manual", fuente: p.fuente, seccion: p.seccion, titulo: p.titulo, pagina: p.pagina, cita: p.cita, extracto: clip(p.texto, 600) });
+  const reg = (x) => x && R.regla.set(x.id, { tipo: "regla", id: x.id, sistema: x.sistema, operacion: x.operacion, descripcion: x.operacion_desc, horas: x.horas, aceptadas: x.aceptadas, rechazos: x.rechazos });
+  const cas = (x) => x && R.caso.push({ tipo: "caso", vehiculo: x.vehiculo, km: x.km, sistema: x.sistema, estado: x.estado, operacion: x.operacion, horas: x.horas_finales || x.horas, comentario: clip(x.comentario_de_planta, 300), texto: clip(x.texto_del_caso, 200) });
+  const eje = (x) => x && R.ejemplo.set(x.id, { tipo: "ejemplo", archivo: x.archivo, folio: x.folio, vehiculo: x.vehiculo, sistema: x.sistema, resultado: x.resultado, resumen: clip(x.resumen, 300) });
+  if (name === "buscar_todo") { (out.politica_oficial_gm || []).forEach(man); (out.reglas || []).forEach(reg); (out.casos_planta || []).forEach(cas); (out.documentos_ensenados || []).forEach(eje); }
+  if (name === "buscar_politicas") (out.secciones || []).forEach(man);
+  if (name === "ver_politica" && out.seccion) man(out.seccion);
+  if (name === "buscar_reglas") (out.reglas || []).forEach(reg);
+  if (name === "ver_regla") { reg(out.regla); (out.casos_reales || []).forEach(cas); }
+  if (name === "casos_planta") (out.casos || []).forEach(cas);
+  if (name === "buscar_ejemplos") (out.ejemplos || []).forEach(eje);
+  if (name === "ver_ejemplo" && out.ejemplo) eje({ ...out.ejemplo, archivo: out.ejemplo.file_name, sistema: out.ejemplo.sys });
+  if (name === "fotos_ejemplo") for (const f of out._fotos || []) if (!R.fotos.some((g) => g.path === f.path)) R.fotos.push(f);
+  if (name === "precio_servicio" && out.referencia && out.referencia.grupo) R.precio = { tipo: "precio", ...out.referencia };
+}
+function refsCitadas(R, text) {
+  const t = norm(text), refs = [];
+  const esta = (v) => { const k = norm(v).trim(); return k.length >= 3 && t.includes(k); };
+  for (const m of R.manual.values()) {
+    const sec = String(m.seccion || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if ((sec && (/\./.test(m.seccion) ? new RegExp("(^|[^0-9.])" + sec + "([^0-9]|$)") : new RegExp("seccion\\s*" + sec + "\\b")).test(t)) || (m.pagina && new RegExp("pag\\.?\\s*" + m.pagina + "\\b").test(t))) refs.push(m);
+  }
+  for (const g of R.regla.values()) if (esta(g.id)) refs.push(g);
+  for (const e of R.ejemplo.values()) if ((e.folio && esta(e.folio)) || (e.archivo && esta(e.archivo))) refs.push(e);
+  const casos = R.caso.filter((c) => c.vehiculo && esta(c.vehiculo) || (c.comentario && esta(c.comentario.slice(0, 40))));
+  refs.push(...casos.slice(0, 3));
+  if (R.precio) refs.push(R.precio);
+  for (const f of R.fotos.slice(0, 6)) refs.push({ tipo: "foto", ...f });
+  return refs.slice(0, 14);
 }
 
 async function conversar(sb, body, rol, marca, run) {
@@ -310,6 +385,7 @@ async function conversar(sb, body, rol, marca, run) {
     last.content = [...adj, { type: "text", text: last.content + "\n\n(Se adjuntaron " + adj.length + " archivo(s))" }];
   }
   const pasos = [];
+  const R = { manual: new Map(), regla: new Map(), caso: [], ejemplo: new Map(), fotos: [], precio: null };
   for (let i = 0; i < 8; i++) {
     const ti = Date.now();
     /* los reintentos no pasan de ~110 s en total: la función tiene un límite de tiempo */
@@ -319,7 +395,7 @@ async function conversar(sb, body, rol, marca, run) {
     if (r.error) return { status: r.error === "ai_not_configured" ? 503 : 502, body: { error: r.error } };
     const content = r.data.content || [];
     const uses = content.filter((b) => b.type === "tool_use");
-    if (r.data.stop_reason !== "tool_use" || !uses.length) return { status: 200, body: { text: content.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim(), pasos } };
+    if (r.data.stop_reason !== "tool_use" || !uses.length) { const text = content.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim(); return { status: 200, body: { text, pasos, refs: refsCitadas(R, text) } }; }
     messages.push({ role: "assistant", content });
     const results = [];
     for (const u of uses) {
@@ -328,6 +404,8 @@ async function conversar(sb, body, rol, marca, run) {
       try { out = await tool(sb, u.name, u.input, marca); } catch (e) { out = { error: String((e && e.message) || e) }; }
       run.anotar("herramienta:" + u.name, out && out.error ? "error" : "ok", Date.now() - tt, out && out.error ? { error: clip(typeof out.error === "string" ? out.error : JSON.stringify(out.error), 120) } : {});
       pasos.push(resumenPaso(u.name, out));
+      try { juntarRefs(R, u.name, out); } catch (_) { /* las referencias son un extra */ }
+      if (out && out._fotos) out = { ...out, _fotos: undefined };
       results.push({ type: "tool_result", tool_use_id: u.id, content: JSON.stringify(out).slice(0, 18000) });
     }
     messages.push({ role: "user", content: results });

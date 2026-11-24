@@ -2015,6 +2015,23 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 #svcTa::placeholder{color:var(--faint)}
 .svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1.5px dashed var(--fg);border-radius:16px;font-weight:500;pointer-events:none;z-index:4}.svc-chat.over .svc-drop{display:grid}
 .svc-g{grid-template-columns:minmax(0,1fr) 260px!important}
+.rf{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.rf-fs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.rf-f{flex:none;width:148px;border:1px solid var(--card-line);border-radius:12px;overflow:hidden;background:var(--card);padding:0;cursor:zoom-in;text-align:left;color:inherit}
+.rf-f img{display:block;width:100%;height:104px;object-fit:cover;background:var(--fill-slab)}
+.rf-f span{display:block;padding:6px 8px;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rf-cs{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.rf-c{border:1px solid var(--card-line);border-radius:12px;background:var(--card);font-size:13px}
+.rf-c summary,.rf-c>.rf-k{list-style:none}.rf-c summary::-webkit-details-marker{display:none}
+.rf-c summary,div.rf-c{display:flex;flex-direction:column;gap:3px;padding:10px 12px;cursor:default}
+.rf-c summary{cursor:pointer}.rf-c summary:hover{background:var(--hover);border-radius:12px}
+.rf-c b{font-weight:600;line-height:1.35}.rf-c small{color:var(--muted);font-size:12px;line-height:1.4}
+.rf-c p{margin:0;padding:0 12px 12px;font-size:12.5px;line-height:1.55;color:var(--muted)}
+.rf-k{align-self:flex-start;font-size:10.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;padding:2px 7px;border-radius:99px;background:var(--fill-slab);color:var(--muted)}
+.rf-k.rf-manual{background:rgba(34,49,221,.1);color:#2231dd}.rf-k.rf-precio{background:rgba(31,138,76,.12);color:#1f8a4c}.rf-k.rf-caso{background:rgba(224,161,0,.14);color:#9a6b00}
+.rf-lb{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;cursor:zoom-out}
+.rf-lb img{max-width:100%;max-height:84vh;border-radius:10px}.rf-lb p{margin:0;color:#ddd;font-size:13px}
+.rf-lb button{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font-size:16px;cursor:pointer}
 .svc-sim{white-space:nowrap}.gp-demo{border:1px dashed var(--card-line);margin-bottom:6px}
 .svc-ck{position:sticky;top:12px;padding:18px;border:1px solid var(--card-line);border-radius:16px;background:var(--card)}
 .svc-ck h4{margin:0 0 12px;font-size:13px;font-weight:600;color:var(--muted)}
@@ -5676,6 +5693,40 @@ GP.answerCobros=async function(text){
     return {md:'De mano de obra reclamaste '+mo(c.lc)+' y esperaría '+mo(c.estL)+' ('+Math.round(c.rl*100)+'%). De piezas reclamaste '+mo(c.pc)+' y esperaría '+mo(c.estP)+' ('+Math.round(c.rp*100)+'%).'};
   return null;
 };
+/* ══ Referencias debajo de cada respuesta del cerebro: fotos, manual, reglas, casos, ejemplos y precios ══ */
+var REFS={};
+REFS.K={manual:'Manual GM',regla:'Regla',caso:'Caso real',ejemplo:'Ejemplo',precio:'Cerebro de servicios'};
+REFS.html=function(L){
+  L=Array.isArray(L)?L:[];if(!L.length)return '';
+  var f=L.filter(function(r){return r.tipo==='foto'&&r.path}),c=L.filter(function(r){return r.tipo!=='foto'});
+  var mo=function(n){return DEB.mx(Number(n)||0)};
+  var card=function(r){
+    var k=REFS.K[r.tipo]||'Referencia',t='',sub='',det='';
+    if(r.tipo==='manual'){t=(r.seccion?r.seccion+' · ':'')+(r.titulo||'');sub=(r.pagina?'pág. '+r.pagina:'')+(r.fuente?' · '+String(r.fuente).split(' · ')[0].split('(')[0].trim():'');det=r.extracto}
+    else if(r.tipo==='regla'){t=r.id+(r.sistema?' · '+r.sistema:'');sub=[r.operacion,r.horas!=null?r.horas+' h':'',r.aceptadas!=null?r.aceptadas+' aceptadas':'',r.rechazos?r.rechazos+' rechazos':''].filter(Boolean).join(' · ');det=r.descripcion}
+    else if(r.tipo==='caso'){t=[r.vehiculo,r.sistema].filter(Boolean).join(' · ')||'Caso';sub=[r.estado,r.km?Number(r.km).toLocaleString('en-US')+' km':'',r.horas?r.horas+' h':''].filter(Boolean).join(' · ');det=(r.comentario?'Planta: «'+r.comentario+'»\n':'')+(r.texto||'')}
+    else if(r.tipo==='ejemplo'){t=r.folio||r.archivo||'Documento enseñado';sub=[r.vehiculo,r.sistema,r.resultado].filter(Boolean).join(' · ');det=r.resumen}
+    else if(r.tipo==='precio'){var g=r.grupo||{},n=r.red||{};t=r.tipo_servicio||r.tipo_nombre||r.clave||'Servicio';t=r.nombre||t;sub=(g.n?'Tu grupo: '+mo(g.mediana)+' típico · '+g.n+' servicios':'Aún sin cobros en tu grupo')+(n.n?' · Red: '+mo(n.mediana):'');
+      det=(g.n?'Rango del grupo: '+mo(g.min)+' a '+mo(g.max)+'\n':'')+((g.por_agencia||[]).map(function(a){return '• '+a.agencia+': '+mo(a.mediana)+' ('+a.n+')'}).join('\n'))}
+    if(r.tipo==='precio'&&r.tipo_label)t=r.tipo_label;
+    var body='<span class="rf-k rf-'+ea(r.tipo)+'">'+esc(k)+'</span><b>'+esc(t)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');
+    return det?'<details class="rf-c"><summary>'+body+'</summary><p>'+esc(det).replace(/\n/g,'<br>')+'</p></details>':'<div class="rf-c">'+body+'</div>';
+  };
+  return '<div class="rf">'+
+    (f.length?'<div class="rf-fs">'+f.map(function(x){return '<button type="button" class="rf-f" data-rfpath="'+ea(x.path)+'" aria-label="Ver foto de ejemplo"><img alt="Foto de ejemplo'+(x.folio?' · '+ea(x.folio):'')+'" loading="lazy"><span>'+esc([x.folio,x.vehiculo||x.sistema].filter(Boolean).join(' · '))+'</span></button>'}).join('')+'</div>':'')+
+    (c.length?'<div class="rf-cs">'+c.map(card).join('')+'</div>':'')+'</div>';
+};
+/* las fotos se firman aquí (solo las que el usuario puede ver) y caducan en una hora */
+REFS.firmar=async function(el){
+  if(!el||!SB.c)return;var bs=[].slice.call(el.querySelectorAll('[data-rfpath]')).filter(function(b){return !b.dataset.ok});if(!bs.length)return;
+  try{var r=await SB.c.storage.from('expedientes-docs').createSignedUrls(bs.map(function(b){return b.dataset.rfpath}),3600);
+    (r.data||[]).forEach(function(u,i){var b=bs[i];if(!b)return;if(u&&u.signedUrl){b.dataset.ok='1';b.querySelector('img').src=u.signedUrl}else b.remove()})}catch(e){console.warn('[fotos]',e)}
+};
+REFS.poner=function(w,L){var h=REFS.html(L);if(!h||!w)return;var col=w.querySelector('.ai-col')||w;var d=document.createElement('div');d.innerHTML=h;var n=d.firstChild;var a=col.querySelector('.ai-actions');if(a)col.insertBefore(n,a);else col.appendChild(n);REFS.firmar(n)};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.rf-f');if(!b)return;var im=b.querySelector('img');if(!im||!im.src)return;
+  var o=document.createElement('div');o.className='rf-lb';o.setAttribute('role','dialog');o.setAttribute('aria-label','Foto de ejemplo');o.innerHTML='<img alt=""><button type="button" aria-label="Cerrar">✕</button><p></p>';
+  o.querySelector('img').src=im.src;o.querySelector('p').textContent=b.textContent;document.body.appendChild(o);
+  var cierra=function(){o.remove();document.removeEventListener('keydown',k,true);b.focus()},k=function(ev){if(ev.key==='Escape'){ev.preventDefault();ev.stopImmediatePropagation();cierra()}};o.addEventListener('click',cierra);document.addEventListener('keydown',k,true);o.querySelector('button').focus()});
 GP.think=async function(text,my){
   await nap(380,my);
   var st=MI.smalltalk(text);if(st)return {md:st};
@@ -5685,7 +5736,7 @@ GP.think=async function(text,my){
       if(S.convP)await S.convP;if(GP.lastExpP)await GP.lastExpP;
       var ctxS=GP.tipo==='Servicio'?await SVR.ctx(GP.srv||{wo:GP.cur},text):'';
       var r=await SB.ai({rol_agente:ag,orden:GP.cur||null,conversation_id:S.convId||null,folio:GP.srv?GP.srv.folio:(CB.last&&CB.last.prea)||null,messages:GP.msgs.slice(-12).concat([{role:'user',content:ctxS+text}]),ahora:MI.nowInfo()},'manual');
-      if(r&&r.text)return {md:r.text};
+      if(r&&r.text)return {md:r.text,refs:r.refs};
     }catch(e){SB.aiFail(e)}
   }
   var loc=ag==='cobros'?await GP.answerCobros(text):await GP.answer(text);
@@ -5704,6 +5755,7 @@ async function runConv(text){
   if(out.md)plain=await stream(body,out.md,my);else body.innerHTML='';
   if(out.html){var c=document.createElement('div');c.className='mi-wrap';c.innerHTML=out.html;col.insertBefore(c,$('.ai-actions',w));toBottom()}
   w._text=(plain||MI.plain(out.html)).replace(/\*\*/g,'');$('.ai-actions',w).hidden=false;
+  if(out.refs&&out.refs.length){REFS.poner(w,out.refs);toBottom()}
   if(out.chips)GP.suggest(w,out.chips);
   GP.remember(text,plain||MI.plain(out.html));finish(my);
 }
@@ -6386,7 +6438,7 @@ SVR.ctx=async function(sv,text){
   return '[Contexto: la orden '+(sv.wo||'')+' es un SERVICIO, no lleva PREA; su ciclo es abrir la orden, hacer el servicio y subir la evidencia, facturar y cobrar, en un día'+(fx?'; va en la etapa «'+FL.nom(fx.etapa,1)+'» y lo siguiente es: '+fx.siguiente:'')+
     (sv.sys?'. Tipo de servicio: '+sv.sys:'. Aún no tiene tipo de servicio capturado')+(sv.vehicle?'; vehículo '+sv.vehicle:'')+(sv.km?'; '+sv.km+' km':'')+(Number(sv.labor)?'; se cobró '+DEB.mx(sv.labor)+' antes de IVA':'')+
     '. Cerebro de servicios'+(tq?' para «'+tq+'»: '+(SVR.txt(ref)||'todavía no hay cobros registrados de este tipo en las agencias de la marca').replace(/\.$/,''):': pide el tipo de servicio (por ejemplo 6,000 km) para dar el precio de referencia')+
-    '. Si preguntan cuánto cobrar, responde con esa referencia del grupo y la red. No propongas armar una PREA. Responde breve, como el agente de este servicio.]\n';
+    '. Si preguntan cuánto cobrar, responde con esa referencia del grupo y la red (usa precio_servicio). Si una foto, un ejemplo o una sección del manual ayuda, tráela con tus herramientas (fotos_ejemplo, buscar_todo) y cítala. No propongas armar una PREA. Responde breve y natural, como una persona del equipo.]\n';
 };
 var SVC={x:null,msgs:[],conv:null,busy:false};
 SVC.pasos=function(f){var L=FL.ES,i=f?FL.idx(f):0;return '<ol class="svc-st" aria-label="Ciclo del servicio">'+L.map(function(e,k){return '<li class="'+((f&&f.etapa==='cerrado')||k<i?'done':k===i?'now':'')+'"><i></i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'};
@@ -6410,7 +6462,7 @@ SVC.burb=function(m){
   if(m.role==='user'){d.className='msg-user';var a=/^📎 (.+)$/.exec(c);
     d.innerHTML=a?'<div class="files"><span class="file">'+svg('file','sm')+'<b>'+esc(a[1])+'</b></span></div>':'<div class="bubble">'+esc(c)+'</div>'}
   else{d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body">'+md(c,false)+'</div></div>'}
-  var th=$('#svcThi');th.appendChild(d);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;return d;
+  var th=$('#svcThi');th.appendChild(d);if(m.refs)REFS.poner(d,m.refs);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;return d;
 };
 SVC.pensando=function(t){var d=document.createElement('div');d.className='msg-ai';
   d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"><span class="thinking">'+esc(t||'Pensando')+'<span class="dots"><i></i><i></i><i></i></span></span><span class="typing" hidden></span></div></div>';
@@ -6447,7 +6499,7 @@ SVC.abrir=async function(x){
   else SVC.saludoP=SVC.tipear(SVC.saludo(x),'Escribiendo',900);
 };
 SVC.guardar=async function(){if(!SVC.conv)return;try{await SB.c.from('conversations').update({messages:SVC.msgs.slice(-60)}).eq('id',SVC.conv)}catch(e){console.warn('[servicio chat]',e)}};
-SVC.decir=function(role,txt){var m={role:role,content:String(txt).slice(0,3000)};SVC.msgs.push(m);return m};
+SVC.decir=function(role,txt,refs){var m={role:role,content:String(txt).slice(0,3000)};if(refs&&refs.length)m.refs=refs.slice(0,14);SVC.msgs.push(m);return m};
 SVC.pintar=function(x){SVR.pintar(x);SVC.ck()};
 /* la lista fija: se marca sola con lo que ya está en el expediente */
 SVC.CK=[['factura','Facturarlo'],['planta','Cobrarlo'],['evidencia','Subir la evidencia completa del expediente'],['cerrado','Cerrado']];
@@ -6490,7 +6542,8 @@ SIM.run=async function(){
     await paso(function(){return SIM.archivos(['foto_odometro.jpg','foto_motor.jpg'])});
     await paso(async function(){SIM.fila('evidencia',['foto_odometro.jpg','foto_motor.jpg']);await SVC.tipear('Perfecto, con las fotos ya quedó completa la evidencia.\n\nAhora sí, a facturarlo: mándame la factura en cuanto la tengas.','Revisando las fotos',1800)});
     await paso(function(){return SIM.yo('¿Cuánto le cobro?')});
-    await paso(function(){return SVC.tipear('Cóbrale **$1,950 + IVA**, o sea **$2,262** en total. Es lo típico en tu grupo: las otras agencias lo cobran entre $1,900 y $2,000.','Revisando lo que cobra tu grupo',1500)});
+    await paso(async function(){var w=await SVC.tipear('Cóbrale **$1,950 + IVA**, o sea **$2,262** en total. Es lo típico en tu grupo: las otras agencias lo cobran entre $1,900 y $2,000. Te dejo abajo el detalle y un servicio igual que ya se cerró.','Revisando lo que cobra tu grupo',1500);
+      REFS.poner(w,[{tipo:'precio',tipo_label:'Servicio 6,000 km',grupo:{n:9,mediana:1950,min:1790,max:2150,por_agencia:[{agencia:'Agencia A del grupo',n:4,mediana:1900},{agencia:'Agencia B del grupo',n:5,mediana:2000}]},red:{n:31,mediana:1880}},{tipo:'ejemplo',folio:'SRV-GA9990',vehiculo:'Aveo 2025',sistema:'Servicio 6,000 km',resultado:'cerrado',resumen:'Ejemplo de la simulación: facturado en $1,950 antes de IVA y cobrado el mismo día, con orden, foto del odómetro y foto del motor.'}]);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight});
     await paso(function(){return SIM.archivos(['factura_A1234.xml'])});
     await paso(async function(){x.labor=1950;SIM.fila('factura',['factura_A1234.xml']);await SVC.tipear('Recibí la factura por **$1,950** antes de IVA. Va justo en lo que cobra tu grupo.\n\nCuando te paguen, mándame el comprobante y lo cierro.','Leyendo la factura',1800)});
     await paso(function(){return SVC.dormir(900)});
@@ -6512,12 +6565,12 @@ SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x)
 SVC.enviar=async function(text){
   var x=SVC.x;text=String(text||'').trim();if(!x||!text||SVC.busy||SIM.on)return;SVC.busy=true;
   SVC.burb(SVC.decir('user',text));SVC.on();var w=SVC.pensando('Revisando lo que sé de este servicio');
-  var resp='';
+  var resp='',refs=null;
   try{var ctx=await SVR.ctx(x,text);
     var r=await SB.ai({rol_agente:'garantias',orden:x.wo||null,conversation_id:SVC.conv,folio:x.folio,messages:SVC.msgs.filter(function(m){return !SVC.viejo(m)}).slice(-12,-1).concat([{role:'user',content:ctx+text}]),ahora:MI.nowInfo()},'manual');
-    resp=(r&&r.text)||'No encontré esa respuesta en lo que sé de este servicio.';
+    resp=(r&&r.text)||'No encontré esa respuesta en lo que sé de este servicio.';refs=r&&r.refs||null;
   }catch(e){resp='No pude contestar ahorita ('+TR.errTxt(e)+'). Inténtalo otra vez en un momento.'}
-  w.remove();SVC.decir('assistant',resp);await SVC.tipear(resp,null,200);SVC.busy=false;SVC.on();SVC.guardar();
+  w.remove();SVC.decir('assistant',resp,refs);var wr=await SVC.tipear(resp,null,200);if(refs&&refs.length){REFS.poner(wr,refs);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight}SVC.busy=false;SVC.on();SVC.guardar();
 };
 SVC.NOM={orden:'la orden de servicio',factura:'la factura',comprobante_pago:'el comprobante de pago',foto_odometro:'la foto del odómetro',foto_trabajo:'una foto del trabajo',otro:'un documento'};
 SVC.subir=async function(files){
