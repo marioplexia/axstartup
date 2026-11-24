@@ -1975,7 +1975,10 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .sv-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.sv-g label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
 .sv-g input,.sv-g select{padding:9px 11px;border-radius:10px;border:1px solid var(--card-line);background:var(--fill-slab);color:var(--fg,inherit);font:13.5px var(--f-ui,inherit)}
 .sv-ref{margin-top:12px}.sv-ref .xz-mut{margin:0}.sv-rb{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,#2231dd 7%,transparent);font-size:13px}.sv-rb p{margin:6px 0}.sv-rb ul{margin:4px 0 10px;padding-left:18px;font-size:12.5px}.sv-rb small{color:var(--muted)}
-.sv-a{margin-top:12px}
+.sv-ro [data-svusar]{display:none}
+.sv-a{margin-top:12px}.sv-hb{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.sv-h{flex-wrap:wrap}
+.sv-ro .sv-g input,.sv-ro .sv-g select{background:transparent;border-color:transparent;padding-left:0;color:var(--fg,inherit);font-weight:600;opacity:1;-webkit-text-fill-color:currentColor;appearance:none}
+.sv-ro .sv-g input::placeholder{color:var(--muted);font-weight:400;-webkit-text-fill-color:var(--muted)}
 .ex-pipe{margin:0 0 18px}.exp-p{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
 .exp-s{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:64px;padding:12px 18px 12px 24px;border:0;background:var(--fill-slab,#f1f1ef);color:var(--muted);font:inherit;text-align:left;cursor:pointer;min-width:0;
   clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,12px 50%);transition:background-color .15s}
@@ -6237,20 +6240,52 @@ SVR.txt=function(R){
   if(w.n)L.push('En otras '+w.agencias+(w.agencias===1?' agencia':' agencias')+' '+(R.marca||'')+' de la red: mediana '+DEB.mx(w.mediana)+' en '+w.n+' servicios (de '+DEB.mx(w.min)+' a '+DEB.mx(w.max)+').');
   return L.join(' ');
 };
+SVR.estado=function(x){
+  var L=x.servicio_leido&&x.servicio_leido.archivos||[];
+  if(!L.length)return 'Sube la orden, las fotos o la factura y el cerebro llena estos datos solo.';
+  var u=L[L.length-1];return 'Leído por el cerebro de '+L.length+(L.length===1?' archivo':' archivos')+' · el último: «'+u.archivo+'»';
+};
 SVR.box=function(x){
   var t=x.sys||'',otro=t&&SVR.TIPOS.indexOf(t)<0;
-  return '<section class="sv-d" id="svDatos"><div class="sv-h"><h3>Datos del servicio</h3><span class="xz-mut" id="svMsg"></span></div><div class="sv-g">'+
+  return '<section class="sv-d sv-ro" id="svDatos"><div class="sv-h"><h3>Datos del servicio</h3><span class="xz-mut" id="svMsg">'+esc(SVR.estado(x))+'</span>'+
+    '<span class="sv-hb"><button class="bt" type="button" data-svleer>Leer evidencias otra vez</button><button class="bt" type="button" data-svedit>Corregir</button></span></div><div class="sv-g">'+
     '<label><span>Tipo de servicio</span><select id="svTipo"><option value="">Elige…</option>'+SVR.TIPOS.map(function(o){return '<option'+(o===t?' selected':'')+'>'+esc(o)+'</option>'}).join('')+'<option value="otro"'+(otro?' selected':'')+'>Otro…</option></select>'+
       '<input id="svOtro" placeholder="Ej. Afinación mayor" value="'+ea(otro?t:'')+'"'+(otro?'':' hidden')+'></label>'+
     '<label><span>Vehículo</span><input id="svVeh" placeholder="Ej. Aveo 2025" value="'+ea(x.vehicle||'')+'"></label>'+
     '<label><span>Kilometraje</span><input id="svKm" type="number" min="0" placeholder="6000" value="'+ea(x.km||'')+'"></label>'+
     '<label><span>Monto cobrado (antes de IVA)</span><input id="svMonto" type="number" min="0" step="0.01" placeholder="0.00" value="'+ea(Number(x.labor||0)+Number(x.parts_total||0)||'')+'"></label></div>'+
-    '<div class="sv-ref" id="svRef"></div><div class="sv-a"><button class="bt pri" type="button" data-svsave>Guardar datos</button></div></section>';
+    '<div class="sv-ref" id="svRef"></div><div class="sv-a" hidden><button class="bt pri" type="button" data-svsave>Guardar corrección</button></div></section>';
+};
+/* el modo lectura: los campos los llena el cerebro; «Corregir» los habilita */
+SVR.bloquear=function(on){var b=$('#svDatos');if(!b)return;b.classList.toggle('sv-ro',on);b.querySelectorAll('input,select').forEach(function(i){i.disabled=on});var a=$('#svDatos .sv-a');if(a)a.hidden=on};
+SVR.pintar=function(x){var b=$('#svDatos');if(!b||!XD.cur||XD.cur.id!==x.id)return;b.outerHTML=SVR.box(x);SVR.bloquear(true);SVR.pintarRef()};
+SVR.leer=async function(x,file,k,meta){
+  var base=meta?meta.textContent:'';if(meta){meta.className='xd-meta';meta.textContent=XD.fmt(file.size)+' · el cerebro lo está leyendo…'}
+  try{
+    var f=/\.(xml|txt)$/i.test(file.name)?{name:file.name,text:await file.text()}:await TR.prep(file);
+    var r=await SB.ai({expediente_id:x.id,file:f,seccion:k},'servicio');
+    if(r&&r.expediente)Object.assign(x,r.expediente);
+    if(meta)meta.textContent=XD.fmt(file.size)+' · ✓ '+(r&&r.llenado&&r.llenado.length?'llené '+r.llenado.join(', '):(r&&r.leido&&r.leido.nota)||'leído');
+    SVR.pintar(x);FL.refresh(x);
+    return r;
+  }catch(e){if(meta){meta.className='xd-meta err';meta.textContent=XD.fmt(file.size)+' · se guardó, pero el cerebro no pudo leerlo ('+TR.errTxt(e)+')'}console.warn('[servicio]',e)}
+};
+/* para servicios con archivos de antes: leer todo lo que ya está subido */
+SVR.leerTodo=async function(btn){
+  var x=XD.cur;if(!x)return;btn.disabled=true;var t0=btn.textContent;btn.textContent='Leyendo…';var n=0;
+  try{
+    for(var i=0;i<XD.SRV.length;i++){var k=XD.SRV[i][0],ls=await SB.c.storage.from(XD.B).list(x.id+'/'+k,{limit:50});
+      for(var j=0;j<((ls.data)||[]).length;j++){var f=ls.data[j];if(!f.id)continue;var dl=await SB.c.storage.from(XD.B).download(x.id+'/'+k+'/'+f.name);if(dl.error||!dl.data)continue;
+        var file=new File([dl.data],f.name.replace(/^\d+_/,''),{type:dl.data.type||(/\.pdf$/i.test(f.name)?'application/pdf':'')});btn.textContent='Leyendo '+file.name+'…';
+        if(await SVR.leer(x,file,k,null))n++}}
+    toast(n?'El cerebro leyó '+n+(n===1?' archivo':' archivos'):'No hay archivos para leer todavía');
+  }catch(e){SB.fail(e);toast('No se pudieron leer las evidencias')}
+  var b2=document.querySelector('[data-svleer]');if(b2){b2.disabled=false;b2.textContent=t0}
 };
 SVR.tipoForm=function(){var v=$('#svTipo').value;return v==='otro'?($('#svOtro').value||'').trim():v};
 SVR.pintarRef=async function(){
   var el=$('#svRef');if(!el)return;var t=SVR.tipoForm();
-  if(!t){el.innerHTML='<p class="xz-mut">Elige el tipo de servicio y el cerebro te dice cuánto se cobra en las agencias de tu marca.</p>';return}
+  if(!t){el.innerHTML='<p class="xz-mut">Cuando el cerebro sepa qué servicio fue, aquí verás cuánto se cobra en las agencias de tu marca.</p>';return}
   el.innerHTML='<p class="xz-mut">Consultando el cerebro…</p>';var R=await SVR.ref(t);if(SVR.tipoForm()!==t)return;
   var g=R&&R.grupo||{},w=R&&R.red||{};
   if(!g.n&&!w.n){el.innerHTML='<p class="xz-mut">Todavía no hay cobros registrados de «'+esc(t)+'» en '+(R&&R.marca?'agencias '+esc(R.marca):'tu marca')+'. Con este servicio empieza la referencia.</p>';return}
@@ -6263,16 +6298,16 @@ SVR.pintarRef=async function(){
 SVR.guardar=async function(){
   var x=XD.cur;if(!x)return;var t=SVR.tipoForm(),p={sys:t||null,vehicle:($('#svVeh').value||'').trim()||null,km:Number($('#svKm').value)||null,labor:Number($('#svMonto').value)||0,parts_total:0};
   var r=await SB.c.from('expedientes').update(p).eq('id',x.id);if(r.error){SB.fail(r.error);toast('No se pudo guardar');return}
-  Object.assign(x,p);$('#svMsg').textContent='Guardado';toast('Datos del servicio guardados');SVR.pintarRef();
+  Object.assign(x,p);$('#svMsg').textContent='Corregido a mano';toast('Datos del servicio corregidos');SVR.pintarRef();
 };
 document.addEventListener('change',function(e){var t=e.target;if(!t||!t.id)return;if(t.id==='svTipo'){var o=$('#svOtro');if(o){o.hidden=t.value!=='otro';if(!o.hidden)o.focus()}SVR.pintarRef()}if(t.id==='svOtro')SVR.pintarRef()});
-document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;if(t.closest('[data-svsave]')){SVR.guardar();return}var u=t.closest('[data-svusar]');if(u){$('#svMonto').value=u.dataset.svusar;$('#svMsg').textContent='Precio de referencia puesto: guarda para confirmar'}});
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;if(t.closest('[data-svsave]')){SVR.guardar().then(function(){SVR.bloquear(true)});return}if(t.closest('[data-svedit]')){SVR.bloquear(false);var s1=$('#svTipo');if(s1)s1.focus();return}var lb=t.closest('[data-svleer]');if(lb){SVR.leerTodo(lb);return}var u=t.closest('[data-svusar]');if(u){$('#svMonto').value=u.dataset.svusar;$('#svMsg').textContent='Precio de referencia puesto: guarda para confirmar'}});
 XD.openSrv=function(x,el){
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Servicios</button>'+
     '<div><h2>'+esc(x.wo||x.folio)+'</h2><p>'+esc(['Servicio',x.queja].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts"><button class="bt pri" type="button" data-xdchat>Chatear con el agente</button>'+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</div></div>'+
     FL.html(x)+SVR.box(x)+'<div class="xd-grid">'+XD.SRV.map(XD.secBox).join('')+'</div></div>';
-  $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;$('.xd-back',el).focus();SVR.pintarRef();
+  $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;$('.xd-back',el).focus();SVR.bloquear(true);SVR.pintarRef();
   XD.SRV.forEach(function(d){XD.load(x.id,d[0])});
   FL.refresh(x);
 };
@@ -6327,7 +6362,7 @@ XD.send=async function(k,file){
     return;
   }
   bar.style.transform='scaleX(1)';meta.textContent=XD.fmt(file.size)+' · Subido';
-  if(x.tipo==='Servicio'){FL.refresh(x);setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>')},350);return}
+  if(x.tipo==='Servicio'){FL.refresh(x);setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>')},350);SVR.leer(x,file,k,meta);return}
   var rev=k==='actualizacion'?XD.formRead(x.id,file,file.name,path,meta):XD.learn(k,file,meta);
   setTimeout(function(){var t=row.querySelector('.xd-track');if(t)t.remove();row.insertAdjacentHTML('beforeend','<span class="xd-tick">✓</span>');
     var nm=row.querySelector('.xd-name');nm.outerHTML='<button type="button" class="xd-name" data-xdopen="'+ea(path)+'">'+esc(file.name)+'</button>'},350);
