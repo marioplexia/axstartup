@@ -1976,15 +1976,20 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .sv-g input,.sv-g select{padding:9px 11px;border-radius:10px;border:1px solid var(--card-line);background:var(--fill-slab);color:var(--fg,inherit);font:13.5px var(--f-ui,inherit)}
 .sv-ref{margin-top:12px}.sv-ref .xz-mut{margin:0}.sv-rb{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,#2231dd 7%,transparent);font-size:13px}.sv-rb p{margin:6px 0}.sv-rb ul{margin:4px 0 10px;padding-left:18px;font-size:12.5px}.sv-rb small{color:var(--muted)}
 .sv-a{margin-top:12px}
-.ex-pipe{margin:0 0 18px}.exp-p{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--card-line);border-radius:14px;background:var(--card);overflow:hidden}
-.exp-s{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px 12px 22px;border:0;background:none;color:var(--muted);font:inherit;text-align:left;cursor:pointer;min-width:0}
-.exp-s:first-child{padding-left:14px}
-.exp-s:not(:last-child)::after{content:'';position:absolute;right:-9px;top:50%;width:16px;height:16px;border-top:1px solid var(--card-line);border-right:1px solid var(--card-line);background:var(--card);transform:translateY(-50%) rotate(45deg);z-index:1}
+.ex-pipe{margin:0 0 18px}.exp-p{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.exp-s{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:64px;padding:12px 18px 12px 24px;border:0;background:var(--fill-slab,#f1f1ef);color:var(--muted);font:inherit;text-align:left;cursor:pointer;min-width:0;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,12px 50%);transition:background-color .15s}
+.exp-s:first-child{padding-left:14px;border-radius:12px 0 0 12px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%)}
+.exp-s:last-child{border-radius:0 12px 12px 0;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,12px 50%)}
 .exp-s b{font-size:20px;font-weight:600;color:var(--muted)}.exp-s span{font-size:12px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.exp-s.has b,.exp-s.has span{color:var(--fg,inherit)}.exp-s:hover{background:var(--hover,rgba(0,0,0,.03))}
-.exp-s.on{background:var(--fill-on,#111)}.exp-s.on b,.exp-s.on span{color:var(--bg,#fff)}.exp-s.on::after{background:var(--fill-on,#111);border-color:var(--fill-on,#111)}
+.exp-s.has{background:color-mix(in srgb,#2231dd 9%,var(--fill-slab,#f1f1ef))}.exp-s.has b,.exp-s.has span{color:var(--fg,inherit)}.exp-s:hover{background:color-mix(in srgb,#2231dd 16%,var(--fill-slab,#f1f1ef))}
+.exp-s.on{background:var(--fill-on,#111)}.exp-s.on b,.exp-s.on span{color:var(--bg,#fff)}
+.exp-drag .exp-s{outline:2px dashed color-mix(in srgb,#2231dd 45%,transparent);outline-offset:-6px}.exp-s.over{background:#2231dd}.exp-s.over b,.exp-s.over span{color:#fff}
+.exp-hint{margin:8px 2px 0;font-size:12px;color:var(--muted)}
+.exmv-l{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}.exmv-b{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--card-line);background:var(--card);color:inherit;font:500 13.5px var(--f-ui,inherit);text-align:left;cursor:pointer}
+.exmv-b i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--fill-slab);font-style:normal;font-size:11.5px}.exmv-b:hover{border-color:#2231dd}.exmv-b.on{background:var(--fill-on,#111);color:var(--bg,#fff);border-color:transparent}.exmv-b.on i{background:rgba(255,255,255,.2)}
 .exp-all{margin-top:8px;padding:0;border:0;background:none;color:var(--muted);font:500 12.5px var(--f-ui,inherit);cursor:pointer;text-decoration:underline}
-@media(max-width:760px){.exp-p{grid-template-columns:repeat(4,minmax(0,1fr))}.exp-s span{white-space:normal;font-size:11px}.exp-s b{font-size:18px}.exp-s,.exp-s:first-child{padding:10px}.exp-s::after{display:none}.exp-s{border-bottom:1px solid var(--card-line)}}
+@media(max-width:760px){.exp-p{grid-template-columns:repeat(4,minmax(0,1fr))}.exp-s span{white-space:normal;font-size:11px}.exp-s b{font-size:18px}.exp-s,.exp-s:first-child,.exp-s:last-child{padding:10px;clip-path:none;border-radius:10px}}
 .xd-acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-self:center}.xd-acts .xd-del{margin-left:0}
 .xd-del{margin-left:auto;align-self:center;padding:7px 14px;border-radius:99px;border:1px solid color-mix(in srgb,#d6453b 40%,transparent);background:transparent;color:#b4372b;font:500 12.5px var(--f-ui,inherit);cursor:pointer}
 .xd-del:hover{background:color-mix(in srgb,#d6453b 10%,transparent)}
@@ -2565,6 +2570,7 @@ var P={
   chart:'<path d="M3 3v18h18M7 14l4-4 4 4 5-6"/>',
   x:'<path d="M18 6 6 18M6 6l12 12"/>',
   trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>',
+  chev:'<path d="M5 12h14M13 6l6 6-6 6"/>',
   up:'<path d="m5 12 7-7 7 7M12 19V5"/>',
   stop:'<rect x="6.5" y="6.5" width="11" height="11" rx="2.5" fill="currentColor" stroke="none"/>',
   mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/>',
@@ -5833,6 +5839,7 @@ var NODE=(function(){
     var L=[];
     if(x.status==='borrador'&&x.tipo!=='Servicio'){L.push(A('data-r="ok"','Fue aceptada','ok'));L.push(A('data-r="no"','Fue rechazada','no'))}
     L.push(A(cp(x.folio,'Folio copiado'),'Copiar folio','copy'));
+    if(x.tipo!=='Servicio')L.push(A('data-xmv="1"','Mover de etapa','chev'));
     if(XDEL.puede(x))L.push(A('data-xdelc="1"','Eliminar expediente','trash'));
     if(x.status!=='borrador')L.push(A(cp([x.folio,x.queja,[x.sys,x.op].filter(Boolean).join(' · ')].filter(Boolean).join(' — '),'Resumen copiado'),'Copiar resumen','doc'));
     return L;
@@ -5882,7 +5889,7 @@ var NODE=(function(){
   /* an expediente (Expedientes) */
   function card(x,admin,stl){
     return shell({id:x.id,name:x.folio,say:x.queja||'Sin descripción',
-      more:stl[x.status]+' · '+(x.hours||0)+' h · '+EX.money(Number(x.parts_total)+Number(x.labor)),
+      more:(x._etapa||stl[x.status])+' · '+(x.hours||0)+' h · '+EX.money(Number(x.parts_total)+Number(x.labor)),
       tip:[x.sys,x.op,x.rule_id?'regla '+x.rule_id:'',admin&&x.profiles?x.profiles.name:''].filter(Boolean).join(' · '),acts:acts(x)});
   }
   /* a PREA aprobada (Inicio) */
@@ -6016,7 +6023,12 @@ EX.load=async function(){
 /* ── el pipeline de las PREAs: en qué etapa va cada una ──
    PREA por subir → En proceso → Aceptada → Esperando pieza → Cambiando pieza → Facturada → Cobrada */
 EX.PIPE=[['subir','PREA por subir'],['proceso','En proceso'],['aceptada','Aceptada'],['espera','Esperando pieza'],['cambio','Cambiando pieza'],['facturada','Facturada'],['cobrada','Cobrada']];
+EX.rank=function(k){return EX.PIPE.map(function(e){return e[0]}).indexOf(k)};
 EX.etapa=function(x){
+  var a=EX.auto(x);if(!x.prea_etapa)return a;
+  return EX.rank(a)>=EX.rank('facturada')&&EX.rank(a)>EX.rank(x.prea_etapa)?a:x.prea_etapa;
+};
+EX.auto=function(x){
   var c=EX.car[x.id]||{},pz=EX.piezas[x.id]||[];
   if(x.gwm_cobrada_at||c.estado==='pagada'||c.pagada_at)return 'cobrada';
   if(c.estado==='facturada'||c.facturada_at)return 'facturada';
@@ -6029,9 +6041,40 @@ EX.pipe=function(list){
   var cnt={};list.forEach(function(x){var k=EX.etapa(x);cnt[k]=(cnt[k]||0)+1});
   el.innerHTML='<div class="exp-p" role="group" aria-label="Etapas de las PREAs">'+EX.PIPE.map(function(e,i){var n=cnt[e[0]]||0;
     return '<button type="button" class="exp-s'+(EX.pe===e[0]?' on':'')+(n?' has':'')+'" data-pe="'+e[0]+'" aria-pressed="'+(EX.pe===e[0])+'"><b>'+n+'</b><span>'+esc(e[1])+'</span></button>'}).join('')+'</div>'+
-    (EX.pe?'<button type="button" class="exp-all" data-pe="">Ver todas las PREAs</button>':'');
+    (EX.pe?'<button type="button" class="exp-all" data-pe="">Ver todas las PREAs</button>':'<p class="exp-hint">Arrastra una tarjeta a una etapa para moverla, o ábrela y usa el botón «Etapa».</p>');
 };
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#exPipe [data-pe]');if(!b)return;EX.pe=EX.pe===b.dataset.pe?'':b.dataset.pe;EX.render()});
+EX.nomE=function(k){return (EX.PIPE.filter(function(e){return e[0]===k})[0]||['',k])[1]};
+EX.mover=async function(id,k){
+  var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x||!k)return;
+  var antes=EX.etapa(x);if(antes===k){toast('Ya está en «'+EX.nomE(k)+'»');return}
+  /* aceptarla es un dato real: se registra como siempre (y el cerebro aprende) */
+  if(k!=='subir'&&k!=='proceso'&&x.status==='borrador'){await EX.resolve(x.id,true);x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0]||x;if(x.status!=='aceptada')return}
+  var now=new Date().toISOString(),c=EX.car[x.id];
+  var r=await SB.c.from('expedientes').update({prea_etapa:k,prea_etapa_at:now}).eq('id',x.id);
+  if(r.error){SB.fail(r.error);toast('No se pudo mover');return}
+  x.prea_etapa=k;x.prea_etapa_at=now;
+  /* facturada y cobrada también quedan en Cartera */
+  if(c&&(k==='facturada'||k==='cobrada')){var pc=k==='facturada'?{estado:'facturada',facturada_at:c.facturada_at||now}:{estado:'pagada',pagada_at:now,facturada_at:c.facturada_at||now};
+    var rc=await SB.c.from('cartera').update(pc).eq('expediente_id',x.id);if(!rc.error)Object.assign(c,pc)}
+  toast((x.wo||x.folio)+' → '+EX.nomE(k));EX.render();
+  var bm=document.querySelector('[data-xdmv] b');if(bm&&XD.cur&&XD.cur.id===x.id)bm.textContent=EX.nomE(EX.etapa(x));
+};
+EX.menuMover=function(id){
+  var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x)return;var cur=EX.etapa(x);
+  var d=$('#exMv');if(!d){d=document.createElement('dialog');d.id='exMv';d.className='bx-dlg exmv';document.body.appendChild(d)}
+  d.innerHTML='<form method="dialog"><h3>Mover '+esc(x.wo||x.folio)+'</h3><p>Hoy está en «'+esc(EX.nomE(cur))+'». ¿A qué etapa pasa?</p><div class="exmv-l">'+EX.PIPE.map(function(e,i){return '<button type="button" class="exmv-b'+(e[0]===cur?' on':'')+'" data-mv="'+e[0]+'"><i>'+(i+1)+'</i>'+esc(e[1])+'</button>'}).join('')+'</div>'+
+    (x.prea_etapa?'<button type="button" class="exp-all" data-mv="auto">Que Ax AI la calcule sola otra vez</button>':'')+'<div class="row"><button class="bt" type="button" data-mv="x">Cancelar</button></div></form>';
+  d.onclick=async function(ev){var b=ev.target.closest&&ev.target.closest('[data-mv]');if(!b)return;var k=b.dataset.mv;d.close();if(k==='x')return;
+    if(k==='auto'){var r=await SB.c.from('expedientes').update({prea_etapa:null,prea_etapa_at:null}).eq('id',x.id);if(r.error){SB.fail(r.error);return}x.prea_etapa=null;EX.render();toast('Ax AI vuelve a calcular su etapa');return}
+    EX.mover(x.id,k)};
+  d.showModal();
+};
+/* arrastrar la tarjeta a una etapa */
+document.addEventListener('dragstart',function(e){var n=e.target.closest&&e.target.closest('#exList .nod[data-id]');if(!n||EX.f!=='prea')return;e.dataTransfer.setData('text/x-exp',n.dataset.id);e.dataTransfer.effectAllowed='move';document.body.classList.add('exp-drag')});
+document.addEventListener('dragend',function(){document.body.classList.remove('exp-drag');document.querySelectorAll('.exp-s.over').forEach(function(z){z.classList.remove('over')})});
+document.addEventListener('dragover',function(e){var z=e.target.closest&&e.target.closest('#exPipe .exp-s');if(!z||!document.body.classList.contains('exp-drag'))return;e.preventDefault();document.querySelectorAll('.exp-s.over').forEach(function(o){if(o!==z)o.classList.remove('over')});z.classList.add('over')});
+document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.closest('#exPipe .exp-s');if(!z)return;var id=e.dataTransfer.getData('text/x-exp');if(!id)return;e.preventDefault();z.classList.remove('over');document.body.classList.remove('exp-drag');EX.mover(id,z.dataset.pe)});
 EX.money=function(n){return '$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})};
 
 /* ── el filtro: PREAs · Campañas · Servicios ───────────────
@@ -6069,7 +6112,7 @@ EX.render=function(){
   EX.pipe(EX.rows.filter(function(x){return x.tipo!=='Servicio'}));
   if(EX.f==='prea'){
     var list=EX.rows.filter(function(x){return x.tipo!=='Servicio'&&(!EX.pe||EX.etapa(x)===EX.pe)}).filter(function(x){return !q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0});
-    n=list.length;html=list.map(function(x){return NODE.card(x,admin,stl)}).join('');
+    n=list.length;html=list.map(function(x){x._etapa=EX.nomE(EX.etapa(x));return NODE.card(x,admin,stl)}).join('');
     if(!n)html='<div class="ex-empty">'+(EX.pe&&!q?'Ninguna PREA en «'+esc((EX.PIPE.filter(function(e){return e[0]===EX.pe})[0]||['',''])[1])+'».':q?'Sin resultados para esa búsqueda.':'Aún no hay PREAs. Cada PREA que arme el agente aparecerá aquí.')+'</div>';
   }else if(EX.f==='cam'){
     var lc=EX.cam.filter(function(x){return !q||norm([x.orden,x.cliente,x.unidad,x.campana].join(' ')).indexOf(q)>=0});
@@ -6083,6 +6126,7 @@ EX.render=function(){
   }
   $('#exList').innerHTML=html;
   NODE.mount($('#exList'));
+  if(EX.f==='prea')document.querySelectorAll('#exList .nod[data-id]').forEach(function(n){n.draggable=true;n.title='Arrástrala a una etapa para moverla'});
 };
 EX.resolve=async function(id,ok){
   var x=EX.rows.filter(function(r){return r.id===id})[0];if(!x||x.status!=='borrador')return;
@@ -6118,6 +6162,7 @@ EX.resolve=async function(id,ok){
 };
 document.addEventListener('click',function(e){
   var f=e.target.closest&&e.target.closest('#exBar [data-f]');if(f){EX.pick(f.dataset.f);return}
+  var mv=e.target.closest&&e.target.closest('#exList [data-xmv]');if(mv){EX.menuMover(mv.closest('[data-id]').dataset.id);return}
   var dl=e.target.closest&&e.target.closest('#exList [data-xdelc]');if(dl){var rw=dl.closest('[data-id]'),xx=EX.rows.filter(function(z){return String(z.id)===String(rw.dataset.id)})[0];if(xx)XDEL.uno(xx).then(function(ok){if(ok)EX.load()});return}
   var b=e.target.closest&&e.target.closest('#exList [data-r]');if(b){var row=b.closest('[data-id]');EX.resolve(row.dataset.id,b.dataset.r==='ok');return}
 });
@@ -6227,7 +6272,7 @@ XD.open=function(id){
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
-    (XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div>'+
+    '<div class="xd-acts"><button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>'+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
     FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.gridHtml()+XD.qHtml()+'</div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
@@ -6808,6 +6853,7 @@ XD.take=function(k,files){[].slice.call(files||[]).forEach(function(f){XD.send(k
 document.addEventListener('click',function(e){
   var t=e.target;if(!t.closest)return;
   if(t.closest('[data-xdclose]')){XD.close();return}
+  if(t.closest('[data-xdmv]')&&XD.cur){EX.menuMover(XD.cur.id);return}
   if(t.closest('[data-xdchat]')&&XD.cur){var sx=XD.cur;if(!sx.conversation_id){toast('Este servicio no tiene conversación');return}XD.close();GP.open(sx.conversation_id,{chat:true});return}
   if(t.closest('[data-xddel]')&&XD.cur){var cx=XD.cur;XDEL.uno(cx).then(function(ok){if(ok){XD.close();if(S.view==='exp')EX.load()}});return}
   if(t.closest('[data-xdsave]')){XD.qSave();return}
