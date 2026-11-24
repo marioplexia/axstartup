@@ -1985,25 +1985,23 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .svc-st li i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--card-line);background:var(--card)}.svc-st li.done{color:var(--fg,inherit)}.svc-st li.done i{background:#1f8a4c;border-color:#1f8a4c}
 .svc-st li.now{background:var(--fill-on,#111);color:var(--bg,#fff)}.svc-st li.now i{background:#6b79ff;border-color:#6b79ff}
 .svc-g{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
-.svc-chat{position:relative;display:flex;flex-direction:column;height:calc(100vh - 210px);min-height:460px;border:1px solid var(--card-line);border-radius:18px;background:var(--card);overflow:hidden}
-.svc-th{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-.svc-m{display:flex;gap:10px;max-width:88%}.svc-m.yo{align-self:flex-end}.svc-m.ag{align-self:flex-start}
-.svc-av{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--signal,#2231dd);color:#fff;font:700 13px var(--f-ui,inherit)}
-.svc-b{padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.55;background:var(--fill-slab)}.svc-m.yo .svc-b{background:var(--fill-on,#111);color:var(--bg,#fff)}.svc-b p{margin:0 0 6px}.svc-b p:last-child{margin:0}
-.svc-m.wait .svc-b{opacity:.7}
-.svc-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}.svc-chips:empty{display:none}
-.svc-in{display:flex;gap:8px;align-items:flex-end;padding:12px;border-top:1px solid var(--card-line)}
-.svc-in textarea{flex:1;min-height:40px;max-height:140px;resize:none;padding:10px 12px;border-radius:12px;border:1px solid var(--card-line);background:var(--fill-slab);color:inherit;font:14px/1.4 var(--f-ui,inherit)}
-.svc-clip{flex:none;width:40px;height:40px;border-radius:12px;border:1px solid var(--card-line);background:var(--card);color:inherit;font:500 20px var(--f-ui,inherit);cursor:pointer}.svc-clip:hover{background:var(--hover,rgba(0,0,0,.04))}
-.svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,#2231dd 12%,transparent);border:2px dashed #2231dd;border-radius:18px;font-weight:600;color:#2231dd;pointer-events:none}.svc-chat.over .svc-drop{display:grid}
+.svc-chat{position:relative;display:flex;flex-direction:column;height:calc(100vh - 190px);min-height:460px}
+.svc-th{flex:1;min-height:0;overflow-y:auto;padding:8px 4px 24px}
+.svc-thi{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+.svc-dock{position:relative;max-width:752px;width:100%;margin:0 auto;padding:0 0 6px}
+.svc-dock::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:28px;background:linear-gradient(to top,var(--bg),transparent);pointer-events:none}
+.svc-comp .card{border-radius:14px}
+#svcTa{display:block;width:100%;min-height:52px;max-height:200px;resize:none;border:0;outline:0;background:transparent;padding:14px 18px 2px;font:inherit;font-size:15px;line-height:1.55;color:inherit}
+#svcTa::placeholder{color:var(--faint)}
+.svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1.5px dashed var(--fg);border-radius:16px;font-weight:500;pointer-events:none;z-index:4}.svc-chat.over .svc-drop{display:grid}
 .svc-side{display:flex;flex-direction:column;gap:12px}.svc-side>h4{margin:0;font-size:13px;color:var(--muted);font-weight:600}
 .svc-side .sv-d{margin:0;padding:14px}.svc-side .sv-g{grid-template-columns:1fr 1fr}.svc-side .sv-h{gap:6px}.svc-side .sv-h h3{font-size:14px}.svc-side .sv-hb .bt{padding:5px 10px;font-size:12px}
 .svc-docs{display:flex;flex-direction:column;gap:10px}.svc-sec{padding:12px 14px;gap:8px}.svc-sec h3{font-size:13px}
 #exDoc .svc-sec .xd-list:empty::before{content:'Aún nada';display:block;font-size:12px;color:var(--muted)}
-.svc .xd-top{flex-wrap:wrap}.svc-g>*{min-width:0}.svc-side .sv-g label,.svc-side .sv-g span{min-width:0;overflow-wrap:anywhere}.svc-side .sv-g{grid-template-columns:1fr}
-.svc-in textarea{min-width:0}
+.svc .xd-top{flex-wrap:wrap}.svc-g>*{min-width:0}.svc-side .sv-g label,.svc-side .sv-g span{min-width:0;overflow-wrap:anywhere}.svc-side .sv-g{grid-template-columns:1fr 1fr;gap:10px 14px}
 @media(max-width:980px){.svc-g{grid-template-columns:1fr}.svc-chat{height:70vh}}
-@media(max-width:640px){.svc-t{flex-basis:100%;order:3}.svc .xd-acts{margin-left:auto}.svc-th{padding:14px}.svc-m{max-width:96%}.svc-b{font-size:13.5px}}
+@media(max-width:640px){.svc-t{flex-basis:100%;order:3}.svc .xd-acts{margin-left:auto}.svc-th{padding:8px 0 20px}}
+.svc-side .sv-ro .sv-g input::placeholder{color:transparent;-webkit-text-fill-color:transparent}.svc-side .sv-ro .sv-g input:placeholder-shown{background:linear-gradient(var(--muted),var(--muted)) 0 50%/14px 1.5px no-repeat}
 .sv-ro [data-svusar]{display:none}
 .sv-a{margin-top:12px}.sv-hb{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}.sv-h{flex-wrap:wrap}
 .sv-ro .sv-g input,.sv-ro .sv-g select{background:transparent;border-color:transparent;padding-left:0;color:var(--fg,inherit);font-weight:600;opacity:1;-webkit-text-fill-color:currentColor;appearance:none}
@@ -6264,7 +6262,7 @@ SVR.txt=function(R){
 };
 SVR.estado=function(x){
   var L=x.servicio_leido&&x.servicio_leido.archivos||[];
-  if(!L.length)return 'Sube los archivos abajo y el cerebro llena estos datos solo.';
+  if(!L.length)return 'Mándale al agente la orden o las fotos y él llena estos datos.';
   var u=L[L.length-1];return 'Leído por el cerebro de '+L.length+(L.length===1?' archivo':' archivos')+' · el último: «'+u.archivo+'»';
 };
 SVR.box=function(x){
@@ -6279,7 +6277,7 @@ SVR.box=function(x){
     '<div class="sv-ref" id="svRef"></div><div class="sv-a" hidden><button class="bt pri" type="button" data-svsave>Guardar corrección</button></div></section>';
 };
 /* el modo lectura: los campos los llena el cerebro; «Corregir» los habilita */
-SVR.bloquear=function(on){var b=$('#svDatos');if(!b)return;b.classList.toggle('sv-ro',on);b.querySelectorAll('input,select').forEach(function(i){i.disabled=on});var a=$('#svDatos .sv-a');if(a)a.hidden=on};
+SVR.bloquear=function(on){var b=$('#svDatos');if(!b)return;var o0=b.querySelector('#svTipo option[value=""]');if(o0)o0.textContent=on?'—':'Elige…';b.classList.toggle('sv-ro',on);b.querySelectorAll('input,select').forEach(function(i){i.disabled=on});var a=$('#svDatos .sv-a');if(a)a.hidden=on};
 SVR.pintar=function(x){var b=$('#svDatos');if(!b||!XD.cur||XD.cur.id!==x.id)return;b.outerHTML=SVR.box(x);SVR.bloquear(true);SVR.pintarRef()};
 SVR.leer=async function(x,file,k,meta){
   var base=meta?meta.textContent:'';if(meta){meta.className='xd-meta';meta.textContent=XD.fmt(file.size)+' · el cerebro lo está leyendo…'}
@@ -6366,28 +6364,28 @@ SVC.html=function(x){
   return '<div class="xd-in svc"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Servicios</button>'+
     '<div class="svc-t"><h2>'+esc(x.wo||x.folio)+' <small>Servicio</small></h2><div id="svcCab">'+SVC.cab(x)+'</div></div>'+
     (XDEL.puede(x)?'<div class="xd-acts"><button class="xd-del" type="button" data-xddel>Eliminar servicio</button></div>':'')+'</div>'+
-    '<div class="svc-g"><section class="svc-chat" aria-label="Agente del servicio"><div class="svc-th" id="svcTh" aria-live="polite"></div><div class="svc-chips" id="svcChips"></div>'+
-      '<form class="svc-in" id="svcForm"><button type="button" class="svc-clip" data-svcclip aria-label="Subir archivos" title="Subir orden, fotos, factura o comprobante">+</button>'+
-      '<textarea id="svcTa" rows="1" placeholder="Escríbele al agente o arrastra aquí la orden, fotos, factura o comprobante…" aria-label="Mensaje para el agente del servicio"></textarea><button class="bt pri" type="submit">Enviar</button>'+
+    '<div class="svc-g"><section class="svc-chat" aria-label="Agente del servicio"><div class="svc-th" id="svcTh" aria-live="polite"><div class="svc-thi" id="svcThi"></div></div>'+
+      '<form class="svc-dock" id="svcForm"><div class="composer svc-comp"><div class="card">'+
+      '<textarea id="svcTa" rows="2" placeholder="Escríbele al agente o arrastra aquí la orden, fotos, factura o comprobante…" aria-label="Mensaje para el agente del servicio"></textarea>'+
+      '<div class="c-foot"><button type="button" class="fb" data-svcclip aria-label="Subir archivos" title="Subir orden, fotos, factura o comprobante">'+svg('plus')+'</button><span class="sp"></span>'+
+      '<button class="send" id="svcSend" type="submit" aria-label="Enviar" disabled>'+svg('up')+'</button></div></div></div>'+
       '<input type="file" id="svcFile" multiple hidden accept=".pdf,image/*,.xml"></form><div class="svc-drop" aria-hidden="true">Suéltalo y el agente lo revisa</div></section>'+
     '<aside class="svc-side"><h4>Lo que sé de este servicio</h4>'+SVR.box(x)+
       '<div class="svc-docs">'+XD.SRV.map(function(d){return '<section class="xd-sec svc-sec" data-k="'+d[0]+'"><h3>'+esc(d[1])+'</h3><div class="xd-list"></div></section>'}).join('')+'</div></aside></div></div>';
 };
 SVC.burb=function(m){
-  var d=document.createElement('div');d.className='svc-m '+(m.role==='user'?'yo':'ag');
-  d.innerHTML=m.role==='user'?'<div class="svc-b">'+esc(m.content)+'</div>':'<span class="svc-av">A</span><div class="svc-b">'+md(m.content,false)+'</div>';
-  var th=$('#svcTh');th.appendChild(d);th.scrollTop=th.scrollHeight;return d;
+  var d=document.createElement('div'),c=String(m.content||'');
+  if(m.role==='user'){d.className='msg-user';var a=/^📎 (.+)$/.exec(c);
+    d.innerHTML=a?'<div class="files"><span class="file">'+svg('file','sm')+'<b>'+esc(a[1])+'</b></span></div>':'<div class="bubble">'+esc(c)+'</div>'}
+  else{d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body">'+md(c,false)+'</div></div>'}
+  var th=$('#svcThi');th.appendChild(d);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;return d;
 };
-SVC.pensando=function(t){var d=SVC.burb({role:'assistant',content:'_'+(t||'Pensando')+'…_'});d.classList.add('wait');return d};
-SVC.chips=function(){
-  var x=SVC.x,f=x&&x.flujo,e=f&&f.etapa,L=[];
-  if(e==='servicio'||!e)L.push(['up','Subir orden o fotos del trabajo']);
-  if(e==='factura')L.push(['up','Subir la factura']);
-  if(e==='cobro')L.push(['up','Subir el comprobante de pago']);
-  L.push(['q','¿Cuánto se cobra este servicio?']);
-  if(e==='cerrado')L.push(['q','Hazme el resumen de este servicio']);else L.push(['q','¿Qué me falta para cerrarlo?']);
-  $('#svcChips').innerHTML=L.map(function(c){return '<button type="button" class="gp-chip'+(c[0]==='up'?' arm':'')+'" '+(c[0]==='up'?'data-svcclip':'data-svcq="'+ea(c[1])+'"')+'>'+esc(c[1])+'</button>'}).join('');
-};
+SVC.pensando=function(t){var d=document.createElement('div');d.className='msg-ai';
+  d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"><span class="thinking">'+esc(t||'Pensando')+'<span class="dots"><i></i><i></i><i></i></span></span><span class="typing" hidden></span></div></div>';
+  $('#svcThi').appendChild(d);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;return d};
+SVC.on=function(){var t=$('#svcTa'),b=$('#svcSend');if(!t||!b)return;var on=!!t.value.trim()&&!SVC.busy;b.classList.toggle('on',on);b.disabled=!on;
+  t.style.height='auto';t.style.height=Math.min(200,t.scrollHeight)+'px'};
+SVC.chips=function(){};
 SVC.saludo=function(x){
   var f=x.flujo,e=f&&f.etapa;
   return 'Soy el agente del servicio **'+(x.wo||'')+'**. '+(e==='cerrado'?'Este servicio ya está cobrado: si quieres, te hago el resumen.':
@@ -6399,21 +6397,21 @@ SVC.abrir=async function(x){
   SVC.x=x;SVC.msgs=[];SVC.conv=x.conversation_id||null;SVC.busy=false;
   if(SVC.conv){try{var c=await SB.c.from('conversations').select('messages').eq('id',SVC.conv).single();SVC.msgs=(c.data&&Array.isArray(c.data.messages))?c.data.messages.slice():[]}catch(_){}}
   if(!XD.cur||XD.cur.id!==x.id)return;
-  $('#svcTh').innerHTML='';SVC.msgs.slice(-30).forEach(SVC.burb);
-  SVC.burb({role:'assistant',content:SVC.saludo(x)});SVC.chips();
+  $('#svcThi').innerHTML='';SVC.msgs.slice(-30).forEach(SVC.burb);
+  if(!SVC.msgs.some(function(m){return m.role==='user'&&!/^Abrir la orden /.test(m.content)}))SVC.burb({role:'assistant',content:SVC.saludo(x)});
 };
 SVC.guardar=async function(){if(!SVC.conv)return;try{await SB.c.from('conversations').update({messages:SVC.msgs.slice(-60)}).eq('id',SVC.conv)}catch(e){console.warn('[servicio chat]',e)}};
 SVC.decir=function(role,txt){var m={role:role,content:String(txt).slice(0,3000)};SVC.msgs.push(m);return m};
 SVC.pintar=function(x){var c=$('#svcCab');if(c)c.innerHTML=SVC.cab(x);SVR.pintar(x);SVC.chips()};
 SVC.enviar=async function(text){
   var x=SVC.x;text=String(text||'').trim();if(!x||!text||SVC.busy)return;SVC.busy=true;
-  SVC.burb(SVC.decir('user',text));var w=SVC.pensando('Revisando lo que sé de este servicio');
+  SVC.burb(SVC.decir('user',text));SVC.on();var w=SVC.pensando('Revisando lo que sé de este servicio');
   var resp='';
   try{var ctx=await SVR.ctx(x,text);
     var r=await SB.ai({rol_agente:'garantias',orden:x.wo||null,conversation_id:SVC.conv,folio:x.folio,messages:SVC.msgs.slice(-12,-1).concat([{role:'user',content:ctx+text}]),ahora:MI.nowInfo()},'manual');
     resp=(r&&r.text)||'No encontré esa respuesta en lo que sé de este servicio.';
   }catch(e){resp='No pude contestar ahorita ('+TR.errTxt(e)+'). Inténtalo otra vez en un momento.'}
-  w.remove();SVC.burb(SVC.decir('assistant',resp));SVC.busy=false;SVC.guardar();
+  w.remove();SVC.burb(SVC.decir('assistant',resp));SVC.busy=false;SVC.on();SVC.guardar();
 };
 SVC.NOM={orden:'la orden de servicio',factura:'la factura',comprobante_pago:'el comprobante de pago',foto_odometro:'la foto del odómetro',foto_trabajo:'una foto del trabajo',otro:'un documento'};
 SVC.subir=async function(files){
@@ -6438,11 +6436,12 @@ SVC.subir=async function(files){
   }
   SVC.guardar();
 };
-document.addEventListener('submit',function(e){if(e.target&&e.target.id==='svcForm'){e.preventDefault();var t=$('#svcTa');var v=t.value;t.value='';SVC.enviar(v)}});
-document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='svcTa'&&e.key==='Enter'&&!e.shiftKey){e.preventDefault();var v=e.target.value;e.target.value='';SVC.enviar(v)}});
+document.addEventListener('submit',function(e){if(e.target&&e.target.id==='svcForm'){e.preventDefault();var t=$('#svcTa');var v=t.value;t.value='';SVC.on();SVC.enviar(v)}});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='svcTa')SVC.on()});
+document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='svcTa'&&e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();var v=e.target.value;e.target.value='';SVC.on();SVC.enviar(v)}});
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
   if(t.closest('[data-svcclip]')){var fi=$('#svcFile');if(fi)fi.click();return}
-  var q=t.closest('[data-svcq]');if(q){SVC.enviar(q.dataset.svcq);return}});
+});
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='svcFile'){SVC.subir(e.target.files);e.target.value=''}});
 ['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#exDoc .svc-chat');if(!z)return;e.preventDefault();z.classList.add('over')})});
 document.addEventListener('dragleave',function(e){var z=e.target.closest&&e.target.closest('#exDoc .svc-chat');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
