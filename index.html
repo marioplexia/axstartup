@@ -6285,9 +6285,9 @@ var NODE=(function(){
   function cp(text,msg){return 'data-copy="'+ea(text)+'" data-msg="'+ea(msg)+'"'}
   function acts(x){
     var L=[];
-    if(x.status==='borrador'&&x.tipo!=='Servicio'){L.push(A('data-r="ok"','Fue aceptada','ok'));L.push(A('data-r="no"','Fue rechazada','no'))}
+    if(x.status==='borrador'&&(!x.tipo||x.tipo==='PREA')){L.push(A('data-r="ok"','Fue aceptada','ok'));L.push(A('data-r="no"','Fue rechazada','no'))}
     L.push(A(cp(x.folio,'Folio copiado'),'Copiar folio','copy'));
-    if(x.tipo!=='Servicio')L.push(A('data-xmv="1"','Mover de etapa','chev'));
+    if(!x.tipo||x.tipo==='PREA')L.push(A('data-xmv="1"','Mover de etapa','chev'));
     if(XDEL.puede(x))L.push(A('data-xdelc="1"','Eliminar expediente','trash'));
     if(x.status!=='borrador')L.push(A(cp([x.folio,x.queja,[x.sys,x.op].filter(Boolean).join(' · ')].filter(Boolean).join(' — '),'Resumen copiado'),'Copiar resumen','doc'));
     return L;
@@ -6557,15 +6557,18 @@ EX.render=function(){
   $('#exSub').textContent=EX.SUB[EX.f]();
   var q=norm(EX.q),admin=SB.user&&(SB.user.role==='admin'||SB.user.gerente),stl={borrador:'Pendiente',aceptada:'Aceptada',rechazada:'Rechazada'},html='',n=0;
   if(EX.loading){$('#exList').innerHTML='<div class="ex-empty">Cargando…</div>';return}
-  EX.pipe(EX.rows.filter(function(x){return x.tipo!=='Servicio'}));
+  var esPrea=function(x){return !x.tipo||x.tipo==='PREA'};
+  EX.pipe(EX.rows.filter(esPrea));
   if(EX.f==='prea'){
-    var list=EX.rows.filter(function(x){return x.tipo!=='Servicio'&&(!EX.pe||EX.etapa(x)===EX.pe)}).filter(function(x){return !q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0});
+    var list=EX.rows.filter(function(x){return esPrea(x)&&(!EX.pe||EX.etapa(x)===EX.pe)}).filter(function(x){return !q||norm([x.folio,x.queja,x.vin,x.wo,x.sys].join(' ')).indexOf(q)>=0});
     n=list.length;html=list.map(function(x){x._etapa=EX.nomE(EX.etapa(x));return NODE.card(x,admin,stl)}).join('');
     if(!n)html='<div class="ex-empty">'+(EX.pe&&!q?'Ninguna PREA en «'+esc((EX.PIPE.filter(function(e){return e[0]===EX.pe})[0]||['',''])[1])+'».':q?'Sin resultados para esa búsqueda.':'Aún no hay PREAs. Cada PREA que arme el agente aparecerá aquí.')+'</div>';
   }else if(EX.f==='cam'){
-    var lc=EX.cam.filter(function(x){return !q||norm([x.orden,x.cliente,x.unidad,x.campana].join(' ')).indexOf(q)>=0});
-    n=lc.length;html=lc.map(function(x){return NODE.cam(x)}).join('');
-    if(!n)html='<div class="ex-empty">'+(EX.cam.length?'Sin resultados para esa búsqueda.':'Aún no hay campañas registradas.')+'</div>';
+    var ce=EX.rows.filter(function(x){return x.tipo==='Campaña'&&(!q||norm([x.folio,x.wo,x.queja].join(' ')).indexOf(q)>=0)}),conExp=ce.map(function(x){return String(x.wo||'')});
+    var lc=EX.cam.filter(function(x){return conExp.indexOf(String(x.orden||''))<0&&(!q||norm([x.orden,x.cliente,x.unidad,x.campana].join(' ')).indexOf(q)>=0)});
+    n=ce.length+lc.length;
+    html=ce.map(function(x){var f=x.flujo,y=Object.assign({},x,{status:f&&f.etapa==='cerrado'?'aceptada':'borrador'});return NODE.card(y,admin,{borrador:f?FL.nom(f.etapa):'En proceso',aceptada:'Cobrada'})}).join('')+lc.map(function(x){return NODE.cam(x)}).join('');
+    if(!n)html='<div class="ex-empty">'+(EX.cam.length||EX.rows.some(function(x){return x.tipo==='Campaña'})?'Sin resultados para esa búsqueda.':'Aún no hay campañas. En el Agente de Garantías elige «Campaña», escribe la orden y dale Continuar.')+'</div>';
   }else{
     var sv=EX.rows.filter(function(x){return x.tipo==='Servicio'&&(!q||norm([x.folio,x.wo,x.queja].join(' ')).indexOf(q)>=0)});
     var stS={borrador:'En proceso'};
@@ -7846,7 +7849,7 @@ document.addEventListener('click',function(e){
   if(o){SB.c.storage.from(XD.B).createSignedUrl(o.dataset.xdopen,300).then(function(r){if(r.data&&r.data.signedUrl)window.open(r.data.signedUrl,'_blank','noopener');else toast('No pude abrir el archivo')});return}
   var z=t.closest('#exDoc .xd-zone');if(z){if(t.tagName!=='INPUT')$('input',z).click();return}
   /* la tarjeta del expediente (no sus botones) */
-  var c=t.closest('#exList .nod');if(c&&(EX.f==='prea'||EX.f==='srv')&&!t.closest('.nod-act')&&c.dataset.id)XD.open(c.dataset.id);
+  var c=t.closest('#exList .nod');if(c&&(EX.f==='prea'||EX.f==='srv'||EX.f==='cam')&&!t.closest('.nod-act')&&c.dataset.id)XD.open(c.dataset.id);
 });
 document.addEventListener('change',function(e){
   var i=e.target;if(i.matches&&i.matches('#xdQ input[type=radio]')){XD.qVerd(XD.qRead());return}
@@ -7859,7 +7862,7 @@ document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.cl
 document.addEventListener('keydown',function(e){
   if(XD.cur&&e.key==='Escape'){XD.close();return}
   var z=e.target.closest&&e.target.closest('#exDoc .xd-zone');if(z&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('input',z).click()}
-  var c=e.target.classList&&e.target.classList.contains('nod')&&e.target.closest('#exList');if(c&&e.key==='Enter'&&(EX.f==='prea'||EX.f==='srv'))XD.open(e.target.dataset.id);
+  var c=e.target.classList&&e.target.classList.contains('nod')&&e.target.closest('#exList');if(c&&e.key==='Enter'&&(EX.f==='prea'||EX.f==='srv'||EX.f==='cam'))XD.open(e.target.dataset.id);
 });
 SB.lgMsg=function(t,err){var m=$('#lgMsg');m.textContent=t||'';m.className='axl-msg'+(t?' on':'')+(t&&err?' err':'')};
 SB.lgMode=function(m){
