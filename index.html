@@ -1075,6 +1075,129 @@ canvas.orb{display:block;width:100%;height:100%;border-radius:50%;background:#2a
 .gp-a span:hover{background:var(--card);color:var(--fg)}
 .gp-none{padding:26px 14px;text-align:center;color:var(--muted);font-size:13px;line-height:1.55}
 @media(max-width:1100px){.gp{display:none}}
+
+/* ═══════════ Tablero del asesor · tema «espacio de trabajo» ═══════════
+   Lienzo gris claro, barra blanca, títulos en negritas, tarjetas blancas con sombra suave,
+   listas tipo flujo (palomita negra + línea) y barras de progreso. Solo aplica al asesor. */
+body.asesor{--as-canvas:#f4f4f5;--as-card:#ffffff;--as-line:#ebebec;--as-mut:#8b8b90;--as-ink:#111113;--as-soft:#f4f4f5;--as-blue:#3b82f6;--as-red:#e5484d;--as-sh:0 1px 2px rgba(16,16,20,.04),0 8px 24px -12px rgba(16,16,20,.10)}
+:root[data-theme="dark"] body.asesor{--as-canvas:#0e0e10;--as-card:#18181b;--as-line:#27272a;--as-mut:#8f8f96;--as-ink:#f4f4f5;--as-soft:#1f1f23;--as-sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body.asesor{--as-canvas:#0e0e10;--as-card:#18181b;--as-line:#27272a;--as-mut:#8f8f96;--as-ink:#f4f4f5;--as-soft:#1f1f23;--as-sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6)}}
+body.asesor{background:var(--as-canvas);letter-spacing:-.005em}
+body.asesor .main{background:var(--as-canvas)}
+body.asesor .stage[data-state="chat"] .dock::before,body.asesor .svc-dock::before{background:linear-gradient(to top,var(--as-canvas),transparent)}
+body.asesor #exDoc,body.asesor .admin{background:var(--as-canvas)}
+/* barra lateral */
+body.asesor #app>.gp{background:var(--as-card);border-right:1px solid var(--as-line);width:272px}
+body.asesor .as-top{padding:14px 16px 0}body.asesor .as-top .brand{opacity:.0;width:0;overflow:hidden}
+body.asesor .as-top{position:absolute;right:8px;top:6px;padding:0;z-index:2}
+body.asesor #app>.gp{position:relative}
+.as-ws{display:flex;align-items:center;gap:11px;margin:16px 14px 6px;padding:0 0 14px;border-bottom:1px solid var(--as-line)}
+.as-logo{flex:none;width:36px;height:36px;border-radius:50%;background:var(--as-ink);color:var(--as-card);display:grid;place-items:center;font:700 13px var(--f-ui);letter-spacing:-.02em}
+.as-ws b{display:block;font-size:14.5px;font-weight:650;letter-spacing:-.015em;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.as-ws small{display:block;color:var(--as-mut);font-size:12px}
+body.asesor .gp-h{padding:14px 16px 8px}
+body.asesor .gp-h b{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut)}
+body.asesor .gp-h small{display:none}
+body.asesor .gp-new{height:28px;padding:0 11px;border-radius:99px;border:0;background:var(--as-ink);color:var(--as-card);font:600 12px var(--f-ui)}
+body.asesor .gp-new:hover{opacity:.88;background:var(--as-ink)}
+body.asesor .gp-s{margin:0 12px 10px;height:36px;border:0;border-radius:10px;background:var(--as-soft)}
+body.asesor .gp-l{padding:2px 8px 18px}
+body.asesor .gp-d{padding:14px 8px 6px;font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--as-mut)}
+body.asesor .gp-i{padding:8px 10px;border-radius:10px}
+body.asesor .gp-i:hover{background:var(--as-soft)}
+body.asesor .gp-i[aria-current="true"]{background:var(--as-soft);box-shadow:inset 0 0 0 1px var(--as-line)}
+body.asesor .gp-t{font-size:13.5px;font-weight:550;letter-spacing:-.01em}
+body.asesor .gp-q{font-size:12px;color:var(--as-mut)}
+body.asesor .gp-x{background:var(--as-soft);color:var(--as-mut);font-weight:600;border-radius:99px;padding:1px 8px}
+body.asesor .gp-ap,body.asesor .gp-demo{border:0;margin-bottom:2px}
+body.asesor .gp-ap .gp-api{background:var(--as-ink);border-radius:6px}
+body.asesor .gp-st{width:7px;height:7px}
+/* barra de arriba: ruta en píldora */
+body.asesor .topbar{background:transparent}
+body.asesor .crumbs{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;background:var(--as-card);box-shadow:var(--as-sh);font-size:12.5px}
+body.asesor .crumbs .sep{color:var(--as-mut)}body.asesor .crumbs #crumb{color:var(--as-ink);font-weight:550}body.asesor .crumbs:has(#crumbSep:not([hidden])) #crumb{color:var(--as-mut);font-weight:400}body.asesor .crumbs .cur{color:var(--as-ink);font-weight:550}
+body.asesor .crumbs #crumb:only-child,body.asesor .crumbs #crumbSep[hidden]~*{color:var(--as-ink)}
+/* títulos: negritas, sin letra de adorno */
+body.asesor .hero-title,body.asesor .ap .ad-head h2,body.asesor .ap-lec h2,body.asesor .ap-card h3,body.asesor .xd-top h2,body.asesor .svc-t h2,body.asesor .ad-head h2,body.asesor #viewExp h1,body.asesor #viewExp h2{font-family:var(--f-ui)!important;font-weight:700!important;letter-spacing:-.035em!important}
+body.asesor .hero-title{font-size:clamp(30px,4.4vw,40px)}
+body.asesor .ap .ad-head h2{font-size:clamp(30px,3.6vw,40px)}
+/* chat */
+.ax-mono{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--as-ink,#111);color:var(--as-card,#fff);font:700 11px var(--f-ui);letter-spacing:-.02em}
+body.asesor .ai-mark{width:28px;height:28px}
+body.asesor .ai-body{font-size:14.5px;line-height:1.65}
+body.asesor .msg-user .bubble{background:var(--as-card);box-shadow:var(--as-sh);border-radius:14px;font-size:14.5px}
+body.asesor .composer,body.asesor .svc-comp{background:transparent;box-shadow:none}
+body.asesor .composer .card,body.asesor .svc-comp .card{background:var(--as-card);border:1px solid var(--as-line);border-radius:16px;box-shadow:var(--as-sh)}
+body.asesor .c-head{padding:6px 6px 8px}
+body.asesor .c-head .dd,body.asesor .svc-dd{background:var(--as-card);border-radius:99px;box-shadow:var(--as-sh);height:28px;padding:0 11px;font-size:12.5px;color:var(--as-ink)}
+body.asesor .send{border-radius:50%;width:34px;height:34px}body.asesor .send .ic{width:17px;height:17px;stroke-width:2.2}
+body.asesor .ai-actions .fb{color:var(--as-mut)}
+/* tarjetas */
+body.asesor .xd-cont,body.asesor .svc-ck,body.asesor .prp-fl,body.asesor .fl,body.asesor .ap-c,body.asesor .ap-card,body.asesor .ap-tot,body.asesor .rf-c,body.asesor .rf-f,body.asesor .act,body.asesor .ap-idx,body.asesor .ex-card,body.asesor .nod{background:var(--as-card);border:1px solid var(--as-line);box-shadow:var(--as-sh)}
+body.asesor .xd-cont,body.asesor .svc-ck,body.asesor .fl,body.asesor .ap-c,body.asesor .ap-card,body.asesor .ap-tot{border-radius:16px}
+body.asesor .prp{background:var(--as-card);border-left:1px solid var(--as-line)}
+body.asesor .ap-cert{background:var(--as-ink)}
+body.asesor .bt{border-radius:10px}body.asesor .bt.pri{background:var(--as-ink);color:var(--as-card);border-color:var(--as-ink)}
+body.asesor .xd-back{border-radius:99px;background:var(--as-card);box-shadow:var(--as-sh);border:0}
+/* encabezados de tarjeta: mayúsculas chiquitas con línea abajo */
+body.asesor .xd-cont h4,body.asesor .svc-ck h4,body.asesor .xa-h h3{font-size:12px!important;font-weight:600!important;letter-spacing:.05em;text-transform:uppercase;color:var(--as-ink)!important;margin:0}
+body.asesor .xd-cont h4,body.asesor .svc-ck h4{padding-bottom:12px;margin:-2px -18px 12px;padding-left:18px;border-bottom:1px solid var(--as-line)}
+body.asesor .xd-cont h5,body.asesor .prp h5{font-size:10.5px;letter-spacing:.07em;color:var(--as-mut)}
+/* «Arma el expediente»: tarjeta blanca, no bloque negro */
+body.asesor .xa{background:var(--as-card)!important;color:var(--as-ink)!important;border:1px solid var(--as-line);box-shadow:var(--as-sh);border-radius:16px}
+body.asesor .xa .xa-mk{background:var(--as-ink);color:var(--as-card)}
+body.asesor .xa-zone{background:var(--as-soft)!important;border:1.5px dashed #d4d4d8!important;color:var(--as-ink)!important;border-radius:14px}
+body.asesor .xa-zone .xd-icon{background:var(--as-card)!important;color:var(--as-ink)!important;box-shadow:var(--as-sh)}
+body.asesor .xa-zone .xd-say span{color:var(--as-mut)!important}
+body.asesor .xa-f{background:var(--as-soft)!important;color:var(--as-ink)!important}
+/* proceso: puntos y línea en negro */
+body.asesor .fl-st li.done i,body.asesor .fl-st li.now i{background:var(--as-ink)!important;border-color:var(--as-ink)!important}
+body.asesor .fl-st li.done::before,body.asesor .fl-st li.done::after,body.asesor .fl-st li.now::before{background:var(--as-ink)!important}
+body.asesor .fl-next{background:var(--as-soft)!important;border-radius:12px}
+body.asesor .prp-fl li.done i{background:var(--as-ink)}body.asesor .prp-fl li.now i{background:var(--as-blue)}
+/* ── listas tipo flujo: palomita negra unida por una línea; lo que falta, círculo vacío y etiqueta roja ── */
+body.asesor .xd-cont ul,body.asesor .prp ul,body.asesor .svc-ck ol{position:relative}
+body.asesor .xd-ci,body.asesor .svc-ck li{position:relative}
+body.asesor .xd-ci:not(:last-child)::before,body.asesor .svc-ck li:not(:last-child)::before{content:"";position:absolute;left:15px;top:28px;bottom:-6px;width:1.5px;background:var(--as-line)}
+body.asesor .xd-ci.ok:not(:last-child)::before,body.asesor .svc-ck li.ok:not(:last-child)::before{background:var(--as-ink);opacity:.85}
+body.asesor .xd-ci .xd-cb,body.asesor .svc-cb{width:20px!important;height:20px!important;border-radius:50%!important;position:relative;z-index:1}
+body.asesor .xd-ci.ok .xd-cb,body.asesor .svc-ck li.ok .svc-cb{background:var(--as-ink)!important;border-color:var(--as-ink)!important;color:var(--as-card)!important}
+body.asesor .xd-ci.falta .xd-cb,body.asesor .svc-ck li.no .svc-cb{background:var(--as-card)!important;border:1.5px solid #d4d4d8!important;color:transparent!important}
+body.asesor .xd-ci.falta .xd-cb .ic,body.asesor .svc-ck li.no .svc-cb .ic{display:none}
+body.asesor .xd-ci.ok .xd-cn,body.asesor .svc-ck li.ok{color:var(--as-ink)!important}
+body.asesor .xd-ci.ok .xd-cn small{color:var(--as-mut)!important}
+body.asesor .xd-ci.falta .xd-cn{color:var(--as-mut)!important}
+body.asesor .xd-ci.falta .xd-cn small{color:var(--as-red)!important;font-weight:550}
+body.asesor .svc-ck li.no{color:var(--as-mut)!important}
+body.asesor .svc-ck li.no>span:nth-child(2)::after{content:"Pendiente";margin-left:8px;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--as-red)}
+body.asesor .xd-cont-s.ok{color:var(--as-ink)!important}body.asesor .xd-cont-s.mal{color:var(--as-mut)!important}
+body.asesor .xd-mas2 .xd-ci::before,body.asesor .prp .xd-mas2 .xd-ci::before{display:none}
+/* barra de progreso, como «PROGRESS 60%» */
+.wf-pg{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px 10px;margin:16px -18px -18px;padding:14px 18px 18px;border-top:1px solid var(--as-line,#ebebec);background:linear-gradient(to bottom,transparent,var(--as-soft,#f4f4f5))}
+.wf-pg span{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}.wf-pg b{font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace}
+.wf-pg>i{grid-column:1/-1;display:block;height:5px;border-radius:99px;background:#e4e4e7;overflow:hidden}.wf-pg>i>i{display:block;height:100%;width:0;border-radius:99px;background:var(--as-ink,#111);transition:width .5s cubic-bezier(.3,.8,.3,1)}
+body:not(.asesor) .wf-pg{display:none}
+body.asesor .prp .wf-pg{margin:16px -16px 0;padding:14px 16px}
+body.asesor .xd-cont .wf-pg+.xd-cont-pdf{margin-top:28px}
+/* actividad de los agentes = tarjeta de flujo «TRABAJANDO» */
+body.asesor .act{border-radius:14px;padding:0;overflow:hidden;max-width:560px}
+body.asesor .act-h{display:flex;width:100%;padding:12px 16px;border-bottom:1px solid var(--as-line);color:var(--as-ink);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+body.asesor .act-t b{font-weight:600;color:var(--as-ink)}
+body.asesor .act-sp i{background:var(--as-blue)}
+body.asesor .act.fin .act-h{border-bottom:0;color:var(--as-mut);text-transform:none;letter-spacing:-.005em;font-size:13px;font-weight:500}body.asesor .act.fin[data-open="true"] .act-h{border-bottom:1px solid var(--as-line)}
+body.asesor .act-l{border:0;border-radius:0;margin:0;padding:8px 16px 6px;background:transparent}
+body.asesor .act-l li{border-top:0;padding:8px 0;position:relative;font-size:13.5px}
+body.asesor .act-l li:not(:last-child)::before{content:"";position:absolute;left:9.5px;top:28px;bottom:-8px;width:1.5px;background:var(--as-line)}
+body.asesor .act-l li.ok:not(:last-child)::before{background:var(--as-ink)}
+body.asesor .act-i{width:20px;height:20px;border-width:1.5px;border-color:var(--as-line);border-top-color:var(--as-blue)}
+body.asesor .act-l li.ok .act-i{background-color:var(--as-ink)!important;width:20px;height:20px}
+body.asesor .act-ag{background:transparent;padding:0;font-size:11px;color:var(--as-mut);font-weight:600}
+body.asesor .act-l li.nota{font-style:normal;color:var(--as-mut);padding-left:30px}
+body.asesor .act .wf-pg{margin:6px 0 0;padding:12px 16px 14px}
+body.asesor .act.fin .wf-pg,body.asesor .act[data-open="false"] .wf-pg{display:none}
+/* Aprende */
+body.asesor .ap-ic{background:var(--as-soft)}body.asesor .ap-segs i.now{background:var(--as-ink)}body.asesor .ap-segs i.ok{background:var(--as-ink);opacity:.35}
+body.asesor .ap-bar i{background:var(--as-ink)}
+
 /* ══ Modo asesor ══ */
 body.asesor .sb-wrap,body.asesor .sb-scrim,body.asesor #sbOpen{display:none!important}
 body.asesor #app>.gp{width:288px;border-left:0;border-right:1px solid var(--line);background:var(--bg)}
@@ -3440,7 +3563,7 @@ function updateSend(){
   /* sending: the eyes. Streaming: the stop square, because that press
      has to read as "stop" and nothing else */
   if(S.streaming){EYE.unmount(sendBtn);sendBtn.innerHTML=svg('stop')}
-  else EYE.mount(sendBtn);
+  else if(document.body.classList.contains('asesor')){EYE.unmount(sendBtn);sendBtn.innerHTML=svg('up')}else EYE.mount(sendBtn);
   sendBtn.setAttribute('aria-label',S.streaming?'Detener':'Enviar');
 }
 ta.addEventListener('input',function(){typeTok++;autosize();updateSend()});
@@ -5827,18 +5950,19 @@ ACT.T={
 ACT.seg=function(ms){var s=Math.max(0,Math.round(ms/1000));return s<60?s+'s':Math.floor(s/60)+'m '+(s%60)+'s'};
 ACT.nuevo=function(col,antes){
   var el=document.createElement('div');el.className='act';el.dataset.open='true';
-  el.innerHTML='<button type="button" class="act-h" aria-expanded="true"><span class="act-sp" aria-hidden="true"><i></i><i></i><i></i></span><span class="act-t"><b>Pensando</b></span><span class="act-time">0s</span><svg class="act-ch" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button><ol class="act-l" aria-live="polite"></ol>';
+  el.innerHTML='<button type="button" class="act-h" aria-expanded="true"><span class="act-sp" aria-hidden="true"><i></i><i></i><i></i></span><span class="act-t"><b>Pensando</b></span><span class="act-time">0s</span><svg class="act-ch" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button><ol class="act-l" aria-live="polite"></ol><div class="wf-pg"><span>Progreso</span><b>0%</b><i><i></i></i></div>';
   if(antes)col.insertBefore(el,antes);else col.appendChild(el);
   var a={el:el,t0:Date.now(),li:{},lista:[],ag:{},vivo:true};
   a.tm=setInterval(function(){if(!el.isConnected){clearInterval(a.tm);return}el.querySelector('.act-time').textContent=ACT.seg(Date.now()-a.t0)},1000);
   return a;
 };
 ACT.titulo=function(a,ag){if(!a.vivo)return;a.el.querySelector('.act-t').innerHTML='<b>Trabajando</b>'+(ag?' · '+esc(ag):'')};
-ACT.fila=function(a,id,ag,tx){
+ACT.fila=function(a,id,ag,tx){setTimeout(function(){ACT.pg(a)},0);
   var li=document.createElement('li');li.className='run';li.innerHTML='<span class="act-i" aria-hidden="true"></span><span class="act-ag">'+esc(ag)+'</span><span class="act-tx">'+esc(tx)+'</span><span class="act-res"></span>';
   a.el.querySelector('.act-l').appendChild(li);a.li[id]={li:li,o:{ag:ag,tx:tx,res:'',ok:null}};a.lista.push(a.li[id].o);a.ag[ag]=1;ACT.titulo(a,ag);ACT.baja(a);return li;
 };
-ACT.listo=function(a,id,res,mal){var f=a.li[id];if(!f)return;f.li.className=mal?'err':'ok';f.o.ok=!mal;f.o.res=res||'';f.li.querySelector('.act-res').textContent=res||''};
+ACT.pg=function(a){var L=a.lista.filter(function(o){return !o.nota}),n=L.length,h=L.filter(function(o){return o.ok!==null}).length,p=n?Math.round(h*100/n):0,g=a.el.querySelector('.wf-pg');if(g){g.querySelector('b').textContent=p+'%';g.querySelector('i>i').style.width=p+'%'}};
+ACT.listo=function(a,id,res,mal){var f=a.li[id];if(!f)return;setTimeout(function(){ACT.pg(a)},0);f.li.className=mal?'err':'ok';f.o.ok=!mal;f.o.res=res||'';f.li.querySelector('.act-res').textContent=res||''};
 ACT.baja=function(a){var th=a.el.closest('#svcTh,.thread');if(th)th.scrollTop=th.scrollHeight};
 /* un paso local (subir, guardar, comparar…): se marca solo cuando termina la promesa */
 ACT.paso=async function(a,ag,tx,fn){var id='l'+Math.random().toString(36).slice(2);ACT.fila(a,id,ag,tx);try{var r=await fn();ACT.listo(a,id,typeof r==='string'&&r.length<60?r:(r&&r.toString!==Object.prototype.toString&&typeof r==='object'?String(r):''));return r}catch(e){ACT.listo(a,id,'no se pudo',true);throw e}};
@@ -6908,6 +7032,7 @@ PRP.pintar=function(x,sec){
     (opt.length?'<h5>Según aplique</h5><ul>'+opt.map(function(d){return PRP.item(x,d,sec)}).join('')+'</ul>':'')+
     '<h5>Cobranza</h5><ul>'+cob.map(function(d){return PRP.item(x,d,sec)}).join('')+'</ul>'+
     (mas.length?'<h5>También falta</h5><ul>'+mas.slice(0,6).map(function(t){return '<li class="xd-ci falta"><span class="xd-cb" aria-hidden="true">'+svg('x')+'</span><span class="xd-cn">'+esc(t.replace(/ Captúralas en «Fechas del expediente»\.?/,''))+'</span></li>'}).join('')+'</ul>':'')+
+    '<div class="wf-pg"><span>Progreso</span><b>'+Math.round(hechos*100/Math.max(1,req.length))+'%</b><i><i style="width:'+Math.round(hechos*100/Math.max(1,req.length))+'%"></i></i></div>'+
     '<div class="prp-b"><button type="button" class="bt" data-prpdf>Descargar PDF</button><button type="button" class="bt" data-prexp>Abrir expediente</button></div></div>';
   p.hidden=false;
 };
@@ -6979,7 +7104,7 @@ document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' '
 (function(){var r0=GP.render;GP.render=function(){r0.apply(this,arguments);var b=$('#gpList');if(!b||GP.ag()==='cobros')return;
   var T=AP.total();b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-ap" role="listitem" tabindex="0" data-apnav'+(S.view==='aprende'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('present','sm')+'</span><span>Aprende Ax AI</span><span class="gp-x">'+T.h+'/'+T.n+'</span></div><div class="gp-q">Cursos de la plataforma para asesores</div></div>');
   b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild)}})();
-SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x)};
+SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x);var c=el&&el.closest('.svc-ck');if(!c)return;var n=el.children.length,h=el.querySelectorAll('li.ok').length,p=n?Math.round(h*100/n):0,g=c.querySelector('.wf-pg');if(!g){c.querySelector('ol').insertAdjacentHTML('afterend','<div class="wf-pg"><span>Progreso</span><b></b><i><i></i></i></div>');g=c.querySelector('.wf-pg')}g.querySelector('b').textContent=p+'%';g.querySelector('i>i').style.width=p+'%'};
 SVC.ACC='<div class="ai-actions"><button class="fb" type="button" data-sva="copy" aria-label="Copiar">'+svg('copy','sm')+'</button><button class="fb" type="button" data-sva="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button><button class="fb" type="button" data-sva="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button></div>';
 SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div>'+SVC.ACC+'</div>';$('.ai-actions',d).hidden=true;$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
 SVC.enviar=async function(text){
@@ -7055,7 +7180,7 @@ document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.cl
 XD.openSrv=function(x,el){
   el.innerHTML=SVC.html(x);
   crumb.textContent='Agente de Garantías';crumbSep.hidden=false;crumb2.hidden=false;crumb2.textContent=(x.wo||x.folio)+' · Servicio';
-  var sb=$('#svcSend');if(sb&&typeof EYE!=='undefined')EYE.mount(sb);
+  var sb=$('#svcSend');if(sb&&document.body.classList.contains('asesor'))sb.innerHTML=svg('up');else if(sb&&typeof EYE!=='undefined')EYE.mount(sb);
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   SVR.bloquear(true);SVR.pintarRef();if(!x.demo)XD.SRV.forEach(function(d){XD.load(x.id,d[0])});
   SVC.abrir(x);if(!x.demo)FL.refresh(x).then(function(){if(XD.cur&&XD.cur.id===x.id)SVC.ck()});
@@ -7119,6 +7244,7 @@ XD.cont=function(){
     '<p class="xd-cont-m">'+(cam?'Una campaña no lleva queja, diagnóstico, fotos de falla ni destrucción de partes, salvo que el boletín lo pida: si los subes, aparecen aquí.':(opt.length-optSi.length)+' apartados más según aplique (PRA, batería, facturas de partes, TAC, mantenimientos, M2, WPC): aparecen aquí cuando el agente encuentra uno.')+'</p>'+
     '<h5>Cobranza</h5><ul>'+cob.map(XD.contItem).join('')+'</ul>'+
     (mas.length?'<h5>También falta</h5><ul class="xd-mas2">'+mas.slice(0,8).map(function(t){return '<li class="xd-ci falta"><span class="xd-cb" aria-hidden="true">'+svg('x')+'</span><span class="xd-cn">'+esc(t.replace(/ Captúralas en «Fechas del expediente»\.?/,''))+'</span></li>'}).join('')+'</ul>':'')+
+    '<div class="wf-pg"><span>Progreso</span><b>'+Math.round(hechos*100/Math.max(1,req.length))+'%</b><i><i style="width:'+Math.round(hechos*100/Math.max(1,req.length))+'%"></i></i></div>'+
     '<button class="bt xd-cont-pdf" type="button" data-xz="pdf">Descargar expediente (PDF)</button>';
 };
 XD.contVer=function(){
@@ -10365,10 +10491,11 @@ function start(text,files){
    un acceso corto a Inicio, Bandeja, Expedientes y Notas. En celular la lista se abre como cajón. */
 var AS={on:false};
 AS.set=function(on){
-  AS.on=!!on;document.body.classList.toggle('asesor',AS.on);
+  AS.on=!!on;document.body.classList.toggle('asesor',AS.on);if(AS.on)ORB='<span class="ax-mono">Ax</span>';
   var g=$('#gp');if(!g)return;
   if(AS.on&&!g.dataset.as){g.dataset.as='1';
     $('#app').insertBefore(g,$('.main'));
+    var ag=(SB.agency||'Tu agencia');g.insertAdjacentHTML('afterbegin','<div class="as-ws"><span class="as-logo">Ax</span><div><b>'+esc(ag)+'</b><small>Garantías · asesor</small></div></div>');
     g.insertAdjacentHTML('afterbegin','<div class="as-top"><div class="brand"><svg class="br-mark" viewBox="0 0 1122 883" aria-hidden="true" focusable="false"><path fill="currentColor" d="M0 0 465 0 465 475Z M499 0 937 439 493 883Z M949 0 947 409 744 205Z M979 0 1122 147 979 147Z M465 688 465 883 270 883Z"/></svg><span>Ax AI</span></div><span class="as-bell" id="asBell"></span></div>');
     $('#asBell').appendChild($('#bell'));
     var gs=$('#gpShow'),cw=$('.crumbs-wrap');cw.insertBefore(gs,cw.firstChild);gs.innerHTML=svg('panel');gs.setAttribute('aria-label','Mostrar órdenes');
