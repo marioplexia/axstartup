@@ -1202,6 +1202,39 @@ body.asesor .act.fin .wf-pg,body.asesor .act[data-open="false"] .wf-pg{display:n
 body.asesor .ap-ic{background:var(--as-soft)}body.asesor .ap-segs i.now{background:var(--as-ink)}body.asesor .ap-segs i.ok{background:var(--as-ink);opacity:.35}
 body.asesor .ap-bar i{background:var(--as-ink)}
 
+/* ══ Inicio del asesor ══ */
+body.asesor #viewExp>.ad-in{display:none}
+.ah-in{max-width:1180px;margin:0 auto;padding:10px max(24px,env(safe-area-inset-right,0px)) 48px max(24px,env(safe-area-inset-left,0px))}
+.ah-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:14px 0 22px}
+.ah-head h1{margin:0;font:700 clamp(30px,4vw,40px)/1.1 var(--f-ui);letter-spacing:-.035em}
+.ah-head p{margin:8px 0 0;color:var(--as-mut,#8b8b90);font-size:14px}
+.ah-new{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:99px;background:var(--as-ink,#111);color:var(--as-card,#fff);font:600 13.5px var(--f-ui);cursor:pointer}
+.ah-new .ic{width:16px;height:16px;stroke-width:2.2}
+.ah-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.ah-c{display:flex;flex-direction:column;gap:4px;text-align:left;padding:18px;border-radius:18px;background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);box-shadow:var(--as-sh);color:inherit;font:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.ah-c:hover{transform:translateY(-2px);box-shadow:0 1px 2px rgba(16,16,20,.05),0 16px 32px -16px rgba(16,16,20,.22)}
+.ah-ch{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.ah-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--as-soft,#f4f4f5)}.ah-ic .ic{width:16px;height:16px}
+.ah-ct{flex:1;font-weight:600;font-size:14px}.ah-dots{color:var(--as-mut,#8b8b90);letter-spacing:1px}
+.ah-n{font:700 44px/1 var(--f-ui);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.ah-sub{color:var(--as-mut,#8b8b90);font-size:12.5px;margin-bottom:12px}
+.ah-ft{display:flex;align-items:center;gap:8px;padding-top:12px;border-top:1px solid var(--as-line,#ebebec);font-size:12.5px;color:var(--as-mut,#8b8b90)}
+.ah-ft span{flex:1}.ah-ft b{font:600 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--as-ink,#111)}
+.ah-ring{width:20px;height:20px;transform:rotate(-90deg)}.ah-ring circle{fill:none;stroke-width:4}.ah-ring .t{stroke:#e4e4e7}.ah-ring .v{stroke:var(--as-ink,#111);stroke-linecap:round;transition:stroke-dashoffset .6s}
+.ah-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.ah-tags i{font-style:normal;font-size:11.5px;padding:3px 9px;border-radius:99px;background:var(--as-soft,#f4f4f5);color:var(--as-ink,#111)}
+.ah-box{margin-top:16px;padding:6px 6px 8px;border-radius:18px;background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);box-shadow:var(--as-sh)}
+.ah-bh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px}.ah-bh b{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}.ah-bh span{font-size:12.5px;color:var(--as-mut,#8b8b90)}
+.ah-list{display:flex;flex-direction:column}
+.ah-r{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;text-align:left;color:inherit;font:inherit;cursor:pointer;border-top:1px solid var(--as-line,#ebebec)}
+.ah-r:first-child{border-top:0}.ah-r:hover{background:var(--as-soft,#f4f4f5)}
+.ah-rt{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:99px;background:var(--as-soft,#f4f4f5);color:var(--as-mut,#8b8b90)}
+.ah-r b{font-weight:600;font-size:14px}.ah-rs{color:var(--as-mut,#8b8b90);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ah-rv{font-size:12px;color:var(--as-mut,#8b8b90);white-space:nowrap}.ah-rv.warn{color:#b07400}.ah-rv.bad{color:var(--as-red,#e5484d)}
+.ah-vacio{margin:0;padding:18px 14px 20px;color:var(--as-mut,#8b8b90);font-size:13.5px}
+@media(max-width:860px){.ah-grid{grid-template-columns:1fr}.ah-r{grid-template-columns:auto minmax(0,1fr) auto}.ah-r .ah-rs{display:none}}
+body.asesor #expBtn{display:none!important}
+body.asesor .gp-home .gp-api{display:grid;place-items:center;width:18px;height:18px;background:var(--as-ink);color:var(--as-card);border-radius:6px}body.asesor .gp-home .gp-api .ic{width:12px;height:12px}body.asesor .gp-home{margin-bottom:2px}
+
 /* ══ Modo asesor ══ */
 body.asesor .sb-wrap,body.asesor .sb-scrim,body.asesor #sbOpen{display:none!important}
 body.asesor #app>.gp{width:288px;border-left:0;border-right:1px solid var(--line);background:var(--bg)}
@@ -2630,6 +2663,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         <div class="ex-pipe" id="exPipe" hidden></div>
         <div class="nod-grid" id="exList"></div>
       </div>
+      <div class="ah" id="asHome" hidden></div>
     </section>
     <div class="xd" id="exDoc" hidden aria-label="Expediente"></div>
     <section class="admin" id="viewBit" hidden>
@@ -6553,6 +6587,8 @@ EX.pick=function(f){
   EX.f=f;EX.render();
 };
 EX.render=function(){
+  if(typeof AS!=='undefined'&&AS.on){if(EX.loading&&!(EX.rows||[]).length){var ah=$('#asHome');if(ah){ah.hidden=false;ah.innerHTML='<div class="ah-in"><p class="ah-vacio">Cargando…</p></div>'}return}AH.render();return}
+  var ah0=$('#asHome');if(ah0)ah0.hidden=true;
   EX.bar();
   $('#exSub').textContent=EX.SUB[EX.f]();
   var q=norm(EX.q),admin=SB.user&&(SB.user.role==='admin'||SB.user.gerente),stl={borrador:'Pendiente',aceptada:'Aceptada',rechazada:'Rechazada'},html='',n=0;
@@ -7058,6 +7094,46 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   var b=t.closest('[data-prpdf]');if(b&&PRP.x){XA.pdf(PRP.x.id,b);return}
   if(t.closest('[data-prexp]')&&PRP.x){var x=PRP.x;EX.f=XD.esCam(x)?'cam':'prea';showView('exp');EX.load().then(function(){if(!EX.rows.some(function(r){return r.id===x.id}))EX.rows.unshift(x);XD.open(x.id)})}
 });
+/* ══ Inicio del asesor: su nombre, la hora y sus PREAs, campañas y servicios en tiempo real ══ */
+var AH={};
+AH.hola=function(){var h=new Date().getHours();return h<5||h>=19?'Buenas noches':h<12?'Buenos días':'Buenas tardes'};
+AH.nombre=function(){var n=String((SB.user&&SB.user.name)||'').trim();return n.split(/\s+/)[0]||''};
+AH.fecha=function(){var d=new Date();return d.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'}).replace(/^./,function(c){return c.toUpperCase()})+' · '+d.toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'})};
+AH.tipo=function(x){return x.tipo==='Servicio'?'srv':x.tipo==='Campaña'?'cam':'prea'};
+AH.cerrado=function(x){return !!(x.flujo&&x.flujo.etapa==='cerrado')};
+AH.anillo=function(p){var r=15,c=2*Math.PI*r,o=c*(1-p/100);return '<svg class="ah-ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="'+r+'" class="t"/><circle cx="18" cy="18" r="'+r+'" class="v" stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+o.toFixed(1)+'"/></svg>'};
+AH.render=function(){
+  var el=$('#asHome');if(!el)return;el.hidden=false;
+  var mios=(EX.rows||[]).filter(function(x){return !x.user_id||x.user_id===ME});
+  var G={prea:[],cam:[],srv:[]};mios.forEach(function(x){G[AH.tipo(x)].push(x)});
+  var K=[['prea','PREAs','file','Reparaciones por garantía'],['cam','Campañas','chart','Campañas del fabricante'],['srv','Servicios','dollar','Servicios sin PREA']];
+  var tarjeta=function(k){var L=G[k[0]],n=L.length,c=L.filter(AH.cerrado).length,a=n-c,p=n?Math.round(c*100/n):0;
+    var det=k[0]==='prea'?(function(){var acc=L.filter(function(x){return x.status==='aceptada'}).length,rech=L.filter(function(x){return x.status==='rechazada'}).length;return [a+' abiertas',acc+' aceptadas',rech?rech+' rechazadas':''].filter(Boolean)})():[a+(a===1?' abierta':' abiertas'),c+(c===1?' cerrada':' cerradas')];
+    return '<button type="button" class="ah-c" data-ahk="'+k[0]+'"><span class="ah-ch"><span class="ah-ic">'+svg(k[2])+'</span><span class="ah-ct">'+k[1]+'</span><span class="ah-dots" aria-hidden="true">···</span></span>'+
+      '<span class="ah-n">'+n+'</span><span class="ah-sub">'+esc(k[3])+'</span>'+
+      '<span class="ah-ft">'+AH.anillo(p)+'<span>'+c+'/'+n+' cerrad'+(k[0]==='srv'?'os':'as')+'</span><b>'+p+'%</b></span>'+
+      '<span class="ah-tags">'+det.map(function(t){return '<i>'+esc(t)+'</i>'}).join('')+'</span></button>'};
+  /* lo que sigue: lo abierto, lo que vence primero arriba */
+  var sig=mios.filter(function(x){return x.flujo&&!AH.cerrado(x)}).sort(function(a,b){var va=a.flujo.vence||'9999',vb=b.flujo.vence||'9999';return va<vb?-1:va>vb?1:0}).slice(0,8);
+  var nomT={prea:'PREA',cam:'Campaña',srv:'Servicio'};
+  var fila=function(x){var f=x.flujo||{},k=AH.tipo(x),v=f.vence?FL.vence(f.vence):'';
+    return '<button type="button" class="ah-r" data-ahx="'+ea(x.id)+'"><span class="ah-rt ah-'+k+'">'+nomT[k]+'</span><b>'+esc(x.wo||x.folio||'')+'</b><span class="ah-rs">'+esc(f.siguiente||FL.nom(f.etapa,k==='srv'))+'</span>'+(v?'<span class="ah-rv'+(f.estado==='bad'?' bad':f.estado==='warn'?' warn':'')+'">'+esc(v)+'</span>':'<span></span>')+'</button>'};
+  var tot=mios.length,cer=mios.filter(AH.cerrado).length;
+  el.innerHTML='<div class="ah-in"><div class="ah-head"><div><h1><span id="ahHola">'+AH.hola()+'</span>, <span id="ahNom">'+esc(AH.nombre()||'asesor')+'</span></h1>'+
+      '<p><span id="ahFecha">'+esc(AH.fecha())+'</span> · '+tot+(tot===1?' orden':' órdenes')+', '+cer+(cer===1?' cerrada':' cerradas')+'</p></div>'+
+      '<button type="button" class="ah-new" data-ahnew>'+svg('plus')+'Nueva orden</button></div>'+
+    '<div class="ah-grid">'+K.map(tarjeta).join('')+'</div>'+
+    '<section class="ah-box"><div class="ah-bh"><b>Lo que sigue</b><span>'+(sig.length?sig.length+(sig.length===1?' orden abierta':' órdenes abiertas'):'Todo al día')+'</span></div>'+
+      (sig.length?'<div class="ah-list">'+sig.map(fila).join('')+'</div>':'<p class="ah-vacio">No tienes órdenes pendientes. Abre una nueva con «Nueva orden».</p>')+'</section></div>';
+};
+/* el lugar de la lista de expedientes para el asesor: ahí vive su inicio */
+AH.tic=function(){if(!AS.on)return;var h=$('#ahHola'),f=$('#ahFecha'),n=$('#ahNom');if(h)h.textContent=AH.hola();if(f)f.textContent=AH.fecha();if(n)n.textContent=AH.nombre()||'asesor'};
+setInterval(AH.tic,20000);
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest||!t.closest('#asHome'))return;
+  var r=t.closest('[data-ahx]');if(r){XD.open(r.dataset.ahx);return}
+  if(t.closest('[data-ahnew]')){showView('agent');var b=$('#gpNew');if(b)b.click();return}
+  var k=t.closest('[data-ahk]');if(k){var x=(EX.rows||[]).filter(function(z){return (!z.user_id||z.user_id===ME)&&AH.tipo(z)===k.dataset.ahk&&!AH.cerrado(z)})[0]||(EX.rows||[]).filter(function(z){return (!z.user_id||z.user_id===ME)&&AH.tipo(z)===k.dataset.ahk})[0];if(x)XD.open(x.id);else toast('Aún no tienes '+(k.dataset.ahk==='prea'?'PREAs':k.dataset.ahk==='cam'?'campañas':'servicios'))}
+});
 /* ══ Simulación: una orden de prueba (GA9999) que se juega sola, sin tocar la base ══ */
 var SIM={on:false};
 SIM.x=function(){return {id:'sim-servicio',folio:'SRV-GA9999',wo:'GA9999',tipo:'Servicio',demo:true,status:'borrador',sys:null,vehicle:null,km:null,labor:0,parts_total:0,flujo:{etapa:'servicio',siguiente:'Hacer el servicio y subir la evidencia'}}};
@@ -7115,13 +7191,15 @@ SIM.run=async function(){
 };
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
   if(t.closest('[data-svcsim]')){SIM.run();return}
-  if(t.closest('[data-svcdemo]')){e.stopPropagation();SIM.abrir(false)}
+  if(t.closest('[data-svcdemo]')){e.stopPropagation();SIM.abrir(false);return}
+  if(t.closest('[data-ahome]')){e.stopPropagation();if(XD.cur)XD.close();showView('exp');if(typeof AS!=='undefined')AS.drawer(false)}
 },true);
 document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-apnav]')){e.preventDefault();e.target.closest('[data-apnav]').click();return}if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-svcdemo]')){e.preventDefault();e.stopPropagation();SIM.abrir(false)}},true);
 /* la orden de simulación, fija arriba de la lista de órdenes */
 (function(){var r0=GP.render;GP.render=function(){r0.apply(this,arguments);var b=$('#gpList');if(!b||GP.ag()==='cobros')return;
+  if(AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-home" role="listitem" tabindex="0" data-ahome'+(S.view==='exp'&&!XD.cur?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('home','sm')+'</span><span>Inicio</span></div></div>');
   var T=AP.total();b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-ap" role="listitem" tabindex="0" data-apnav'+(S.view==='aprende'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('present','sm')+'</span><span>Aprende Ax AI</span><span class="gp-x">'+T.h+'/'+T.n+'</span></div><div class="gp-q">Cursos de la plataforma para asesores</div></div>');
-  b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild)}})();
+  b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild);var hx=b.querySelector('.gp-home');if(hx)b.insertBefore(hx,b.firstChild)}})();
 SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x);var c=el&&el.closest('.svc-ck');if(!c)return;var n=el.children.length,h=el.querySelectorAll('li.ok').length,p=n?Math.round(h*100/n):0,g=c.querySelector('.wf-pg');if(!g){c.querySelector('ol').insertAdjacentHTML('afterend','<div class="wf-pg"><span>Progreso</span><b></b><i><i></i></i></div>');g=c.querySelector('.wf-pg')}g.querySelector('b').textContent=p+'%';g.querySelector('i>i').style.width=p+'%'};
 SVC.ACC='<div class="ai-actions"><button class="fb" type="button" data-sva="copy" aria-label="Copiar">'+svg('copy','sm')+'</button><button class="fb" type="button" data-sva="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button><button class="fb" type="button" data-sva="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button></div>';
 SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div>'+SVC.ACC+'</div>';$('.ai-actions',d).hidden=true;$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
@@ -7221,7 +7299,7 @@ XD.open=function(id){
   var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x){toast('No encontré ese expediente');return}
   XD.cur=x;XD.mode='exp';var el=$('#exDoc');
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
-  el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
+  el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(typeof AS!=='undefined'&&AS.on?'← Inicio':'← Expedientes')+'</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts">'+(x.conversation_id?'<button class="bt pri" type="button" data-xdchat>Chatear con el agente</button>':'')+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
     '<div class="xd-body"><div class="xd-main">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+XD.contHtml()+'</div></div>';
@@ -7981,10 +8059,12 @@ SB.enter=async function(user){
     await SB.pull(true);
     SB.loadHist();GP.load();AL.load().then(BX.load);
     MI.loadAgenda().then(MI.startTimer);
-    showView(MR.is()?'m_res':DN.is()?'dueno':SB.user&&SB.user.director?'grp':PV.is()?'pv':AS.on?'agent':'inicio');
+    showView(MR.is()?'m_res':DN.is()?'dueno':SB.user&&SB.user.director?'grp':PV.is()?'pv':AS.on?'exp':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
       if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
+      if(p.table==='expedientes'&&typeof AS!=='undefined'&&AS.on){clearTimeout(AH.t);AH.t=setTimeout(function(){if(S.view==='exp'&&!XD.cur)EX.load();else if(typeof GP!=='undefined')GP.load()},700)}
+      if(p.table==='profiles'&&p.new&&p.new.id===ME&&SB.user){SB.user.name=p.new.name||SB.user.name;if(typeof AH!=='undefined')AH.tic()}
       if(p.table==='alertas'){if(p.eventType==='INSERT')AL.onNew(p.new);return}
       if(p.table==='buzon'){if(p.eventType==='INSERT'&&p.new)toast('Correo de tu agente: '+p.new.asunto);clearTimeout(CG.t);CG.t=setTimeout(CG.load,600);return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
@@ -10510,7 +10590,7 @@ function start(text,files){
    un acceso corto a Inicio, Bandeja, Expedientes y Notas. En celular la lista se abre como cajón. */
 var AS={on:false};
 AS.set=function(on){
-  AS.on=!!on;document.body.classList.toggle('asesor',AS.on);if(AS.on)ORB='<span class="ax-mono">Ax</span>';
+  AS.on=!!on;if(AS.on)VIEWS.exp='Inicio';document.body.classList.toggle('asesor',AS.on);if(AS.on)ORB='<span class="ax-mono">Ax</span>';
   var g=$('#gp');if(!g)return;
   if(AS.on&&!g.dataset.as){g.dataset.as='1';
     $('#app').insertBefore(g,$('.main'));
