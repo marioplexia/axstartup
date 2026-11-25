@@ -1212,6 +1212,23 @@ body.asesor .ap-bar i{background:var(--as-ink)}
 body.asesor .fl-st li.fin i,.fl-st li.fin i{background:#1f8a4c!important;border-color:#1f8a4c!important}
 .wf-pg.full>span{display:inline-flex;align-items:center;gap:9px;color:#1f8a4c}.wf-pg.full>b{color:#1f8a4c}.wf-pg.full>i>i{background:#1f8a4c!important}
 .wf-pg.full .ok-ck{width:20px;height:20px}
+/* ══ Pantalla única de la orden ══ */
+.ord-main{position:relative;display:flex;flex-direction:column;min-height:calc(100vh - 170px)}
+.ord-tabs{display:inline-flex;align-self:flex-start;gap:2px;padding:3px;margin-bottom:12px;border-radius:99px;background:var(--as-card,#fff);box-shadow:var(--as-sh,0 1px 2px rgba(0,0,0,.05));border:1px solid var(--as-line,#ebebec)}
+.ord-tabs button{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 14px;border-radius:99px;font:550 13px var(--f-ui);color:var(--as-mut,#8b8b90);cursor:pointer}
+.ord-tabs button[aria-selected="true"]{background:var(--as-ink,#111);color:var(--as-card,#fff)}
+.ord-tabs i{font-style:normal;font:600 11px ui-monospace,SFMono-Regular,Menlo,monospace;padding:1px 6px;border-radius:99px;background:rgba(127,127,127,.18)}.ord-tabs i:empty{display:none}
+.ord-exp{flex:1;display:flex;flex-direction:column;gap:16px}
+.ord-exp[hidden],.ord-chat[hidden]{display:none!important}
+.ord-chat{flex:1;display:flex;flex-direction:column;min-height:0}
+.ord-chat .svc-th{height:calc(100vh - 330px);min-height:320px;overflow-y:auto;padding:4px 0 16px}
+.ord-chat .svc-thi{max-width:none;padding:8px 4px 0}
+.ord-dock{position:sticky;bottom:0;max-width:none;margin:12px 0 0;padding:0 0 max(12px,env(safe-area-inset-bottom,0px));z-index:3;background:linear-gradient(to top,var(--as-canvas,var(--bg)) 70%,transparent)}
+.ord-dock::before{display:none}
+.ord-main .svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1.5px dashed var(--fg);border-radius:16px;font-weight:500;pointer-events:none;z-index:5}
+.ord-main.over .svc-drop{display:grid}
+.ord-side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.ord .svc-ck{position:sticky;top:12px;margin-top:0}
 /* ══ Inicio del asesor ══ */
 body.asesor #viewExp>.ad-in{display:none}
 .ah-in{max-width:1180px;margin:0 auto;padding:10px max(24px,env(safe-area-inset-right,0px)) 48px max(24px,env(safe-area-inset-left,0px))}
@@ -6872,13 +6889,14 @@ SVC.on=function(){var t=$('#svcTa'),b=$('#svcSend');if(!t||!b)return;var on=!!t.
 SVC.chips=function(){};
 /* un solo recibimiento: el cerebro, con todos los agentes, en este chat */
 SVC.saludo=function(x){
+  if(x.tipo!=='Servicio'){var h0=new Date().getHours(),hi=h0<5||h0>=19?'¡Buenas noches!':h0<12?'¡Buenos días!':'¡Buenas tardes!';return hi+' Soy Ax. Estoy al pendiente de '+(x.tipo==='Campaña'?'la campaña':'la PREA')+' de la orden **'+(x.wo||x.folio||'')+'**. Pregúntame lo que necesites o mándame aquí los documentos y los acomodo en el expediente.'}
   var h=new Date().getHours(),hola=h<12?'¡Buenos días!':h<19?'¡Buenas tardes!':'¡Buenas noches!',o='**'+(x.wo||'')+'**';
   if(x.flujo&&x.flujo.etapa==='cerrado')return hola+' Este servicio ya quedó cerrado: facturado, cobrado y con su evidencia.\n\nSi quieres te hago un resumen o lo comparo con lo que cobran las otras agencias del grupo.';
   return hola+' Soy Ax. Ya tengo abierta la orden '+o+' y aquí estamos todos los agentes al pendiente de este servicio.\n\n'+
     'Cuando terminen, mándame la orden o unas fotos y yo me encargo del resto: lo facturamos, lo cobramos y lo dejamos cerrado hoy mismo.\n\n¿Qué servicio le están haciendo?';
 };
 /* los mensajes automáticos con que antes se abría la orden ya no se muestran */
-SVC.viejo=function(m){var c=String(m&&m.content||'');return m&&(m.role==='user'?/^Abrir la orden \S+ · /.test(c):/^Listo: abrí la orden /.test(c))};
+SVC.viejo=function(m){var c=String(m&&m.content||'');return m&&(m.role==='user'?/^Abrir la orden \S+ · |^Arma el expediente con (este archivo|estos \d+ archivos)$/.test(c):/^Listo: abrí la orden |^\*\*Armé el expediente|^Esta es la PREA de esta conversación/.test(c))};
 SVC.abrir=async function(x){
   SVC.x=x;SVC.msgs=[];SVC.conv=x.conversation_id||null;SVC.busy=false;
   if(SVC.conv){try{var c=await SB.c.from('conversations').select('messages').eq('id',SVC.conv).single();SVC.msgs=(c.data&&Array.isArray(c.data.messages))?c.data.messages.slice():[]}catch(_){}}
@@ -7153,7 +7171,7 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest||!t.c
 });
 /* ══ Simulación: una orden de prueba (GA9999) que se juega sola, sin tocar la base ══ */
 var SIM={on:false};
-SIM.x=function(){return {id:'sim-servicio',folio:'SRV-GA9999',wo:'GA9999',tipo:'Servicio',demo:true,status:'borrador',sys:null,vehicle:null,km:null,labor:0,parts_total:0,flujo:{etapa:'servicio',siguiente:'Hacer el servicio y subir la evidencia'}}};
+SIM.x=function(){return {id:'sim-servicio',folio:'SRV-GA9999',wo:'GA9999',tipo:'Servicio',demo:true,status:'borrador',sys:null,vehicle:null,km:null,labor:0,parts_total:0,flujo:{etapa:'servicio',tipo:'Servicio',siguiente:'Hacer el servicio y subir la evidencia'}}};
 SIM.abrir=function(auto){
   if(S.view!=='exp')showView('exp');else if(XD.cur)XD.close();
   var x=SIM.x();XD.cur=x;XD.mode='exp';XD.from=null;XD.openSrv(x,$('#exDoc'));
@@ -7166,7 +7184,7 @@ SIM.yo=async function(txt){var t=$('#svcTa'),x=SVC.x;if(!t)return;t.focus();
 SIM.archivos=async function(L){var d=document.createElement('div');d.className='msg-user';
   d.innerHTML='<div class="files">'+L.map(function(n){return '<span class="file">'+svg('file','sm')+'<b>'+esc(n)+'</b></span>'}).join('')+'</div>';
   $('#svcThi').appendChild(d);var sc=$('#svcTh');sc.scrollTop=sc.scrollHeight;await SVC.dormir(400)};
-SIM.fila=function(k,L){var l=document.querySelector('#exDoc .svc-sec[data-k="'+k+'"] .xd-list');if(l)L.forEach(function(n){l.insertAdjacentHTML('beforeend','<div class="xd-row"><span class="xd-name">'+esc(n)+'</span><span class="xd-tick">✓</span></div>')});SVC.ck()};
+SIM.fila=function(k,L){var sx=SVC.x;if(sx&&sx.demo){var et=k==='planta'?'cerrado':k==='factura'?'cobro':'factura',sg={factura:'Facturar el servicio y subir la factura',cobro:'Cobrar el servicio y subir el comprobante de pago',cerrado:''};sx.flujo={etapa:et,tipo:'Servicio',siguiente:sg[et]};setTimeout(function(){FL.draw(sx)},0)}var l=document.querySelector('#exDoc .svc-sec[data-k="'+k+'"] .xd-list');if(l)L.forEach(function(n){l.insertAdjacentHTML('beforeend','<div class="xd-row"><span class="xd-name">'+esc(n)+'</span><span class="xd-tick">✓</span></div>')});SVC.ck()};
 SIM.trabaja=async function(L,txt,refs){
   var x=SVC.x,w=SVC.msgAI(),act=ACT.nuevo($('.ai-col',w),$('.ai-body',w));
   await SVC.dormir(500);
@@ -7180,6 +7198,7 @@ SIM.run=async function(){
   var ok=function(){return SVC.x===x&&XD.cur===x};
   try{
     if($('#svcThi').children.length>1||SIM.hecho){SIM.on=false;SIM.hecho=false;SIM.abrir(true);return}
+    ORD.ver('chat');
     SIM.boton('Simulando…',true);$('#svcTa').readOnly=true;
     try{await SVC.saludoP}catch(_){}
     var paso=async function(f){if(!ok())throw 0;await f()};
@@ -7200,7 +7219,7 @@ SIM.run=async function(){
       'Recibí la factura por **$1,950** antes de IVA. Va justo en lo que cobra tu grupo.\n\nCuando te paguen, mándame el comprobante y lo cierro.')});
     await paso(function(){return SVC.dormir(900)});
     await paso(function(){return SIM.archivos(['comprobante_pago.pdf'])});
-    await paso(function(){return SIM.trabaja([['Cerebro','Leyendo «comprobante_pago.pdf»','pago por $2,262',1300],['Agente de cobros','Cruzó el pago con la factura','coincide'],['Expediente','Guardando en Comprobante de cobro','listo',700,function(){SIM.fila('planta',['comprobante_pago.pdf'])}],['Agente de servicios','Cerró el servicio','3 de 3 listos',700,function(){x.flujo={etapa:'cerrado'};SVC.ck()}]],
+    await paso(function(){return SIM.trabaja([['Cerebro','Leyendo «comprobante_pago.pdf»','pago por $2,262',1300],['Agente de cobros','Cruzó el pago con la factura','coincide'],['Expediente','Guardando en Comprobante de cobro','listo',700,function(){SIM.fila('planta',['comprobante_pago.pdf'])}],['Agente de servicios','Cerró el servicio','3 de 3 listos',700,function(){x.flujo={etapa:'cerrado',tipo:'Servicio'};SVC.ck();FL.draw(x)}]],
       'Ya vi el comprobante, quedó pagado.\n\nCon esto la orden **GA9999** queda **cerrada**: facturada, cobrada y con su evidencia completa, todo el mismo día. ¡Buen trabajo!')});
     SIM.hecho=true;SIM.boton('Repetir simulación');
   }catch(e){if(e)console.warn('[simulación]',e)}
@@ -7221,22 +7240,23 @@ SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x)
 SVC.ACC='<div class="ai-actions"><button class="fb" type="button" data-sva="copy" aria-label="Copiar">'+svg('copy','sm')+'</button><button class="fb" type="button" data-sva="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button><button class="fb" type="button" data-sva="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button></div>';
 SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div>'+SVC.ACC+'</div>';$('.ai-actions',d).hidden=true;$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
 SVC.enviar=async function(text){
-  var x=SVC.x;text=String(text||'').trim();if(!x||!text||SVC.busy||SIM.on)return;SVC.busy=true;
+  var x=SVC.x;text=String(text||'').trim();if(!x||!text||SVC.busy||SIM.on)return;SVC.busy=true;ORD.ver('chat');
   SVC.burb(SVC.decir('user',text));SVC.on();
   var w=SVC.msgAI(),col=$('.ai-col',w),act=ACT.nuevo(col,$('.ai-body',w)),resp='',refs=null;
-  try{var ctx=await SVR.ctx(x,text);
+  try{var ctx=await ORD.ctx(x,text);
     var body={rol_agente:'garantias',orden:x.wo||null,conversation_id:SVC.conv,folio:x.folio,messages:SVC.msgs.filter(function(m){return !SVC.viejo(m)}).slice(-12,-1).concat([{role:'user',content:ctx+text}]),ahora:MI.nowInfo()};
     var r;try{r=await SB.aiStream(body,'manual',function(ev){ACT.ev(act,ev)})}catch(e1){if(act.lista.length)throw e1;r=await SB.ai(body,'manual')}
     resp=(r&&r.text)||'No encontré esa respuesta en lo que sé de este servicio.';refs=r&&r.refs||null;
   }catch(e){resp='No pude contestar ahorita ('+TR.errTxt(e)+'). Inténtalo otra vez en un momento.'}
   ACT.cerrar(act);
   var m=SVC.decir('assistant',resp,refs);if(act.lista.length){m.pasos=act.lista.slice(0,30);m.res=act.resumen}
-  await SVC.tipear(resp,null,120,w);if(refs&&refs.length){REFS.poner(w,refs);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight}SVC.busy=false;SVC.on();SVC.guardar();
+  await SVC.tipear(resp,null,120,w);if(refs&&refs.length){REFS.poner(w,refs);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight}SVC.busy=false;SVC.on();SVC.guardar();ORD.n();
 };
 SVC.NOM={orden:'la orden de servicio',factura:'la factura',comprobante_pago:'el comprobante de pago',foto_odometro:'la foto del odómetro',foto_trabajo:'una foto del trabajo',otro:'un documento'};
 SVC.subir=async function(files){
   var x=SVC.x;files=[].slice.call(files||[]);if(!x||!files.length)return;
   if(x.demo){toast('Esta es la orden de simulación: dale «Iniciar simulación»');return}
+  ORD.ver('chat');if(x.tipo!=='Servicio'){ORD.armar(files);return}
   var DOND={evidencia:'Evidencia del servicio',factura:'Factura',planta:'Comprobante de cobro'};
   for(var i=0;i<files.length;i++){var file=files[i];
     SVC.burb(SVC.decir('user','📎 '+file.name));
@@ -7287,10 +7307,84 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   if(k==='copy'){var tx=String(w._text||$('.ai-body',w).innerText||'').replace(/\*\*/g,'');try{navigator.clipboard.writeText(tx).then(function(){toast('Respuesta copiada')},function(){toast('No se pudo copiar')})}catch(_){toast('No se pudo copiar')}}
   else{var o=$('[data-sva="'+(k==='up'?'down':'up')+'"]',w);if(o)o.classList.remove('act');b.classList.toggle('act')}
 });
-['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#exDoc .svc-chat');if(!z)return;e.preventDefault();z.classList.add('over')})});
-document.addEventListener('dragleave',function(e){var z=e.target.closest&&e.target.closest('#exDoc .svc-chat');if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
-document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.closest('#exDoc .svc-chat');if(!z)return;e.preventDefault();z.classList.remove('over');SVC.subir(e.dataTransfer.files)});
+function ordDz(e){if(!e.target.closest||e.target.closest('#exDoc .xa-zone'))return null;return e.target.closest('#exDoc .svc-chat, #exDoc .ord-main')};
+['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=ordDz(e);if(!z)return;e.preventDefault();z.classList.add('over')})});
+document.addEventListener('dragleave',function(e){var z=ordDz(e);if(z&&!z.contains(e.relatedTarget))z.classList.remove('over')});
+document.addEventListener('drop',function(e){var z=ordDz(e);if(!z)return;e.preventDefault();z.classList.remove('over');SVC.subir(e.dataTransfer.files)});
+['dragover','dragenter'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#exDoc .ord-zone');if(!z)return;e.preventDefault();z.setAttribute('data-over','')})});
+document.addEventListener('dragleave',function(e){var z=e.target.closest&&e.target.closest('#exDoc .ord-zone');if(z&&!z.contains(e.relatedTarget))z.removeAttribute('data-over')});
+document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.closest('#exDoc .ord-zone');if(!z)return;e.preventDefault();e.stopPropagation();z.removeAttribute('data-over');SVC.subir(e.dataTransfer.files)},true);
+/* ══ Una sola pantalla por orden (PREA, campaña o servicio) ══
+   Arriba el expediente (ciclo y zona para subir), a la derecha la lista, abajo siempre para escribirle al agente.
+   Al escribirle, el expediente se oculta y aparece la conversación; «Expediente» lo vuelve a mostrar. */
+var ORD={v:'exp'};
+ORD.nom=function(x){return x.tipo==='Servicio'?'Servicio':x.tipo==='Campaña'?'Campaña':'PREA'};
+ORD.tabs=function(){return '<div class="ord-tabs" role="tablist" aria-label="Vista de la orden"><button type="button" role="tab" data-ordv="exp" aria-selected="true">Expediente</button><button type="button" role="tab" data-ordv="chat" aria-selected="false">Conversación<i id="ordN"></i></button></div>'};
+ORD.chat=function(){return '<div class="ord-chat" id="ordChat" hidden><div class="svc-th" id="svcTh" aria-live="polite"><div class="svc-thi" id="svcThi"></div></div></div>'};
+ORD.comp=function(x){
+  var marca=($('#brandLabel')&&$('#brandLabel').textContent)||'General Motors',sv=x.tipo==='Servicio';
+  return '<form class="svc-dock ord-dock" id="svcForm"><div class="composer svc-comp">'+
+    '<div class="c-head"><span class="dd svc-dd">'+svg('folder')+'<span>'+ORD.nom(x)+' · '+esc(x.wo||x.folio)+'</span></span><span class="dd svc-dd">'+esc(marca)+'</span></div>'+
+    '<div class="card"><textarea id="svcTa" rows="2" placeholder="'+(sv?'Escríbele al agente o arrastra aquí la orden, fotos, factura o comprobante…':'Escríbele al agente o arrastra aquí los documentos de la orden…')+'" aria-label="Mensaje para el agente de la orden"></textarea>'+
+    '<div class="c-foot"><button type="button" class="fb" data-svcclip aria-label="Subir archivos" title="Subir archivos">'+svg('plus')+'</button><span class="sp"></span>'+
+    '<button type="button" class="fb" data-svcclr aria-label="Limpiar">'+svg('x')+'</button>'+
+    '<button class="send" id="svcSend" type="submit" aria-label="Enviar" disabled></button></div></div></div>'+
+    '<input type="file" id="svcFile" multiple hidden accept=".pdf,image/*,.xml"></form><div class="svc-drop" aria-hidden="true">Suéltalo y el agente lo revisa</div>';
+};
+ORD.up=function(){return '<section class="xa ord-up" aria-label="Subir documentos del servicio"><div class="xa-h"><span class="xa-mk">A</span><div><h3>Sube lo del servicio</h3></div></div>'+
+  '<div class="xa-zone ord-zone" tabindex="0" role="button" aria-label="Subir archivos del servicio"><span class="xd-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
+  '<span class="xd-say"><b>Arrastra aquí la orden, fotos, factura o comprobante</b><span>o haz clic · el agente lo revisa y lo acomoda</span></span><input type="file" multiple hidden accept=".pdf,image/*,.xml"></div></section>'};
+ORD.ver=function(v){
+  ORD.v=v;var e=$('#ordExp'),c=$('#ordChat');if(!e||!c)return;e.hidden=v!=='exp';c.hidden=v!=='chat';
+  $$('#exDoc [data-ordv]').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.ordv===v))});
+  if(v==='chat'){var t=$('#svcTh');if(t)t.scrollTop=t.scrollHeight}
+};
+ORD.n=function(){var el=$('#ordN');if(!el)return;var n=(SVC.msgs||[]).filter(function(m){return m.role==='user'&&!SVC.viejo(m)}).length;el.textContent=n?String(n):''};
+ORD.listo=function(x){
+  var sb=$('#svcSend');if(sb){if(document.body.classList.contains('asesor'))sb.innerHTML=svg('up');else if(typeof EYE!=='undefined')EYE.mount(sb)}
+  ORD.ver('exp');SVC.abrir(x).then(ORD.n);
+};
+/* lo que el agente sabe de la orden cuando le escriben */
+ORD.ctx=async function(x,text){
+  if(x.tipo==='Servicio')return SVR.ctx(x,text);
+  var f=x.flujo||{},ar=x.armado||{},F=(ar.faltantes||[]).slice(0,6);
+  return '[Contexto: la orden '+(x.wo||'')+' es '+(x.tipo==='Campaña'?'una CAMPAÑA del fabricante (no lleva PREA; lleva la orden firmada con la campaña, el boletín o IVH, la factura y la transacción)':'una PREA de garantía')+
+    (x.folio?', expediente '+x.folio:'')+(f.etapa?'; va en «'+FL.nom(f.etapa)+'»':'')+(f.siguiente&&f.etapa!=='cerrado'?' y sigue: '+f.siguiente:'')+
+    (F.length?'. Según la revisión del expediente le falta: '+F.join(' · '):'')+'. Responde breve y natural, como una persona del equipo. Si te mandan documentos, se acomodan solos en el expediente.]\n';
+};
+/* documentos de una PREA o campaña mandados desde la conversación: el agente arma el expediente */
+ORD.armar=async function(files){
+  var x=SVC.x;files=[].slice.call(files||[]);if(!x||!files.length)return;
+  if(XA.busy){toast('Espera a que termine el armado anterior');return}
+  files.forEach(function(f){SVC.burb(SVC.decir('user','📎 '+f.name))});
+  var w=SVC.msgAI(),body=$('.ai-body',w);
+  body.innerHTML='<p>Estoy acomodando '+(files.length===1?'el archivo':'los '+files.length+' archivos')+' en el expediente…</p><div class="xa-log xa-chat"></div><p class="xa-say"></p>';
+  XA.busy=true;var t='';
+  try{await XA.core(x,files,$('.xa-log',body),{say:function(m){var e=$('.xa-say',body);if(e)e.textContent=m},enChat:true});
+    t='Listo, acomodé '+(files.length===1?'el archivo':'los '+files.length+' archivos')+' en el expediente de la orden **'+(x.wo||x.folio)+'**. Lo que ya tiene y lo que falta está en la lista de la derecha.';
+  }catch(e){t='No pude acomodar los archivos ('+TR.errTxt(e)+'). Inténtalo otra vez.'}
+  XA.busy=false;SVC.decir('assistant',t);await SVC.tipear(t,null,100,w);SVC.guardar();ORD.n();if(typeof XD.cont==='function')XD.cont();
+};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#exDoc [data-ordv]');if(b)ORD.ver(b.dataset.ordv)});
+document.addEventListener('click',function(e){var z=e.target.closest&&e.target.closest('#exDoc .ord-zone');if(z&&e.target.tagName!=='INPUT')$('input',z).click()});
+document.addEventListener('keydown',function(e){var z=e.target.closest&&e.target.closest('#exDoc .ord-zone');if(z&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('input',z).click()}});
+document.addEventListener('change',function(e){var i=e.target;if(i.matches&&i.matches('#exDoc .ord-zone input[type=file]')){SVC.subir(i.files);i.value=''}});
 XD.openSrv=function(x,el){
+  el.innerHTML='<div class="xd-in xd-simple ord"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(typeof AS!=='undefined'&&AS.on?'← Inicio':'← Servicios')+'</button>'+
+    '<div><h2>'+esc(x.wo||x.folio)+'</h2><p>'+esc(['Servicio',x.sys].filter(Boolean).join(' · '))+'</p></div>'+
+    '<div class="xd-acts">'+(!x.demo&&XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</div></div>'+
+    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+ORD.up()+'</div>'+ORD.chat()+ORD.comp(x)+'</div>'+
+    '<div class="ord-side"><aside class="svc-ck" aria-label="Lista del servicio"><h4>Lista del servicio</h4><ol id="svcCk">'+SVC.ckHtml(x)+'</ol>'+
+      (x.demo?'<button class="bt pri svc-sim" type="button" data-svcsim>▶ Iniciar simulación</button>':'')+'</aside>'+
+    '<aside class="svc-side"><h4>Lo que sé de este servicio</h4>'+SVR.box(x)+
+      '<div class="svc-docs">'+XD.SRV.map(function(d){return '<section class="xd-sec svc-sec" data-k="'+d[0]+'"><h3>'+esc(d[1])+'</h3><div class="xd-list"></div></section>'}).join('')+'</div></aside></div></div></div>';
+  $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
+  SVR.bloquear(true);SVR.pintarRef();if(!x.demo)XD.SRV.forEach(function(d){XD.load(x.id,d[0])});
+  ORD.listo(x);SVC.ck();
+  if(!x.demo)FL.refresh(x).then(function(){if(XD.cur&&XD.cur.id===x.id)SVC.ck()});
+  var dk=$('#exDoc .svc-docs');if(dk&&window.MutationObserver){if(SVC.mo)SVC.mo.disconnect();SVC.mo=new MutationObserver(function(){clearTimeout(SVC.mt);SVC.mt=setTimeout(SVC.ck,120)});SVC.mo.observe(dk,{childList:true,subtree:true})}
+};
+XD.openSrvChat=function(x,el){
   el.innerHTML=SVC.html(x);
   crumb.textContent='Agente de Garantías';crumbSep.hidden=false;crumb2.hidden=false;crumb2.textContent=(x.wo||x.folio)+' · Servicio';
   var sb=$('#svcSend');if(sb&&document.body.classList.contains('asesor'))sb.innerHTML=svg('up');else if(sb&&typeof EYE!=='undefined')EYE.mount(sb);
@@ -7318,8 +7412,8 @@ XD.open=function(id){
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
   el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(typeof AS!=='undefined'&&AS.on?'← Inicio':'← Expedientes')+'</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
-    '<div class="xd-acts">'+(x.conversation_id?'<button class="bt pri" type="button" data-xdchat>Chatear con el agente</button>':'')+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
-    '<div class="xd-body"><div class="xd-main">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+XD.contHtml()+'</div></div>';
+    '<div class="xd-acts">'+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
+    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+ORD.chat()+ORD.comp(x)+'</div>'+XD.contHtml()+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
@@ -7329,6 +7423,7 @@ XD.open=function(id){
   FL.refresh(x);
   XD.formInit(x);
   XD.contVer();
+  ORD.listo(x);
 };
 /* ══ Lo que contiene el expediente: una lista al lado, en vez de un apartado por sección ══
    Las secciones siguen existiendo por dentro (ahí acomoda el agente cada documento); aquí solo se listan. */
