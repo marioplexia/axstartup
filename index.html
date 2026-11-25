@@ -6469,6 +6469,8 @@ var XD={cur:null,B:'expedientes-docs',MAX:20,
   ['mantenimiento','Servicios de mantenimiento','Manual GM 4.4 y 15 · evidencias de mantenimientos (tren motriz)','opt'],
   ['m2','Formato M2 (transporte)','Manual GM 12 · daños o faltantes de transporte TYT','opt'],
   ['wpc','Envío de material a WPC o proveedor','Manual GM 4.4 · factura y guía de envío por paquetería','opt'],
+  /* campañas */
+  ['campana','Campaña: boletín e IVH','Boletín de la campaña y consulta del VIN (IVH) donde aparece','cam'],
   /* cobranza */
   ['factura','Factura a planta','Cobranza · factura de la transacción','cob'],
   ['planta','Transacción de planta','Cobranza · pantalla Ver Transacción o comprobante de pago','cob']]};
@@ -7008,14 +7010,14 @@ XD.open=function(id){
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
   el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
-    '<div class="xd-acts"><button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>'+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
+    '<div class="xd-acts">'+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
     '<div class="xd-body"><div class="xd-main">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+XD.contHtml()+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
   XD.qLoad(x.id);
   XD.ctl=null;XD.ctlLoad(x).catch(function(e){console.warn('[control GM]',e)});
-  XA.show(x.armado||null);
+  XA.show(x.armado||null);XA.recam(x);
   FL.refresh(x);
   XD.formInit(x);
   XD.contVer();
@@ -7026,20 +7028,22 @@ XD.contHtml=function(){
   return '<aside class="xd-cont" aria-label="Contenido del expediente"><h4>Contenido del expediente</h4><p class="xd-cont-s" id="xdContS"></p><div id="xdCont"></div>'+
     '<div class="xd-oculto" aria-hidden="true">'+XD.DOCS.map(function(d){return '<section class="xd-sec" data-k="'+d[0]+'"><div class="xd-list"></div></section>'}).join('')+'</div></aside>';
 };
+XD.contRows=function(k){var ks=[k];if(k==='campana'&&XD.esCam(XD.cur))ks.push('actualizacion');var R=[];ks.forEach(function(q){var sk=XD.sec(q);if(sk)R=R.concat([].slice.call(sk.querySelectorAll('.xd-row')))});return R};
+XD.contN=function(k){return XD.contRows(k).length};
 XD.contItem=function(d){
-  var sk=XD.sec(d[0]),rows=sk?[].slice.call(sk.querySelectorAll('.xd-row')):[],n=rows.length;
+  var rows=XD.contRows(d[0]),n=rows.length;
   var arch=rows.map(function(r){var nm=r.querySelector('.xd-name');return nm?'<li>'+nm.outerHTML+'</li>':''}).join('');
-  var ref=String(d[2]||'').split(' · ')[0];
-  return '<li class="xd-ci '+(n?'ok':'falta')+'"><details'+(n?'':' class="vacio"')+'><summary><span class="xd-cb" aria-hidden="true">'+(n?svg('check'):'')+'</span><span class="xd-cn">'+esc(d[1])+'<small>'+(n?n+(n===1?' archivo':' archivos'):'Falta')+(ref?' · '+esc(ref):'')+'</small></span></summary>'+(n?'<ul class="xd-cf">'+arch+'</ul>':'')+'</details></li>';
+  var ref=String(d[2]||'').split(' · ')[0],nom=d[1];if(XD.esCam(XD.cur)){if(d[0]==='contrato'){nom='Orden de reparación firmada';ref='con la campaña y firma del cliente'}if(d[0]==='campana')ref='Boletín y consulta del VIN'}
+  return '<li class="xd-ci '+(n?'ok':'falta')+'"><details'+(n?'':' class="vacio"')+'><summary><span class="xd-cb" aria-hidden="true">'+(n?svg('check'):'')+'</span><span class="xd-cn">'+esc(nom)+'<small>'+(n?n+(n===1?' archivo':' archivos'):'Falta')+(ref?' · '+esc(ref):'')+'</small></span></summary>'+(n?'<ul class="xd-cf">'+arch+'</ul>':'')+'</details></li>';
 };
 XD.cont=function(){
   var el=$('#xdCont');if(!el)return;
-  var g=function(t){return XD.DOCS.filter(function(d){return d[3]===t})},tiene=function(d){var sk=XD.sec(d[0]);return !!(sk&&sk.querySelector('.xd-row'))};
-  var req=g('req'),opt=g('opt'),cob=g('cob'),optSi=opt.filter(tiene),hechos=req.filter(tiene).length;
-  $('#xdContS').textContent=hechos===req.length?'Completo: tiene todo lo obligatorio del manual de GM.':'Lleva '+hechos+' de '+req.length+' documentos obligatorios. Sube todo junto a la izquierda: el agente lo acomoda.';
+  var x=XD.cur,cam=XD.esCam(x),g=function(t){return XD.DOCS.filter(function(d){return d[3]===t})},tiene=function(d){return XD.contN(d[0])>0};
+  var req=XD.req(x),opt=XD.opt(x),cob=g('cob'),optSi=opt.filter(tiene),hechos=req.filter(tiene).length;
+  $('#xdContS').textContent=hechos===req.length?(cam?'Completo: tiene lo que lleva una campaña.':'Completo: tiene todo lo obligatorio del manual de GM.'):'Lleva '+hechos+' de '+req.length+' documentos obligatorios'+(cam?' de una campaña':'')+'. Sube todo junto a la izquierda: el agente lo acomoda.';
   el.innerHTML='<h5>Obligatorios</h5><ul>'+req.map(XD.contItem).join('')+'</ul>'+
     (optSi.length?'<h5>Según aplique</h5><ul>'+optSi.map(XD.contItem).join('')+'</ul>':'')+
-    '<p class="xd-cont-m">'+(opt.length-optSi.length)+' apartados más según aplique (PRA, batería, facturas de partes, TAC, mantenimientos, M2, WPC): aparecen aquí cuando el agente encuentra uno.</p>'+
+    '<p class="xd-cont-m">'+(cam?'Una campaña no lleva queja, diagnóstico, fotos de falla ni destrucción de partes, salvo que el boletín lo pida: si los subes, aparecen aquí.':(opt.length-optSi.length)+' apartados más según aplique (PRA, batería, facturas de partes, TAC, mantenimientos, M2, WPC): aparecen aquí cuando el agente encuentra uno.')+'</p>'+
     '<h5>Cobranza</h5><ul>'+cob.map(XD.contItem).join('')+'</ul>';
 };
 XD.contVer=function(){
@@ -7132,6 +7136,7 @@ XD.qSave=async function(){
 /* subido el archivo, el agente lo LEE y el cerebro aprende: factura y pago de planta se asientan en cartera,
    y todo queda como conocimiento para la siguiente PREA parecida */
 XD.learn=async function(k,file,meta,runId,intento){
+  if(k==='campana'){meta.className='xd-meta';meta.textContent=XD.fmt(file.size)+' · Subido · boletín / IVH de la campaña';return}
   var x=XD.cur;if(!x||!SB.c)return;
   intento=intento||0;
   var base=XD.fmt(file.size)+' · Subido';
@@ -7829,7 +7834,7 @@ PZ.list=function(x,sec,car){
     var due=PZ.add(start,days),rest=(due-now)/PZ.DAY;
     L.push({k:k,label:label,ref:ref,due:due,st:rest<0?'bad':rest<=warnDays?'warn':'ok',txt:'Vence '+PZ.f(due)+' · '+PZ.left(due)});
   };
-  if(sec){var req=XD.DOCS.filter(function(d){return d[3]==='req'}),ok=req.filter(function(d){return sec[d[0]]}).length;
+  if(sec){var req=XD.req(x),ok=req.filter(function(d){return XD.nArch(x,d[0],sec)}).length;
     it('dig','Digitalizar el expediente (15 días tras la entrega)','Manual GM 4.4',cierre,15,ok===req.length,'Completo: '+ok+' de '+req.length+' secciones',4)}
   var cob=PZ.d(x.gwm_cobrada_at)||(car&&(car.estado==='facturada'||car.estado==='pagada')?PZ.d(car.facturada_at||car.pagada_at):null);
   if(x.status!=='rechazada')it('gwm','Procesar la transacción en GWM (30 días tras el cierre; 60 desde la aprobación si hubo PRA)','Manual GM 5 y 5.1',cierre,30,!!cob,'Cobrada '+PZ.f(cob),7);
@@ -7946,8 +7951,8 @@ XD.pdfName=function(x){
   return [cl(x.vehicle)||'VEHICULO',cl(x.vin)||'SIN-VIN',cl(x.wo)||'SIN-OR',cl(comp).slice(0,40)].join('_')+'.pdf';
 };
 XD.pdf=async function(x,btn,quiet){
-  var C=XD.ctl||{},sec=C.sec||{},req=XD.DOCS.filter(function(d){return d[3]==='req'});
-  var falta=req.filter(function(d){return !sec[d[0]]}).map(function(d){return d[1]}),avisos=[];
+  var C=XD.ctl||{},sec=C.sec||{},req=XD.req(x),esReq=function(d){return req.some(function(q){return q[0]===d[0]})};
+  var falta=req.filter(function(d){return !XD.nArch(x,d[0],sec)}).map(function(d){return d[1]}),avisos=[];
   if(!x.orden_apertura||!x.orden_cierre)avisos.push('Faltan las fechas de apertura y cierre de la orden: no se puede comprobar que los documentos estén dentro de la permanencia.');
   try{var lc=await SB.c.from('entrenamiento_docs').select('file_name,resultado,resumen').eq('kind','expediente').eq('folio',x.folio).limit(60);
     (lc.data||[]).forEach(function(d){if(/fuera de (la )?permanencia|fuera del (periodo|tiempo)|fuera de (las )?fechas|no coincide|falta|faltan|ilegible|sin firma|a mano|tachad/i.test(d.resumen||''))avisos.push((XD.DOCS.filter(function(k){return k[0]===d.resultado})[0]||[0,d.resultado])[1]+' · '+d.file_name+': '+String(d.resumen).slice(0,220))})}catch(_){}
@@ -7978,7 +7983,7 @@ XD.pdf=async function(x,btn,quiet){
     var files=[];
     for(var i=0;i<XD.DOCS.length;i++){var d=XD.DOCS[i],ls=await SB.c.storage.from(XD.B).list(x.id+'/'+d[0],{limit:100,sortBy:{column:'created_at',order:'asc'}}),L2=(ls.data||[]).filter(function(f){return f.name&&f.name!=='.emptyFolderPlaceholder'});
       var rs=RV.filter(function(c){return c.seccion===d[0]}),rc=rs.filter(function(c){return c.estado==='cumple'}).length,rn=rs.filter(function(c){return c.estado==='no_cumple'||c.estado==='no_se_puede_ver'}).length;
-      if(L2.length||d[3]==='req')line((L2.length?(rn?'[REVISAR] ':'[OK] '):'[FALTA] ')+d[1]+(L2.length?' ('+L2.length+(L2.length===1?' archivo':' archivos')+(rs.length?'; '+rc+' cumplen'+(rn?', '+rn+' por corregir':''):'')+')':'')+(d[2]?' - '+d[2]:''),{s:9.5});
+      if(L2.length||esReq(d))line((L2.length?(rn?'[REVISAR] ':'[OK] '):'[FALTA] ')+d[1]+(L2.length?' ('+L2.length+(L2.length===1?' archivo':' archivos')+(rs.length?'; '+rc+' cumplen'+(rn?', '+rn+' por corregir':''):'')+')':'')+(d[2]?' - '+d[2]:''),{s:9.5});
       L2.forEach(function(f){files.push({sec:d[1],path:x.id+'/'+d[0]+'/'+f.name,name:f.name.replace(/^\d+_/,'')})})}
     var blk=function(t,L){if(L&&L.length){y-=8;line(t,{b:1,s:13});L.forEach(function(a){line('- '+a,{s:9.5})})}};
     blk('Lo que falta',NOW.faltantes);
@@ -8016,6 +8021,15 @@ XD.pdf=async function(x,btn,quiet){
    3. Con los datos que sacó (orden, VIN, km, fechas) se llena el expediente (solo lo vacío) y se buscan cosas que no cuadran.
    4. Lo que falta queda en expedientes.armado: se ve aquí, en Inicio y en el chat de la orden, y va en la carátula del PDF. */
 var XA={busy:false,CH:10,B64:4.2e6,PIEZA:4.4e6};
+/* una campaña NO es una PREA: lleva la orden firmada con la campaña, el boletín y la consulta del VIN, y la cobranza.
+   No lleva queja ni diagnóstico, ni fotos de falla ni destrucción de partes, salvo que el boletín lo pida. */
+XD.esCam=function(x){return !!x&&x.tipo==='Campaña'};
+XD.req=function(x){return XD.esCam(x)?XD.DOCS.filter(function(d){return d[0]==='contrato'||d[0]==='campana'}):XD.DOCS.filter(function(d){return d[3]==='req'})};
+XD.opt=function(x){return XD.esCam(x)?XD.DOCS.filter(function(d){return ['piezas','evidencia','destruccion','facturas_partes','recepcion'].indexOf(d[0])>=0}):XD.DOCS.filter(function(d){return d[3]==='opt'})};
+XD.nArch=function(x,k,sec){var n=Number(sec&&sec[k])||0;if(XD.esCam(x)&&k==='campana')n+=Number(sec&&sec.actualizacion)||0;return n};
+XA.FALTA_CAM={contrato:'Falta la orden de reparación firmada por el cliente, con el número de la campaña.',campana:'Falta el boletín de la campaña o la consulta del VIN (IVH) donde aparece la campaña.'};
+/* lo que en una PREA es requisito y en una campaña no aplica (para limpiar revisiones viejas) */
+XA.NO_CAM=/queja|condici[oó]n|causa|DTC|diagn[oó]stic|fotos? de (la )?(recepci|falla|evidencia|destrucci)|recepci[oó]n|destrucci|pedido|vale de piezas|eSPOM|c[oó]digos|PREA|preautoriz|orden de garant[ií]a firmada|resguardo|carpeta digital|nombre del archivo|historial del VIN|fecha de cobro en GWM|equipo no original|Cerrad|Arrendamiento|no aparece el n[uú]mero de orden/i;
 XA.SEC=function(k){return k==='otro'?'No es del expediente':(XD.DOCS.filter(function(d){return d[0]===k})[0]||[0,k])[1]};
 XA.FALTA={contrato:'Falta la orden de garantía firmada por el cliente.',recepcion:'Faltan las fotos de la recepción: el VIN, el odómetro y una foto completa del vehículo.',diagnostico:'Falta el diagnóstico: el reporte del escáner o la hoja del técnico con sus lecturas.',evidencia:'Faltan las fotos de la falla y de los daños.',piezas:'Falta el pedido y la salida de las refacciones, con la captura de eSPOM.',destruccion:'Faltan las fotos de la pieza con su etiqueta, antes y después de destruirla.'};
 XA.html=function(){
@@ -8077,6 +8091,7 @@ XA.up=async function(x,k,file){
   var path=x.id+'/'+k+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]+/g,'_');
   var r=await SB.c.storage.from(XD.B).upload(path,file,{contentType:file.type||undefined});if(r.error)throw r.error;
   if(k==='actualizacion')return XD.formRead(x.id,file,file.name,path,null);
+  if(k==='campana')return null;
   var f=/\.xml$/i.test(file.name)?{name:file.name,text:await file.text()}:await TR.prep(file);
   for(var i=0;i<2;i++){
     try{return await SB.ai({expediente_id:x.id,tipo:k,file:f},'documento')}
@@ -8151,7 +8166,9 @@ XA.fill=async function(x,A){
 /* qué falta y qué no cuadra, en palabras simples */
 XA.check=function(x,A,C){
   C=C||XD.ctl||{};var sec=C.sec||{},F=[],N=[],add=function(L,t){if(t&&L.indexOf(t)<0)L.push(t)};
-  XD.DOCS.filter(function(d){return d[3]==='req'&&!sec[d[0]]}).forEach(function(d){add(F,XA.FALTA[d[0]]||'Falta: '+d[1]+'.')});
+  var cam=XD.esCam(x);
+  XD.req(x).filter(function(d){return !XD.nArch(x,d[0],sec)}).forEach(function(d){add(F,(cam?XA.FALTA_CAM[d[0]]:XA.FALTA[d[0]])||'Falta: '+d[1]+'.')});
+  if(cam)C=Object.assign({},C,{rev:(C.rev||[]).filter(function(c){return (c.seccion==='factura'||c.seccion==='planta')&&c.estado==='no_cumple'})});
   if(!x.orden_apertura||!x.orden_cierre)add(F,'Faltan '+(!x.orden_apertura&&!x.orden_cierre?'las fechas de apertura y cierre':!x.orden_apertura?'la fecha de apertura':'la fecha de cierre')+' de la orden: no vienen en los documentos. Captúralas en «Fechas del expediente».');
   (C.rev||[]).forEach(function(c){if(c.estado==='no_cumple'||c.estado==='no_se_puede_ver')add(F,XA.SEC(c.seccion)+': '+(c.nota||c.tema)+(c.estado==='no_se_puede_ver'?' (no se alcanza a ver)':''))});
   var D=A.datos||[],vins=[],ords=[];
@@ -8164,13 +8181,22 @@ XA.check=function(x,A,C){
     if(mx.valor-mn.valor>20)add(N,'El kilometraje no cuadra: '+XA.SEC(mn.seccion)+' dice '+mn.valor.toLocaleString('es-MX')+' km y '+XA.SEC(mx.seccion)+' dice '+mx.valor.toLocaleString('es-MX')+' km.')}
   if(x.km&&km.length&&km.every(function(k){return Math.abs(k.valor-Number(x.km))>20}))add(N,'El kilometraje del expediente ('+Number(x.km).toLocaleString('es-MX')+' km) no aparece en los documentos.');
   if(x.orden_apertura&&x.orden_cierre&&String(x.orden_cierre)<String(x.orden_apertura))add(N,'La fecha de cierre es anterior a la de apertura.');
-  if(D.some(function(d){return d.firma_cliente===false}))add(N,'La orden de garantía no tiene la firma del cliente.');
-  (A.avisos||[]).forEach(function(t){add(N,t)});
+  if(D.some(function(d){return d.firma_cliente===false}))add(N,cam?'La orden de reparación no tiene la firma del cliente.':'La orden de garantía no tiene la firma del cliente.');
+  (A.avisos||[]).forEach(function(t){if(!(cam&&XA.NO_CAM.test(t)))add(N,t)});
   var PL=[];try{PZ.list(x,sec,C.car).forEach(function(i){if(i.st==='bad'||i.st==='warn')PL.push({label:i.label,txt:i.txt,ref:i.ref,st:i.st})})}catch(_){}
   var rv=C.rev||[];
   return {at:A.at,archivos:A.archivos,documentos:A.documentos,lleno:A.lleno||[],datos:A.extra||{},errores:A.errores,
     faltantes:F.slice(0,14),discrepancias:N.slice(0,10),plazos:PL,
     revision:{cumple:rv.filter(function(c){return c.estado==='cumple'}).length,no_cumple:rv.filter(function(c){return c.estado==='no_cumple'||c.estado==='no_se_puede_ver'}).length}};
+};
+XA.recam=async function(x){
+  var o=x&&x.armado;if(!XD.esCam(x)||!o||o.cam)return;
+  try{var C=await XA.ctx(x);
+    var A={at:o.at,archivos:o.archivos||[],documentos:o.documentos||[],lleno:o.lleno||[],extra:o.datos||{},errores:o.errores||[],datos:[],avisos:(o.discrepancias||[]).filter(function(t){return !XA.NO_CAM.test(t)}),km:[]};
+    var r=XA.check(x,A,C);r.cam=true;x.armado=r;
+    var u=await SB.c.from('expedientes').update({armado:r}).eq('id',x.id);if(u.error)console.warn('[campaña]',u.error.message);
+    if(XD.cur&&XD.cur.id===x.id)XA.show(r);
+  }catch(e){console.warn('[campaña]',e)}
 };
 XA.show=function(o){
   var el=$('#xaRes');if(!el)return;if(!o){el.innerHTML='';return}
@@ -8214,7 +8240,7 @@ XA.core=async function(x,files,log,o){
   await Promise.all(jobs);
   var C=await XA.ctx(x);
   if(XD.cur&&XD.cur.id===x.id){XD.ctl=Object.assign(XD.ctl||{},C);await XD.ctlLoad(x).catch(function(){})}
-  var res=XA.check(x,A,C);x.armado=res;
+  var res=XA.check(x,A,C);if(XD.esCam(x))res.cam=true;x.armado=res;
   var u=await SB.c.from('expedientes').update({armado:res}).eq('id',x.id);if(u.error)SB.fail(u.error);
   if(XD.cur&&XD.cur.id===x.id)XA.show(res);
   if(!o.enChat)res.chat=await XA.chat(x,res);
@@ -8363,19 +8389,20 @@ document.addEventListener('change',function(e){if(e.target&&e.target.id==='alF'&
    un agente la recalcula cada hora y en cuanto cambia algo (planta responde, se sube un documento, se factura, se cobra).
    Aquí se muestra: la línea del ciclo, el siguiente paso, de quién es y cuándo vence. */
 var FL={E:[['orden','Orden abierta'],['prea','Preautorización'],['expediente','Expediente'],['transaccion','Transacción GWM'],['factura','Factura a planta'],['cobro','Cobro'],['cerrado','Cerrada']]};
-FL.nom=function(k,srv){return ((srv?FL.ES.concat(FL.E):FL.E.concat(FL.ES)).filter(function(e){return e[0]===k})[0]||[k,k])[1]};
+FL.nom=function(k,srv){return ((srv?FL.ES.concat(FL.E):FL.E.concat(FL.ES,FL.EC)).filter(function(e){return e[0]===k})[0]||[k,k])[1]};
 FL.ES=[['orden','Orden abierta'],['servicio','Servicio y evidencia'],['factura','Factura'],['cobro','Cobro'],['cerrado','Cerrado']];
-FL.lista=function(f){return f&&f.tipo==='Servicio'?FL.ES:FL.E};
+FL.EC=[['campana','Campaña y documentos'],['factura','Factura a planta'],['cobro','Cobro'],['cerrado','Cerrada']];
+FL.lista=function(f){return f&&f.tipo==='Servicio'?FL.ES:f&&f.tipo==='Campaña'?FL.EC:FL.E};
 FL.idx=function(f){return f?FL.lista(f).map(function(e){return e[0]}).indexOf(f.etapa):-1};
 FL.vence=function(v){if(!v)return '';var d=Math.ceil((new Date(v+'T12:00:00')-Date.now())/864e5);return d<0?'vencido hace '+(-d)+(d===-1?' día':' días'):d===0?'vence hoy':'vence en '+d+(d===1?' día':' días')};
 FL.html=function(x){
   var f=x.flujo,i=FL.idx(f);
   if(!f)return '<section class="fl" id="xdFlujo" aria-label="Ciclo de la garantía"><div class="fl-h"><h3>Ciclo de la garantía</h3><span class="xz-mut">El agente está calculando la etapa…</span></div></section>';
   var st=f.estado==='bad'?'bad':f.estado==='warn'?'warn':'ok',H=(f.historia||[]).slice(-4).reverse();
-  var srv=f.tipo==='Servicio';
-  return '<section class="fl" id="xdFlujo" aria-label="Ciclo"><div class="fl-h"><h3>'+(srv?'Ciclo del servicio':'Ciclo de la garantía')+'</h3><span class="fl-who">'+(srv?'Sin PREA · se cierra en un día: evidencia, factura y cobro':'El agente la avanza solo con lo que va pasando')+'</span></div>'+
+  var srv=f.tipo==='Servicio',cam=f.tipo==='Campaña';
+  return '<section class="fl" id="xdFlujo" aria-label="Ciclo"><div class="fl-h"><h3>'+(srv?'Ciclo del servicio':cam?'Ciclo de la campaña':'Ciclo de la garantía')+'</h3><span class="fl-who">'+(srv?'Sin PREA · se cierra en un día: evidencia, factura y cobro':cam?'Sin PREA · orden firmada con la campaña, boletín o IVH, factura y cobro':'El agente la avanza solo con lo que va pasando')+'</span></div>'+
     '<ol class="fl-st'+(f.tipo==='Servicio'?' srv':'')+'">'+FL.lista(f).map(function(e,k){return '<li class="'+(k<i||f.etapa==='cerrado'?'done':k===i?'now '+st:'')+'"><i></i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'+
-    (f.etapa!=='cerrado'?'<div class="fl-next '+st+'"><div><span>Siguiente paso · '+esc(f.responsable||'')+'</span><b>'+esc(f.siguiente||'')+'</b></div>'+(f.vence?'<em>'+esc(FL.vence(f.vence))+'<small>'+new Date(f.vence+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'})+'</small></em>':'')+'</div>':'<div class="fl-next ok"><div><b>'+(f.tipo==='Servicio'?'Servicio cobrado':'Garantía cobrada')+'</b></div></div>')+
+    (f.etapa!=='cerrado'?'<div class="fl-next '+st+'"><div><span>Siguiente paso · '+esc(f.responsable||'')+'</span><b>'+esc(f.siguiente||'')+'</b></div>'+(f.vence?'<em>'+esc(FL.vence(f.vence))+'<small>'+new Date(f.vence+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'})+'</small></em>':'')+'</div>':'<div class="fl-next ok"><div><b>'+(f.tipo==='Servicio'?'Servicio cobrado':f.tipo==='Campaña'?'Campaña cobrada':'Garantía cobrada')+'</b></div></div>')+
     ((f.tambien||[]).length?'<ul class="fl-tb">'+f.tambien.map(function(t){var v=t.vence&&new Date(t.vence+'T12:00:00')<Date.now();return '<li class="'+(v||t.urgente?'bad':'')+'">'+esc(t.t)+(t.vence?' · '+esc(FL.vence(t.vence)):'')+'</li>'}).join('')+'</ul>':'')+
     (H.length?'<p class="fl-hist">'+H.map(function(h){return esc(FL.nom(h.etapa))+' '+new Date(h.at).toLocaleDateString('es-MX',{day:'numeric',month:'short'})}).join(' ← ')+'</p>':'')+'</section>';
 };
