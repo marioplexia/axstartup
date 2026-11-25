@@ -1810,6 +1810,20 @@ button.dn-mk{width:100%;border:0;border-top:1px solid var(--card-line);backgroun
 .xd-cont-s.ok{color:#1f8a4c;font-weight:500}.xd-cont-s.mal{color:#b0413d}
 .xd-mas2 .xd-ci{display:flex;align-items:flex-start;gap:10px;padding:7px 6px;font-size:13px}
 .xd-cont-pdf{width:100%;margin-top:14px;justify-content:center}
+.prp{width:300px;flex:none;border-left:1px solid var(--line);background:var(--bg);overflow-y:auto}
+.prp[hidden]{display:none}
+.prp-in{padding:18px 16px 24px}
+.prp-h{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}.prp-h b{font-size:15px}.prp-h span{font-size:12px;color:var(--muted)}
+.prp-fl{padding:12px;border:1px solid var(--card-line);border-radius:12px;background:var(--card);margin-bottom:12px}
+.prp-fl ol{list-style:none;margin:0 0 8px;padding:0;display:flex;gap:4px}.prp-fl li{flex:1}.prp-fl li i{display:block;height:5px;border-radius:99px;background:color-mix(in srgb,var(--fg,#111) 10%,transparent)}
+.prp-fl li.done i{background:#1f8a4c}.prp-fl li.now i{background:var(--signal,#2231dd)}
+.prp-fl p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}.prp-fl p b{color:var(--fg);font-weight:600}
+.prp h5{margin:14px 0 6px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.prp ul{list-style:none;margin:0;padding:0}.prp .xd-ci{display:flex;align-items:flex-start;gap:10px;padding:6px 4px;font-size:13px}
+.prp-b{display:flex;gap:8px;margin-top:16px}.prp-b .bt{flex:1;justify-content:center;font-size:12.5px}
+@media(max-width:1100px){.prp{display:none!important}}
+.svc-ck li.no{color:#b0413d}.svc-ck li.no .svc-cb{border-color:#d9534f;background:rgba(217,83,79,.1);color:#d9534f}.svc-ck li.no .svc-cb .ic{width:11px;height:11px;stroke-width:3}
+.svc-ck li.ok{color:#1f8a4c!important}.svc-ck li.ok>span:nth-child(2){text-decoration:none!important}
 .xd-body{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 .xd-main{min-width:0}
 .xd-oculto{display:none}
@@ -1822,7 +1836,7 @@ button.dn-mk{width:100%;border:0;border-top:1px solid var(--card-line);backgroun
 .xd-cb{flex:none;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--card-line);display:grid;place-items:center;margin-top:1px}
 .xd-ci.ok .xd-cb{background:#1f8a4c;border-color:#1f8a4c;color:#fff}.xd-cb .ic{width:11px;height:11px;stroke-width:3}
 .xd-cn{display:flex;flex-direction:column;min-width:0}.xd-cn small{color:var(--muted);font-size:11.5px}
-.xd-ci.falta .xd-cn small{color:#b07400}
+.xd-ci.falta .xd-cn small{color:#b0413d}
 .xd-cf{padding:0 6px 6px 34px!important;display:flex;flex-direction:column;gap:2px}.xd-cf .xd-name{font-size:12.5px;text-align:left;background:none;border:0;padding:2px 0;color:var(--signal,#2231dd);cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .xd-cont-m{margin:10px 0 0;font-size:12px;color:var(--muted);line-height:1.45}
 @media(max-width:1000px){.xd-body{grid-template-columns:1fr}.xd-cont{position:static}}
@@ -2462,6 +2476,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
         </div>
       </div>
     </section>
+    <aside class="prp" id="prPanel" aria-label="Expediente de la orden" hidden></aside>
     <aside class="gp" id="gp" aria-label="Conversaciones" hidden>
       <div class="gp-h"><div><b>Órdenes</b><small id="gpCount"></small></div><span class="gp-bt"><button class="gp-new" id="gpNew" type="button">+ Nueva</button><button class="gp-hide" id="gpHide" type="button" aria-label="Ocultar órdenes" title="Ocultar órdenes">✕</button></span></div>
       <label class="gp-s"><span data-i="search" style="display:contents"></span><input id="gpQ" type="search" placeholder="Buscar orden o queja" aria-label="Buscar órdenes" autocomplete="off"></label>
@@ -2808,7 +2823,7 @@ function showView(id){
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():(v===id||(id==='red'&&v==='bx'));b.setAttribute('aria-current',on?'true':'false')});
   if(typeof BXT!=='undefined')BXT.sync(id);
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros')||document.body.classList.contains('asesor');$('#gp').hidden=!gpOn;if(typeof AS!=='undefined')AS.sync(id);if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='agv'||id==='cg'||id==='dueno'||id==='aprende';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewAgv').hidden=id!=='agv';$('#viewCg').hidden=id!=='cg';$('#viewAp').hidden=id!=='aprende';if(typeof AP!=='undefined'){if(id==='aprende')AP.abrir();else AP.run++}$('#viewDueno').hidden=id!=='dueno';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros')||document.body.classList.contains('asesor');if(typeof PRP!=='undefined'){if(main)setTimeout(PRP.load,0);else PRP.ocultar()}$('#gp').hidden=!gpOn;if(typeof AS!=='undefined')AS.sync(id);if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='agv'||id==='cg'||id==='dueno'||id==='aprende';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewAgv').hidden=id!=='agv';$('#viewCg').hidden=id!=='cg';$('#viewAp').hidden=id!=='aprende';if(typeof AP!=='undefined'){if(id==='aprende')AP.abrir();else AP.run++}$('#viewDueno').hidden=id!=='dueno';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='pv'){crumb.textContent=VIEWS.pv;crumbSep.hidden=true;crumb2.hidden=true;PV.load()}
@@ -3474,7 +3489,7 @@ function enterChat(title){
   }
   syncCrumb();if(GATE)GATE.sync();
 }
-function resetChat(){
+function resetChat(){if(typeof PRP!=='undefined')PRP.ocultar();
   if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(typeof PR!=='undefined'&&PR)PR.msgs=[];if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.evid=false;GP.caseText='';GP.lastExpP=null;GP.tipo=null;GP.srv=null}if(typeof CB!=='undefined'&&CB)CB.last=null
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
@@ -5618,6 +5633,7 @@ GP.abrir=async function(text,fobjs){
   if(ex)GP.suggest(w,[{t:'Armar el expediente · subir todo',arm:1},{t:'Ver en Expedientes',exp:ex.folio}]);
   /* si trajo archivos al abrirla, el agente arma el expediente con ellos de una vez */
   if(ex&&fobjs&&fobjs.length)setTimeout(function(){GP.armar('',fobjs)},300);
+  if(typeof PRP!=='undefined')PRP.load();
 };
 GP.armaQ=function(text){var t=norm(text||'');return /\b(expediente|auditoria|acomoda|clasifica|arma(lo|me)? todo)\b/.test(t)||(!t&&GP.nPrea>0)};
 GP.armar=async function(text,fobjs){
@@ -5689,6 +5705,7 @@ GP.open=async function(id,o){
   var tgt=last||[].slice.call(document.querySelectorAll('#threadIn .msg-ai')).pop();
   if(tgt&&chips.length)GP.suggest(tgt,chips);
   S.last=null;toBottom(true);GP.render();
+  if(typeof PRP!=='undefined')PRP.load();
 };
 
 /* ---- conversar sobre la orden: el cerebro (reglas aprendidas, resultados y pagos de planta) ---- */
@@ -6683,7 +6700,7 @@ SVC.hecho=function(k){var l=document.querySelector('#exDoc .svc-sec[data-k="'+k+
 SVC.ckHtml=function(x){
   var h={};SVC.CK.forEach(function(c){if(c[0]!=='cerrado')h[c[0]]=SVC.hecho(c[0])});
   h.cerrado=(x&&x.flujo&&x.flujo.etapa==='cerrado')||(h.factura&&h.planta&&h.evidencia);
-  return SVC.CK.map(function(c){var ok=h[c[0]];return '<li class="'+(ok?'ok':'')+'"><span class="svc-cb" aria-hidden="true">'+(ok?svg('check'):'')+'</span><span>'+esc(c[1])+'</span><span class="sr-only">'+(ok?' (hecho)':' (pendiente)')+'</span></li>'}).join('');
+  return SVC.CK.map(function(c){var ok=h[c[0]];return '<li class="'+(ok?'ok':'no')+'"><span class="svc-cb" aria-hidden="true">'+(ok?svg('check'):svg('x'))+'</span><span>'+esc(c[1])+'</span><span class="sr-only">'+(ok?' (hecho)':' (pendiente)')+'</span></li>'}).join('');
 };
 /* ══ Aprende Ax AI: cursos de la plataforma para asesores de garantías ══
    Cursos con lecciones cortas, un «Pruébalo» que te lleva al lugar de la plataforma y una pregunta de repaso.
@@ -6854,6 +6871,46 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   var y=t.closest('[data-aptry]');if(y){AP.ir(y.dataset.aptry);return}
   var r=t.closest('[data-apr]');if(r&&AP.c){var x=AP.c.L[AP.li].s[AP.si];AP.r=+r.dataset.apr;if(AP.r!==x.ok)AP.mal++;AP.paso();return}
 },true);
+/* ══ Al lado del chat de una PREA o campaña: el proceso y lo que tiene el expediente (verde) y lo que falta (rojo) ══ */
+var PRP={x:null,t:0};
+PRP.ocultar=function(){var p=$('#prPanel');if(p){p.hidden=true;p.innerHTML=''}PRP.x=null};
+PRP.load=async function(){
+  var my=++PRP.t,p=$('#prPanel');if(!p)return;
+  if(S.view!=='agent'||S.agent!=='garantias'||!S.convId||!SB.c||!SB.entered){PRP.ocultar();return}
+  try{
+    if(S.convP)await S.convP;
+    var q=await SB.c.from('expedientes').select('*').eq('conversation_id',S.convId).neq('tipo','Servicio').order('created_at',{ascending:false}).limit(1);
+    if(my!==PRP.t)return;var x=q.data&&q.data[0];if(!x){PRP.ocultar();return}
+    var r=await SB.c.rpc('expediente_secciones',{p_ids:[x.id]});if(my!==PRP.t)return;
+    var sec={};(r.data||[]).forEach(function(z){sec[z.seccion]=z.archivos});PRP.x=x;PRP.pintar(x,sec);
+  }catch(e){console.warn('[panel]',e)}
+};
+PRP.item=function(x,d,sec){
+  var n=XD.nArch(x,d[0],sec),cam=XD.esCam(x),nom=d[1],ref=String(d[2]||'').split(' · ')[0];
+  if(cam&&d[0]==='contrato'){nom='Orden de reparación firmada';ref='con la campaña'}
+  return '<li class="xd-ci '+(n?'ok':'falta')+'"><span class="xd-cb" aria-hidden="true">'+(n?svg('check'):svg('x'))+'</span><span class="xd-cn">'+esc(nom)+'<small>'+(n?n+(n===1?' archivo':' archivos'):'Falta')+(ref?' · '+esc(ref):'')+'</small></span></li>';
+};
+PRP.pintar=function(x,sec){
+  var p=$('#prPanel');if(!p)return;var cam=XD.esCam(x),f=x.flujo,L=f?FL.lista(f):[],i=f?FL.idx(f):-1;
+  var req=XD.req(x),opt=XD.opt(x).filter(function(d){return XD.nArch(x,d[0],sec)}),cob=XD.DOCS.filter(function(d){return d[3]==='cob'});
+  var hechos=req.filter(function(d){return XD.nArch(x,d[0],sec)}).length,full=hechos===req.length;
+  var docF=req.map(function(d){return (cam?XA.FALTA_CAM[d[0]]:XA.FALTA[d[0]])||''}),mas=[];
+  ((x.armado&&x.armado.faltantes)||[]).forEach(function(t){if(t&&docF.indexOf(t)<0&&!/^(Falta|Faltan) (la orden|las fotos de la recepci|el diagn|las fotos de la falla|el pedido|las fotos de la pieza|el bolet)/.test(t)&&!(cam&&XA.NO_CAM.test(t)))mas.push(t)});
+  p.innerHTML='<div class="prp-in"><div class="prp-h"><b>'+esc(x.folio||x.wo||'Expediente')+'</b><span>'+esc(cam?'Campaña':'PREA')+'</span></div>'+
+    (f?'<div class="prp-fl"><ol>'+L.map(function(e,k){return '<li class="'+(f.etapa==='cerrado'||k<i?'done':k===i?'now':'')+'" title="'+ea(e[1])+'"><i></i></li>'}).join('')+'</ol>'+
+      '<p><b>'+esc(FL.nom(f.etapa))+'</b>'+(f.etapa!=='cerrado'&&f.siguiente?' · '+esc(f.siguiente):'')+'</p></div>':'')+
+    '<p class="xd-cont-s '+(full?'ok':'mal')+'">'+(full?(cam?'Completo: tiene lo que lleva una campaña.':'Completo: tiene todo lo obligatorio.'):'Lleva '+hechos+' de '+req.length+' documentos obligatorios. Mándame lo que falta aquí en el chat.')+'</p>'+
+    '<h5>Obligatorios</h5><ul>'+req.map(function(d){return PRP.item(x,d,sec)}).join('')+'</ul>'+
+    (opt.length?'<h5>Según aplique</h5><ul>'+opt.map(function(d){return PRP.item(x,d,sec)}).join('')+'</ul>':'')+
+    '<h5>Cobranza</h5><ul>'+cob.map(function(d){return PRP.item(x,d,sec)}).join('')+'</ul>'+
+    (mas.length?'<h5>También falta</h5><ul>'+mas.slice(0,6).map(function(t){return '<li class="xd-ci falta"><span class="xd-cb" aria-hidden="true">'+svg('x')+'</span><span class="xd-cn">'+esc(t.replace(/ Captúralas en «Fechas del expediente»\.?/,''))+'</span></li>'}).join('')+'</ul>':'')+
+    '<div class="prp-b"><button type="button" class="bt" data-prpdf>Descargar PDF</button><button type="button" class="bt" data-prexp>Abrir expediente</button></div></div>';
+  p.hidden=false;
+};
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+  var b=t.closest('[data-prpdf]');if(b&&PRP.x){XA.pdf(PRP.x.id,b);return}
+  if(t.closest('[data-prexp]')&&PRP.x){var x=PRP.x;EX.f=XD.esCam(x)?'cam':'prea';showView('exp');EX.load().then(function(){if(!EX.rows.some(function(r){return r.id===x.id}))EX.rows.unshift(x);XD.open(x.id)})}
+});
 /* ══ Simulación: una orden de prueba (GA9999) que se juega sola, sin tocar la base ══ */
 var SIM={on:false};
 SIM.x=function(){return {id:'sim-servicio',folio:'SRV-GA9999',wo:'GA9999',tipo:'Servicio',demo:true,status:'borrador',sys:null,vehicle:null,km:null,labor:0,parts_total:0,flujo:{etapa:'servicio',siguiente:'Hacer el servicio y subir la evidencia'}}};
@@ -8260,6 +8317,7 @@ XA.core=async function(x,files,log,o){
   if(!o.enChat)res.chat=await XA.chat(x,res);
   await FL.refresh(x);
   if(HM.d&&HM.d.exp){var h=HM.d.exp.filter(function(r){return r.id===x.id})[0];if(h)h.armado=res}
+  if(typeof PRP!=='undefined')PRP.load();
   var ex=(typeof EX!=='undefined'&&EX.rows||[]).filter(function(r){return r.id===x.id})[0];if(ex)Object.assign(ex,x);
   return res;
 };
@@ -10025,7 +10083,7 @@ async function run(text,files){
   try{await LS.apply(ctx)}catch(_){}
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
   var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+PRA.note(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(evi?'\n\n> **Evidencia inspeccionada** ('+evi.archivos+(evi.archivos===1?' archivo':' archivos')+'): '+evi.resumen+(evi.inconsistencias.length?' **Ojo:** '+evi.inconsistencias.join('; '):''):'')+(brain?'\n\n### Lo que sabe el cerebro para tu PREA\n'+brain:'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
-  if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;GP.nPrea++;GP.caseText=text;GP.remember(text,w._text);GP.suggest(w,[{t:'Armar el expediente · subir todo',arm:1},{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'¿Cuánto pagará planta?',q:'¿Cuánto crees que pagará planta por esto?'}])}
+  if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;Promise.resolve(ctx.expP).then(function(){setTimeout(PRP.load,800)});GP.nPrea++;GP.caseText=text;GP.remember(text,w._text);GP.suggest(w,[{t:'Armar el expediente · subir todo',arm:1},{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'¿Cuánto pagará planta?',q:'¿Cuánto crees que pagará planta por esto?'}])}
   finish(my);
 }
 
