@@ -1208,6 +1208,10 @@ body.asesor #viewExp>.ad-in{display:none}
 .ah-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:14px 0 22px}
 .ah-head h1{margin:0;font:700 clamp(30px,4vw,40px)/1.1 var(--f-ui);letter-spacing:-.035em}
 .ah-head p{margin:8px 0 0;color:var(--as-mut,#8b8b90);font-size:14px}
+.ah-acts{display:flex;flex-wrap:wrap;gap:8px}
+.ah-b2{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:99px;background:var(--as-card,#fff);box-shadow:var(--as-sh);border:1px solid var(--as-line,#ebebec);color:var(--as-ink,#111);font:600 13.5px var(--f-ui);cursor:pointer}
+.ah-b2:hover{background:var(--as-soft,#f4f4f5)}.ah-b2 .ic{width:16px;height:16px}
+.ah-b2 i{font-style:normal;font:600 11.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--as-mut,#8b8b90);padding:2px 7px;border-radius:99px;background:var(--as-soft,#f4f4f5)}
 .ah-new{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:99px;background:var(--as-ink,#111);color:var(--as-card,#fff);font:600 13.5px var(--f-ui);cursor:pointer}
 .ah-new .ic{width:16px;height:16px;stroke-width:2.2}
 .ah-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -2936,6 +2940,7 @@ var P={
   folderopen:'<path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>',
   dollar:'<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 7v10M14.8 9.4c0-.9-1.2-1.6-2.8-1.6s-2.8.7-2.8 1.8c0 2.4 5.6 1.2 5.6 3.8 0 1.1-1.3 1.8-2.8 1.8s-2.8-.8-2.8-1.7"/>',
   wallet:'<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>',
+  play:'<path d="M7 5.5v13l10.5-6.5z"/>',
   present:'<path d="M2 3h20M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3M8 21l4-4 4 4"/>',
   settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
   folder:'<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
@@ -7121,7 +7126,9 @@ AH.render=function(){
   var tot=mios.length,cer=mios.filter(AH.cerrado).length;
   el.innerHTML='<div class="ah-in"><div class="ah-head"><div><h1><span id="ahHola">'+AH.hola()+'</span>, <span id="ahNom">'+esc(AH.nombre()||'asesor')+'</span></h1>'+
       '<p><span id="ahFecha">'+esc(AH.fecha())+'</span> · '+tot+(tot===1?' orden':' órdenes')+', '+cer+(cer===1?' cerrada':' cerradas')+'</p></div>'+
-      '<button type="button" class="ah-new" data-ahnew>'+svg('plus')+'Nueva orden</button></div>'+
+      '<div class="ah-acts"><button type="button" class="ah-b2" data-apnav>'+svg('present')+'Aprende Ax AI<i>'+AP.total().h+'/'+AP.total().n+'</i></button>'+
+      '<button type="button" class="ah-b2" data-svcdemo>'+svg('play')+'Simulación</button>'+
+      '<button type="button" class="ah-new" data-ahnew>'+svg('plus')+'Nueva orden</button></div></div>'+
     '<div class="ah-grid">'+K.map(tarjeta).join('')+'</div>'+
     '<section class="ah-box"><div class="ah-bh"><b>Lo que sigue</b><span>'+(sig.length?sig.length+(sig.length===1?' orden abierta':' órdenes abiertas'):'Todo al día')+'</span></div>'+
       (sig.length?'<div class="ah-list">'+sig.map(fila).join('')+'</div>':'<p class="ah-vacio">No tienes órdenes pendientes. Abre una nueva con «Nueva orden».</p>')+'</section></div>';
@@ -7198,8 +7205,8 @@ document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' '
 /* la orden de simulación, fija arriba de la lista de órdenes */
 (function(){var r0=GP.render;GP.render=function(){r0.apply(this,arguments);var b=$('#gpList');if(!b||GP.ag()==='cobros')return;
   if(AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-home" role="listitem" tabindex="0" data-ahome'+(S.view==='exp'&&!XD.cur?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('home','sm')+'</span><span>Inicio</span></div></div>');
-  var T=AP.total();b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-ap" role="listitem" tabindex="0" data-apnav'+(S.view==='aprende'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('present','sm')+'</span><span>Aprende Ax AI</span><span class="gp-x">'+T.h+'/'+T.n+'</span></div><div class="gp-q">Cursos de la plataforma para asesores</div></div>');
-  b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild);var hx=b.querySelector('.gp-home');if(hx)b.insertBefore(hx,b.firstChild)}})();
+  var T=AP.total();if(!AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-ap" role="listitem" tabindex="0" data-apnav'+(S.view==='aprende'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('present','sm')+'</span><span>Aprende Ax AI</span><span class="gp-x">'+T.h+'/'+T.n+'</span></div><div class="gp-q">Cursos de la plataforma para asesores</div></div>');
+  if(!AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild);var hx=b.querySelector('.gp-home');if(hx)b.insertBefore(hx,b.firstChild)}})();
 SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x);var c=el&&el.closest('.svc-ck');if(!c)return;var n=el.children.length,h=el.querySelectorAll('li.ok').length,p=n?Math.round(h*100/n):0,g=c.querySelector('.wf-pg');if(!g){c.querySelector('ol').insertAdjacentHTML('afterend','<div class="wf-pg"><span>Progreso</span><b></b><i><i></i></i></div>');g=c.querySelector('.wf-pg')}g.querySelector('b').textContent=p+'%';g.querySelector('i>i').style.width=p+'%'};
 SVC.ACC='<div class="ai-actions"><button class="fb" type="button" data-sva="copy" aria-label="Copiar">'+svg('copy','sm')+'</button><button class="fb" type="button" data-sva="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button><button class="fb" type="button" data-sva="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button></div>';
 SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div>'+SVC.ACC+'</div>';$('.ai-actions',d).hidden=true;$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
