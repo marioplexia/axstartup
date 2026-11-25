@@ -5747,13 +5747,11 @@ GP.abrir=async function(text,fobjs){
       if(ni.error)throw ni.error;ex=ni.data;
     }
   }catch(e){SB.fail(e);ex=null}
-  if(ex){GP.nPrea=1;t+='\n\nSu expediente **'+ex.folio+'** ya está creado, en blanco. Arrástrame aquí todo lo de la orden y lo armo yo, o ábrelo en Expedientes para subir cada documento.'}
+  if(ex){GP.nPrea=1;t+='\n\nYa está su expediente **'+ex.folio+'**. Arrástrame aquí lo de la orden y lo acomodo.'}
   else t+='\n\nNo pude crear su expediente; inténtalo de nuevo en un momento.';
   body.innerHTML=md(t,false);w._text=t;
-  if(ex){var box=document.createElement('div');box.className='mi-wrap';box.innerHTML=GP.prea(ex);$('.ai-col',w).insertBefore(box,$('.ai-actions',w))}
   $('.ai-actions',w).hidden=false;toBottom(true);
   GP.remember(text||('Abrir la orden '+ord+' · '+tipo),t);SB.loadHist();GP.load();
-  if(ex)GP.suggest(w,[{t:'Armar el expediente · subir todo',arm:1},{t:'Ver en Expedientes',exp:ex.folio}]);
   /* si trajo archivos al abrirla, el agente arma el expediente con ellos de una vez */
   if(ex&&fobjs&&fobjs.length)setTimeout(function(){GP.armar('',fobjs)},300);
   if(typeof PRP!=='undefined')PRP.load();
@@ -5763,8 +5761,8 @@ GP.armar=async function(text,fobjs){
   if(XA.busy){toast('Espera a que termine el armado anterior');return}
   fobjs=(fobjs||[]).map(function(o){return o&&o.file?o:{name:o.name||'archivo',img:null,file:o}});
   var files=fobjs.map(function(o){return o.file}).filter(Boolean);if(!files.length)return;
-  var ut=text||('Arma el expediente con '+(files.length===1?'este archivo':'estos '+files.length+' archivos'));
-  closeMenu();showView('agent');enterChat(GP.cur||ut);addUser(ut,fobjs);
+  var ut=text||files.map(function(f){return '📎 '+f.name}).join('\n');
+  closeMenu();showView('agent');enterChat(GP.cur||ut);addUser(text||'',fobjs);
   ta.value='';S.files=[];renderFiles();autosize();updateSend();
   var w=addAssistant();hideRegen(w);var body=$('.ai-body',w),fin=function(t){body.insertAdjacentHTML('beforeend',md(t,false));w._text=t;$('.ai-actions',w).hidden=false;GP.remember(ut,t);toBottom(true)};
   var rows=[];try{rows=await GP.rowsCtx()}catch(_){}
@@ -5777,8 +5775,8 @@ GP.armar=async function(text,fobjs){
   try{
     var o=await XA.core(x,files,$('.xa-log',body),{say:say,enChat:true});
     var e1=$('.xa-say',body);if(e1)e1.remove();
-    fin(XA.md(x,o).replace('súbelo en el expediente y lo vuelvo a revisar','mándamelo aquí (con «Subir lo que falta») y lo vuelvo a revisar'));
-    GP.suggest(w,[{t:'Descargar expediente armado (PDF)',pdf:x.id},{t:'Ver en Expedientes',exp:x.folio},{t:'Subir lo que falta',arm:1}]);
+    var dl=$('.xa-log',body);if(dl)dl.remove();body.innerHTML='';
+    fin('Listo, acomodé '+(files.length===1?'el archivo':'los '+files.length+' archivos')+' en el expediente de la orden **'+(x.wo||x.folio)+'**. Lo que ya tiene y lo que falta está en la lista de la derecha.');
   }catch(e){console.error(e);say('No pude armar el expediente: '+TR.errTxt(e))}
   XA.busy=false;
 };
@@ -5803,7 +5801,7 @@ GP.open=async function(id,o){
   enterChat(cv.orden||cv.title||'Conversación');
   var ex=await SB.c.from('expedientes').select(GP.COLS).eq('conversation_id',id).order('created_at',{ascending:true}).limit(10);
   var rows=(ex.data||[]);GP.nPrea=rows.length;
-  if(GP.msgs.length)GP.msgs.forEach(function(m){
+  if(GP.msgs.length)GP.msgs.filter(function(m){var c=String(m.content||'');return !(m.role==='assistant'&&/^\*\*Armé el expediente/.test(c))&&!(m.role==='user'&&/^Arma el expediente con (este archivo|estos \d+ archivos)$/.test(c))}).forEach(function(m){
     if(m.role==='user')addUser(m.content,[]);
     else{var w=addAssistant();hideRegen(w);$('.ai-body',w).innerHTML=md(m.content,false);w._text=m.content;$('.ai-actions',w).hidden=false}
   });else if(GP.tipo!=='Servicio')addUser(cv.text||'',[]);
@@ -5815,9 +5813,7 @@ GP.open=async function(id,o){
     if(GP.srv){var tg=last||[].slice.call(document.querySelectorAll('#threadIn .msg-ai')).pop();if(tg)GP.suggest(tg,[{t:'Volver al expediente del servicio',srv:GP.srv.id},{t:'¿Qué evidencia debo subir?',q:'¿Qué evidencia debo subir para este servicio?'},{t:'¿Cómo lo facturo?',q:'¿Cómo facturo este servicio?'}])}
     S.last=null;toBottom(true);GP.render();return;
   }
-  if(!cob&&rows.length){
-    last=addAssistant();hideRegen(last);$('.ai-body',last).innerHTML=md(rows.length>1?'Estas son las PREAs de esta conversación.':'Esta es la PREA de esta conversación.',false);
-    var box=document.createElement('div');box.className='mi-wrap';box.innerHTML=rows.map(GP.prea).join('');$('.ai-col',last).insertBefore(box,$('.ai-actions',last));$('.ai-actions',last).hidden=false;
+  if(!cob&&rows.length){/* el expediente se ve en la lista de la derecha */
   }else if(!GP.msgs.length){
     last=addAssistant();hideRegen(last);$('.ai-body',last).innerHTML=md(cob?'Esta conversación no llegó a estimar un pago. Puedes continuar escribiendo aquí.':'Esta conversación no llegó a generar una PREA. Puedes continuar escribiendo aquí.',false);$('.ai-actions',last).hidden=false;
   }
@@ -5826,7 +5822,7 @@ GP.open=async function(id,o){
     try{var o=await CB.prepare(cv.text||'',[],{step:function(){return {done:function(){}}},end:function(){}},{aborted:false,fast:true});if(o.kind==='ok'){CB.last=o.ctx;chips.push({t:'¿Por qué ese porcentaje?',q:'¿Por qué ese porcentaje?'},{t:'¿Cuánto es con IVA?',q:'¿Cuánto es con IVA?'})}}catch(_){}
     chips.push({t:'Ver en Cartera',q:'',go:'cartera'});
   }else if(rows.length){
-    var rw=rows[rows.length-1];chips.push({t:'Armar el expediente · subir todo',arm:1},{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'Estimar pago en Cobros',q:'Estima cuánto pagará planta por la PREA '+rw.folio,go:'cobros'});
+    var rw=rows[rows.length-1];if(false)chips.push({t:'Armar el expediente · subir todo',arm:1},{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'Estimar pago en Cobros',q:'Estima cuánto pagará planta por la PREA '+rw.folio,go:'cobros'});
   }
   if(sb)chips.push({t:'Ver su conversación de '+(sb.agent==='cobros'?'Cobros':'Garantías'),open:sb.id});
   var tgt=last||[].slice.call(document.querySelectorAll('#threadIn .msg-ai')).pop();
@@ -8420,6 +8416,7 @@ XA.md=function(x,o){
 };
 /* lo dice en el chat de la orden */
 XA.chat=async function(x,o){
+  return false;
   try{
     var id=x.conversation_id||null;
     if(!id&&x.wo){var f=await SB.c.from('conversations').select('id').eq('agent','garantias').eq('orden',x.wo).limit(1);if(!f.error&&f.data&&f.data[0])id=f.data[0].id}
@@ -10213,7 +10210,7 @@ async function run(text,files){
   try{await LS.apply(ctx)}catch(_){}
   ctx.expId=crypto.randomUUID();ctxReg[ctx.expId]=ctx;
   var okp=await agentTurn(w,ctx,introText(ctx),STEPS,simulatePrea,finalText(ctx)+PRA.note(ctx)+(ctx.aiNote?'\n\n> Nota del agente: '+ctx.aiNote:'')+(evi?'\n\n> **Evidencia inspeccionada** ('+evi.archivos+(evi.archivos===1?' archivo':' archivos')+'): '+evi.resumen+(evi.inconsistencias.length?' **Ojo:** '+evi.inconsistencias.join('; '):''):'')+(brain?'\n\n### Lo que sabe el cerebro para tu PREA\n'+brain:'')+(ctx.lessonNote||'')+(ctx.wo?'':'\n\n> Aún no tengo el número de orden. Escríbelo (por ejemplo **GA4041**) y lo uso como título de esta conversación.'),my,buildPreaCard);
-  if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;Promise.resolve(ctx.expP).then(function(){setTimeout(PRP.load,800)});GP.nPrea++;GP.caseText=text;GP.remember(text,w._text);GP.suggest(w,[{t:'Armar el expediente · subir todo',arm:1},{t:'¿Por qué esa operación?',q:'¿Por qué elegiste esa operación?'},{t:'¿Qué tan seguido se acepta?',q:'¿Qué tan seguido se acepta algo parecido?'},{t:'¿Cuánto pagará planta?',q:'¿Cuánto crees que pagará planta por esto?'}])}
+  if(okp){SB.saveExp(ctx);GP.lastExpP=ctx.expP;Promise.resolve(ctx.expP).then(function(){setTimeout(PRP.load,800)});GP.nPrea++;GP.caseText=text;GP.remember(text,w._text)}
   finish(my);
 }
 
