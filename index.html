@@ -7223,7 +7223,7 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest||!t.c
   var r=t.closest('[data-ahx]');if(r){XD.open(r.dataset.ahx);return}
   if(t.closest('[data-ahnew]')){showView('agent');var b=$('#gpNew');if(b)b.click();return}
   var k=t.closest('[data-ahk]');if(k){var Lk=AH.mios().filter(function(z){return AH.tipo(z)===k.dataset.ahk});
-    if(Lk.length>1){AH.vista=k.dataset.ahk;AH.filtro='todas';AH.q='';AH.render();var vx=$('#viewExp');if(vx)vx.scrollTop=0;return}
+    if(Lk){AH.vista=k.dataset.ahk;AH.filtro='todas';AH.q='';AH.render();var vx=$('#viewExp');if(vx)vx.scrollTop=0;return}
     var x=(EX.rows||[]).filter(function(z){return (!z.user_id||z.user_id===ME)&&AH.tipo(z)===k.dataset.ahk&&!AH.cerrado(z)})[0]||(EX.rows||[]).filter(function(z){return (!z.user_id||z.user_id===ME)&&AH.tipo(z)===k.dataset.ahk})[0];if(x)XD.open(x.id);else toast('Aún no tienes '+(k.dataset.ahk==='prea'?'PREAs':k.dataset.ahk==='cam'?'campañas':'servicios'))}
 });
 /* ══ Simulación: una orden de prueba (GA9999) que se juega sola, sin tocar la base ══ */
