@@ -5673,6 +5673,10 @@ GP.open=async function(id,o){
   GP.srv=null;
   if(GP.tipo==='Servicio'){var sx=await SB.c.from('expedientes').select('*').eq('conversation_id',id).eq('tipo','Servicio').limit(1);GP.srv=sx.data&&sx.data[0]||null;
     if(GP.srv&&!o.chat){resetChat();EX.f='srv';EX.q='';$('#exQ').value='';showView('exp');await EX.load();if(!EX.rows.some(function(r){return r.id===sx.data[0].id}))EX.rows.unshift(sx.data[0]);XD.open(sx.data[0].id);return}}
+  if(o.exp&&!cob&&GP.tipo!=='Servicio'){
+    var xq=await SB.c.from('expedientes').select('*').eq('conversation_id',id).neq('tipo','Servicio').order('created_at',{ascending:false}).limit(1),xe=xq.data&&xq.data[0];
+    if(xe){resetChat();EX.f=xe.tipo==='Campaña'?'cam':'prea';EX.q='';$('#exQ').value='';showView('exp');await EX.load();var xr=EX.rows.filter(function(r){return r.id===xe.id})[0];if(xr)Object.assign(xr,xe);else EX.rows.unshift(xe);XD.open(xe.id);GP.render();return}
+  }
   enterChat(cv.orden||cv.title||'Conversación');
   var ex=await SB.c.from('expedientes').select(GP.COLS).eq('conversation_id',id).order('created_at',{ascending:true}).limit(10);
   var rows=(ex.data||[]);GP.nPrea=rows.length;
@@ -5954,9 +5958,9 @@ async function runConv(text){
     var x=e.target.closest('[data-gpopen]');if(x){e.stopPropagation();GP.open(x.dataset.gpopen);return}
     var b=e.target.closest('[data-gp]'),it=e.target.closest('.gp-i');if(!it)return;
     if(b){e.stopPropagation();if(b.dataset.gp==='ren')GP.rename(it.dataset.id);else GP.del(it.dataset.id);return}
-    GP.open(it.dataset.id);
+    GP.open(it.dataset.id,{exp:true});
   });
-  list.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.classList.contains('gp-i'))GP.open(e.target.dataset.id)});
+  list.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.classList.contains('gp-i'))GP.open(e.target.dataset.id,{exp:true})});
   $('#gpQ').addEventListener('input',function(){GP.q=this.value;GP.render()});
   $('#gpNew').addEventListener('click',function(){document.getElementById('newChat').click()});
   document.addEventListener('click',function(e){
@@ -7076,7 +7080,7 @@ XD.open=function(id){
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
   el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
-    '<div class="xd-acts">'+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
+    '<div class="xd-acts">'+(x.conversation_id?'<button class="bt pri" type="button" data-xdchat>Chatear con el agente</button>':'')+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
     '<div class="xd-body"><div class="xd-main">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+XD.contHtml()+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
@@ -7694,7 +7698,7 @@ document.addEventListener('click',function(e){
   var t=e.target;if(!t.closest)return;
   if(t.closest('[data-xdclose]')){XD.close();return}
   if(t.closest('[data-xdmv]')&&XD.cur){EX.menuMover(XD.cur.id);return}
-  if(t.closest('[data-xdchat]')&&XD.cur){var sx=XD.cur;if(!sx.conversation_id){toast('Este servicio no tiene conversación');return}XD.close();GP.open(sx.conversation_id,{chat:true});return}
+  if(t.closest('[data-xdchat]')&&XD.cur){var sx=XD.cur;if(!sx.conversation_id){toast('Esta orden no tiene conversación');return}XD.close();GP.open(sx.conversation_id,{chat:true});return}
   if(t.closest('[data-xddel]')&&XD.cur){var cx=XD.cur;XDEL.uno(cx).then(function(ok){if(ok){XD.close();if(S.view==='exp')EX.load()}});return}
   if(t.closest('[data-xdsave]')){XD.qSave();return}
   var o=t.closest('[data-xdopen]');
@@ -8270,7 +8274,7 @@ XA.recam=async function(x){
   }catch(e){console.warn('[campaña]',e)}
 };
 XA.show=function(o){
-  var el=$('#xaRes');setTimeout(function(){if(typeof XD!=='undefined'&&XD.cont)XD.cont()},0);if(!el)return;if(!o){el.innerHTML='';return}
+  var el=$('#xaRes');setTimeout(function(){if(typeof XD!=='undefined'&&XD.cont)XD.cont()},0);if(!el)return;if(!o){el.innerHTML='';return}o=Object.assign({faltantes:[],discrepancias:[],plazos:[],lleno:[],documentos:[],revision:{cumple:0,no_cumple:0}},o);
   var secs=(o.documentos||[]).filter(function(d){return d.seccion!=='otro'}).map(function(d){return d.seccion}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
   var L=function(t,arr,cls){return arr&&arr.length?'<div class="xa-b '+cls+'"><h4>'+t+'</h4><ul>'+arr.map(function(a){return '<li>'+esc(typeof a==='string'?a:a.label+': '+a.txt)+'</li>'}).join('')+'</ul></div>':''};
   var ok=!o.faltantes.length&&!o.discrepancias.length;
