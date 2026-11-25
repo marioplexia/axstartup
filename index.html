@@ -1229,6 +1229,13 @@ body.asesor .fl-st li.fin i,.fl-st li.fin i{background:#1f8a4c!important;border-
 .ord-main.over .svc-drop{display:grid}
 .ord-side{display:flex;flex-direction:column;gap:12px;min-width:0}
 .ord .svc-ck{position:sticky;top:12px;margin-top:0}
+body.asesor #preaHost,body.asesor #brandHost{display:none!important}
+body.asesor #composer .c-head:not(:has(#gtTag:not([hidden]))){display:none}
+/* la zona grande para subir se oculta: queda el botón «Subir actualización del expediente» */
+.ord #xdArm,.ord-main #xdArm,.ord-main .ord-up{display:none!important}
+.ord-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.ord-bar .ord-tabs{margin-bottom:0}
+.ord-upb{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:99px;border:1.5px dashed #c9c9cf;background:var(--as-card,#fff);color:var(--as-ink,#111);font:600 13px var(--f-ui);cursor:pointer}
+.ord-upb:hover{border-style:solid;border-color:var(--as-ink,#111)}.ord-upb .ic{width:15px;height:15px;stroke-width:2.2}
 /* ══ Inicio del asesor ══ */
 body.asesor #viewExp>.ad-in{display:none}
 .ah-in{max-width:1180px;margin:0 auto;padding:10px max(24px,env(safe-area-inset-right,0px)) 48px max(24px,env(safe-area-inset-left,0px))}
@@ -7319,12 +7326,11 @@ document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.cl
    Al escribirle, el expediente se oculta y aparece la conversación; «Expediente» lo vuelve a mostrar. */
 var ORD={v:'exp'};
 ORD.nom=function(x){return x.tipo==='Servicio'?'Servicio':x.tipo==='Campaña'?'Campaña':'PREA'};
-ORD.tabs=function(){return '<div class="ord-tabs" role="tablist" aria-label="Vista de la orden"><button type="button" role="tab" data-ordv="exp" aria-selected="true">Expediente</button><button type="button" role="tab" data-ordv="chat" aria-selected="false">Conversación<i id="ordN"></i></button></div>'};
+ORD.tabs=function(){return '<div class="ord-bar"><div class="ord-tabs" role="tablist" aria-label="Vista de la orden"><button type="button" role="tab" data-ordv="exp" aria-selected="true">Expediente</button><button type="button" role="tab" data-ordv="chat" aria-selected="false">Conversación<i id="ordN"></i></button></div><button type="button" class="ord-upb" data-ordup title="Sube documentos nuevos y el agente los acomoda">'+svg('plus')+'Subir actualización del expediente</button></div>'};
 ORD.chat=function(){return '<div class="ord-chat" id="ordChat" hidden><div class="svc-th" id="svcTh" aria-live="polite"><div class="svc-thi" id="svcThi"></div></div></div>'};
 ORD.comp=function(x){
   var marca=($('#brandLabel')&&$('#brandLabel').textContent)||'General Motors',sv=x.tipo==='Servicio';
   return '<form class="svc-dock ord-dock" id="svcForm"><div class="composer svc-comp">'+
-    '<div class="c-head"><span class="dd svc-dd">'+svg('folder')+'<span>'+ORD.nom(x)+' · '+esc(x.wo||x.folio)+'</span></span><span class="dd svc-dd">'+esc(marca)+'</span></div>'+
     '<div class="card"><textarea id="svcTa" rows="2" placeholder="'+(sv?'Escríbele al agente o arrastra aquí la orden, fotos, factura o comprobante…':'Escríbele al agente o arrastra aquí los documentos de la orden…')+'" aria-label="Mensaje para el agente de la orden"></textarea>'+
     '<div class="c-foot"><button type="button" class="fb" data-svcclip aria-label="Subir archivos" title="Subir archivos">'+svg('plus')+'</button><span class="sp"></span>'+
     '<button type="button" class="fb" data-svcclr aria-label="Limpiar">'+svg('x')+'</button>'+
@@ -7365,7 +7371,7 @@ ORD.armar=async function(files){
   }catch(e){t='No pude acomodar los archivos ('+TR.errTxt(e)+'). Inténtalo otra vez.'}
   XA.busy=false;SVC.decir('assistant',t);await SVC.tipear(t,null,100,w);SVC.guardar();ORD.n();if(typeof XD.cont==='function')XD.cont();
 };
-document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#exDoc [data-ordv]');if(b)ORD.ver(b.dataset.ordv)});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#exDoc [data-ordv]');if(b)ORD.ver(b.dataset.ordv);if(e.target.closest&&e.target.closest('#exDoc [data-ordup]')){var f=$('#svcFile');if(f)f.click()}});
 document.addEventListener('click',function(e){var z=e.target.closest&&e.target.closest('#exDoc .ord-zone');if(z&&e.target.tagName!=='INPUT')$('input',z).click()});
 document.addEventListener('keydown',function(e){var z=e.target.closest&&e.target.closest('#exDoc .ord-zone');if(z&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('input',z).click()}});
 document.addEventListener('change',function(e){var i=e.target;if(i.matches&&i.matches('#exDoc .ord-zone input[type=file]')){SVC.subir(i.files);i.value=''}});
