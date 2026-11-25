@@ -1202,6 +1202,16 @@ body.asesor .act.fin .wf-pg,body.asesor .act[data-open="false"] .wf-pg{display:n
 body.asesor .ap-ic{background:var(--as-soft)}body.asesor .ap-segs i.now{background:var(--as-ink)}body.asesor .ap-segs i.ok{background:var(--as-ink);opacity:.35}
 body.asesor .ap-bar i{background:var(--as-ink)}
 
+.ok-ck{display:inline-grid;place-items:center;flex:none;width:22px;height:22px;border-radius:50%;background:#1f8a4c;color:#fff;box-shadow:0 0 0 4px rgba(31,138,76,.14)}
+.ok-ck .ic{width:13px;height:13px;stroke-width:3}
+.fl-st li.fin i{display:grid!important;place-items:center;width:24px!important;height:24px!important;margin-top:-5px;background:#1f8a4c!important;border-color:#1f8a4c!important;color:#fff;box-shadow:0 0 0 4px rgba(31,138,76,.16)}
+.fl-st li.fin i .ic{width:13px;height:13px;stroke-width:3}
+.fl-st li.fin span,body.asesor .fl-st li.fin span{color:#1f8a4c!important;font-weight:600}
+.fl-hecho{display:flex!important;align-items:center;justify-content:flex-start!important;gap:12px;background:rgba(31,138,76,.08)!important}.fl-hecho b{color:#1f8a4c}
+.ok-ck .ic,.fl-st li.fin i .ic{display:block!important;stroke:#fff!important;fill:none!important}
+body.asesor .fl-st li.fin i,.fl-st li.fin i{background:#1f8a4c!important;border-color:#1f8a4c!important}
+.wf-pg.full>span{display:inline-flex;align-items:center;gap:9px;color:#1f8a4c}.wf-pg.full>b{color:#1f8a4c}.wf-pg.full>i>i{background:#1f8a4c!important}
+.wf-pg.full .ok-ck{width:20px;height:20px}
 /* ══ Inicio del asesor ══ */
 body.asesor #viewExp>.ad-in{display:none}
 .ah-in{max-width:1180px;margin:0 auto;padding:10px max(24px,env(safe-area-inset-right,0px)) 48px max(24px,env(safe-area-inset-left,0px))}
@@ -7091,7 +7101,7 @@ PRP.pintar=function(x,sec){
     (opt.length?'<h5>Según aplique</h5><ul>'+opt.map(function(d){return PRP.item(x,d,sec)}).join('')+'</ul>':'')+
     '<h5>Cobranza</h5><ul>'+cob.map(function(d){return PRP.item(x,d,sec)}).join('')+'</ul>'+
     (mas.length?'<h5>También falta</h5><ul>'+mas.slice(0,6).map(function(t){return '<li class="xd-ci falta"><span class="xd-cb" aria-hidden="true">'+svg('x')+'</span><span class="xd-cn">'+esc(t.replace(/ Captúralas en «Fechas del expediente»\.?/,''))+'</span></li>'}).join('')+'</ul>':'')+
-    '<div class="wf-pg"><span>Progreso</span><b>'+Math.round(hechos*100/Math.max(1,req.length))+'%</b><i><i style="width:'+Math.round(hechos*100/Math.max(1,req.length))+'%"></i></i></div>'+
+    '<div class="wf-pg'+(full?' full':'')+'"><span>'+(full?'<span class="ok-ck">'+svg('check')+'</span>Completo':'Progreso')+'</span><b>'+Math.round(hechos*100/Math.max(1,req.length))+'%</b><i><i style="width:'+Math.round(hechos*100/Math.max(1,req.length))+'%"></i></i></div>'+
     '<div class="prp-b"><button type="button" class="bt" data-prpdf>Descargar PDF</button><button type="button" class="bt" data-prexp>Abrir expediente</button></div></div>';
   p.hidden=false;
 };
@@ -7207,7 +7217,7 @@ document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' '
   if(AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-home" role="listitem" tabindex="0" data-ahome'+(S.view==='exp'&&!XD.cur?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('home','sm')+'</span><span>Inicio</span></div></div>');
   var T=AP.total();if(!AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-ap" role="listitem" tabindex="0" data-apnav'+(S.view==='aprende'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('present','sm')+'</span><span>Aprende Ax AI</span><span class="gp-x">'+T.h+'/'+T.n+'</span></div><div class="gp-q">Cursos de la plataforma para asesores</div></div>');
   if(!AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild);var hx=b.querySelector('.gp-home');if(hx)b.insertBefore(hx,b.firstChild)}})();
-SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x);var c=el&&el.closest('.svc-ck');if(!c)return;var n=el.children.length,h=el.querySelectorAll('li.ok').length,p=n?Math.round(h*100/n):0,g=c.querySelector('.wf-pg');if(!g){c.querySelector('ol').insertAdjacentHTML('afterend','<div class="wf-pg"><span>Progreso</span><b></b><i><i></i></i></div>');g=c.querySelector('.wf-pg')}g.querySelector('b').textContent=p+'%';g.querySelector('i>i').style.width=p+'%'};
+SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x);var c=el&&el.closest('.svc-ck');if(!c)return;var n=el.children.length,h=el.querySelectorAll('li.ok').length,p=n?Math.round(h*100/n):0,g=c.querySelector('.wf-pg');if(!g){c.querySelector('ol').insertAdjacentHTML('afterend','<div class="wf-pg"><span>Progreso</span><b></b><i><i></i></i></div>');g=c.querySelector('.wf-pg')}g.querySelector('b').textContent=p+'%';g.querySelector('i>i').style.width=p+'%';g.classList.toggle('full',p===100);g.querySelector('span').innerHTML=p===100?'<span class="ok-ck">'+svg('check')+'</span>Completo':'Progreso'};
 SVC.ACC='<div class="ai-actions"><button class="fb" type="button" data-sva="copy" aria-label="Copiar">'+svg('copy','sm')+'</button><button class="fb" type="button" data-sva="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button><button class="fb" type="button" data-sva="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button></div>';
 SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div>'+SVC.ACC+'</div>';$('.ai-actions',d).hidden=true;$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
 SVC.enviar=async function(text){
@@ -7347,7 +7357,7 @@ XD.cont=function(){
     '<p class="xd-cont-m">'+(cam?'Una campaña no lleva queja, diagnóstico, fotos de falla ni destrucción de partes, salvo que el boletín lo pida: si los subes, aparecen aquí.':(opt.length-optSi.length)+' apartados más según aplique (PRA, batería, facturas de partes, TAC, mantenimientos, M2, WPC): aparecen aquí cuando el agente encuentra uno.')+'</p>'+
     '<h5>Cobranza</h5><ul>'+cob.map(XD.contItem).join('')+'</ul>'+
     (mas.length?'<h5>También falta</h5><ul class="xd-mas2">'+mas.slice(0,8).map(function(t){return '<li class="xd-ci falta"><span class="xd-cb" aria-hidden="true">'+svg('x')+'</span><span class="xd-cn">'+esc(t.replace(/ Captúralas en «Fechas del expediente»\.?/,''))+'</span></li>'}).join('')+'</ul>':'')+
-    '<div class="wf-pg"><span>Progreso</span><b>'+Math.round(hechos*100/Math.max(1,req.length))+'%</b><i><i style="width:'+Math.round(hechos*100/Math.max(1,req.length))+'%"></i></i></div>'+
+    '<div class="wf-pg'+(hechos===req.length?' full':'')+'"><span>'+(hechos===req.length?'<span class="ok-ck">'+svg('check')+'</span>Completo':'Progreso')+'</span><b>'+Math.round(hechos*100/Math.max(1,req.length))+'%</b><i><i style="width:'+Math.round(hechos*100/Math.max(1,req.length))+'%"></i></i></div>'+
     '<button class="bt xd-cont-pdf" type="button" data-xz="pdf">Descargar expediente (PDF)</button>';
 };
 XD.contVer=function(){
@@ -8709,8 +8719,8 @@ FL.html=function(x){
   var st=f.estado==='bad'?'bad':f.estado==='warn'?'warn':'ok',H=(f.historia||[]).slice(-4).reverse();
   var srv=f.tipo==='Servicio',cam=f.tipo==='Campaña';
   return '<section class="fl" id="xdFlujo" aria-label="Ciclo"><div class="fl-h"><h3>'+(srv?'Ciclo del servicio':cam?'Ciclo de la campaña':'Ciclo de la garantía')+'</h3><span class="fl-who">'+(srv?'Sin PREA · se cierra en un día: evidencia, factura y cobro':cam?'Sin PREA · orden firmada con la campaña, boletín o IVH, factura y cobro':'El agente la avanza solo con lo que va pasando')+'</span></div>'+
-    '<ol class="fl-st'+(f.tipo==='Servicio'?' srv':'')+'">'+FL.lista(f).map(function(e,k){return '<li class="'+(k<i||f.etapa==='cerrado'?'done':k===i?'now '+st:'')+'"><i></i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'+
-    (f.etapa!=='cerrado'?'<div class="fl-next '+st+'"><div><span>Siguiente paso · '+esc(f.responsable||'')+'</span><b>'+esc(f.siguiente||'')+'</b></div>'+(f.vence?'<em>'+esc(FL.vence(f.vence))+'<small>'+new Date(f.vence+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'})+'</small></em>':'')+'</div>':'<div class="fl-next ok"><div><b>'+(f.tipo==='Servicio'?'Servicio cobrado':f.tipo==='Campaña'?'Campaña cobrada':'Garantía cobrada')+'</b></div></div>')+
+    '<ol class="fl-st'+(f.tipo==='Servicio'?' srv':'')+'">'+FL.lista(f).map(function(e,k,A){return '<li class="'+(k<i||f.etapa==='cerrado'?'done':k===i?'now '+st:'')+(f.etapa==='cerrado'&&k===A.length-1?' fin':'')+'"><i>'+(f.etapa==='cerrado'&&k===A.length-1?svg('check'):'')+'</i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'+
+    (f.etapa!=='cerrado'?'<div class="fl-next '+st+'"><div><span>Siguiente paso · '+esc(f.responsable||'')+'</span><b>'+esc(f.siguiente||'')+'</b></div>'+(f.vence?'<em>'+esc(FL.vence(f.vence))+'<small>'+new Date(f.vence+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'})+'</small></em>':'')+'</div>':'<div class="fl-next ok fl-hecho"><span class="ok-ck">'+svg('check')+'</span><div><b>'+(f.tipo==='Servicio'?'Servicio cobrado':f.tipo==='Campaña'?'Campaña cobrada':'Garantía cobrada')+'</b></div></div>')+
     ((f.tambien||[]).length?'<ul class="fl-tb">'+f.tambien.map(function(t){var v=t.vence&&new Date(t.vence+'T12:00:00')<Date.now();return '<li class="'+(v||t.urgente?'bad':'')+'">'+esc(t.t)+(t.vence?' · '+esc(FL.vence(t.vence)):'')+'</li>'}).join('')+'</ul>':'')+
     (H.length?'<p class="fl-hist">'+H.map(function(h){return esc(FL.nom(h.etapa))+' '+new Date(h.at).toLocaleDateString('es-MX',{day:'numeric',month:'short'})}).join(' ← ')+'</p>':'')+'</section>';
 };
