@@ -1801,6 +1801,15 @@ button.dn-mk{width:100%;border:0;border-top:1px solid var(--card-line);backgroun
 .xd-mas{margin-top:16px;border:1px solid var(--line,#e5e7eb);border-radius:16px;padding:12px 16px}
 .xd-mas>summary{cursor:pointer;font-weight:600;font-size:14px;list-style:revert}.xd-mas>summary span{font-weight:400;color:var(--mut,#6b7280);font-size:12.5px;margin-left:6px}
 .xd-mas[open]>summary{margin-bottom:14px}
+/* expediente simple: solo la zona para subir, el proceso y la lista */
+.xd-simple #xdBrain,.xd-simple #xdPlan,.xd-simple #xdForm,.xd-simple #xdCtl,.xd-simple #xdQ,.xd-simple #xaRes,.xd-simple .xd-q{display:none!important}
+.xd-simple .xa-h p{display:none}
+.xd-ci.falta .xd-cb{border-color:#d9534f;background:rgba(217,83,79,.1);color:#d9534f}
+.xd-ci.falta .xd-cn{color:#b0413d}.xd-ci.falta .xd-cn small{color:#b0413d}
+.xd-ci.ok .xd-cn small{color:#1f8a4c}
+.xd-cont-s.ok{color:#1f8a4c;font-weight:500}.xd-cont-s.mal{color:#b0413d}
+.xd-mas2 .xd-ci{display:flex;align-items:flex-start;gap:10px;padding:7px 6px;font-size:13px}
+.xd-cont-pdf{width:100%;margin-top:14px;justify-content:center}
 .xd-body{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 .xd-main{min-width:0}
 .xd-oculto{display:none}
@@ -7008,7 +7017,7 @@ XD.open=function(id){
   var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x){toast('No encontré ese expediente');return}
   XD.cur=x;XD.mode='exp';var el=$('#exDoc');
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
-  el.innerHTML='<div class="xd-in"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
+  el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>← Expedientes</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts">'+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
     '<div class="xd-body"><div class="xd-main">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+XD.contHtml()+'</div></div>';
@@ -7034,17 +7043,22 @@ XD.contItem=function(d){
   var rows=XD.contRows(d[0]),n=rows.length;
   var arch=rows.map(function(r){var nm=r.querySelector('.xd-name');return nm?'<li>'+nm.outerHTML+'</li>':''}).join('');
   var ref=String(d[2]||'').split(' · ')[0],nom=d[1];if(XD.esCam(XD.cur)){if(d[0]==='contrato'){nom='Orden de reparación firmada';ref='con la campaña y firma del cliente'}if(d[0]==='campana')ref='Boletín y consulta del VIN'}
-  return '<li class="xd-ci '+(n?'ok':'falta')+'"><details'+(n?'':' class="vacio"')+'><summary><span class="xd-cb" aria-hidden="true">'+(n?svg('check'):'')+'</span><span class="xd-cn">'+esc(nom)+'<small>'+(n?n+(n===1?' archivo':' archivos'):'Falta')+(ref?' · '+esc(ref):'')+'</small></span></summary>'+(n?'<ul class="xd-cf">'+arch+'</ul>':'')+'</details></li>';
+  return '<li class="xd-ci '+(n?'ok':'falta')+'"><details'+(n?'':' class="vacio"')+'><summary><span class="xd-cb" aria-hidden="true">'+(n?svg('check'):svg('x'))+'</span><span class="xd-cn">'+esc(nom)+'<small>'+(n?n+(n===1?' archivo':' archivos'):'Falta')+(ref?' · '+esc(ref):'')+'</small></span></summary>'+(n?'<ul class="xd-cf">'+arch+'</ul>':'')+'</details></li>';
 };
 XD.cont=function(){
   var el=$('#xdCont');if(!el)return;
   var x=XD.cur,cam=XD.esCam(x),g=function(t){return XD.DOCS.filter(function(d){return d[3]===t})},tiene=function(d){return XD.contN(d[0])>0};
   var req=XD.req(x),opt=XD.opt(x),cob=g('cob'),optSi=opt.filter(tiene),hechos=req.filter(tiene).length;
+  var cs=$('#xdContS');cs.classList.toggle('ok',hechos===req.length);cs.classList.toggle('mal',hechos<req.length);
   $('#xdContS').textContent=hechos===req.length?(cam?'Completo: tiene lo que lleva una campaña.':'Completo: tiene todo lo obligatorio del manual de GM.'):'Lleva '+hechos+' de '+req.length+' documentos obligatorios'+(cam?' de una campaña':'')+'. Sube todo junto a la izquierda: el agente lo acomoda.';
+  var docF=[],ar=x&&x.armado,mas=[];XD.req(x).forEach(function(d){docF.push((cam?XA.FALTA_CAM[d[0]]:XA.FALTA[d[0]])||'')});
+  if(ar&&Array.isArray(ar.faltantes))ar.faltantes.forEach(function(t){if(t&&docF.indexOf(t)<0&&!/^(Falta|Faltan) (la orden|las fotos de la recepci|el diagn|las fotos de la falla|el pedido|las fotos de la pieza|el bolet)/.test(t)&&!(cam&&XA.NO_CAM.test(t)))mas.push(t)});
   el.innerHTML='<h5>Obligatorios</h5><ul>'+req.map(XD.contItem).join('')+'</ul>'+
     (optSi.length?'<h5>Según aplique</h5><ul>'+optSi.map(XD.contItem).join('')+'</ul>':'')+
     '<p class="xd-cont-m">'+(cam?'Una campaña no lleva queja, diagnóstico, fotos de falla ni destrucción de partes, salvo que el boletín lo pida: si los subes, aparecen aquí.':(opt.length-optSi.length)+' apartados más según aplique (PRA, batería, facturas de partes, TAC, mantenimientos, M2, WPC): aparecen aquí cuando el agente encuentra uno.')+'</p>'+
-    '<h5>Cobranza</h5><ul>'+cob.map(XD.contItem).join('')+'</ul>';
+    '<h5>Cobranza</h5><ul>'+cob.map(XD.contItem).join('')+'</ul>'+
+    (mas.length?'<h5>También falta</h5><ul class="xd-mas2">'+mas.slice(0,8).map(function(t){return '<li class="xd-ci falta"><span class="xd-cb" aria-hidden="true">'+svg('x')+'</span><span class="xd-cn">'+esc(t.replace(/ Captúralas en «Fechas del expediente»\.?/,''))+'</span></li>'}).join('')+'</ul>':'')+
+    '<button class="bt xd-cont-pdf" type="button" data-xz="pdf">Descargar expediente (PDF)</button>';
 };
 XD.contVer=function(){
   XD.cont();var oc=$('#exDoc .xd-oculto');if(!oc||!window.MutationObserver)return;
@@ -8199,7 +8213,7 @@ XA.recam=async function(x){
   }catch(e){console.warn('[campaña]',e)}
 };
 XA.show=function(o){
-  var el=$('#xaRes');if(!el)return;if(!o){el.innerHTML='';return}
+  var el=$('#xaRes');setTimeout(function(){if(typeof XD!=='undefined'&&XD.cont)XD.cont()},0);if(!el)return;if(!o){el.innerHTML='';return}
   var secs=(o.documentos||[]).filter(function(d){return d.seccion!=='otro'}).map(function(d){return d.seccion}).filter(function(v,i,a){return a.indexOf(v)===i}).length;
   var L=function(t,arr,cls){return arr&&arr.length?'<div class="xa-b '+cls+'"><h4>'+t+'</h4><ul>'+arr.map(function(a){return '<li>'+esc(typeof a==='string'?a:a.label+': '+a.txt)+'</li>'}).join('')+'</ul></div>':''};
   var ok=!o.faltantes.length&&!o.discrepancias.length;
