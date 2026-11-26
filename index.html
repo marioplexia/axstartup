@@ -6952,6 +6952,12 @@ SVR.leer=async function(x,file,k,meta){
 /* para servicios con archivos de antes: leer todo lo que ya está subido */
 /* el agente decide dónde va cada archivo del servicio */
 SVR.DONDE={factura:'factura',comprobante_pago:'planta'};
+SVR.secciones=function(r,f){var L=r&&r.leido||{},C=[L.que_es].concat(L.contiene||[]),o=[];
+  C.forEach(function(q){var k=SVR.DONDE[q]||(q?'evidencia':null);if(k&&o.indexOf(k)<0)o.push(k)});
+  if(!o.length)o.push(/cfdi:Comprobante|<Comprobante/i.test((f&&f.text)||'')?'factura':'evidencia');
+  /* si trae la orden o fotos además de la factura o el pago, también es evidencia del servicio */
+  if(C.some(function(q){return q==='orden'||/^foto/.test(q||'')})&&o.indexOf('evidencia')<0)o.push('evidencia');
+  return o};
 SVR.subir=async function(files){
   var x=XD.cur;if(!x||x.tipo!=='Servicio')return;files=[].slice.call(files||[]);var st=$('#svZoneSt');
   for(var i=0;i<files.length;i++){var file=files[i];if(file.size>XD.MAX*1e6){toast(file.name+' pesa más de '+XD.MAX+' MB');continue}
@@ -6960,10 +6966,10 @@ SVR.subir=async function(files){
     try{var f=/\.(xml|txt)$/i.test(file.name)?{name:file.name,text:await file.text()}:await TR.prep(file);
       r=await SB.ai({expediente_id:x.id,file:f},'servicio');
       if(r&&r.expediente)Object.assign(x,r.expediente);
-      k=SVR.DONDE[r&&r.leido&&r.leido.que_es]||(/cfdi:Comprobante|<Comprobante/i.test(f.text||'')?'factura':'evidencia');
+      var K=SVR.secciones(r,f);
       txt=(r&&r.llenado&&r.llenado.length?'llené '+r.llenado.join(', '):(r&&r.leido&&r.leido.nota)||'revisado');
-    }catch(e){console.warn('[servicio]',e);txt='se guardó; el agente no pudo leerlo ('+TR.errTxt(e)+')'}
-    await XD.send(k,file,{leido:true,txt:txt});
+    }catch(e){console.warn('[servicio]',e);txt='se guardó; el agente no pudo leerlo ('+TR.errTxt(e)+')';K=['evidencia']}
+    for(var j=0;j<K.length;j++)await XD.send(K[j],file,{leido:true,txt:txt});
     SVR.pintar(x);
   }
   if(st)st.textContent='Orden, fotos, factura o comprobante · el agente lo revisa y lo acomoda';
@@ -7634,17 +7640,17 @@ SVC.subir=async function(files){
   for(var i=0;i<files.length;i++){var file=files[i];
     SVC.burb(SVC.decir('user','📎 '+file.name));
     if(file.size>XD.MAX*1e6){SVC.burb(SVC.decir('assistant','«'+file.name+'» pesa más de '+XD.MAX+' MB; mándamelo más ligero.'));continue}
-    var w=SVC.msgAI(),act=ACT.nuevo($('.ai-col',w),$('.ai-body',w)),k='evidencia',r=null,txt='',f=null,m='';
+    var w=SVC.msgAI(),act=ACT.nuevo($('.ai-col',w),$('.ai-body',w)),k='evidencia',K=['evidencia'],r=null,txt='',f=null,m='';
     try{
       f=await ACT.paso(act,'Agente de servicios','Recibió «'+file.name+'»',async function(){var o=/\.(xml|txt)$/i.test(file.name)?{name:file.name,text:await file.text()}:await TR.prep(file);return o});
       r=await ACT.paso(act,'Cerebro','Leyendo «'+file.name+'»',async function(){var rr=await SB.ai({expediente_id:x.id,file:f},'servicio');rr.toString=function(){return (SVC.NOM[rr.leido&&rr.leido.que_es]||'un documento')+(rr.llenado&&rr.llenado.length?' · llenó '+rr.llenado.length+' datos':'')};return rr});
       if(r&&r.expediente)Object.assign(x,r.expediente);
-      k=SVR.DONDE[r&&r.leido&&r.leido.que_es]||(/cfdi:Comprobante|<Comprobante/i.test(f.text||'')?'factura':'evidencia');
+      K=SVR.secciones(r,f);k=K[0];
       txt=r&&r.llenado&&r.llenado.length?'llené '+r.llenado.join(', '):'revisado';
     }catch(e){console.warn('[servicio]',e);txt='se guardó';r=null}
-    try{await ACT.paso(act,'Expediente','Guardando en '+DOND[k],async function(){await XD.send(k,file,{leido:true,txt:txt});await SVC.dormir(420);return 'listo'})}catch(_){}
+    for(var j=0;j<K.length;j++){try{await ACT.paso(act,'Expediente','Guardando en '+DOND[K[j]],(function(kk){return async function(){await XD.send(kk,file,{leido:true,txt:txt});await SVC.dormir(320);return 'listo'}})(K[j]))}catch(_){}}
     try{await ACT.paso(act,'Agente de servicios','Revisando el ciclo del servicio',async function(){await FL.refresh(x);SVC.pintar(x);var hz=SVC.CK.filter(function(c){return c[0]!=='cerrado'&&SVC.hecho(c[0])}).length;return hz+' de 3 listos'})}catch(_){}
-    try{m=await ACT.paso(act,x.sys?'Cerebro de servicios':'Agente de servicios',x.sys?'Comparando con lo que cobra tu grupo':'Preparando la respuesta',async function(){return SVC.natural(x,r,file,k)});m=String(m)}catch(_){m='Guardé **'+file.name+'**.'}
+    try{m=await ACT.paso(act,x.sys?'Cerebro de servicios':'Agente de servicios',x.sys?'Comparando con lo que cobra tu grupo':'Preparando la respuesta',async function(){return SVC.natural(x,r,file,k,K)});m=String(m)}catch(_){m='Guardé **'+file.name+'**.'}
     ACT.cerrar(act);
     var mm=SVC.decir('assistant',m);mm.pasos=act.lista.slice(0,30);mm.res=act.resumen;
     await SVC.tipear(m,null,150,w);
@@ -7653,10 +7659,15 @@ SVC.subir=async function(files){
 };
 SVC.falta=function(){var o=['evidencia','factura','planta'];for(var i=0;i<o.length;i++)if(!SVC.hecho(o[i]))return o[i];return null};
 SVC.SIGUE={evidencia:'Mándame unas fotos del trabajo terminado para completar la evidencia.',factura:'Ahora sí, a facturarlo: mándame la factura en cuanto la tengas.',planta:'Cuando te paguen, mándame el comprobante y lo cierro.'};
-SVC.natural=async function(x,r,file,k){
+SVC.natural=async function(x,r,file,k,K){K=K||[k];
   if(!r)return 'Lo guardé, pero no alcancé a leer bien **'+file.name+'**. ¿Me lo mandas más claro?';
   var L=r.leido||{},q=L.que_es,m='',ref=null;
   if(x.sys){try{ref=await SVR.ref(x.sys)}catch(_){}}
+  if(K.length>1){var nm={evidencia:'la orden',factura:'la factura',planta:'el cobro de planta'},pz=K.map(function(z){return nm[z]});
+    m='Revisé **'+file.name+'**: trae '+(pz.length>1?pz.slice(0,-1).join(', ')+' y '+pz[pz.length-1]:pz[0])+'. Lo acomodé en cada apartado del expediente.';
+    if(K.indexOf('factura')>=0&&(L.monto_antes_iva||L.factura_total))m+=' La factura es por **'+DEB.mx(L.monto_antes_iva||L.factura_total)+'**'+(L.monto_antes_iva?' antes de IVA':'')+'.';
+    if(K.indexOf('planta')>=0)m+=' Planta '+(/rechaz/i.test(L.pago_estado||'')?'**rechazó** la transacción':'ya lo pagó'+(L.pago_total?' (**'+DEB.mx(L.pago_total)+'**)':''))+'.';
+    var f0=['evidencia','factura','planta'].filter(function(z){return K.indexOf(z)<0&&!SVC.hecho(z)})[0];return m+'\n\n'+(f0?SVC.SIGUE[f0]:'Con esto queda **cerrado**: facturado, cobrado y con su evidencia completa. ¡Buen trabajo!')}
   var med=ref&&ref.grupo&&ref.grupo.n?Number(ref.grupo.mediana):0;
   if(q==='factura'){var mo=Number(L.monto_antes_iva||x.labor)||0;m='Recibí la factura'+(mo?' por **'+DEB.mx(mo)+'** antes de IVA':'')+'.';
     if(mo&&med){var d=mo-med;m+=Math.abs(d)<=med*.05?' Va justo en lo que cobra tu grupo.':d>0?' Quedó '+DEB.mx(d)+' arriba de lo típico en tu grupo ('+DEB.mx(med)+').':' Quedó '+DEB.mx(-d)+' abajo de lo típico en tu grupo ('+DEB.mx(med)+').'}}
@@ -7934,6 +7945,9 @@ XD.openSrvViejo=function(x,el){
 XD.open=function(id){
   var x=EX.rows.filter(function(r){return String(r.id)===String(id)})[0];if(!x){toast('No encontré ese expediente');return}
   XD.cur=x;XD.mode='exp';var el=$('#exDoc');
+  /* el regreso y las migas siguen el tipo de ESTA orden: si venías de otra lista (p. ej. Campañas) y abres un servicio, regresa a Inicio */
+  if(typeof AH!=='undefined'&&AH.activo()){if(AH.vista&&AH.tipo(x)!==AH.vista)AH.vista=null;
+    crumb.textContent='Inicio';crumbSep.hidden=false;crumb2.hidden=false;crumb2.textContent=AH.vista?AH.NOM[AH.vista][0]+' · '+(x.wo||x.folio||''):(x.wo||x.folio||'')}
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
   el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(AH.activo()?'← '+(AH.vista?AH.NOM[AH.vista][0]:'Inicio'):'← Expedientes')+'</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
