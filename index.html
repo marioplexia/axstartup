@@ -6272,8 +6272,8 @@ REFS.html=function(L){
     else if(r.tipo==='regla'){t=r.id+(r.sistema?' · '+r.sistema:'');sub=[r.operacion,r.horas!=null?r.horas+' h':'',r.aceptadas!=null?r.aceptadas+' aceptadas':'',r.rechazos?r.rechazos+' rechazos':''].filter(Boolean).join(' · ');det=r.descripcion}
     else if(r.tipo==='caso'){t=[r.vehiculo,r.sistema].filter(Boolean).join(' · ')||'Caso';sub=[r.estado,r.km?Number(r.km).toLocaleString('en-US')+' km':'',r.horas?r.horas+' h':''].filter(Boolean).join(' · ');det=(r.comentario?'Planta: «'+r.comentario+'»\n':'')+(r.texto||'')}
     else if(r.tipo==='ejemplo'){t=r.folio||r.archivo||'Documento enseñado';sub=[r.vehiculo,r.sistema,r.resultado].filter(Boolean).join(' · ');det=r.resumen}
-    else if(r.tipo==='precio'){var g=r.grupo||{},n=r.red||{};t=r.tipo_servicio||r.tipo_nombre||r.clave||'Servicio';t=r.nombre||t;sub=(g.n?'Tu grupo: '+mo(g.mediana)+' típico · '+g.n+' servicios':'Aún sin cobros en tu grupo')+(n.n?' · Red: '+mo(n.mediana):'');
-      det=(g.n?'Rango del grupo: '+mo(g.min)+' a '+mo(g.max)+'\n':'')+((g.por_agencia||[]).map(function(a){return '• '+a.agencia+': '+mo(a.mediana)+' ('+a.n+')'}).join('\n'))}
+    else if(r.tipo==='precio'){var g=r.grupo||{},U=g.por_unidad||[];t=r.tipo_servicio||r.tipo||r.clave||'Servicio';t=r.nombre||t;sub=U.length?(r.marca?r.marca+' · ':'')+U.length+(U.length===1?' unidad':' unidades')+' en tu grupo':'Aún sin cobros en tu grupo';
+      det=U.map(function(u){return '• '+u.modelo+': '+EX.money(u.monto)+(u.horas!=null?' · '+SVR.h(u.horas):'')+(u.pagado_planta!=null?' · planta '+EX.money(u.pagado_planta):'')+' (orden '+u.orden+')'}).join('\n')}
     if(r.tipo==='precio'&&r.tipo_label)t=r.tipo_label;
     var body='<span class="rf-k rf-'+ea(r.tipo)+'">'+esc(k)+'</span><b>'+esc(t)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');
     return det?'<details class="rf-c"><summary>'+body+'</summary><p>'+esc(det).replace(/\n/g,'<br>')+'</p></details>':'<div class="rf-c">'+body+'</div>';
@@ -6912,19 +6912,18 @@ var SVR={TIPOS:['Servicio 6,000 km','Servicio 12,000 km','Servicio 18,000 km','S
 /* «6 mil km», «servicio de 6000» → «Servicio 6,000 km» */
 SVR.tipoDe=function(t){t=String(t||'');var m=/(\d+)\s*mil\b/i.exec(t),d=/(?:^|[^A-Za-z\d])(\d[\d,\.]*)\s*(?:km|kil)/i.exec(t)||/(?:^|[^A-Za-z\d])(\d[\d,\.]*)/.exec(t),n=m?Number(m[1])*1000:d?Number(d[1].replace(/[^0-9]/g,'')):0;
   if(n>=1000&&(/km|kil|mil/i.test(t)||n%1000===0))return 'Servicio '+n.toLocaleString('en-US')+' km';return null};
-SVR.ref=async function(tipo){if(!tipo)return null;try{var r=await SB.c.rpc('servicios_referencia',{p_tipo:tipo,p_marca:null});return r.error?null:r.data}catch(_){return null}};
-SVR.txt=function(R){
-  if(!R)return '';var g=R.grupo||{},w=R.red||{},L=[];
-  if(g.n)L.push('En tu grupo ('+(R.marca||'tu marca')+') se ha cobrado en '+g.n+(g.n===1?' servicio':' servicios')+': mediana '+DEB.mx(g.mediana)+(g.n>1?' (de '+DEB.mx(g.min)+' a '+DEB.mx(g.max)+')':'')+'. Por agencia: '+(g.por_agencia||[]).map(function(a){return a.agencia+' '+DEB.mx(a.mediana)+' ('+a.n+')'}).join('; ')+'.');
-  if(w.n)L.push('En otras '+w.agencias+(w.agencias===1?' agencia':' agencias')+' '+(R.marca||'')+' de la red: mediana '+DEB.mx(w.mediana)+' en '+w.n+' servicios (de '+DEB.mx(w.min)+' a '+DEB.mx(w.max)+').');
-  var A=R.aprendido||{},ag=A.grupo||{},ar=A.red||{};
-  if(ag.n){var t='Lo que el cerebro aprendió de '+ag.n+(ag.n===1?' servicio leído':' servicios leídos')+' en tu grupo:';
-    if(ag.horas_mo)t+=' tiempo típico de mano de obra '+Number(ag.horas_mo)+' h;';
-    if(ag.pagado_planta)t+=' planta pagó típicamente '+DEB.mx(ag.pagado_planta)+' ('+ag.n_pagados+(ag.n_pagados===1?' pago':' pagos')+');';
-    if((ag.operaciones||[]).length)t+=' operaciones: '+ag.operaciones.map(function(o){return o.op+(o.desc?' '+o.desc:'')+(o.horas?' '+o.horas+' h':'')+' ('+o.n+')'}).join(', ')+';';
-    if((ag.unidades||[]).length)t+=' unidades: '+ag.unidades.map(function(u){return u.modelo+' ('+u.n+(u.mediana?', '+DEB.mx(u.mediana):'')+')'}).join(', ')+';';
-    L.push(t.replace(/;$/,'.'))}
-  if(ar.n&&(ar.horas_mo||ar.pagado_planta))L.push('En la red: '+(ar.horas_mo?Number(ar.horas_mo)+' h de mano de obra típicas':'')+(ar.horas_mo&&ar.pagado_planta?' y ':'')+(ar.pagado_planta?'planta paga típicamente '+DEB.mx(ar.pagado_planta):'')+' ('+ar.n+' servicios).');
+SVR.ref=async function(tipo){if(!tipo)return null;try{var r=await SB.c.rpc('servicios_referencia',{p_tipo:tipo});return r.error?null:r.data}catch(_){return null}};
+/* lo que se cobra es exacto: en la misma marca y grupo cada servicio se cobra igual por unidad.
+   Montos con centavos y horas con todos sus decimales, tal como vienen de la última orden de esa unidad. */
+SVR.h=function(h){return h==null||h===''?'':String(Number(h))+' h'};
+SVR.uni=function(R,veh){var L=(R&&R.grupo&&R.grupo.por_unidad)||[];if(!veh)return null;var v=norm(String(veh).replace(/\b(19|20)\d{2}\b/,''));
+  return L.filter(function(u){return norm(u.modelo)===v})[0]||L.filter(function(u){var m=norm(u.modelo);return m&&(v.indexOf(m)>=0||m.indexOf(v)>=0)})[0]||null};
+SVR.unTxt=function(u){return u.modelo+': '+EX.money(u.monto)+' antes de IVA'+(u.horas!=null?', '+SVR.h(u.horas)+' de mano de obra':'')+(u.pagado_planta!=null?', planta pagó '+EX.money(u.pagado_planta):'')+' (orden '+u.orden+(u.n>1?'; '+u.n+' servicios':'')+(u.montos_distintos>1?'; hubo '+u.montos_distintos+' montos distintos, el vigente es el de la última orden':'')+')'};
+SVR.txt=function(R,veh){
+  if(!R)return '';var g=R.grupo||{},w=R.red||{},L=[],U=g.por_unidad||[],u=SVR.uni(R,veh);
+  if(u)L.push('Para esta unidad ('+(R.marca||'')+', '+R.tipo+') se cobra exactamente: '+SVR.unTxt(u)+'.');
+  if(U.length)L.push('Lo que se cobra en tu grupo por unidad: '+U.map(SVR.unTxt).join('; ')+'.');
+  if(w.n&&(w.por_unidad||[]).length)L.push('En otras '+w.agencias+(w.agencias===1?' agencia':' agencias')+' de la marca: '+w.por_unidad.map(function(x){return x.modelo+' '+EX.money(x.monto)+(x.horas!=null?' con '+SVR.h(x.horas):'')}).join('; ')+'.');
   return L.join(' ');
 };
 SVR.estado=function(x){
@@ -7005,13 +7004,11 @@ SVR.pintarRef=async function(){
   var el=$('#svRef');if(!el)return;var t=SVR.tipoForm();
   if(!t){el.innerHTML='<p class="xz-mut">Cuando el cerebro sepa qué servicio fue, aquí verás cuánto se cobra en las agencias de tu marca.</p>';return}
   el.innerHTML='<p class="xz-mut">Consultando el cerebro…</p>';var R=await SVR.ref(t);if(SVR.tipoForm()!==t)return;
-  var g=R&&R.grupo||{},w=R&&R.red||{};
-  if(!g.n&&!w.n){el.innerHTML='<p class="xz-mut">Todavía no hay cobros registrados de «'+esc(t)+'» en '+(R&&R.marca?'agencias '+esc(R.marca):'tu marca')+'. Con este servicio empieza la referencia.</p>';return}
-  var sug=g.n?g.mediana:w.mediana;
-  el.innerHTML='<div class="sv-rb"><b>Lo que sabe el cerebro de «'+esc(t)+'»</b>'+
-    (g.n?'<p>En tu grupo ('+esc(R.marca||'')+'): <b>'+DEB.mx(g.mediana)+'</b> típico · '+g.n+(g.n===1?' servicio':' servicios')+(g.n>1?' · de '+DEB.mx(g.min)+' a '+DEB.mx(g.max):'')+'</p><ul>'+(g.por_agencia||[]).map(function(a){return '<li>'+esc(a.agencia)+': '+DEB.mx(a.mediana)+' <small>('+a.n+')</small></li>'}).join('')+'</ul>':'')+
-    (w.n?'<p>Otras '+w.agencias+' agencias '+esc(R.marca||'')+' de la red: <b>'+DEB.mx(w.mediana)+'</b> típico · '+w.n+' servicios</p>':'')+
-    '<button class="bt" type="button" data-svusar="'+sug+'">Usar '+DEB.mx(sug)+'</button></div>';
+  var g=R&&R.grupo||{},w=R&&R.red||{},U=g.por_unidad||[],x0=XD.cur||SVC.x||{},u=SVR.uni(R,($('#svVeh')&&$('#svVeh').value)||x0.vehicle);
+  if(!U.length&&!w.n){el.innerHTML='<p class="xz-mut">Todavía no hay cobros registrados de «'+esc(t)+'» en '+(R&&R.marca?'agencias '+esc(R.marca):'tu marca')+'. Con este servicio empieza la referencia.</p>';return}
+  el.innerHTML='<div class="sv-rb"><b>Lo que se cobra «'+esc(t)+'» en tu grupo ('+esc(R.marca||'')+')</b><ul>'+
+    U.map(function(x){return '<li'+(u&&x.modelo===u.modelo?' class="on"':'')+'>'+esc(x.modelo)+': <b>'+EX.money(x.monto)+'</b>'+(x.horas!=null?' · '+esc(SVR.h(x.horas)):'')+(x.pagado_planta!=null?' · planta pagó '+EX.money(x.pagado_planta):'')+' <small>(orden '+esc(x.orden)+(x.n>1?' · '+x.n+' servicios':'')+')</small></li>'}).join('')+'</ul>'+
+    (u?'<button class="bt" type="button" data-svusar="'+u.monto+'">Usar '+EX.money(u.monto)+'</button>':'')+'</div>';
 };
 SVR.guardar=async function(){
   var x=XD.cur;if(!x)return;var t=SVR.tipoForm(),p={sys:t||null,vehicle:($('#svVeh').value||'').trim()||null,km:Number($('#svKm').value)||null,labor:Number($('#svMonto').value)||0,parts_total:0};
@@ -7026,9 +7023,9 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
 SVR.ctx=async function(sv,text){
   var fx=sv.flujo||null,tq=SVR.tipoDe(text)||sv.sys||null,ref=tq?await SVR.ref(tq):null;
   return '[Contexto: la orden '+(sv.wo||'')+' es un SERVICIO, no lleva PREA; su ciclo es abrir la orden, hacer el servicio y subir la evidencia, facturar y cobrar, en un día'+(fx?'; va en la etapa «'+FL.nom(fx.etapa,1)+'» y lo siguiente es: '+fx.siguiente:'')+
-    (sv.sys?'. Tipo de servicio: '+sv.sys:'. Aún no tiene tipo de servicio capturado')+(sv.vehicle?'; vehículo '+sv.vehicle:'')+(sv.km?'; '+sv.km+' km':'')+(Number(sv.labor)?'; se cobró '+DEB.mx(sv.labor)+' antes de IVA':'')+
-    '. Cerebro de servicios'+(tq?' para «'+tq+'»: '+(SVR.txt(ref)||'todavía no hay cobros registrados de este tipo en las agencias de la marca').replace(/\.$/,''):': pide el tipo de servicio (por ejemplo 6,000 km) para dar el precio de referencia')+
-    '. Si preguntan cuánto cobrar, responde con esa referencia del grupo y la red (usa precio_servicio). Si una foto, un ejemplo o una sección del manual ayuda, tráela con tus herramientas (fotos_ejemplo, buscar_todo) y cítala. No propongas armar una PREA. Responde breve y natural, como una persona del equipo.]\n';
+    (sv.sys?'. Tipo de servicio: '+sv.sys:'. Aún no tiene tipo de servicio capturado')+(sv.vehicle?'; vehículo '+sv.vehicle:'')+(sv.km?'; '+sv.km+' km':'')+(Number(sv.labor)?'; se cobró '+EX.money(sv.labor)+' antes de IVA':'')+(Number(sv.hours)?'; '+SVR.h(sv.hours)+' de mano de obra':'')+
+    '. Cerebro de servicios'+(tq?' para «'+tq+'»: '+(SVR.txt(ref,sv.vehicle)||'todavía no hay cobros registrados de este tipo en las agencias de la marca').replace(/\.$/,''):': pide el tipo de servicio (por ejemplo 6,000 km) para dar el precio de referencia')+
+    '. IMPORTANTE: en la misma marca y grupo cada servicio se cobra IGUAL por unidad; no hay medianas, promedios, rangos ni «típicos». Da las cifras EXACTAS tal como vienen: montos con centavos y horas de mano de obra con TODOS sus decimales (por ejemplo 2.7021552 h, nunca 2.7 h). Si preguntan cuánto cobrar, responde con lo que se cobra para ESA unidad (usa precio_servicio). Si una foto, un ejemplo o una sección del manual ayuda, tráela con tus herramientas (fotos_ejemplo, buscar_todo) y cítala. No propongas armar una PREA. Responde breve y natural, como una persona del equipo.]\n';
 };
 var SVC={x:null,msgs:[],conv:null,busy:false};
 SVC.pasos=function(f){var L=FL.ES,i=f?FL.idx(f):0;return '<ol class="svc-st" aria-label="Ciclo del servicio">'+L.map(function(e,k){return '<li class="'+((f&&f.etapa==='cerrado')||k<i?'done':k===i?'now':'')+'"><i></i><span>'+esc(e[1])+'</span></li>'}).join('')+'</ol>'};
@@ -7155,7 +7152,7 @@ AP.CURSOS=[
    {p:'¿Quién palomea la lista?',o:['Tú, a mano','Se palomea sola'],ok:1,por:'Cada archivo guardado palomea su punto.'}]},
   {id:'srv-3',t:'¿Cuánto cobro?',s:[
    'Pregunta en el chat: **"¿cuánto se cobra este servicio?"**',
-   'El cerebro te da el precio típico **en tu grupo**, por agencia, y **en la red** de la marca.',
+   'El cerebro te dice **lo que se cobra exacto** ese servicio en tu grupo para **esa unidad**: monto con centavos, horas de mano de obra con todos sus decimales y lo que pagó planta.',
    'Tus datos no se ven en otros grupos: solo se comparte lo aprendido.',
    {p:'¿De dónde sale el precio de referencia?',o:['De lo que se cobra en tu grupo y la red','De una lista fija'],ok:0,por:'El cerebro aprende de cada servicio que se cobra.'}]}
  ]},
@@ -7592,20 +7589,20 @@ SIM.run=async function(){
     await paso(function(){return SIM.yo('Buenas, ya terminamos el servicio del Aveo')});
     await paso(function(){return SIM.trabaja([['Agente de garantías','Revisó la orden GA9999 y su expediente','servicio · sin PREA']],'¡Qué bien! Mándame la orden o unas fotos y lo reviso.')});
     await paso(function(){return SIM.archivos(['orden_GA9999.pdf'])});
-    await paso(function(){return SIM.trabaja([['Agente de servicios','Recibió «orden_GA9999.pdf»','PDF · 1 página'],['Cerebro','Leyendo «orden_GA9999.pdf»','la orden de servicio · llenó 3 datos',1900,function(){Object.assign(x,{sys:'Servicio 6,000 km',vehicle:'Aveo 2025',km:6012})}],['Expediente','Guardando en Evidencia del servicio','listo',700,function(){SIM.fila('evidencia',['orden_GA9999.pdf'])}],['Cerebro de servicios','Buscó cuánto se cobra «Servicio 6,000 km» en tu grupo','9 servicios · $1,950 típico'],['Agente de servicios','Revisando el ciclo del servicio','1 de 3 listos']],
-      'Ya revisé la orden. Es el **servicio de 6,000 km** de un **Aveo 2025** con 6,012 km. En tu grupo ese servicio se cobra en **$1,950** antes de IVA.\n\nMándame unas fotos del trabajo terminado para completar la evidencia.')});
+    await paso(function(){return SIM.trabaja([['Agente de servicios','Recibió «orden_GA9999.pdf»','PDF · 1 página'],['Cerebro','Leyendo «orden_GA9999.pdf»','la orden de servicio · llenó 3 datos',1900,function(){Object.assign(x,{sys:'Servicio 6,000 km',vehicle:'Aveo 2025',km:6012})}],['Expediente','Guardando en Evidencia del servicio','listo',700,function(){SIM.fila('evidencia',['orden_GA9999.pdf'])}],['Cerebro de servicios','Buscó cuánto se cobra «Servicio 6,000 km» de un Aveo','$1,950.00 · 1.3047277 h'],['Agente de servicios','Revisando el ciclo del servicio','1 de 3 listos']],
+      'Ya revisé la orden. Es el **servicio de 6,000 km** de un **Aveo 2025** con 6,012 km. En tu grupo ese servicio de un Aveo se cobra **$1,950.00** antes de IVA con **1.3047277 h** de mano de obra (orden SRV-GA9990).\n\nMándame unas fotos del trabajo terminado para completar la evidencia.')});
     await paso(function(){return SIM.archivos(['foto_odometro.jpg','foto_motor.jpg'])});
     await paso(function(){return SIM.trabaja([['Cerebro','Leyendo «foto_odometro.jpg»','odómetro · 6,012 km',1200],['Cerebro','Leyendo «foto_motor.jpg»','foto del trabajo terminado',1100],['Manual GM','Revisó qué evidencia pide un mantenimiento','completa'],['Expediente','Guardando en Evidencia del servicio','2 fotos',700,function(){SIM.fila('evidencia',['foto_odometro.jpg','foto_motor.jpg'])}]],
       'Perfecto, con las fotos ya quedó completa la evidencia.\n\nAhora sí, a facturarlo: mándame la factura en cuanto la tengas.')});
     await paso(function(){return SIM.yo('¿Cuánto le cobro?')});
-    await paso(function(){return SIM.trabaja([{nota:'Voy a revisar cuánto se cobra este servicio en tu grupo y en la red.'},['Cerebro de servicios','Buscó cuánto se cobra «Servicio 6,000 km» en tu grupo','2 agencias · 9 servicios',1300],['Cerebro de servicios','Comparó con la red de la marca','31 servicios · $1,880'],['Ejemplos','Buscó un servicio igual ya cerrado','SRV-GA9990']],
-      'Cóbrale **$1,950 + IVA**, o sea **$2,262** en total. Es lo típico en tu grupo: las otras agencias lo cobran entre $1,900 y $2,000. Te dejo abajo el detalle y un servicio igual que ya se cerró.',[{tipo:'precio',tipo_label:'Servicio 6,000 km',grupo:{n:9,mediana:1950,min:1790,max:2150,por_agencia:[{agencia:'Agencia A del grupo',n:4,mediana:1900},{agencia:'Agencia B del grupo',n:5,mediana:2000}]},red:{n:31,mediana:1880}},{tipo:'ejemplo',folio:'SRV-GA9990',vehiculo:'Aveo 2025',sistema:'Servicio 6,000 km',resultado:'cerrado',resumen:'Ejemplo de la simulación: facturado en $1,950 antes de IVA y cobrado el mismo día, con orden, foto del odómetro y foto del motor.'}])});
+    await paso(function(){return SIM.trabaja([{nota:'Voy a revisar cuánto se cobra este servicio para un Aveo en tu grupo.'},['Cerebro de servicios','Buscó cuánto se cobra «Servicio 6,000 km» de un Aveo','orden SRV-GA9990 · $1,950.00',1300],['Ejemplos','Buscó un servicio igual ya cerrado','SRV-GA9990']],
+      'Cóbrale **$1,950.00 + IVA**, o sea **$2,262.00** en total, con **1.3047277 h** de mano de obra. Es lo que se cobra el Servicio 6,000 km de un Aveo en tu grupo (orden SRV-GA9990). Te dejo abajo el detalle.',[{tipo:'precio',tipo_label:'Servicio 6,000 km',marca:'Chevrolet',grupo:{n:9,por_unidad:[{modelo:'Aveo',monto:1950,horas:1.3047277,pagado_planta:2262,n:9,orden:'SRV-GA9990'}]},red:{n:0}},{tipo:'ejemplo',folio:'SRV-GA9990',vehiculo:'Aveo 2025',sistema:'Servicio 6,000 km',resultado:'cerrado',resumen:'Ejemplo de la simulación: facturado en $1,950.00 antes de IVA con 1.3047277 h de mano de obra y cobrado el mismo día, con orden, foto del odómetro y foto del motor.'}])});
     await paso(function(){return SIM.archivos(['factura_A1234.xml'])});
-    await paso(function(){return SIM.trabaja([['Agente de servicios','Recibió «factura_A1234.xml»','CFDI'],['Cerebro','Leyendo «factura_A1234.xml»','la factura · $1,950 antes de IVA',1500,function(){x.labor=1950}],['Cerebro de servicios','Comparando con lo que cobra tu grupo','en línea'],['Expediente','Guardando en Factura','listo',700,function(){SIM.fila('factura',['factura_A1234.xml'])}],['Agente de cobros','Abrió el cobro del servicio','$2,262 por cobrar']],
-      'Recibí la factura por **$1,950** antes de IVA. Va justo en lo que cobra tu grupo.\n\nCuando te paguen, mándame el comprobante y lo cierro.')});
+    await paso(function(){return SIM.trabaja([['Agente de servicios','Recibió «factura_A1234.xml»','CFDI'],['Cerebro','Leyendo «factura_A1234.xml»','la factura · $1,950.00 · 1.3047277 h',1500,function(){x.labor=1950}],['Cerebro de servicios','Comparando con lo que cobra tu grupo','en línea'],['Expediente','Guardando en Factura','listo',700,function(){SIM.fila('factura',['factura_A1234.xml'])}],['Agente de cobros','Abrió el cobro del servicio','$2,262 por cobrar']],
+      'Recibí la factura por **$1,950.00** antes de IVA con **1.3047277 h** de mano de obra. Es exactamente lo que se cobra este servicio de un Aveo en tu grupo.\n\nCuando te paguen, mándame el comprobante y lo cierro.')});
     await paso(function(){return SVC.dormir(900)});
     await paso(function(){return SIM.archivos(['comprobante_pago.pdf'])});
-    await paso(function(){return SIM.trabaja([['Cerebro','Leyendo «comprobante_pago.pdf»','pago por $2,262',1300],['Agente de cobros','Cruzó el pago con la factura','coincide'],['Expediente','Guardando en Comprobante de cobro','listo',700,function(){SIM.fila('planta',['comprobante_pago.pdf'])}],['Agente de servicios','Cerró el servicio','3 de 3 listos',700,function(){x.flujo={etapa:'cerrado',tipo:'Servicio'};SVC.ck();FL.draw(x)}]],
+    await paso(function(){return SIM.trabaja([['Cerebro','Leyendo «comprobante_pago.pdf»','pago por $2,262.00',1300],['Agente de cobros','Cruzó el pago con la factura','coincide'],['Expediente','Guardando en Comprobante de cobro','listo',700,function(){SIM.fila('planta',['comprobante_pago.pdf'])}],['Agente de servicios','Cerró el servicio','3 de 3 listos',700,function(){x.flujo={etapa:'cerrado',tipo:'Servicio'};SVC.ck();FL.draw(x)}]],
       'Ya vi el comprobante, quedó pagado.\n\nCon esto la orden **GA9999** queda **cerrada**: facturada, cobrada y con su evidencia completa, todo el mismo día. ¡Buen trabajo!')});
     SIM.hecho=true;SIM.boton('Repetir simulación');
   }catch(e){if(e)console.warn('[simulación]',e)}
@@ -7654,13 +7651,13 @@ SVC.subir=async function(files){
       r=await ACT.paso(act,'Cerebro','Leyendo «'+file.name+'»',async function(){var rr=await SB.ai({expediente_id:x.id,file:f},'servicio');rr.toString=function(){return (SVC.NOM[rr.leido&&rr.leido.que_es]||'un documento')+(rr.llenado&&rr.llenado.length?' · llenó '+rr.llenado.length+' datos':'')};return rr});
       if(r&&r.expediente)Object.assign(x,r.expediente);
       K=SVR.secciones(r,f);k=K[0];
-      if(r&&r.aprendido){var ap=r.aprendido,pz=[ap.tipo_servicio,ap.modelo&&(ap.modelo+(ap.anio?' '+ap.anio:'')),ap.horas_mo&&(ap.horas_mo+' h de mano de obra'),ap.pagado_planta&&('planta pagó '+DEB.mx(ap.pagado_planta))].filter(Boolean);
+      if(r&&r.aprendido){var ap=r.aprendido,pz=[ap.tipo_servicio,ap.modelo&&(ap.modelo+(ap.anio?' '+ap.anio:'')),ap.horas_mo&&(ap.horas_mo+' h de mano de obra'),ap.pagado_planta&&('planta pagó '+EX.money(ap.pagado_planta))].filter(Boolean);
         while(pz.length>1&&pz.join(' · ').length>=60)pz.pop();if(pz.length)try{await ACT.paso(act,'Cerebro','Aprendió de este servicio',async function(){await SVC.dormir(380);return pz.join(' · ').slice(0,59)})}catch(_){}}
       txt=r&&r.llenado&&r.llenado.length?'llené '+r.llenado.join(', '):'revisado';
     }catch(e){console.warn('[servicio]',e);txt='se guardó';r=null}
     for(var j=0;j<K.length;j++){try{await ACT.paso(act,'Expediente','Guardando en '+DOND[K[j]],(function(kk){return async function(){await XD.send(kk,file,{leido:true,txt:txt});await SVC.dormir(320);return 'listo'}})(K[j]))}catch(_){}}
     try{await ACT.paso(act,'Agente de servicios','Revisando el ciclo del servicio',async function(){await FL.refresh(x);SVC.pintar(x);var hz=SVC.CK.filter(function(c){return c[0]!=='cerrado'&&SVC.hecho(c[0])}).length;return hz+' de 3 listos'})}catch(_){}
-    try{m=await ACT.paso(act,x.sys?'Cerebro de servicios':'Agente de servicios',x.sys?'Comparando con lo que cobra tu grupo':'Preparando la respuesta',async function(){return SVC.natural(x,r,file,k,K)});m=String(m)}catch(_){m='Guardé **'+file.name+'**.'}
+    try{m=await ACT.paso(act,x.sys?'Cerebro de servicios':'Agente de servicios',x.sys?'Comparando con lo que se cobra esta unidad':'Preparando la respuesta',async function(){return SVC.natural(x,r,file,k,K)});m=String(m)}catch(_){m='Guardé **'+file.name+'**.'}
     ACT.cerrar(act);
     var mm=SVC.decir('assistant',m);mm.pasos=act.lista.slice(0,30);mm.res=act.resumen;
     await SVC.tipear(m,null,150,w);
@@ -7673,21 +7670,22 @@ SVC.natural=async function(x,r,file,k,K){K=K||[k];
   if(!r)return 'Lo guardé, pero no alcancé a leer bien **'+file.name+'**. ¿Me lo mandas más claro?';
   var L=r.leido||{},q=L.que_es,m='',ref=null;
   if(x.sys){try{ref=await SVR.ref(x.sys)}catch(_){}}
-  var ap=r.aprendido||{},ag=(ref&&ref.aprendido&&ref.aprendido.grupo)||{},extra='';
-  if(ap.horas_mo){extra+=' Lo registré con **'+ap.horas_mo+' h** de mano de obra';if(ag.horas_mo&&ag.n>1){var dh=ap.horas_mo-Number(ag.horas_mo);extra+=Math.abs(dh)<0.05?', igual que lo típico en tu grupo':dh>0?', '+(+dh.toFixed(2))+' h más que lo típico en tu grupo ('+Number(ag.horas_mo)+' h)':', '+(+(-dh).toFixed(2))+' h menos que lo típico en tu grupo ('+Number(ag.horas_mo)+' h)'}extra+='.'}
-  if(ap.pagado_planta&&ag.pagado_planta&&ag.n_pagados>1){var dp=ap.pagado_planta-Number(ag.pagado_planta);if(Math.abs(dp)>Number(ag.pagado_planta)*.05)extra+=' Planta pagó '+DEB.mx(ap.pagado_planta)+', '+(dp>0?'más':'menos')+' que lo típico ('+DEB.mx(ag.pagado_planta)+').'}
+  var ap=r.aprendido||{},un=SVR.uni(ref,x.vehicle),extra='';
+  if(un&&un.orden===x.wo)un=null; /* la referencia es la de OTRA orden de esa unidad */
+  if(ap.horas_mo){extra+=' Lo registré con **'+SVR.h(ap.horas_mo)+'** de mano de obra';if(un&&un.horas!=null)extra+=Number(un.horas)===Number(ap.horas_mo)?', igual que en la orden '+un.orden:'; en la orden '+un.orden+' de esta unidad fueron **'+SVR.h(un.horas)+'**';extra+='.'}
+  if(un&&Number(x.labor)&&Number(un.monto)!==Number(x.labor))extra+=' Ojo: esta unidad se cobró **'+EX.money(un.monto)+'** en la orden '+un.orden+' y aquí va en **'+EX.money(x.labor)+'**.'
   if(K.length>1){var nm={evidencia:'la orden',factura:'la factura',planta:'el cobro de planta'},pz=K.map(function(z){return nm[z]});
     m='Revisé **'+file.name+'**: trae '+(pz.length>1?pz.slice(0,-1).join(', ')+' y '+pz[pz.length-1]:pz[0])+'. Lo acomodé en cada apartado del expediente.';
-    if(K.indexOf('factura')>=0&&(L.monto_antes_iva||L.factura_total))m+=' La factura es por **'+DEB.mx(L.monto_antes_iva||L.factura_total)+'**'+(L.monto_antes_iva?' antes de IVA':'')+'.';
-    if(K.indexOf('planta')>=0)m+=' Planta '+(/rechaz/i.test(L.pago_estado||'')?'**rechazó** la transacción':'ya lo pagó'+(L.pago_total?' (**'+DEB.mx(L.pago_total)+'**)':''))+'.';
+    if(K.indexOf('factura')>=0&&(L.monto_antes_iva||L.factura_total))m+=' La factura es por **'+EX.money(L.monto_antes_iva||L.factura_total)+'**'+(L.monto_antes_iva?' antes de IVA':'')+'.';
+    if(K.indexOf('planta')>=0)m+=' Planta '+(/rechaz/i.test(L.pago_estado||'')?'**rechazó** la transacción':'ya lo pagó'+(L.pago_total?' (**'+EX.money(L.pago_total)+'**)':''))+'.';
     m+=extra;var f0=['evidencia','factura','planta'].filter(function(z){return K.indexOf(z)<0&&!SVC.hecho(z)})[0];return m+'\n\n'+(f0?SVC.SIGUE[f0]:'Con esto queda **cerrado**: facturado, cobrado y con su evidencia completa. ¡Buen trabajo!')}
-  var med=ref&&ref.grupo&&ref.grupo.n?Number(ref.grupo.mediana):0;
-  if(q==='factura'){var mo=Number(L.monto_antes_iva||x.labor)||0;m='Recibí la factura'+(mo?' por **'+DEB.mx(mo)+'** antes de IVA':'')+'.';
-    if(mo&&med){var d=mo-med;m+=Math.abs(d)<=med*.05?' Va justo en lo que cobra tu grupo.':d>0?' Quedó '+DEB.mx(d)+' arriba de lo típico en tu grupo ('+DEB.mx(med)+').':' Quedó '+DEB.mx(-d)+' abajo de lo típico en tu grupo ('+DEB.mx(med)+').'}}
+  var uq=SVR.uni(ref,x.vehicle),med=uq&&uq.orden!==x.wo?Number(uq.monto):0;
+  if(q==='factura'){var mo=Number(L.monto_antes_iva||x.labor)||0;m='Recibí la factura'+(mo?' por **'+EX.money(mo)+'** antes de IVA':'')+'.';
+    if(mo&&med){m+=Math.abs(mo-med)<0.01?' Es exactamente lo que se cobra esta unidad en tu grupo (orden '+uq.orden+').':' Ojo: esta unidad se cobra **'+EX.money(med)+'** en tu grupo (orden '+uq.orden+') y aquí va en **'+EX.money(mo)+'**; diferencia de '+EX.money(Math.abs(mo-med))+'.'}}
   else if(q==='comprobante_pago')m='Ya vi el comprobante, quedó pagado.';
   else{m=q==='orden'?'Ya revisé la orden.':/^foto/.test(q||'')?'Ya vi la foto.':'Ya lo revisé.';
     if(x.sys&&r.llenado&&r.llenado.indexOf('tipo de servicio')>=0){m+=' Es el **'+String(x.sys).replace(/^Servicio /,'servicio de ')+'**'+(x.vehicle?' de un '+x.vehicle:'')+(Number(x.km)?' con '+Number(x.km).toLocaleString('en-US')+' km':'')+'.';
-      if(med)m+=' En tu grupo ese servicio se cobra en **'+DEB.mx(med)+'** antes de IVA.'}}
+      if(med)m+=' En tu grupo ese servicio de un '+uq.modelo+' se cobra **'+EX.money(med)+'** antes de IVA'+(uq.horas!=null?' con **'+SVR.h(uq.horas)+'** de mano de obra':'')+' (orden '+uq.orden+').'}}
   m+=extra;var f=SVC.falta();
   return m+'\n\n'+(f?SVC.SIGUE[f]:'Con esto queda **cerrado**: facturado, cobrado y con su evidencia completa. ¡Buen trabajo!');
 };

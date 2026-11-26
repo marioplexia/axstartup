@@ -1,0 +1,5 @@
+-- Lo que se cobra por un servicio NO es una mediana: en la misma marca y grupo cada tipo de servicio se cobra igual por unidad.
+-- servicios_referencia(p_tipo, p_marca, p_modelo) devuelve, por unidad (modelo), las cifras EXACTAS de la orden más reciente:
+-- monto antes de IVA con centavos, horas de mano de obra con todos sus decimales (expedientes.hours o servicios_aprendidos.horas_mo),
+-- lo que pagó planta, la orden y cuántas veces se ha cobrado. La red (otros grupos) solo por unidad, sin agencias.
+-- (Aplicada en el proyecto; ver la definición vigente con pg_get_functiondef('public.servicios_referencia'::regproc).)
