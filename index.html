@@ -1251,7 +1251,8 @@ body.ws-rol .sb-ib{color:var(--sb-muted)}body.ws-rol .sb-ib:hover{background:var
 body.ws-rol .sb-head .brand{display:none}
 body.ws-rol .sb-head{justify-content:flex-end;min-height:44px}
 body.ws-rol .sb-ib,body.ws-rol .sb-ib.dark,body.ws-rol .sek-skin{background:transparent!important;color:var(--sb-muted)!important;box-shadow:none!important}
-body.ws-rol .sb .nav[data-view="dueno"],body.ws-rol .sb .nav[data-view="inicio"],body.ws-rol .sb .nav[data-view="exp"]:not(#rolHome){display:none!important}
+body.ws-rol [data-cgban]{display:none!important}
+body.ws-rol .sb .nav[data-view="dueno"],body.ws-rol .sb .nav[data-view="cg"],body.ws-rol .sb .nav[data-view="inicio"],body.ws-rol .sb .nav[data-view="exp"]:not(#rolHome){display:none!important}
 .rol-ws{margin:4px 14px 10px}
 body.ws-rol .sb-foot{border-top:1px solid var(--sb-line)}
 body.ws-rol .avatar{background:var(--as-ink,#111);color:var(--as-card,#fff)}
@@ -8846,7 +8847,7 @@ SB.enter=async function(user){
       if(p.table==='expedientes'&&typeof AH!=='undefined'&&AH.activo()){clearTimeout(AH.t);AH.t=setTimeout(function(){if(S.view==='exp'&&!XD.cur)EX.load();else if(typeof GP!=='undefined')GP.load()},700)}
       if(p.table==='profiles'&&p.new&&p.new.id===ME&&SB.user){SB.user.name=p.new.name||SB.user.name;if(typeof AH!=='undefined')AH.tic();if(typeof ACC!=='undefined')ACC.pintar()}
       if(p.table==='alertas'){if(p.eventType==='INSERT')AL.onNew(p.new);return}
-      if(p.table==='buzon'){if(p.eventType==='INSERT'&&p.new)toast('Correo de tu agente: '+p.new.asunto);clearTimeout(CG.t);CG.t=setTimeout(CG.load,600);return}
+      if(p.table==='buzon'){if(p.eventType==='INSERT'&&p.new&&!(typeof ROL!=='undefined'&&ROL.on))toast('Correo de tu agente: '+p.new.asunto);clearTimeout(CG.t);CG.t=setTimeout(CG.load,600);return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
       if(p.table==='expedientes'||p.table==='decisiones'){clearTimeout(BX.t);BX.t=setTimeout(BX.load,800)}
       if(p.table==='decisiones')return;
