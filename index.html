@@ -1277,6 +1277,40 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 body.ws-rol .acc-foot>#settings,body.ws-rol .acc-foot>#userBtn{display:none}
 body.ws-rol .acc-foot{padding:0}body.ws-rol .acc{border-top:0}
 body.ws-rol .sb{overflow:clip}
+/* ══ Pago ══ */
+.ord-pag[hidden]{display:none}
+.pag{margin-bottom:150px;display:flex;flex-direction:column;gap:14px}
+.pag-v{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:var(--as-card,var(--bg));border:1px solid var(--as-line,var(--line));box-shadow:var(--as-sh,none)}
+.pag-v>div{flex:1;min-width:0}.pag-v b{font-size:16px;font-weight:650;letter-spacing:-.01em}.pag-v p{margin:2px 0 0;font-size:13px;color:var(--as-mut,var(--muted))}
+.pag-ic{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--as-soft,#f1f1f2);color:var(--as-mut,#888)}.pag-ic .ic{width:18px;height:18px;stroke-width:3}
+.pag-v.ok{border-color:#b9e3c8;background:color-mix(in srgb,#1f8a4c 6%,var(--as-card,#fff))}.pag-v.ok .pag-ic{background:#1f8a4c;color:#fff}.pag-v.ok b{color:#16723e}
+.pag-v.mal{border-color:#f3c4c5;background:color-mix(in srgb,#d1343a 5%,var(--as-card,#fff))}.pag-v.mal .pag-ic{background:#d1343a;color:#fff}.pag-v.mal b{color:#b42a2f}
+.pag-sp{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}
+.pag-re{flex:none;font:inherit;font-size:12.5px;font-weight:550;padding:7px 12px;border-radius:99px;border:1px solid var(--as-line,var(--line));background:var(--as-card,#fff);color:inherit;cursor:pointer}.pag-re:disabled{opacity:.6;cursor:default}
+.pag-ex{display:flex;gap:10px;align-items:flex-start;margin:0;padding:0 4px;font-size:13.5px;line-height:1.5}.pag-ex .xa-mk{flex:none}
+.pag-g{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+.pag-vs{align-self:center;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;background:var(--as-card,#fff);border:1px solid var(--as-line,var(--line));color:var(--as-mut,var(--muted))}
+.pag-c{display:flex;flex-direction:column;background:var(--as-card,var(--bg));border:1px solid var(--as-line,var(--line));border-radius:16px;box-shadow:var(--as-sh,none);padding:16px 18px;min-width:0}
+.pag-c header{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px}.pag-c header span{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut,var(--muted))}
+.pag-c header em{font-style:normal;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--as-soft,#f1f1f2)}.pag-c header em.ok{background:#e6f4ec;color:#16723e}.pag-c header em.mal{background:#fbe7e7;color:#b42a2f}
+.pag-tot{font-size:28px;font-weight:650;letter-spacing:-.02em;margin-bottom:10px;font-variant-numeric:tabular-nums}.pag-tot small{display:block;font-size:12px;font-weight:400;letter-spacing:0;color:var(--as-mut,var(--muted))}
+.pag-r{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--as-line,var(--line));font-size:13px}.pag-r span{color:var(--as-mut,var(--muted))}.pag-r b{font-weight:550;text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.pag-cs{list-style:none;margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--as-soft,#f6f6f7);display:flex;flex-direction:column;gap:5px}
+.pag-cs li{display:flex;justify-content:space-between;gap:10px;font-size:12px}.pag-cs li span{min-width:0}.pag-cs li small{display:block;color:var(--as-mut,var(--muted))}.pag-cs li b{font-weight:550;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pag-cs.rec li b{color:#b42a2f}
+.pag-falta{margin:6px 0 10px;font-size:13px;color:var(--as-mut,var(--muted))}
+.pag-c footer{margin-top:auto;padding-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.pag-a,.pag-up{display:inline-flex;align-items:center;gap:6px;max-width:100%;font:inherit;font-size:12px;padding:5px 10px;border-radius:99px;border:1px solid var(--as-line,var(--line));background:transparent;color:inherit;cursor:pointer}
+.pag-a span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pag-a .ic,.pag-up .ic{width:13px;height:13px;flex:none}
+.pag-up{border-style:dashed;color:var(--as-mut,var(--muted))}
+.pag-cmp{background:var(--as-card,var(--bg));border:1px solid var(--as-line,var(--line));border-radius:16px;box-shadow:var(--as-sh,none);padding:14px 18px}
+.pag-cmp h5{margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut,var(--muted))}
+.pag-cmp table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}.pag-cmp th{font-weight:500;font-size:11.5px;color:var(--as-mut,var(--muted));text-align:right;padding:4px 6px}
+.pag-cmp td{padding:7px 6px;border-top:1px solid var(--as-line,var(--line));text-align:right}.pag-cmp td:first-child{text-align:left}.pag-cmp td:last-child{width:24px;color:#1f8a4c}.pag-cmp tr.mal td{color:#b42a2f}.pag-cmp td .ic{width:14px;height:14px;stroke-width:3}
+.pag-at{margin:0 4px;font-size:11.5px;color:var(--as-mut,var(--muted))}
+.pag-vacio{color:var(--as-mut,var(--muted));font-size:13px}
+.pag-dot{width:7px;height:7px;border-radius:50%;padding:0!important;background:transparent!important}.pag-dot.ok{background:#22a55a!important}.pag-dot.mal{background:#e5484d!important}
+@media(max-width:760px){.pag-g{grid-template-columns:1fr}.pag-vs{justify-self:center}.pag-v{flex-wrap:wrap}}
 /* ══ Evidencia visual ══ */
 .ord-tabs button{white-space:nowrap}@media(max-width:600px){.ord-tabs{max-width:100%;overflow-x:auto;scrollbar-width:none}.ord-tabs button{padding:0 11px}}
 .ord-vis[hidden]{display:none}
@@ -7661,7 +7695,7 @@ document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.cl
    Al escribirle, el expediente se oculta y aparece la conversación; «Expediente» lo vuelve a mostrar. */
 var ORD={v:'exp'};
 ORD.nom=function(x){return x.tipo==='Servicio'?'Servicio':x.tipo==='Campaña'?'Campaña':'PREA'};
-ORD.tabs=function(){return '<div class="ord-bar"><div class="ord-tabs" role="tablist" aria-label="Vista de la orden"><button type="button" role="tab" data-ordv="exp" aria-selected="true">Expediente</button><button type="button" role="tab" data-ordv="vis" aria-selected="false">Evidencia visual<i id="visN"></i></button><button type="button" role="tab" data-ordv="chat" aria-selected="false">Conversación<i id="ordN"></i></button></div><button type="button" class="ord-upb" data-ordup title="Sube documentos nuevos y el agente los acomoda">'+svg('plus')+'Subir actualización del expediente</button></div>'};
+ORD.tabs=function(){return '<div class="ord-bar"><div class="ord-tabs" role="tablist" aria-label="Vista de la orden"><button type="button" role="tab" data-ordv="exp" aria-selected="true">Expediente</button><button type="button" role="tab" data-ordv="vis" aria-selected="false">Evidencia visual<i id="visN"></i></button><button type="button" role="tab" data-ordv="pag" aria-selected="false">Pago<i id="pagN" class="pag-dot"></i></button><button type="button" role="tab" data-ordv="chat" aria-selected="false">Conversación<i id="ordN"></i></button></div><button type="button" class="ord-upb" data-ordup title="Sube documentos nuevos y el agente los acomoda">'+svg('plus')+'Subir actualización del expediente</button></div>'};
 ORD.chat=function(){return '<div class="ord-chat" id="ordChat" hidden><div class="svc-th" id="svcTh" aria-live="polite"><div class="svc-thi" id="svcThi"></div></div></div>'};
 ORD.comp=function(x){
   var marca=($('#brandLabel')&&$('#brandLabel').textContent)||'General Motors',sv=x.tipo==='Servicio';
@@ -7676,14 +7710,14 @@ ORD.up=function(){return '<section class="xa ord-up" aria-label="Subir documento
   '<div class="xa-zone ord-zone" tabindex="0" role="button" aria-label="Subir archivos del servicio"><span class="xd-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
   '<span class="xd-say"><b>Arrastra aquí la orden, fotos, factura o comprobante</b><span>o haz clic · el agente lo revisa y lo acomoda</span></span><input type="file" multiple hidden accept=".pdf,image/*,.xml"></div></section>'};
 ORD.ver=function(v){
-  ORD.v=v;var e=$('#ordExp'),c=$('#ordChat');if(!e||!c)return;e.hidden=v!=='exp';c.hidden=v!=='chat';var vi=$('#ordVis');if(vi)vi.hidden=v!=='vis';if(v==='vis')VIS.load();
+  ORD.v=v;var e=$('#ordExp'),c=$('#ordChat');if(!e||!c)return;e.hidden=v!=='exp';c.hidden=v!=='chat';var vi=$('#ordVis');if(vi)vi.hidden=v!=='vis';if(v==='vis')VIS.load();var pg=$('#ordPag');if(pg)pg.hidden=v!=='pag';if(v==='pag')PAG.abrir();
   $$('#exDoc [data-ordv]').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.ordv===v))});
   if(v==='chat'){var t=$('#svcTh');if(t)t.scrollTop=t.scrollHeight}
 };
 ORD.n=function(){var el=$('#ordN');if(!el)return;var n=(SVC.msgs||[]).filter(function(m){return m.role==='user'&&!SVC.viejo(m)}).length;el.textContent=n?String(n):''};
 ORD.listo=function(x){
   var sb=$('#svcSend');if(sb){if(document.body.classList.contains('ws'))sb.innerHTML=svg('up');else if(typeof EYE!=='undefined')EYE.mount(sb)}
-  ORD.ver('exp');SVC.abrir(x).then(ORD.n);VIS.x=x;VIS.items=null;VIS.load(true);
+  ORD.ver('exp');SVC.abrir(x).then(ORD.n);VIS.x=x;VIS.items=null;VIS.load(true);PAG.x=x;PAG.busy=false;PAG.dot();
 };
 /* ══ Evidencia visual: fotos, videos y audios del carro, sin clasificar ══
    Van a expedientes-docs/<id>/visual/. No entran al armado ni al PDF del expediente: son el respaldo visual. */
@@ -7762,6 +7796,83 @@ document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' '
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='visFile'){VIS.subir(e.target.files);e.target.value=''}});
 ['dragover','drop'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#ordVis');if(!z)return;e.preventDefault();e.stopPropagation();
   if(ev==='dragover'){z.classList.add('over');clearTimeout(VIS.dt);VIS.dt=setTimeout(function(){z.classList.remove('over')},150)}else{z.classList.remove('over');VIS.subir(e.dataTransfer&&e.dataTransfer.files)}},true)});
+/* ══ Pago: la factura contra la transacción de planta, ¿cuadró? ══
+   La función «pago» lee juntos los archivos de factura y de planta y guarda el cuadre en expedientes.pago. */
+var PAG={x:null,busy:false};
+PAG.html=function(){return '<div class="ord-pag" id="ordPag" hidden><div id="pagIn"></div>'+
+  '<input type="file" id="pagFile" hidden accept=".pdf,.xml,image/*"></div>'};
+PAG.m=function(n){return n===null||n===undefined||n===''?'—':EX.money(n)};
+PAG.f=function(d){if(!d)return '—';var x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})};
+PAG.dot=function(){var el=$('#pagN');if(!el||!PAG.x)return;var e=PAG.x.pago&&PAG.x.pago.estado;el.className='pag-dot'+(e==='cuadra'?' ok':e==='no_cuadra'?' mal':'')};
+PAG.abrir=function(){
+  var x=PAG.x;if(!x)return;
+  if(x.demo){$('#pagIn').innerHTML='<section class="pag"><p class="pag-vacio">Es la orden de simulación: aquí no hay factura ni transacción.</p></section>';return}
+  PAG.pintar(x.pago);PAG.revisar(false);
+};
+PAG.revisar=async function(forzar){
+  var x=PAG.x;if(!x||PAG.busy)return;PAG.busy=true;
+  if(forzar||!x.pago)PAG.pintar(x.pago,true);
+  try{var r=await SB.ai({expediente_id:x.id,forzar:!!forzar},'pago');if(PAG.x!==x)return;x.pago=r&&r.pago||x.pago}
+  catch(e){if(PAG.x===x&&forzar)toast('No pude revisar el pago ('+TR.errTxt(e)+')')}
+  PAG.busy=false;if(PAG.x===x){PAG.dot();if(ORD.v==='pag')PAG.pintar(x.pago)}
+};
+PAG.fila=function(k,v){return '<div class="pag-r"><span>'+esc(k)+'</span><b>'+v+'</b></div>'};
+PAG.pintar=function(p,cargando){
+  var el=$('#pagIn');if(!el)return;var x=PAG.x;
+  if(cargando&&!p){el.innerHTML='<section class="pag"><div class="pag-v carga"><span class="pag-ic"><i class="pag-sp"></i></span><div><b>Revisando la factura y la transacción de planta…</b><p>El agente las lee juntas y compara los importes.</p></div></div></section>';return}
+  p=p||{};var e=p.estado,F=p.factura||{},T=p.planta||{};
+  var falta=p.falta||[],nombre={factura:'la factura',planta:'la transacción de planta'};
+  var V=e==='cuadra'?['ok','Cuadra','Lo que pagó planta ('+PAG.m(T.total)+') coincide con lo facturado.']:
+    e==='no_cuadra'?['mal','No cuadra',(p.diferencia?'Diferencia de '+PAG.m(Math.abs(p.diferencia))+(p.diferencia<0?': planta pagó de menos.':': planta pagó de más.'):'Revisa el estado de la transacción.')]:
+    e==='falta_documento'?['gris','Falta '+falta.map(function(k){return nombre[k]}).join(' y '),'Súbela y reviso si cuadra.']:
+    e==='incompleto'?['gris','No pude leer los dos totales','Sube una copia más clara de la factura o de la transacción.']:
+    e==='no_se_lee'?['gris','No se leen los importes','Sube una copia más clara.']:['gris','Sin revisar','Toca «Volver a revisar».'];
+  var ic=V[0]==='ok'?svg('check'):V[0]==='mal'?svg('x'):'<b>!</b>';
+  var arch=function(k){return (p.archivos||[]).filter(function(a){return a.k===k}).map(function(a){return '<button type="button" class="pag-a" data-xdopen="'+ea(x.id+'/'+k+'/'+a.name)+'">'+svg('file','sm')+'<span>'+esc(String(a.name).replace(/^\d{10,}_/,''))+'</span></button>'}).join('')};
+  var hayF=e!=='falta_documento'||falta.indexOf('factura')<0,hayT=e!=='falta_documento'||falta.indexOf('planta')<0;
+  var cardF='<article class="pag-c"><header><span>Factura a planta</span>'+(F.numero?'<em>'+esc(F.numero)+'</em>':'')+'</header>'+
+    (hayF&&F.total!==undefined?
+      '<div class="pag-tot">'+PAG.m(F.total)+'<small>total facturado</small></div>'+
+      PAG.fila('Fecha',esc(PAG.f(F.fecha)))+(F.receptor?PAG.fila('A nombre de',esc(F.receptor)):'')+
+      PAG.fila('Subtotal',PAG.m(F.subtotal))+PAG.fila('IVA',PAG.m(F.iva))+
+      (F.mano_obra!==null&&F.mano_obra!==undefined?PAG.fila('Mano de obra',PAG.m(F.mano_obra)):'')+(F.piezas?PAG.fila('Piezas',PAG.m(F.piezas)):'')+
+      ((F.conceptos||[]).length?'<ul class="pag-cs">'+F.conceptos.map(function(c){return '<li><span>'+esc(c.d)+'</span><b>'+PAG.m(c.importe)+'</b></li>'}).join('')+'</ul>':'')
+      :'<p class="pag-falta">'+(hayF?'Todavía no la leo.':'No hay factura en el expediente.')+'</p>')+
+    '<footer>'+arch('factura')+'<button type="button" class="pag-up" data-pagup="factura">'+svg('plus','sm')+(hayF?'Cambiar factura':'Subir factura')+'</button></footer></article>';
+  var cardT='<article class="pag-c"><header><span>Transacción de planta</span>'+(T.estado?'<em class="'+(/acept|pagad/i.test(T.estado)?'ok':/rechaz/i.test(T.estado)?'mal':'')+'">'+esc(T.estado)+'</em>':'')+'</header>'+
+    (hayT&&T.total!==undefined?
+      '<div class="pag-tot">'+PAG.m(T.total)+'<small>total pagado</small></div>'+
+      PAG.fila('Transacción',esc(T.transaccion||'—'))+PAG.fila('Fecha',esc(PAG.f(T.fecha)))+
+      (T.mano_obra!==null&&T.mano_obra!==undefined?PAG.fila('Mano de obra',PAG.m(T.mano_obra)):'')+(T.piezas!==null&&T.piezas!==undefined?PAG.fila('Piezas',PAG.m(T.piezas)):'')+
+      (T.otros?PAG.fila('Otros',PAG.m(T.otros)):'')+(T.impuesto!==null&&T.impuesto!==undefined?PAG.fila('Impuesto',PAG.m(T.impuesto)):'')+
+      ((T.recortes||[]).length?'<ul class="pag-cs rec">'+T.recortes.map(function(c){return '<li><span>Recorte · '+esc(c.concepto)+(c.motivo?'<small>'+esc(c.motivo)+'</small>':'')+'</span><b>'+(c.monto?'−'+PAG.m(c.monto):'')+'</b></li>'}).join('')+'</ul>':'')
+      :'<p class="pag-falta">'+(hayT?'Todavía no la leo.':'No hay transacción de planta en el expediente.')+'</p>')+
+    '<footer>'+arch('planta')+'<button type="button" class="pag-up" data-pagup="planta">'+svg('plus','sm')+(hayT?'Cambiar transacción':'Subir transacción')+'</button></footer></article>';
+  var R=(p.renglones||[]).filter(function(r){return r.factura!==null||r.planta!==null});
+  el.innerHTML='<section class="pag">'+
+    '<div class="pag-v '+V[0]+'"><span class="pag-ic">'+ic+'</span><div><b>'+esc(V[1])+'</b><p>'+esc(V[2])+'</p></div>'+
+      '<button type="button" class="pag-re" data-pagre'+(PAG.busy?' disabled':'')+'>'+(PAG.busy?'Revisando…':'Volver a revisar')+'</button></div>'+
+    (p.explicacion?'<p class="pag-ex"><span class="xa-mk">A</span>'+esc(p.explicacion)+'</p>':'')+
+    '<div class="pag-g">'+cardF+'<div class="pag-vs" aria-hidden="true">'+(V[0]==='ok'?'=':V[0]==='mal'?'≠':'vs')+'</div>'+cardT+'</div>'+
+    (R.length?'<div class="pag-cmp"><h5>Renglón por renglón</h5><table><thead><tr><th></th><th>Factura</th><th>Planta</th><th></th></tr></thead><tbody>'+
+      R.map(function(r){return '<tr class="'+(r.ok?'':'mal')+'"><td>'+esc(r.concepto)+'</td><td>'+PAG.m(r.factura)+'</td><td>'+PAG.m(r.planta)+'</td><td>'+(r.ok?svg('check','sm'):svg('x','sm'))+'</td></tr>'}).join('')+'</tbody></table></div>':'')+
+    (p.at?'<p class="pag-at">Revisado '+esc(AL.ago(p.at))+'</p>':'')+'</section>';
+};
+PAG.k='';
+PAG.subir=async function(file){
+  var x=PAG.x,k=PAG.k;if(!x||!file||!k)return;
+  var path=x.id+'/'+k+'/'+Date.now()+'_'+file.name.replace(/[^\w.\-]+/g,'_');
+  toast('Subiendo '+(k==='factura'?'la factura':'la transacción')+'…');
+  var r;try{r=await SB.c.storage.from(XD.B).upload(path,file,{contentType:file.type||undefined})}catch(e){r={error:e}}
+  if(r.error){toast('No se pudo subir: '+(r.error.message||'error'));return}
+  if(typeof FL!=='undefined'&&FL.refresh)try{FL.refresh(x)}catch(_){}
+  PAG.revisar(true);
+};
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest||!t.closest('#ordPag'))return;
+  if(t.closest('[data-pagre]')){PAG.revisar(true);return}
+  var u=t.closest('[data-pagup]');if(u){PAG.k=u.dataset.pagup;$('#pagFile').click();return}
+});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='pagFile'){var f=e.target.files&&e.target.files[0];e.target.value='';PAG.subir(f)}});
 /* lo que el agente sabe de la orden cuando le escriben */
 ORD.ctx=async function(x,text){
   if(x.tipo==='Servicio')return SVR.ctx(x,text);
@@ -7791,7 +7902,7 @@ XD.openSrv=function(x,el){
   el.innerHTML='<div class="xd-in xd-simple ord"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(AH.activo()?'← '+(AH.vista?AH.NOM[AH.vista][0]:'Inicio'):'← Servicios')+'</button>'+
     '<div><h2>'+esc(x.wo||x.folio)+'</h2><p>'+esc(['Servicio',x.sys].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts">'+(!x.demo&&XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</div></div>'+
-    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+ORD.up()+'</div>'+ORD.chat()+VIS.html()+ORD.comp(x)+'</div>'+
+    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+ORD.up()+'</div>'+ORD.chat()+VIS.html()+PAG.html()+ORD.comp(x)+'</div>'+
     '<div class="ord-side"><aside class="svc-ck" aria-label="Lista del servicio"><h4>Lista del servicio</h4><ol id="svcCk">'+SVC.ckHtml(x)+'</ol>'+
       (x.demo?'<button class="bt pri svc-sim" type="button" data-svcsim>▶ Iniciar simulación</button>':'')+'</aside>'+
     '<aside class="svc-side"><h4>Lo que sé de este servicio</h4>'+SVR.box(x)+
@@ -7831,7 +7942,7 @@ XD.open=function(id){
   el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(AH.activo()?'← '+(AH.vista?AH.NOM[AH.vista][0]:'Inicio'):'← Expedientes')+'</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts">'+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
-    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+ORD.chat()+VIS.html()+ORD.comp(x)+'</div>'+XD.contHtml()+'</div></div>';
+    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+ORD.chat()+VIS.html()+PAG.html()+ORD.comp(x)+'</div>'+XD.contHtml()+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
