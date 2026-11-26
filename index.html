@@ -1259,6 +1259,9 @@ body.ws-rol .avatar{background:var(--as-ink,#111);color:var(--as-card,#fff)}
 body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 /* ══ Inicio del grupo: mapa de marcas y agencias ══ */
 .gm-bar{display:flex;padding-top:8px}
+.gm-hero{position:relative}.gm-pdf{position:absolute;top:16px;right:16px;display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:550;padding:8px 14px;border-radius:99px;border:0;background:var(--as-ink,#111);color:var(--as-card,#fff);cursor:pointer}
+.gm-pdf .ic{width:15px;height:15px}.gm-pdf:disabled{opacity:.6;cursor:default}
+@media(max-width:700px){.gm-pdf{position:static;align-self:flex-start;margin-bottom:10px}}
 .gm{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
 .gm-hero{display:flex;flex-direction:column;gap:2px;padding:18px 20px;border-radius:16px;background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);box-shadow:var(--as-sh,none)}
 .gm-hero span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut,#8b8b90)}
@@ -7620,11 +7623,93 @@ GM.html=function(){
           '<span class="gm-ax">'+(ab?'<i>'+ab+(ab===1?' abierta':' abiertas')+'</i>':'<i>al día</i>')+(r.deb?'<i class="mal">'+DEB.mx(r.deb)+' en débitos</i>':'')+'</span></button>'},'gm-ag',4)+'</div>'}
   if(sel)return '<section class="gm gm-solo"><div class="gm-bar"><button type="button" class="xd-back" data-gmk="'+ea(sel.k)+'">← Todas las marcas</button></div>'+
     '<div class="gm-hero"><span>'+esc(sel.k)+' · Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(sel.m)+'</b><small>'+sel.ags.length+(sel.ags.length===1?' agencia':' agencias')+(sel.ab?' · '+sel.ab+(sel.ab===1?' orden abierta':' órdenes abiertas'):'')+(sel.deb?' · '+DEB.mx(sel.deb)+' en débitos':'')+'</small></div>'+agHtml+'</section>';
-  return '<section class="gm"><div class="gm-hero"><span>Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(tot)+'</b><small>'+M.length+(M.length===1?' marca':' marcas')+' · '+GM.ags.length+' agencias · toca una marca para ver sus agencias</small></div>'+
+  return '<section class="gm"><div class="gm-hero">'+(RPT.on()?'<button type="button" class="gm-pdf" data-rptpdf>'+svg('file','sm')+'Descargar reporte PDF</button>':'')+'<span>Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(tot)+'</b><small>'+M.length+(M.length===1?' marca':' marcas')+' · '+GM.ags.length+' agencias · toca una marca para ver sus agencias</small></div>'+
     GM.mosaico(M,function(o){return 1+Math.min(3,Math.sqrt(o.ags.length))},tile,'gm-map',4)+agHtml+'</section>';
 };
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;var b=t.closest('#asHome [data-gmk]');if(!b)return;
   GM.sel=GM.sel===b.dataset.gmk?null:b.dataset.gmk;AH.render();var vx=$('#viewExp');if(vx)vx.scrollTop=0;});
+/* ══ Reporte PDF del dinero recuperado (solo el dueño del grupo) ══
+   Se arma al momento con lo ya cobrado del mes (cobrado_detalle): total, por marca, por agencia y cada orden cobrada.
+   Ax AI escribe el resumen de arriba; si no contesta a tiempo, va un resumen hecho con las mismas cifras. */
+var RPT={busy:false};
+RPT.on=function(){return !!(GM.on()&&SB.user&&SB.user.dueno)};
+RPT.txt=function(t){return String(t==null?'':t).replace(/\*\*|__|`|#+ /g,'').replace(/[^\x20-\x7E -ÿ–—‘’“”•…]/g,'').trim()};
+RPT.resumenBase=function(D,tot,M){
+  if(!D.length)return 'En lo que va del mes todavía no hay cobros registrados en las agencias del grupo.';
+  var top=M[0],ags={};D.forEach(function(r){ags[r.agencia]=(ags[r.agencia]||0)+Number(r.monto)});var ta=Object.keys(ags).sort(function(a,b){return ags[b]-ags[a]})[0];
+  var srv=D.filter(function(r){return r.tipo==='Servicio'}).reduce(function(a,r){return a+Number(r.monto)},0),cam=D.filter(function(r){return r.tipo==='Campaña'}).reduce(function(a,r){return a+Number(r.monto)},0),pre=tot-srv-cam;
+  return 'En lo que va del mes Ax AI lleva '+EX.money(tot)+' recuperados (ya cobrados) en '+D.length+(D.length===1?' orden':' órdenes')+'. '+
+    'La marca con más recuperado es '+top.k+' con '+EX.money(top.m)+' y la agencia con más es '+ta+' con '+EX.money(ags[ta])+'. '+
+    'Por tipo: '+[srv?'servicios '+EX.money(srv):'',cam?'campañas '+EX.money(cam):'',pre>0.005?'PREAs '+EX.money(pre):''].filter(Boolean).join(', ')+'.';
+};
+RPT.resumenIA=async function(D,tot,M,base){
+  var ctx='Escribe en 3 a 5 frases, en español de México y sin viñetas ni negritas, el resumen ejecutivo para el dueño del grupo del dinero recuperado (ya cobrado) este mes. '+
+    'Usa SOLO estas cifras exactas, con centavos, sin redondear ni inventar: total '+EX.money(tot)+' en '+D.length+' órdenes. Por marca: '+M.map(function(m){return m.k+' '+EX.money(m.m)+' ('+m.n+' órdenes)'}).join('; ')+'. '+
+    'Órdenes: '+D.slice(0,60).map(function(r){return r.agencia+' '+(r.wo||r.folio)+' '+r.tipo+' '+EX.money(r.monto)}).join('; ')+'. Termina con una recomendación concreta.';
+  try{var r=await Promise.race([SB.ai({rol_agente:'garantias',messages:[{role:'user',content:ctx}],ahora:MI.nowInfo()},'manual'),new Promise(function(_,ko){setTimeout(function(){ko(new Error('tiempo'))},25000)})]);
+    var t=RPT.txt(r&&r.text);return t.length>40&&t.indexOf(RPT.txt(EX.money(tot)))>=0?t.slice(0,1400):base}catch(_){return base}
+};
+RPT.generar=async function(btn){
+  if(RPT.busy)return;RPT.busy=true;var t0=btn&&btn.innerHTML;if(btn){btn.disabled=true;btn.innerHTML='Ax AI está armando el reporte…'}
+  try{
+    var hoy=new Date(),first=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-01',mes=hoy.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+    var q=await SB.c.rpc('cobrado_detalle',{p_desde:first});if(q.error)throw q.error;
+    var D=(q.data||[]).map(function(r){r.monto=Number(r.monto||0);return r});
+    if(!GM.ags.length)await GM.load();
+    var tot=D.reduce(function(a,r){return a+r.monto},0);
+    var byM={};GM.ags.forEach(function(a){var k=GM.mk(a);(byM[k]=byM[k]||{k:k,ags:{},m:0,n:0}).ags[a.id]={a:a,m:0,n:0,srv:0,cam:0,pre:0,R:[]}});
+    D.forEach(function(r){var k=r.marca||'Otras',o=byM[k]||(byM[k]={k:k,ags:{},m:0,n:0}),g=o.ags[r.agency_id]||(o.ags[r.agency_id]={a:{name:r.agencia,city:r.ciudad},m:0,n:0,srv:0,cam:0,pre:0,R:[]});
+      o.m+=r.monto;o.n++;g.m+=r.monto;g.n++;g.R.push(r);if(r.tipo==='Servicio')g.srv+=r.monto;else if(r.tipo==='Campaña')g.cam+=r.monto;else g.pre+=r.monto});
+    var M=Object.keys(byM).map(function(k){return byM[k]}).sort(function(a,b){return b.m-a.m||a.k.localeCompare(b.k)});
+    var base=RPT.resumenBase(D,tot,M),res=await RPT.resumenIA(D,tot,M,base);
+    var L=await XD.pdfLib(),pdf=await L.PDFDocument.create(),F=await pdf.embedFont(L.StandardFonts.Helvetica),B=await pdf.embedFont(L.StandardFonts.HelveticaBold);
+    var W=612,H=792,mx=44,page,y,pg=0,ink=L.rgb(.07,.07,.08),mut=L.rgb(.45,.45,.48),ln=L.rgb(.88,.88,.9),ver=L.rgb(.09,.51,.29);
+    var T=function(t){return RPT.txt(t)};
+    var nueva=function(){page=pdf.addPage([W,H]);pg++;y=H-46;
+      page.drawText('Ax AI',{x:mx,y:H-30,size:10,font:B,color:ink});page.drawText(T('Reporte de dinero recuperado · '+(SB.grupo||'Grupo')),{x:mx+30,y:H-30,size:9,font:F,color:mut});
+      page.drawLine({start:{x:mx,y:H-38},end:{x:W-mx,y:H-38},thickness:.6,color:ln});y=H-60};
+    var cabe=function(h){if(y-h<54)nueva()};
+    var texto=function(t,o){o=o||{};var size=o.size||10,f=o.b?B:F,maxW=o.w||(W-2*mx),x=o.x||mx,c=o.c||ink,lh=o.lh||size*1.35,palabras=T(t).split(/\s+/),linea='';
+      palabras.forEach(function(p){var prueba=linea?linea+' '+p:p;if(f.widthOfTextAtSize(prueba,size)>maxW&&linea){cabe(lh);page.drawText(linea,{x:x,y:y,size:size,font:f,color:c});y-=lh;linea=p}else linea=prueba});
+      if(linea){cabe(lh);page.drawText(linea,{x:x,y:y,size:size,font:f,color:c});y-=lh}};
+    var corta=function(t,f,size,w){t=T(t);if(f.widthOfTextAtSize(t,size)<=w)return t;while(t.length>1&&f.widthOfTextAtSize(t+'…',size)>w)t=t.slice(0,-1);return t+'…'};
+    var tabla=function(cols,filas,o){o=o||{};var size=8.6,rh=15;cabe(rh*2);
+      var enc=function(){var x=mx;cols.forEach(function(c){var t=corta(c.t,B,size,c.w-6);page.drawText(t,{x:c.r?x+c.w-6-B.widthOfTextAtSize(t,size):x,y:y,size:size,font:B,color:mut});x+=c.w});y-=5;page.drawLine({start:{x:mx,y:y},end:{x:W-mx,y:y},thickness:.5,color:ln});y-=rh-4};
+      enc();filas.forEach(function(f,i){if(y-rh<54){nueva();enc()}var x=mx;cols.forEach(function(c,j){var v=f[j],t=corta(v,j===0&&o.b0?B:F,size,c.w-6),fo=(f.b&&j===cols.length-1)||(j===0&&o.b0)?B:F;
+          page.drawText(t,{x:c.r?x+c.w-6-fo.widthOfTextAtSize(t,size):x,y:y,size:size,font:fo,color:c.v&&f.ok!==false?ver:ink});x+=c.w});
+        y-=4;page.drawLine({start:{x:mx,y:y},end:{x:W-mx,y:y},thickness:.3,color:ln});y-=rh-4});y-=6};
+    var titulo=function(t){cabe(40);y-=8;page.drawText(T(t),{x:mx,y:y,size:12.5,font:B,color:ink});y-=18};
+    nueva();
+    page.drawText(T('Dinero recuperado · '+mes.charAt(0).toUpperCase()+mes.slice(1)),{x:mx,y:y,size:20,font:B,color:ink});y-=20;
+    texto((SB.grupo||'Grupo')+' · del 1 al '+hoy.getDate()+' · generado por Ax AI el '+hoy.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+' a las '+hoy.toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'})+(SB.user&&SB.user.name?' para '+SB.user.name:''),{size:9.5,c:mut});y-=12;
+    page.drawText('RECUPERADO (YA COBRADO)',{x:mx,y:y,size:8.5,font:B,color:mut});y-=30;
+    page.drawText(T(EX.money(tot)),{x:mx,y:y,size:32,font:B,color:tot>0?ver:mut});y-=18;
+    texto(D.length+(D.length===1?' orden cobrada':' órdenes cobradas')+' · '+M.filter(function(m){return m.m>0}).length+' de '+M.length+' marcas con recuperado · '+GM.ags.length+' agencias en el grupo',{size:9.5,c:mut});y-=10;
+    titulo('Resumen de Ax AI');texto(res,{size:10.5,lh:15});
+    titulo('Por marca');
+    tabla([{t:'Marca',w:200},{t:'Agencias',w:70,r:1},{t:'Órdenes cobradas',w:110,r:1},{t:'Recuperado',w:144,r:1,v:1}],
+      M.map(function(m){var f=[m.k,String(Object.keys(m.ags).length),String(m.n),EX.money(m.m)];f.ok=m.m>0;return f}).concat([(function(){var f=['Total del grupo',String(GM.ags.length),String(D.length),EX.money(tot)];f.b=1;f.ok=tot>0;return f})()]),{});
+    titulo('Por agencia');
+    var AG=[];M.forEach(function(m){Object.keys(m.ags).forEach(function(id){var g=m.ags[id];AG.push({m:m.k,g:g})})});AG.sort(function(a,b){return b.g.m-a.g.m||a.g.a.name.localeCompare(b.g.a.name)});
+    tabla([{t:'Agencia',w:150},{t:'Marca',w:72},{t:'Órdenes',w:46,r:1},{t:'Servicios',w:70,r:1},{t:'Campañas',w:64,r:1},{t:'PREAs',w:52,r:1},{t:'Recuperado',w:70,r:1,v:1}],
+      AG.map(function(o){var g=o.g,f=[g.a.name+(g.a.city&&g.a.name.indexOf(g.a.city)<0?' · '+g.a.city:''),o.m,String(g.n),g.srv?EX.money(g.srv):'—',g.cam?EX.money(g.cam):'—',g.pre?EX.money(g.pre):'—',EX.money(g.m)];f.ok=g.m>0;return f}),{});
+    titulo('Detalle de lo cobrado por agencia');
+    var con=AG.filter(function(o){return o.g.R.length});
+    if(!con.length)texto('Todavía no hay órdenes cobradas este mes.',{c:mut});
+    con.forEach(function(o){var g=o.g;cabe(60);y-=4;page.drawText(T(g.a.name+' · '+o.m),{x:mx,y:y,size:10.5,font:B,color:ink});
+      var tt=T(EX.money(g.m));page.drawText(tt,{x:W-mx-B.widthOfTextAtSize(tt,10.5),y:y,size:10.5,font:B,color:ver});y-=16;
+      tabla([{t:'Pagado',w:48},{t:'Orden',w:52},{t:'Tipo',w:50},{t:'Servicio / unidad',w:132},{t:'Asesor',w:72},{t:'Origen del cobro',w:104},{t:'Cobrado',w:66,r:1,v:1}],
+        g.R.map(function(r){return [new Date(r.fecha+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'}),r.wo||r.folio||'',r.tipo||'',[r.sistema,r.vehiculo].filter(Boolean).join(' · '),r.asesor||'',r.fuente||'',EX.money(r.monto)]}),{})});
+    titulo('Cómo se calcula');
+    texto('Recuperado es lo que ya se cobró en el mes, una vez por orden: la cartera marcada como pagada, o lo que pagó planta según la transacción revisada en la pestaña Pago (si planta la rechazó no cuenta), o lo que pagó planta en el servicio según lo que aprendió el cerebro. Las cifras van exactas, con centavos, y salen de los expedientes en el momento de generar el reporte.',{size:9,c:mut,lh:12.5});
+    var n=pdf.getPageCount();pdf.getPages().forEach(function(p,i){var t='Página '+(i+1)+' de '+n+' · Ax AI · confidencial';p.drawText(t,{x:W-mx-F.widthOfTextAtSize(t,8),y:28,size:8,font:F,color:mut})});
+    var bytes=await pdf.save(),blob=new Blob([bytes],{type:'application/pdf'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download='Ax AI - Dinero recuperado '+first.slice(0,7)+'.pdf';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.parentNode.removeChild(a)},1500);
+    toast('Reporte listo: '+EX.money(tot)+' recuperados');
+  }catch(e){console.warn('[reporte]',e);toast('No se pudo generar el reporte ('+TR.errTxt(e)+')')}
+  RPT.busy=false;if(btn){btn.disabled=false;btn.innerHTML=t0}
+};
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-rptpdf]');if(b)RPT.generar(b)});
 AH.render=function(){
   if(AH.vista){var el0=$('#asHome');if(el0)el0.hidden=false;AH.lista(AH.vista);return}
   if(typeof crumb!=='undefined'&&S.view==='exp'){crumb.textContent='Inicio';crumbSep.hidden=true;crumb2.hidden=true}
