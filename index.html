@@ -6917,6 +6917,14 @@ SVR.txt=function(R){
   if(!R)return '';var g=R.grupo||{},w=R.red||{},L=[];
   if(g.n)L.push('En tu grupo ('+(R.marca||'tu marca')+') se ha cobrado en '+g.n+(g.n===1?' servicio':' servicios')+': mediana '+DEB.mx(g.mediana)+(g.n>1?' (de '+DEB.mx(g.min)+' a '+DEB.mx(g.max)+')':'')+'. Por agencia: '+(g.por_agencia||[]).map(function(a){return a.agencia+' '+DEB.mx(a.mediana)+' ('+a.n+')'}).join('; ')+'.');
   if(w.n)L.push('En otras '+w.agencias+(w.agencias===1?' agencia':' agencias')+' '+(R.marca||'')+' de la red: mediana '+DEB.mx(w.mediana)+' en '+w.n+' servicios (de '+DEB.mx(w.min)+' a '+DEB.mx(w.max)+').');
+  var A=R.aprendido||{},ag=A.grupo||{},ar=A.red||{};
+  if(ag.n){var t='Lo que el cerebro aprendió de '+ag.n+(ag.n===1?' servicio leído':' servicios leídos')+' en tu grupo:';
+    if(ag.horas_mo)t+=' tiempo típico de mano de obra '+Number(ag.horas_mo)+' h;';
+    if(ag.pagado_planta)t+=' planta pagó típicamente '+DEB.mx(ag.pagado_planta)+' ('+ag.n_pagados+(ag.n_pagados===1?' pago':' pagos')+');';
+    if((ag.operaciones||[]).length)t+=' operaciones: '+ag.operaciones.map(function(o){return o.op+(o.desc?' '+o.desc:'')+(o.horas?' '+o.horas+' h':'')+' ('+o.n+')'}).join(', ')+';';
+    if((ag.unidades||[]).length)t+=' unidades: '+ag.unidades.map(function(u){return u.modelo+' ('+u.n+(u.mediana?', '+DEB.mx(u.mediana):'')+')'}).join(', ')+';';
+    L.push(t.replace(/;$/,'.'))}
+  if(ar.n&&(ar.horas_mo||ar.pagado_planta))L.push('En la red: '+(ar.horas_mo?Number(ar.horas_mo)+' h de mano de obra típicas':'')+(ar.horas_mo&&ar.pagado_planta?' y ':'')+(ar.pagado_planta?'planta paga típicamente '+DEB.mx(ar.pagado_planta):'')+' ('+ar.n+' servicios).');
   return L.join(' ');
 };
 SVR.estado=function(x){
@@ -7646,6 +7654,8 @@ SVC.subir=async function(files){
       r=await ACT.paso(act,'Cerebro','Leyendo «'+file.name+'»',async function(){var rr=await SB.ai({expediente_id:x.id,file:f},'servicio');rr.toString=function(){return (SVC.NOM[rr.leido&&rr.leido.que_es]||'un documento')+(rr.llenado&&rr.llenado.length?' · llenó '+rr.llenado.length+' datos':'')};return rr});
       if(r&&r.expediente)Object.assign(x,r.expediente);
       K=SVR.secciones(r,f);k=K[0];
+      if(r&&r.aprendido){var ap=r.aprendido,pz=[ap.tipo_servicio,ap.modelo&&(ap.modelo+(ap.anio?' '+ap.anio:'')),ap.horas_mo&&(ap.horas_mo+' h de mano de obra'),ap.pagado_planta&&('planta pagó '+DEB.mx(ap.pagado_planta))].filter(Boolean);
+        while(pz.length>1&&pz.join(' · ').length>=60)pz.pop();if(pz.length)try{await ACT.paso(act,'Cerebro','Aprendió de este servicio',async function(){await SVC.dormir(380);return pz.join(' · ').slice(0,59)})}catch(_){}}
       txt=r&&r.llenado&&r.llenado.length?'llené '+r.llenado.join(', '):'revisado';
     }catch(e){console.warn('[servicio]',e);txt='se guardó';r=null}
     for(var j=0;j<K.length;j++){try{await ACT.paso(act,'Expediente','Guardando en '+DOND[K[j]],(function(kk){return async function(){await XD.send(kk,file,{leido:true,txt:txt});await SVC.dormir(320);return 'listo'}})(K[j]))}catch(_){}}
@@ -7663,11 +7673,14 @@ SVC.natural=async function(x,r,file,k,K){K=K||[k];
   if(!r)return 'Lo guardé, pero no alcancé a leer bien **'+file.name+'**. ¿Me lo mandas más claro?';
   var L=r.leido||{},q=L.que_es,m='',ref=null;
   if(x.sys){try{ref=await SVR.ref(x.sys)}catch(_){}}
+  var ap=r.aprendido||{},ag=(ref&&ref.aprendido&&ref.aprendido.grupo)||{},extra='';
+  if(ap.horas_mo){extra+=' Lo registré con **'+ap.horas_mo+' h** de mano de obra';if(ag.horas_mo&&ag.n>1){var dh=ap.horas_mo-Number(ag.horas_mo);extra+=Math.abs(dh)<0.05?', igual que lo típico en tu grupo':dh>0?', '+(+dh.toFixed(2))+' h más que lo típico en tu grupo ('+Number(ag.horas_mo)+' h)':', '+(+(-dh).toFixed(2))+' h menos que lo típico en tu grupo ('+Number(ag.horas_mo)+' h)'}extra+='.'}
+  if(ap.pagado_planta&&ag.pagado_planta&&ag.n_pagados>1){var dp=ap.pagado_planta-Number(ag.pagado_planta);if(Math.abs(dp)>Number(ag.pagado_planta)*.05)extra+=' Planta pagó '+DEB.mx(ap.pagado_planta)+', '+(dp>0?'más':'menos')+' que lo típico ('+DEB.mx(ag.pagado_planta)+').'}
   if(K.length>1){var nm={evidencia:'la orden',factura:'la factura',planta:'el cobro de planta'},pz=K.map(function(z){return nm[z]});
     m='Revisé **'+file.name+'**: trae '+(pz.length>1?pz.slice(0,-1).join(', ')+' y '+pz[pz.length-1]:pz[0])+'. Lo acomodé en cada apartado del expediente.';
     if(K.indexOf('factura')>=0&&(L.monto_antes_iva||L.factura_total))m+=' La factura es por **'+DEB.mx(L.monto_antes_iva||L.factura_total)+'**'+(L.monto_antes_iva?' antes de IVA':'')+'.';
     if(K.indexOf('planta')>=0)m+=' Planta '+(/rechaz/i.test(L.pago_estado||'')?'**rechazó** la transacción':'ya lo pagó'+(L.pago_total?' (**'+DEB.mx(L.pago_total)+'**)':''))+'.';
-    var f0=['evidencia','factura','planta'].filter(function(z){return K.indexOf(z)<0&&!SVC.hecho(z)})[0];return m+'\n\n'+(f0?SVC.SIGUE[f0]:'Con esto queda **cerrado**: facturado, cobrado y con su evidencia completa. ¡Buen trabajo!')}
+    m+=extra;var f0=['evidencia','factura','planta'].filter(function(z){return K.indexOf(z)<0&&!SVC.hecho(z)})[0];return m+'\n\n'+(f0?SVC.SIGUE[f0]:'Con esto queda **cerrado**: facturado, cobrado y con su evidencia completa. ¡Buen trabajo!')}
   var med=ref&&ref.grupo&&ref.grupo.n?Number(ref.grupo.mediana):0;
   if(q==='factura'){var mo=Number(L.monto_antes_iva||x.labor)||0;m='Recibí la factura'+(mo?' por **'+DEB.mx(mo)+'** antes de IVA':'')+'.';
     if(mo&&med){var d=mo-med;m+=Math.abs(d)<=med*.05?' Va justo en lo que cobra tu grupo.':d>0?' Quedó '+DEB.mx(d)+' arriba de lo típico en tu grupo ('+DEB.mx(med)+').':' Quedó '+DEB.mx(-d)+' abajo de lo típico en tu grupo ('+DEB.mx(med)+').'}}
@@ -7675,7 +7688,7 @@ SVC.natural=async function(x,r,file,k,K){K=K||[k];
   else{m=q==='orden'?'Ya revisé la orden.':/^foto/.test(q||'')?'Ya vi la foto.':'Ya lo revisé.';
     if(x.sys&&r.llenado&&r.llenado.indexOf('tipo de servicio')>=0){m+=' Es el **'+String(x.sys).replace(/^Servicio /,'servicio de ')+'**'+(x.vehicle?' de un '+x.vehicle:'')+(Number(x.km)?' con '+Number(x.km).toLocaleString('en-US')+' km':'')+'.';
       if(med)m+=' En tu grupo ese servicio se cobra en **'+DEB.mx(med)+'** antes de IVA.'}}
-  var f=SVC.falta();
+  m+=extra;var f=SVC.falta();
   return m+'\n\n'+(f?SVC.SIGUE[f]:'Con esto queda **cerrado**: facturado, cobrado y con su evidencia completa. ¡Buen trabajo!');
 };
 document.addEventListener('submit',function(e){if(e.target&&e.target.id==='svcForm'){e.preventDefault();var t=$('#svcTa');var v=t.value;t.value='';SVC.on();SVC.enviar(v)}});

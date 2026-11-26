@@ -134,6 +134,29 @@ Deno.serve(async (req) => {
     explicacion: clip(v.explicacion, 600), archivos: A.map((f) => ({ k: f.k, name: f.name })),
   };
   const up = await sb.from("expedientes").update({ pago }).eq("id", id);
+  /* en un servicio, el cerebro aprende lo que se facturó y lo que pagó planta */
+  if (e.tipo === "Servicio") {
+    try {
+      const adm = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const prev = (await adm.from("servicios_aprendidos").select("expediente_id").eq("expediente_id", id).maybeSingle()).data;
+      const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+      if (fac.subtotal !== null) patch.subtotal = fac.subtotal;
+      if (fac.total !== null) patch.total_facturado = fac.total;
+      if (fac.mano_obra !== null) patch.mano_obra = fac.mano_obra;
+      if (pla.total !== null) patch.pagado_planta = pla.total;
+      if (pla.estado) patch.pago_estado = pla.estado;
+      if (pla.fecha) patch.pago_fecha = pla.fecha;
+      const rec = pla.recortes.reduce((a: number, c: any) => a + (c.monto || 0), 0);
+      if (rec > 0) patch.recorte = Math.round(rec * 100) / 100;
+      if (prev) await adm.from("servicios_aprendidos").update(patch).eq("expediente_id", id);
+      else {
+        const full = (await adm.from("expedientes").select("user_id,wo,sys,km,vehicle,hours,op,opd").eq("id", id).single()).data as any;
+        const prof = (await adm.from("profiles").select("agency_id,grupo_id,agencies(grupo_id,brand,marca_grupo)").eq("id", full.user_id).maybeSingle()).data as any;
+        const clave = full.sys ? (await adm.rpc("servicio_clave", { t: full.sys })).data : null;
+        await adm.from("servicios_aprendidos").insert({ expediente_id: id, user_id: full.user_id, agency_id: prof?.agency_id ?? null, grupo_id: prof?.agencies?.grupo_id ?? prof?.grupo_id ?? null, marca: prof?.agencies?.marca_grupo || prof?.agencies?.brand || null, wo: full.wo, tipo_servicio: full.sys, clave, km: full.km, modelo: full.vehicle ? String(full.vehicle).replace(/\b(19|20)\d{2}\b/, "").trim() : null, horas_mo: full.hours || null, operacion: full.op || null, operacion_desc: full.opd || null, ...patch });
+      }
+    } catch (err) { console.error("aprender pago", String(err)); }
+  }
   if (up.error) return json({ pago, aviso: "no_guardado" });
   return json({ pago });
 });
