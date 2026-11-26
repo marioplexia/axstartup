@@ -1280,14 +1280,11 @@ body.ws-rol .sb{overflow:clip}
 /* ══ Pago ══ */
 .ord-pag[hidden]{display:none}
 .pag{margin-bottom:150px;display:flex;flex-direction:column;gap:14px}
-.pag-v{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:var(--as-card,var(--bg));border:1px solid var(--as-line,var(--line));box-shadow:var(--as-sh,none)}
-.pag-v>div{flex:1;min-width:0}.pag-v b{font-size:16px;font-weight:650;letter-spacing:-.01em}.pag-v p{margin:2px 0 0;font-size:13px;color:var(--as-mut,var(--muted))}
-.pag-ic{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--as-soft,#f1f1f2);color:var(--as-mut,#888)}.pag-ic .ic{width:18px;height:18px;stroke-width:3}
-.pag-v.ok{border-color:#b9e3c8;background:color-mix(in srgb,#1f8a4c 6%,var(--as-card,#fff))}.pag-v.ok .pag-ic{background:#1f8a4c;color:#fff}.pag-v.ok b{color:#16723e}
-.pag-v.mal{border-color:#f3c4c5;background:color-mix(in srgb,#d1343a 5%,var(--as-card,#fff))}.pag-v.mal .pag-ic{background:#d1343a;color:#fff}.pag-v.mal b{color:#b42a2f}
-.pag-sp{width:18px;height:18px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}
+.pag-v{display:flex;align-items:flex-start;gap:14px;padding:2px 4px 0}
+.pag-v>div{flex:1;min-width:0}.pag-v b{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:650;letter-spacing:-.01em}.pag-v p{margin:4px 0 0;font-size:13px;line-height:1.5;color:var(--as-mut,var(--muted))}
+.pag-pt{flex:none;width:8px;height:8px;border-radius:50%;background:#c4c4c8}.pag-v.ok .pag-pt{background:#22a55a}.pag-v.mal .pag-pt{background:#e5484d}
+.pag-sp{flex:none;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}
 .pag-re{flex:none;font:inherit;font-size:12.5px;font-weight:550;padding:7px 12px;border-radius:99px;border:1px solid var(--as-line,var(--line));background:var(--as-card,#fff);color:inherit;cursor:pointer}.pag-re:disabled{opacity:.6;cursor:default}
-.pag-ex{display:flex;gap:10px;align-items:flex-start;margin:0;padding:0 4px;font-size:13.5px;line-height:1.5}.pag-ex .xa-mk{flex:none}
 .pag-g{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
 .pag-vs{align-self:center;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;background:var(--as-card,#fff);border:1px solid var(--as-line,var(--line));color:var(--as-mut,var(--muted))}
 .pag-c{display:flex;flex-direction:column;background:var(--as-card,var(--bg));border:1px solid var(--as-line,var(--line));border-radius:16px;box-shadow:var(--as-sh,none);padding:16px 18px;min-width:0}
@@ -7819,7 +7816,7 @@ PAG.revisar=async function(forzar){
 PAG.fila=function(k,v){return '<div class="pag-r"><span>'+esc(k)+'</span><b>'+v+'</b></div>'};
 PAG.pintar=function(p,cargando){
   var el=$('#pagIn');if(!el)return;var x=PAG.x;
-  if(cargando&&!p){el.innerHTML='<section class="pag"><div class="pag-v carga"><span class="pag-ic"><i class="pag-sp"></i></span><div><b>Revisando la factura y la transacción de planta…</b><p>El agente las lee juntas y compara los importes.</p></div></div></section>';return}
+  if(cargando&&!p){el.innerHTML='<section class="pag"><div class="pag-v carga"><div><b><i class="pag-sp"></i>Revisando la factura y la transacción de planta…</b><p>El agente las lee juntas y compara los importes.</p></div></div></section>';return}
   p=p||{};var e=p.estado,F=p.factura||{},T=p.planta||{};
   var falta=p.falta||[],nombre={factura:'la factura',planta:'la transacción de planta'};
   var V=e==='cuadra'?['ok','Cuadra','Lo que pagó planta ('+PAG.m(T.total)+') coincide con lo facturado.']:
@@ -7850,9 +7847,8 @@ PAG.pintar=function(p,cargando){
     '<footer>'+arch('planta')+'<button type="button" class="pag-up" data-pagup="planta">'+svg('plus','sm')+(hayT?'Cambiar transacción':'Subir transacción')+'</button></footer></article>';
   var R=(p.renglones||[]).filter(function(r){return r.factura!==null||r.planta!==null});
   el.innerHTML='<section class="pag">'+
-    '<div class="pag-v '+V[0]+'"><span class="pag-ic">'+ic+'</span><div><b>'+esc(V[1])+'</b><p>'+esc(V[2])+'</p></div>'+
+    '<div class="pag-v '+V[0]+'"><div><b><i class="pag-pt"></i>'+esc(V[1])+'</b><p>'+esc(V[2])+(p.explicacion?' '+esc(p.explicacion):'')+'</p></div>'+
       '<button type="button" class="pag-re" data-pagre'+(PAG.busy?' disabled':'')+'>'+(PAG.busy?'Revisando…':'Volver a revisar')+'</button></div>'+
-    (p.explicacion?'<p class="pag-ex"><span class="xa-mk">A</span>'+esc(p.explicacion)+'</p>':'')+
     '<div class="pag-g">'+cardF+'<div class="pag-vs" aria-hidden="true">'+(V[0]==='ok'?'=':V[0]==='mal'?'≠':'vs')+'</div>'+cardT+'</div>'+
     (R.length?'<div class="pag-cmp"><h5>Renglón por renglón</h5><table><thead><tr><th></th><th>Factura</th><th>Planta</th><th></th></tr></thead><tbody>'+
       R.map(function(r){return '<tr class="'+(r.ok?'':'mal')+'"><td>'+esc(r.concepto)+'</td><td>'+PAG.m(r.factura)+'</td><td>'+PAG.m(r.planta)+'</td><td>'+(r.ok?svg('check','sm'):svg('x','sm'))+'</td></tr>'}).join('')+'</tbody></table></div>':'')+
