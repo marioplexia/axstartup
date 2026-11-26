@@ -7619,8 +7619,8 @@ AH.render=function(){
       '<button type="button" class="ah-b2" data-svcdemo>'+svg('play')+'Simulación</button>'+
       '<button type="button" class="ah-new" data-ahnew>'+svg('plus')+'Nueva orden</button></div>')+'</div>'+
     (GM.on()?GM.html():'<div class="ah-grid">'+K.map(tarjeta).join('')+'</div>')+
-    '<section class="ah-box"><div class="ah-bh"><b>Lo que sigue</b><span>'+(sig.length?sig.length+(sig.length===1?' orden abierta':' órdenes abiertas'):'Todo al día')+'</span></div>'+
-      (sig.length?'<div class="ah-list">'+sig.map(fila).join('')+'</div>':'<p class="ah-vacio">No tienes órdenes pendientes. Abre una nueva con «Nueva orden».</p>')+'</section></div>';
+    (GM.on()?'':'<section class="ah-box"><div class="ah-bh"><b>Lo que sigue</b><span>'+(sig.length?sig.length+(sig.length===1?' orden abierta':' órdenes abiertas'):'Todo al día')+'</span></div>'+
+      (sig.length?'<div class="ah-list">'+sig.map(fila).join('')+'</div>':'<p class="ah-vacio">No tienes órdenes pendientes. Abre una nueva con «Nueva orden».</p>')+'</section>')+'</div>';
 };
 /* el lugar de la lista de expedientes para el asesor: ahí vive su inicio */
 AH.tic=function(){if(!AH.activo())return;var h=$('#ahHola'),f=$('#ahFecha'),n=$('#ahNom');if(h)h.textContent=AH.hola();if(f)f.textContent=AH.fecha();if(n)n.textContent=AH.nombre()||'asesor'};
