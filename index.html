@@ -1257,6 +1257,7 @@ body.ws-rol .sb-foot{border-top:1px solid var(--sb-line)}
 body.ws-rol .avatar{background:var(--as-ink,#111);color:var(--as-card,#fff)}
 body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 /* ══ Inicio del grupo: mapa de marcas y agencias ══ */
+.gm-bar{display:flex;padding-top:8px}
 .gm{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
 .gm-hero{display:flex;flex-direction:column;gap:2px;padding:18px 20px;border-radius:16px;background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);box-shadow:var(--as-sh,none)}
 .gm-hero span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut,#8b8b90)}
@@ -7511,7 +7512,7 @@ ROL.set=function(me){
   ROL.tipo=me.dueno?'Dueño del grupo':me.director?'Director regional':'Gerente de posventa';
   document.body.classList.add('ws','ws-rol');VIEWS.exp='Inicio';ORB='<span class="ax-mono">Ax</span>';
   var sc=$('.sb-scroll');if(sc&&!$('#rolHome')){sc.insertAdjacentHTML('afterbegin','<button class="nav" id="rolHome" data-view="exp" data-i="home">Inicio</button><button class="nav" id="rolEq" data-view="eq" data-i="inbox">Bandeja<span class="nbadge" data-eqn hidden></span></button>');hydrate(sc);
-    sc.querySelectorAll('#rolHome,#rolEq').forEach(function(b){b.addEventListener('click',function(){showView(b.dataset.view)})});
+    sc.querySelectorAll('#rolHome,#rolEq').forEach(function(b){b.addEventListener('click',function(){if(b.id==='rolHome'&&typeof GM!=='undefined')GM.sel=null;showView(b.dataset.view)})});
     var bxn=sc.querySelector('.nav[data-view="bx"]');if(bxn)[].forEach.call(bxn.childNodes,function(n){if(n.nodeType===3&&/Bandeja/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace('Bandeja','Decisiones')});VIEWS.bx='Decisiones'}
   var hd=$('.sb-head');if(hd&&!$('#rolWs')){var nom=(me.dueno||me.director)?(SB.grupo||SB.agency||'Tu grupo'):(SB.agency||'Tu agencia');
     hd.insertAdjacentHTML('afterend','<div class="as-ws rol-ws" id="rolWs"><span class="as-logo">Ax</span><div><b>'+esc(nom)+'</b><small>'+esc(ROL.tipo)+'</small></div></div>')}
@@ -7583,16 +7584,18 @@ GM.html=function(){
       '<span class="gm-dots" aria-hidden="true">'+o.ags.slice(0,24).map(function(a){var r=GM.rec[a.id]||{};return '<i class="'+(r.m>0?'ok':'')+'"></i>'}).join('')+'</span></button>'};
   var agHtml='';
   if(sel){var maxA=Math.max.apply(null,sel.ags.map(function(a){return (GM.rec[a.id]||{}).m||0}).concat([0]));
-    agHtml='<div class="gm-sub"><div class="gm-sh"><b>Agencias de '+esc(sel.k)+'</b><span>'+DEB.mx(sel.m)+' recuperado en '+GM.mes()+' · '+sel.ags.length+(sel.ags.length===1?' agencia':' agencias')+'</span></div>'+
+    agHtml='<div class="gm-sub"><div class="gm-sh"><b>Agencias de '+esc(sel.k)+'</b><span>toca una para abrirla</span></div>'+
       '<div class="gm-ag">'+sel.ags.slice().sort(function(a,b){return ((GM.rec[b.id]||{}).m||0)-((GM.rec[a.id]||{}).m||0)||a.name.localeCompare(b.name)}).map(function(a){var r=GM.rec[a.id]||{},m=r.m||0,ab=GM.abiertas[a.id]||0;
         return '<button type="button" class="gm-a'+(m>0?' rec':'')+'" data-agv="'+a.id+'" style="--g:'+GM.tono(m,maxA)+'%"><span class="gm-an">'+esc(a.name)+'</span><span class="gm-ac">'+esc(a.city||'')+'</span>'+
           '<span class="gm-am">'+(m>0?DEB.mx(m):'$0')+'<small>'+(m>0?'recuperado':'sin recuperado')+'</small></span>'+
           '<span class="gm-ax">'+(ab?'<i>'+ab+(ab===1?' abierta':' abiertas')+'</i>':'<i>al día</i>')+(r.deb?'<i class="mal">'+DEB.mx(r.deb)+' en débitos</i>':'')+'</span></button>'}).join('')+'</div></div>'}
+  if(sel)return '<section class="gm gm-solo"><div class="gm-bar"><button type="button" class="xd-back" data-gmk="'+ea(sel.k)+'">← Todas las marcas</button></div>'+
+    '<div class="gm-hero"><span>'+esc(sel.k)+' · Ax AI recuperó en '+GM.mes()+'</span><b>'+DEB.mx(sel.m)+'</b><small>'+sel.ags.length+(sel.ags.length===1?' agencia':' agencias')+(sel.ab?' · '+sel.ab+(sel.ab===1?' orden abierta':' órdenes abiertas'):'')+(sel.deb?' · '+DEB.mx(sel.deb)+' en débitos':'')+'</small></div>'+agHtml+'</section>';
   return '<section class="gm"><div class="gm-hero"><span>Ax AI recuperó en '+GM.mes()+'</span><b>'+DEB.mx(tot)+'</b><small>'+M.length+(M.length===1?' marca':' marcas')+' · '+GM.ags.length+' agencias · toca una marca para ver sus agencias</small></div>'+
     '<div class="gm-map">'+M.map(tile).join('')+'</div>'+agHtml+'</section>';
 };
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;var b=t.closest('#asHome [data-gmk]');if(!b)return;
-  GM.sel=GM.sel===b.dataset.gmk?null:b.dataset.gmk;AH.render();if(GM.sel)setTimeout(function(){var s=$('#asHome .gm-sub');if(s)s.scrollIntoView({behavior:'smooth',block:'nearest'})},30)});
+  GM.sel=GM.sel===b.dataset.gmk?null:b.dataset.gmk;AH.render();var vx=$('#viewExp');if(vx)vx.scrollTop=0;});
 AH.render=function(){
   if(AH.vista){var el0=$('#asHome');if(el0)el0.hidden=false;AH.lista(AH.vista);return}
   if(typeof crumb!=='undefined'&&S.view==='exp'){crumb.textContent='Inicio';crumbSep.hidden=true;crumb2.hidden=true}
@@ -7613,6 +7616,7 @@ AH.render=function(){
   var fila=function(x){var f=x.flujo||{},k=AH.tipo(x),v=f.vence?FL.vence(f.vence):'';
     return '<button type="button" class="ah-r" data-ahx="'+ea(x.id)+'"><span class="ah-rt ah-'+k+'">'+nomT[k]+'</span><b>'+esc(x.wo||x.folio||'')+'</b><span class="ah-rs">'+esc(f.siguiente||FL.nom(f.etapa,k==='srv'))+(ROL.on&&x.profiles&&x.profiles.name?' · '+esc(x.profiles.name):'')+'</span>'+(v?'<span class="ah-rv'+(f.estado==='bad'?' bad':f.estado==='warn'?' warn':'')+'">'+esc(v)+'</span>':'<span></span>')+'</button>'};
   var tot=mios.length,cer=mios.filter(AH.cerrado).length;
+  if(GM.on()&&GM.sel&&GM.cargado){el.innerHTML='<div class="ah-in">'+GM.html()+'</div>';return}
   el.innerHTML='<div class="ah-in"><div class="ah-head"><div><h1><span id="ahHola">'+AH.hola()+'</span>, <span id="ahNom">'+esc(AH.nombre()||'asesor')+'</span></h1>'+
       '<p><span id="ahFecha">'+esc(AH.fecha())+'</span> · '+(ROL.on?esc(ROL.tipo)+' · ':'')+tot+(tot===1?' orden':' órdenes')+', '+cer+(cer===1?' cerrada':' cerradas')+(ROL.on?' en lo que ves':'')+'</p></div>'+
       (ROL.on?'':'<div class="ah-acts"><button type="button" class="ah-b2" data-apnav>'+svg('present')+'Aprende Ax AI<i>'+AP.total().h+'/'+AP.total().n+'</i></button>'+
