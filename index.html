@@ -7738,7 +7738,7 @@ ORD.ver=function(v){
 ORD.n=function(){var el=$('#ordN');if(!el)return;var n=(SVC.msgs||[]).filter(function(m){return m.role==='user'&&!SVC.viejo(m)}).length;el.textContent=n?String(n):''};
 ORD.listo=function(x){
   var sb=$('#svcSend');if(sb){if(document.body.classList.contains('ws'))sb.innerHTML=svg('up');else if(typeof EYE!=='undefined')EYE.mount(sb)}
-  ORD.ver('exp');SVC.abrir(x).then(ORD.n);VIS.x=x;VIS.items=null;VIS.load(true);PAG.x=x;PAG.busy=false;PAG.dot();
+  ORD.ver('exp');SVC.abrir(x).then(ORD.n);VIS.x=x;VIS.items=null;VIS.load(true);PAG.x=x;PAG.busy=false;PAG.dot();if(x.tipo==='Servicio'&&!Number(x.hours)&&!x.demo)setTimeout(function(){if(PAG.x===x&&!PAG.busy)PAG.revisar(false)},1500);
 };
 /* ══ Evidencia visual: fotos, videos y audios del carro, sin clasificar ══
    Van a expedientes-docs/<id>/visual/. No entran al armado ni al PDF del expediente: son el respaldo visual. */
@@ -7833,7 +7833,7 @@ PAG.abrir=function(){
 PAG.revisar=async function(forzar){
   var x=PAG.x;if(!x||PAG.busy)return;PAG.busy=true;
   if(forzar||!x.pago)PAG.pintar(x.pago,true);
-  try{var r=await SB.ai({expediente_id:x.id,forzar:!!forzar},'pago');if(PAG.x!==x)return;x.pago=r&&r.pago||x.pago}
+  try{var r=await SB.ai({expediente_id:x.id,forzar:!!forzar},'pago');x.pago=r&&r.pago||x.pago;if(x.tipo==='Servicio'&&x.pago&&x.pago.factura&&x.pago.factura.horas)x.hours=x.pago.factura.horas;if(PAG.x!==x){PAG.busy=false;return}}
   catch(e){if(PAG.x===x&&forzar)toast('No pude revisar el pago ('+TR.errTxt(e)+')')}
   PAG.busy=false;if(PAG.x===x){PAG.dot();if(ORD.v==='pag')PAG.pintar(x.pago)}
 };
@@ -7856,7 +7856,7 @@ PAG.pintar=function(p,cargando){
       '<div class="pag-tot">'+PAG.m(F.total)+'<small>total facturado</small></div>'+
       PAG.fila('Fecha',esc(PAG.f(F.fecha)))+(F.receptor?PAG.fila('A nombre de',esc(F.receptor)):'')+
       PAG.fila('Subtotal',PAG.m(F.subtotal))+PAG.fila('IVA',PAG.m(F.iva))+
-      (F.mano_obra!==null&&F.mano_obra!==undefined?PAG.fila('Mano de obra',PAG.m(F.mano_obra)):'')+(F.piezas?PAG.fila('Piezas',PAG.m(F.piezas)):'')+
+      (F.horas?PAG.fila('Tiempo de mano de obra',esc(String(F.horas))+' h'):'')+(F.mano_obra!==null&&F.mano_obra!==undefined?PAG.fila('Mano de obra',PAG.m(F.mano_obra)):'')+(F.piezas?PAG.fila('Piezas',PAG.m(F.piezas)):'')+
       ((F.conceptos||[]).length?'<ul class="pag-cs">'+F.conceptos.map(function(c){return '<li><span>'+esc(c.d)+'</span><b>'+PAG.m(c.importe)+'</b></li>'}).join('')+'</ul>':'')
       :'<p class="pag-falta">'+(hayF?'Todavía no la leo.':'No hay factura en el expediente.')+'</p>')+
     '<footer>'+arch('factura')+'<button type="button" class="pag-up" data-pagup="factura">'+svg('plus','sm')+(hayF?'Cambiar factura':'Subir factura')+'</button></footer></article>';
