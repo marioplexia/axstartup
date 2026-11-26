@@ -1287,6 +1287,28 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 :root[data-theme="dark"] .gm-hero b,:root[data-theme="dark"] .gm-t.rec .gm-tm,:root[data-theme="dark"] .gm-a.rec .gm-am{color:#5fd896}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .gm-hero b,:root:not([data-theme="light"]) .gm-t.rec .gm-tm,:root:not([data-theme="light"]) .gm-a.rec .gm-am{color:#5fd896}}
 @media(max-width:700px){.gm-row{flex-wrap:wrap}.gm-t,.gm-a{flex:1 1 calc(50% - 1px)!important}.gm-hero b{font-size:30px}}
+/* ══ Agencia: gráfica del mes, recientes y chat con su agente ══ */
+#viewAgv .ad-in{display:flex;flex-direction:column;min-height:100%}
+#agvBody{flex:1;display:flex;flex-direction:column}
+.ag-w{display:flex;flex-direction:column;gap:12px;flex:1}
+.ag-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ag-recb{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:550;padding:7px 13px;border-radius:99px;border:1px solid var(--as-line,var(--line));background:var(--as-card,#fff);color:inherit;cursor:pointer;box-shadow:var(--as-sh,none)}
+.ag-recb .ic{width:15px;height:15px}.ag-recb i{font-style:normal;font-size:11px;padding:0 7px;border-radius:99px;background:var(--as-soft,#f1f1f2)}
+.ag-recb.on{background:var(--as-ink,#111);color:var(--as-card,#fff);border-color:transparent}.ag-recb.on i{background:rgba(255,255,255,.18)}
+.ag-card{background:var(--as-card,#fff);border:1px solid var(--as-line,var(--line));border-radius:16px;box-shadow:var(--as-sh,none);padding:16px 18px}
+.ag-ch{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.ag-ch b{display:block;font-size:15px;font-weight:650;text-transform:none}.ag-ch span{font-size:12.5px;color:var(--as-mut,var(--muted))}.ag-ch em{font-style:normal;color:#16834a;font-weight:600}
+.ag-ley{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--as-mut,var(--muted))}.ag-ley i{width:10px;height:10px;border-radius:3px;margin-left:8px}.ag-ley i.t{background:color-mix(in srgb,var(--as-ink,#111) 14%,transparent)}.ag-ley i.s{background:#22a55a}
+.ag-svg{width:100%;height:auto;display:block}
+.ag-gl{stroke:var(--as-line,#ebebec);stroke-width:1}.ag-gy,.ag-gx{font:500 10px var(--f-ui,system-ui);fill:var(--as-mut,#8b8b90)}.ag-gy{text-anchor:end}.ag-gx{text-anchor:middle}
+.ag-bt{fill:color-mix(in srgb,var(--as-ink,#111) 14%,transparent)}.ag-bs{fill:#22a55a}.ag-hoy{stroke:var(--as-ink,#111);stroke-width:1;stroke-dasharray:3 3;opacity:.35}
+.ag-rec{display:flex;flex-direction:column;padding:6px;max-height:320px;overflow:auto;animation:fadein .2s both}
+.ag-ri{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:0;background:transparent;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.ag-ri:hover{background:var(--as-soft,#f4f4f5)}.ag-ri i{flex:none;width:8px;height:8px;border-radius:50%;background:color-mix(in srgb,var(--as-ink,#111) 18%,transparent)}.ag-ri i.ok{background:#22a55a}
+.ag-ri b{font-size:13.5px;font-weight:600}.ag-ri span{flex:1;min-width:0;font-size:12.5px;color:var(--as-mut,var(--muted));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ag-ri em{font-style:normal;font-size:11.5px;color:var(--as-mut,var(--muted))}
+.ag-chat{flex:1;min-height:180px;overflow:visible;padding:6px 2px 0}
+.ag-dock{position:sticky;bottom:0;max-width:none;width:100%;margin:0;padding:8px 0 16px;background:linear-gradient(to bottom,transparent,var(--as-canvas,var(--bg)) 30%)}.ag-dock::before{display:none}
+.ag-svg{height:190px}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -2443,8 +2465,8 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
 .svc-dock::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:28px;background:linear-gradient(to top,var(--bg),transparent);pointer-events:none}
 .svc-dd{cursor:default}.svc-dd:hover{background:none;color:var(--muted)}.svc-dd .ic{width:15px;height:15px}
 .svc-ck .svc-sim,.svc-ck .svc-del{width:100%;margin-top:14px;justify-content:center}
-#svcTa{display:block;width:100%;min-height:46px;max-height:220px;resize:none;border:0;outline:0;background:transparent;padding:14px 20px 4px;font:inherit;font-size:15px;line-height:1.55;color:inherit}
-#svcTa::placeholder{color:var(--faint)}
+#svcTa,#agcTa{display:block;width:100%;min-height:46px;max-height:220px;resize:none;border:0;outline:0;background:transparent;padding:14px 20px 4px;font:inherit;font-size:15px;line-height:1.55;color:inherit}
+#svcTa::placeholder,#agcTa::placeholder{color:var(--faint)}
 .svc-drop{position:absolute;inset:0;display:none;place-items:center;background:color-mix(in srgb,var(--bg) 70%,transparent);border:1.5px dashed var(--fg);border-radius:16px;font-weight:500;pointer-events:none;z-index:4}.svc-chat.over .svc-drop{display:grid}
 .svc-g{grid-template-columns:minmax(0,1fr) 260px!important}
 .ap>.ad-in{max-width:none;padding:0;height:100%}
@@ -9724,35 +9746,82 @@ AGV.load=async function(){
   }catch(e){SB.fail(e);el.innerHTML='<div class="pv-empty">No se pudo cargar la agencia.</div>'}
 };
 AGV.mx=function(n){return DEB.mx(n)};
+/* completo y sano: cerrado, o con el expediente completo (sin faltantes), sin rechazo y sin plazo vencido */
+AGV.sano=function(x){if(x.flujo&&x.flujo.etapa==='cerrado')return true;var ar=x.armado;
+  return !!(ar&&Array.isArray(ar.faltantes)&&!ar.faltantes.length&&x.status!=='rechazada'&&!(x.flujo&&x.flujo.estado==='bad'))};
+AGV.recientes=false;
+AGV.grafica=function(E){
+  var now=new Date(),y=now.getFullYear(),mo=now.getMonth(),dias=new Date(y,mo+1,0).getDate(),hoy=now.getDate(),T=[],S=[],i;
+  for(i=0;i<dias;i++){T.push(0);S.push(0)}
+  E.forEach(function(x){var d=new Date(x.created_at);if(d.getFullYear()===y&&d.getMonth()===mo){T[d.getDate()-1]++;if(AGV.sano(x))S[d.getDate()-1]++}});
+  var tot=T.reduce(function(a,b){return a+b},0),san=S.reduce(function(a,b){return a+b},0),max=Math.max.apply(null,T.concat([1]));
+  var W=1100,H=190,pl=28,pb=22,pt=10,bw=(W-pl-8)/dias,o='';
+  for(var g=0;g<=max;g+=Math.max(1,Math.ceil(max/4))){var yy=pt+(H-pt-pb)*(1-g/max);o+='<line x1="'+pl+'" x2="'+(W-4)+'" y1="'+yy+'" y2="'+yy+'" class="ag-gl"/><text x="'+(pl-6)+'" y="'+(yy+3)+'" class="ag-gy">'+g+'</text>'}
+  for(i=0;i<dias;i++){var x0=pl+i*bw+bw*.18,w=bw*.64,ht=(H-pt-pb)*T[i]/max,hs=(H-pt-pb)*S[i]/max,base=H-pb;
+    o+='<g><title>'+(i+1)+' de '+now.toLocaleDateString('es-MX',{month:'long'})+': '+T[i]+(T[i]===1?' expediente':' expedientes')+', '+S[i]+' completos y sanos</title>'+
+      (T[i]?'<rect x="'+x0+'" y="'+(base-ht)+'" width="'+w+'" height="'+ht+'" rx="2" class="ag-bt"/>':'')+
+      (S[i]?'<rect x="'+x0+'" y="'+(base-hs)+'" width="'+w+'" height="'+Math.max(2,hs)+'" rx="2" class="ag-bs"/>':'')+
+      ((i+1)%5===0||i===0?'<text x="'+(x0+w/2)+'" y="'+(H-6)+'" class="ag-gx">'+(i+1)+'</text>':'')+
+      (i+1===hoy?'<line x1="'+(x0+w/2)+'" x2="'+(x0+w/2)+'" y1="'+pt+'" y2="'+base+'" class="ag-hoy"/>':'')+'</g>'}
+  return {html:'<svg viewBox="0 0 '+W+' '+H+'" class="ag-svg" role="img" aria-label="Expedientes del mes por día: '+tot+' en total, '+san+' completos y sanos">'+o+'</svg>',tot:tot,san:san};
+};
 AGV.render=function(){
   var el=$('#agvBody'),D=AGV.d;if(!el||!D)return;
-  var E=D.E,now=new Date(),m0=new Date(now.getFullYear(),now.getMonth(),1);
-  var mes=E.filter(function(x){return new Date(x.created_at)>=m0}).length,ac=E.filter(function(x){return x.status==='aceptada'}).length,re=E.filter(function(x){return x.status==='rechazada'}).length;
-  var monto=E.filter(function(x){return x.status==='aceptada'}).reduce(function(s,x){return s+Number(x.parts_total||0)+Number(x.labor||0)},0);
-  var xc=D.car.filter(function(c){return c.estado!=='pagada'}).reduce(function(s,c){return s+Number(c.monto||0)},0),cob=D.car.filter(function(c){return c.estado==='pagada'}).reduce(function(s,c){return s+Number(c.monto_pagado||c.monto||0)},0);
-  var dm=D.deb.reduce(function(s,d){return s+Number(d.monto||0)},0),drev=D.deb.reduce(function(s,d){return s+Number(d.monto_revertido||0)},0);
-  var venc=E.filter(function(x){return x.flujo&&x.flujo.estado==='bad'&&x.flujo.etapa!=='cerrado'}).length;
-  var K=function(l,v,s,c){return '<div class="kp'+(c?' '+c:'')+'"><span>'+l+'</span><b>'+v+'</b><small>'+s+'</small></div>'};
-  var cnt={};E.forEach(function(x){if(x.flujo)cnt[x.flujo.etapa]=(cnt[x.flujo.etapa]||0)+1});
-  var B=(BX.rows||[]).filter(function(i){return i.x.profiles&&i.x.profiles.agency_id===AGV.id});
-  var as={};E.forEach(function(x){var n=(x.profiles&&x.profiles.name)||'Asesor',o=as[n]||(as[n]={n:n,t:0,a:0,r:0,v:0,p:0});o.t++;if(x.status==='aceptada')o.a++;if(x.status==='rechazada')o.r++;if(x.flujo&&x.flujo.estado==='bad'&&x.flujo.etapa!=='cerrado')o.v++});
-  B.forEach(function(i){var n=(i.x.profiles&&i.x.profiles.name)||'Asesor';if(as[n])as[n].p++});
-  var AS=Object.keys(as).map(function(k){return as[k]}).sort(function(a,b){return b.t-a.t});
+  var E=D.E,G=AGV.grafica(E),mes=new Date().toLocaleDateString('es-MX',{month:'long'}),pct=G.tot?Math.round(G.san*100/G.tot):0;
   var ST={borrador:'Esperando planta',aceptada:'Aceptada',rechazada:'Rechazada'};
-  el.innerHTML='<button type="button" class="agv-back" data-agback>← '+(typeof ROL!=='undefined'&&ROL.on?'Inicio':DN.is()?'Tablero del dueño':'Tablero de grupo')+'</button>'+
-    '<div class="ad-kpi">'+K('Expedientes',E.length,mes+' este mes')+K('Aceptación',ac+re?Math.round(ac*100/(ac+re))+'%':'—',ac+' aceptadas · '+re+' rechazadas',ac+re&&ac/(ac+re)<.8?'bad':'')+
-      K('Monto aceptado',AGV.mx(monto),'mano de obra + piezas')+K('Por cobrar a planta',AGV.mx(xc),AGV.mx(cob)+' ya cobrado')+
-      K('Débitos de GM',AGV.mx(dm),D.deb.length+(D.deb.length===1?' débito':' débitos')+(drev?' · '+AGV.mx(drev)+' revertido':''),dm?'bad':'')+K('Plazos vencidos',venc,venc?'casos con un plazo del manual vencido':'todo a tiempo',venc?'bad':'ok')+'</div>'+
-    '<section class="agv-s"><h3>Ciclo de sus garantías</h3><div class="hm-fl-p">'+FL.E.map(function(e){return '<div class="'+(cnt[e[0]]?'on':'')+'"><b>'+(cnt[e[0]]||0)+'</b><span>'+esc(e[1])+'</span></div>'}).join('')+'</div></section>'+
-    '<section class="agv-s"><div class="agv-h"><h3>Su bandeja · '+B.length+(B.length===1?' decisión pendiente':' decisiones pendientes')+'</h3>'+(B.length?'<button class="bt" type="button" data-agbx>Ver en la bandeja</button>':'')+'</div>'+
-      (B.length?'<div class="bx-list">'+B.slice(0,4).map(BX.card).join('')+'</div>'+(B.length>4?'<p class="xz-mut">y '+(B.length-4)+' más en la bandeja.</p>':''):'<p class="xz-mut">Nada que decidir: sus casos esperan a planta o ya avanzaron.</p>')+'</section>'+
-    '<div class="agv-g"><section class="agv-s"><h3>Asesores</h3>'+(AS.length?'<div class="xf-tw"><table class="pv-tb"><thead><tr><th>Asesor</th><th class="r">Expedientes</th><th class="r">Aceptación</th><th class="r">Por decidir</th><th class="r">Vencidos</th></tr></thead><tbody>'+
-      AS.map(function(o){return '<tr><td>'+esc(o.n)+'</td><td class="r">'+o.t+'</td><td class="r">'+(o.a+o.r?Math.round(o.a*100/(o.a+o.r))+'%':'—')+'</td><td class="r">'+o.p+'</td><td class="r'+(o.v?' bad':'')+'">'+o.v+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="xz-mut">Aún no hay asesores con expedientes.</p>')+'</section>'+
-    '<section class="agv-s"><h3>Débitos y alertas</h3>'+(D.deb.length?'<ul class="agv-l">'+D.deb.slice(0,6).map(function(d){return '<li><b class="bad">'+AGV.mx(d.monto)+'</b> '+esc(d.motivo||'Débito')+' <small>'+esc((d.expedientes&&(d.expedientes.wo||d.expedientes.folio))||'')+(d.fecha?' · '+d.fecha:'')+(d.regla_id?' · regla '+esc(d.regla_id):'')+'</small></li>'}).join('')+'</ul>':'<p class="xz-mut">Sin débitos de GM registrados.</p>')+
-      (D.al.length?'<div class="al-list">'+D.al.slice(0,3).map(function(x){return AL.card(x,true)}).join('')+'</div>':'')+'</section></div>'+
-    '<section class="agv-s"><h3>Expedientes recientes</h3>'+(E.length?'<div class="xf-tw"><table class="pv-tb agv-t"><thead><tr><th>Orden</th><th>Asesor</th><th>Sistema</th><th>Etapa</th><th>Planta</th><th class="r">Monto</th></tr></thead><tbody>'+
-      E.slice(0,25).map(function(x){var f=x.flujo;return '<tr data-agexp="'+ea(x.id)+'" tabindex="0"><td><b>'+esc(x.wo||x.folio)+'</b></td><td>'+esc((x.profiles&&x.profiles.name)||'')+'</td><td>'+esc(x.sys||'')+'</td><td>'+(f?'<span class="agv-e '+(f.estado||'ok')+'">'+esc(FL.nom(f.etapa))+'</span>':'—')+'</td><td>'+esc(x.tipo&&x.tipo!=='PREA'&&x.status==='borrador'?x.tipo+' · sin PREA':ST[x.status]||x.status||'')+'</td><td class="r">'+AGV.mx(Number(x.parts_total||0)+Number(x.labor||0))+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="xz-mut">Esta agencia todavía no tiene expedientes en Ax AI.</p>')+'</section>';
+  var rec=E.slice(0,25).map(function(x){var f=x.flujo,ok=AGV.sano(x);
+    return '<button type="button" class="ag-ri" data-agexp="'+ea(x.id)+'"><i class="'+(ok?'ok':'')+'"></i><b>'+esc(x.wo||x.folio||'')+'</b><span>'+esc([AH.NOM[AH.tipo(x)][1],(x.profiles&&x.profiles.name)||'',f?FL.nom(f.etapa,AH.tipo(x)==='srv'):(ST[x.status]||'')].filter(Boolean).join(' · '))+'</span><em>'+esc(AL.ago(x.created_at))+'</em></button>'}).join('');
+  var hay=!!(AGC.m[AGV.id]||[]).length;
+  el.innerHTML='<div class="ag-w">'+
+    '<div class="ag-top"><button type="button" class="xd-back" data-agback>← '+(typeof ROL!=='undefined'&&ROL.on?'Inicio':DN.is()?'Tablero del dueño':'Tablero de grupo')+'</button>'+
+      '<button type="button" class="ag-recb'+(AGV.recientes?' on':'')+'" data-agrec aria-expanded="'+AGV.recientes+'">'+svg('file','sm')+'Expedientes recientes<i>'+E.length+'</i></button></div>'+
+    '<section class="ag-card"><div class="ag-ch"><div><b>Expedientes de '+esc(mes)+'</b><span>'+G.tot+(G.tot===1?' expediente':' expedientes')+' · <em>'+G.san+' completos y sanos</em>'+(G.tot?' ('+pct+'%)':'')+'</span></div>'+
+      '<span class="ag-ley"><i class="t"></i>Expedientes<i class="s"></i>Completos y sanos</span></div>'+G.html+'</section>'+
+    (AGV.recientes?'<section class="ag-card ag-rec">'+(E.length?rec:'<p class="xz-mut">Todavía no hay expedientes en esta agencia.</p>')+'</section>':'')+
+    '<div class="ag-chat svc-th" id="agcTh"><div class="svc-thi" id="agcThi"></div></div>'+
+    '<form class="svc-dock ord-dock ag-dock" id="agcForm"><div class="composer svc-comp"><div class="card"><textarea id="agcTa" rows="2" placeholder="Pregúntale al agente de '+ea((AGV.ag()||{}).name||'la agencia')+'…" aria-label="Mensaje para el agente de la agencia"></textarea>'+
+      '<div class="c-foot"><span class="sp"></span><button class="send" id="agcSend" type="submit" aria-label="Enviar" disabled>'+svg('up')+'</button></div></div></div></form></div>';
+  AGC.pintar();
 };
+/* ══ El agente de la agencia: chat del dueño/director con lo de esa agencia ══ */
+var AGC={m:{},busy:false};
+AGC.ctx=function(){
+  var a=AGV.ag()||{},D=AGV.d||{E:[],deb:[]},E=D.E,now=new Date(),m0=new Date(now.getFullYear(),now.getMonth(),1);
+  var mes=E.filter(function(x){return new Date(x.created_at)>=m0}),ab=E.filter(function(x){return !(x.flujo&&x.flujo.etapa==='cerrado')});
+  var as={};E.forEach(function(x){var n=(x.profiles&&x.profiles.name)||'Asesor';as[n]=(as[n]||0)+1});
+  var L=ab.slice(0,25).map(function(x){var f=x.flujo||{},F=(x.armado&&x.armado.faltantes)||[];return (x.wo||x.folio)+' ('+AH.NOM[AH.tipo(x)][1]+', '+((x.profiles&&x.profiles.name)||'')+'): '+FL.nom(f.etapa,AH.tipo(x)==='srv')+(f.siguiente?' — sigue: '+f.siguiente:'')+(f.vence?' — vence '+f.vence:'')+(f.estado==='bad'?' — VENCIDO':'')+(F.length?' — le falta: '+F.slice(0,3).join('; '):'')+(x.status==='rechazada'?' — PREA rechazada':'')});
+  return '[Contexto: eres el AGENTE DE LA AGENCIA '+(a.name||'')+' ('+[a.marca_grupo||a.brand,a.city].filter(Boolean).join(', ')+'). Te escribe '+(SB.user&&SB.user.dueno?'el dueño del grupo':'la dirección')+'. '+
+    'Este mes: '+mes.length+' expedientes, '+mes.filter(AGV.sano).length+' completos y sanos. Abiertos ('+ab.length+'): '+(L.join(' | ')||'ninguno')+'. '+
+    'Asesores: '+Object.keys(as).map(function(k){return k+' '+as[k]}).join(', ')+'. Débitos de GM registrados: '+(D.deb||[]).length+'. '+
+    'Responde breve y concreto sobre ESTA agencia con estos datos (no inventes); cifras exactas, sin redondear.]\n';
+};
+AGC.pintar=function(){
+  var b=$('#agcThi');if(!b)return;var M=AGC.m[AGV.id]||[];
+  if(!M.length){b.innerHTML='<div class="msg-ai"><div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body">'+md('Soy el agente de **'+((AGV.ag()||{}).name||'esta agencia')+'**. Pregúntame cómo van sus expedientes, qué está atorado, qué le falta a una orden o cómo va cada asesor.',false)+'</div></div></div>';return}
+  b.innerHTML='';M.forEach(function(m){var d=document.createElement('div');
+    if(m.role==='user'){d.className='msg-user';d.innerHTML='<div class="bubble">'+esc(m.content)+'</div>'}
+    else{d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body">'+md(m.content,false)+'</div></div>'}
+    b.appendChild(d)});
+};
+AGC.on=function(){var t=$('#agcTa'),bt=$('#agcSend');if(!t||!bt)return;var on=!!t.value.trim()&&!AGC.busy;bt.classList.toggle('on',on);bt.disabled=!on};
+AGC.enviar=async function(){
+  var t=$('#agcTa'),id=AGV.id;if(!t||AGC.busy)return;var text=t.value.trim();if(!text)return;t.value='';AGC.busy=true;AGC.on();
+  var M=AGC.m[id]||(AGC.m[id]=[]);M.push({role:'user',content:text});AGC.pintar();
+  var b=$('#agcThi'),w=document.createElement('div');w.className='msg-ai';w.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div></div>';b.appendChild(w);
+  w.scrollIntoView({block:'end',behavior:'smooth'});
+  var col=$('.ai-col',w),act=ACT.nuevo(col,$('.ai-body',w)),resp='',refs=null;
+  try{var body={rol_agente:'garantias',messages:M.slice(-12,-1).concat([{role:'user',content:AGC.ctx()+text}]),ahora:MI.nowInfo()};
+    var r;try{r=await SB.aiStream(body,'manual',function(ev){ACT.ev(act,ev)})}catch(e1){if(act.lista.length)throw e1;r=await SB.ai(body,'manual')}
+    resp=(r&&r.text)||'No encontré esa respuesta con lo que sé de esta agencia.';refs=r&&r.refs||null;
+  }catch(e){resp='No pude contestar ahorita ('+TR.errTxt(e)+'). Inténtalo otra vez en un momento.'}
+  ACT.cerrar(act);M.push({role:'assistant',content:resp});
+  if(AGV.id===id){$('.ai-body',w).innerHTML=md(resp,false);if(refs&&refs.length)REFS.poner(w,refs);w.scrollIntoView({block:'end',behavior:'smooth'})}
+  AGC.busy=false;AGC.on();
+};
+document.addEventListener('submit',function(e){if(e.target&&e.target.id==='agcForm'){e.preventDefault();AGC.enviar()}});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='agcTa')AGC.on()});
+document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='agcTa'&&e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();AGC.enviar()}});
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;if(t.closest('#viewAgv [data-agrec]')){AGV.recientes=!AGV.recientes;AGV.render()}});
 AGV.openExp=function(id){
   var x=AGV.d&&AGV.d.E.filter(function(z){return z.id===id})[0];if(!x)return;
   if(!EX.rows.some(function(r){return r.id===x.id}))EX.rows.unshift(x);
