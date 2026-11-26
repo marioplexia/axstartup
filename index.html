@@ -1251,7 +1251,7 @@ body.ws-rol .sb-ib{color:var(--sb-muted)}body.ws-rol .sb-ib:hover{background:var
 body.ws-rol .sb-head .brand{display:none}
 body.ws-rol .sb-head{justify-content:flex-end;min-height:44px}
 body.ws-rol .sb-ib,body.ws-rol .sb-ib.dark,body.ws-rol .sek-skin{background:transparent!important;color:var(--sb-muted)!important;box-shadow:none!important}
-body.ws-rol .sb .nav[data-view="inicio"],body.ws-rol .sb .nav[data-view="exp"]:not(#rolHome){display:none!important}
+body.ws-rol .sb .nav[data-view="dueno"],body.ws-rol .sb .nav[data-view="inicio"],body.ws-rol .sb .nav[data-view="exp"]:not(#rolHome){display:none!important}
 .rol-ws{margin:4px 14px 10px}
 body.ws-rol .sb-foot{border-top:1px solid var(--sb-line)}
 body.ws-rol .avatar{background:var(--as-ink,#111);color:var(--as-card,#fff)}
@@ -9700,7 +9700,7 @@ document.addEventListener('click',function(e){
   var a=e.target.closest&&e.target.closest('[data-agv]');if(a){AGV.id=Number(a.dataset.agv);showView('agv');return}
   var x=e.target.closest&&e.target.closest('#viewAgv [data-agexp]');if(x){AGV.openExp(x.dataset.agexp);return}
   if(e.target.closest&&e.target.closest('[data-agbx]')){var ag=AGV.ag();BX.ag=ag?ag.name:'';showView('bx');return}
-  if(e.target.closest&&e.target.closest('[data-agback]')){showView(DN.is()?'dueno':'grp')}
+  if(e.target.closest&&e.target.closest('[data-agback]')){showView(typeof ROL!=='undefined'&&ROL.on?'exp':DN.is()?'dueno':'grp')}
 });
 document.addEventListener('keydown',function(e){var r=e.target.closest&&e.target.closest('#viewAgv [data-agexp]');if(r&&e.key==='Enter')AGV.openExp(r.dataset.agexp)});
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='sbAgQ'){AGV.q=e.target.value;var p=e.target.selectionStart;AGV.sideRender();var i=$('#sbAgQ');if(i){i.focus();try{i.setSelectionRange(p,p)}catch(_){}}}});
@@ -9739,7 +9739,7 @@ AGV.render=function(){
   B.forEach(function(i){var n=(i.x.profiles&&i.x.profiles.name)||'Asesor';if(as[n])as[n].p++});
   var AS=Object.keys(as).map(function(k){return as[k]}).sort(function(a,b){return b.t-a.t});
   var ST={borrador:'Esperando planta',aceptada:'Aceptada',rechazada:'Rechazada'};
-  el.innerHTML='<button type="button" class="agv-back" data-agback>← '+(DN.is()?'Tablero del dueño':'Tablero de grupo')+'</button>'+
+  el.innerHTML='<button type="button" class="agv-back" data-agback>← '+(typeof ROL!=='undefined'&&ROL.on?'Inicio':DN.is()?'Tablero del dueño':'Tablero de grupo')+'</button>'+
     '<div class="ad-kpi">'+K('Expedientes',E.length,mes+' este mes')+K('Aceptación',ac+re?Math.round(ac*100/(ac+re))+'%':'—',ac+' aceptadas · '+re+' rechazadas',ac+re&&ac/(ac+re)<.8?'bad':'')+
       K('Monto aceptado',AGV.mx(monto),'mano de obra + piezas')+K('Por cobrar a planta',AGV.mx(xc),AGV.mx(cob)+' ya cobrado')+
       K('Débitos de GM',AGV.mx(dm),D.deb.length+(D.deb.length===1?' débito':' débitos')+(drev?' · '+AGV.mx(drev)+' revertido':''),dm?'bad':'')+K('Plazos vencidos',venc,venc?'casos con un plazo del manual vencido':'todo a tiempo',venc?'bad':'ok')+'</div>'+
