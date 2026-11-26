@@ -1288,6 +1288,9 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .gm-hero b,:root:not([data-theme="light"]) .gm-t.rec .gm-tm,:root:not([data-theme="light"]) .gm-a.rec .gm-am{color:#5fd896}}
 @media(max-width:700px){.gm-row{flex-wrap:wrap}.gm-t,.gm-a{flex:1 1 calc(50% - 1px)!important}.gm-hero b{font-size:30px}}
 /* ══ Agencia: gráfica del mes, recientes y chat con su agente ══ */
+.ag-money{display:flex;flex-direction:column;gap:2px}.ag-money span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut,#8b8b90)}
+.ag-money b{font-size:34px;font-weight:650;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--as-mut,#a1a1a6)}.ag-money b.ok{color:#16834a}.ag-money small{font-size:12.5px;color:var(--as-mut,#8b8b90)}
+:root[data-theme="dark"] .ag-money b.ok{color:#5fd896}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ag-money b.ok{color:#5fd896}}
 #viewAgv .ad-in{display:flex;flex-direction:column;min-height:100%}
 #agvBody{flex:1;display:flex;flex-direction:column}
 .ag-w{display:flex;flex-direction:column;gap:12px;flex:1}
@@ -9737,12 +9740,14 @@ AGV.load=async function(){
       SB.c.from('expedientes').select('*,profiles!inner(name,agency_id)').eq('profiles.agency_id',id).order('created_at',{ascending:false}).limit(600),
       SB.c.from('debitos').select('id,fecha,monto,motivo,estado,regla_id,monto_revertido,expediente_id,expedientes(wo,folio)').eq('agency_id',id).order('created_at',{ascending:false}).limit(60),
       SB.c.from('alertas').select('*').or('origen_agency_id.eq.'+id+',agency_id.eq.'+id).order('created_at',{ascending:false}).limit(8),
-      BX.rows.length?null:BX.load()]);
+      BX.rows.length?null:BX.load(),
+      SB.c.rpc('dinero_recuperado',{p_desde:(function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01'})()})]);
     if(r[0].error)throw r[0].error;
     var E=r[0].data||[],ids=E.map(function(x){return x.id}),car=[];
     if(ids.length){var c=await SB.c.from('cartera').select('expediente_id,estado,monto,monto_pagado,facturada_at,pagada_at').in('expediente_id',ids.slice(0,500));car=c.data||[]}
     if(AGV.id!==id)return;
-    AGV.d={E:E,deb:(r[1]&&r[1].data)||[],al:(r[2]&&r[2].data)||[],car:car};AGV.render();
+    var dr=((r[4]&&r[4].data)||[]).filter(function(z){return z.agency_id===id})[0]||{};
+    AGV.d={E:E,deb:(r[1]&&r[1].data)||[],al:(r[2]&&r[2].data)||[],car:car,rec:{prot:Number(dr.monto_protegido||0),rev:Number(dr.monto_revertido||0),np:Number(dr.protegidos||0),nr:Number(dr.revertidos||0)}};AGV.render();
   }catch(e){SB.fail(e);el.innerHTML='<div class="pv-empty">No se pudo cargar la agencia.</div>'}
 };
 AGV.mx=function(n){return DEB.mx(n)};
@@ -9775,6 +9780,9 @@ AGV.render=function(){
   el.innerHTML='<div class="ag-w">'+
     '<div class="ag-top"><button type="button" class="xd-back" data-agback>← '+(typeof ROL!=='undefined'&&ROL.on?'Inicio':DN.is()?'Tablero del dueño':'Tablero de grupo')+'</button>'+
       '<button type="button" class="ag-recb'+(AGV.recientes?' on':'')+'" data-agrec aria-expanded="'+AGV.recientes+'">'+svg('file','sm')+'Expedientes recientes<i>'+E.length+'</i></button></div>'+
+    (function(){var R=D.rec||{prot:0,rev:0,np:0,nr:0},t=R.prot+R.rev;
+      return '<section class="ag-card ag-money"><span>Dinero recuperado en '+esc(mes)+'</span><b class="'+(t>0?'ok':'')+'">'+EX.money(t)+'</b><small>'+
+        (t>0?[R.prot?EX.money(R.prot)+' protegido antes de cobrar'+(R.np?' ('+R.np+(R.np===1?' expediente':' expedientes')+')':''):'',R.rev?EX.money(R.rev)+' de débitos revertidos'+(R.nr?' ('+R.nr+')':''):''].filter(Boolean).join(' · '):'Todavía no hay dinero recuperado este mes en esta agencia')+'</small></section>'})()+
     '<section class="ag-card"><div class="ag-ch"><div><b>Expedientes de '+esc(mes)+'</b><span>'+G.tot+(G.tot===1?' expediente':' expedientes')+' · <em>'+G.san+' completos y sanos</em>'+(G.tot?' ('+pct+'%)':'')+'</span></div>'+
       '<span class="ag-ley"><i class="t"></i>Expedientes<i class="s"></i>Completos y sanos</span></div>'+G.html+'</section>'+
     (AGV.recientes?'<section class="ag-card ag-rec">'+(E.length?rec:'<p class="xz-mut">Todavía no hay expedientes en esta agencia.</p>')+'</section>':'')+
