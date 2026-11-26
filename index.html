@@ -7568,7 +7568,7 @@ AH.lista=function(k){
   crumb.textContent='Inicio';crumbSep.hidden=false;crumb2.hidden=false;crumb2.textContent=N[0];
 };
 /* ══ Inicio del grupo (dueño y director): un mapa de sus marcas y agencias con lo que Ax AI recuperó este mes ══
-   Recuperado = dinero protegido antes de cobrar + débitos revertidos (función dinero_recuperado, desde el día 1 del mes). */
+   Recuperado = lo que ya se cobró en el mes (función cobrado_mes: cartera pagada, transacción de planta o pago del servicio). */
 var GM={ags:[],rec:{},abiertas:{},sel:null,t:0,cargado:false};
 GM.on=function(){return !!(ROL.on&&SB.user&&(SB.user.dueno||SB.user.director)&&SB.grupoId)};
 GM.mes=function(){return new Date().toLocaleDateString('es-MX',{month:'long'})};
@@ -7577,10 +7577,14 @@ GM.load=async function(){
   try{var r=await Promise.all([
       SB.c.from('agencies').select('id,name,brand,marca_grupo,city,tipo').eq('grupo_id',SB.grupoId).order('name'),
       SB.c.rpc('dinero_recuperado',{p_desde:first}),
-      SB.c.from('expedientes').select('id,flujo,profiles(agency_id)').limit(2000)]);
+      SB.c.from('expedientes').select('id,flujo,profiles(agency_id)').limit(2000),
+      SB.c.rpc('cobrado_mes',{p_desde:first})]);
     if(my!==GM.t)return;
     GM.ags=(r[0].data||[]).filter(function(a){return !a.tipo||a.tipo==='agencia'});
-    GM.rec={};(r[1].data||[]).forEach(function(d){GM.rec[d.agency_id]={m:Number(d.monto_protegido||0)+Number(d.monto_revertido||0),deb:Number(d.monto_debitado||0),n:Number(d.expedientes||0)}});
+    /* recuperado = lo que ya se cobró en el mes (cobrado_mes); los débitos salen de dinero_recuperado */
+    GM.rec={};var R=function(id){return GM.rec[id]||(GM.rec[id]={m:0,deb:0,n:0})};
+    (r[3].data||[]).forEach(function(d){var o=R(d.agency_id);o.m=Number(d.cobrado||0);o.n=Number(d.ordenes||0)});
+    (r[1].data||[]).forEach(function(d){R(d.agency_id).deb=Number(d.monto_debitado||0)});
     GM.abiertas={};(r[2].data||[]).forEach(function(x){var id=x.profiles&&x.profiles.agency_id;if(id&&!(x.flujo&&x.flujo.etapa==='cerrado'))GM.abiertas[id]=(GM.abiertas[id]||0)+1});
   }catch(e){console.warn('[mapa del grupo]',e)}
   GM.cargado=true;if(S.view==='exp'&&!XD.cur&&!AH.vista)AH.render();
@@ -7604,18 +7608,18 @@ GM.html=function(){
   var tile=function(o,w){var n=o.ags.length;
     return '<button type="button" class="gm-t'+(o.k===GM.sel?' on':'')+(o.m>0?' rec':'')+'" data-gmk="'+ea(o.k)+'" style="flex-grow:'+w+'" aria-pressed="'+(o.k===GM.sel)+'">'+
       '<span class="gm-tn">'+esc(o.k)+'</span><span class="gm-ta">'+n+(n===1?' agencia':' agencias')+(o.ab?' · '+o.ab+(o.ab===1?' orden abierta':' órdenes abiertas'):'')+'</span>'+
-      '<span class="gm-tm">'+(o.m>0?DEB.mx(o.m):'$0')+'</span><span class="gm-tl">'+(o.m>0?'recuperado en '+GM.mes():'sin recuperado este mes')+'</span>'+
+      '<span class="gm-tm">'+(o.m>0?EX.money(o.m):'$0')+'</span><span class="gm-tl">'+(o.m>0?'recuperado en '+GM.mes():'sin recuperado este mes')+'</span>'+
       '<span class="gm-dots" aria-hidden="true">'+o.ags.slice(0,24).map(function(a){var r=GM.rec[a.id]||{};return '<i class="'+(r.m>0?'ok':'')+'"></i>'}).join('')+'</span></button>'};
   var agHtml='';
   if(sel){var maxA=Math.max.apply(null,sel.ags.map(function(a){return (GM.rec[a.id]||{}).m||0}).concat([0]));
     agHtml='<div class="gm-sub"><div class="gm-sh"><b>Agencias de '+esc(sel.k)+'</b><span>toca una para abrirla</span></div>'+
       GM.mosaico(sel.ags.slice().sort(function(a,b){return ((GM.rec[b.id]||{}).m||0)-((GM.rec[a.id]||{}).m||0)||a.name.localeCompare(b.name)}),function(a){var m=(GM.rec[a.id]||{}).m||0;return 1+(maxA?m/maxA:0)},function(a,w){var r=GM.rec[a.id]||{},m=r.m||0,ab=GM.abiertas[a.id]||0;
         return '<button type="button" class="gm-a'+(m>0?' rec':'')+'" data-agv="'+a.id+'" style="flex-grow:'+w+'"><span class="gm-an">'+esc(a.name)+'</span><span class="gm-ac">'+esc(a.city||'')+'</span>'+
-          '<span class="gm-am">'+(m>0?DEB.mx(m):'$0')+'<small>'+(m>0?'recuperado':'sin recuperado')+'</small></span>'+
+          '<span class="gm-am">'+(m>0?EX.money(m):'$0')+'<small>'+(m>0?'cobrado':'sin cobrar')+'</small></span>'+
           '<span class="gm-ax">'+(ab?'<i>'+ab+(ab===1?' abierta':' abiertas')+'</i>':'<i>al día</i>')+(r.deb?'<i class="mal">'+DEB.mx(r.deb)+' en débitos</i>':'')+'</span></button>'},'gm-ag',4)+'</div>'}
   if(sel)return '<section class="gm gm-solo"><div class="gm-bar"><button type="button" class="xd-back" data-gmk="'+ea(sel.k)+'">← Todas las marcas</button></div>'+
-    '<div class="gm-hero"><span>'+esc(sel.k)+' · Ax AI recuperó en '+GM.mes()+'</span><b>'+DEB.mx(sel.m)+'</b><small>'+sel.ags.length+(sel.ags.length===1?' agencia':' agencias')+(sel.ab?' · '+sel.ab+(sel.ab===1?' orden abierta':' órdenes abiertas'):'')+(sel.deb?' · '+DEB.mx(sel.deb)+' en débitos':'')+'</small></div>'+agHtml+'</section>';
-  return '<section class="gm"><div class="gm-hero"><span>Ax AI recuperó en '+GM.mes()+'</span><b>'+DEB.mx(tot)+'</b><small>'+M.length+(M.length===1?' marca':' marcas')+' · '+GM.ags.length+' agencias · toca una marca para ver sus agencias</small></div>'+
+    '<div class="gm-hero"><span>'+esc(sel.k)+' · Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(sel.m)+'</b><small>'+sel.ags.length+(sel.ags.length===1?' agencia':' agencias')+(sel.ab?' · '+sel.ab+(sel.ab===1?' orden abierta':' órdenes abiertas'):'')+(sel.deb?' · '+DEB.mx(sel.deb)+' en débitos':'')+'</small></div>'+agHtml+'</section>';
+  return '<section class="gm"><div class="gm-hero"><span>Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(tot)+'</b><small>'+M.length+(M.length===1?' marca':' marcas')+' · '+GM.ags.length+' agencias · toca una marca para ver sus agencias</small></div>'+
     GM.mosaico(M,function(o){return 1+Math.min(3,Math.sqrt(o.ags.length))},tile,'gm-map',4)+agHtml+'</section>';
 };
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;var b=t.closest('#asHome [data-gmk]');if(!b)return;
@@ -9741,13 +9745,13 @@ AGV.load=async function(){
       SB.c.from('debitos').select('id,fecha,monto,motivo,estado,regla_id,monto_revertido,expediente_id,expedientes(wo,folio)').eq('agency_id',id).order('created_at',{ascending:false}).limit(60),
       SB.c.from('alertas').select('*').or('origen_agency_id.eq.'+id+',agency_id.eq.'+id).order('created_at',{ascending:false}).limit(8),
       BX.rows.length?null:BX.load(),
-      SB.c.rpc('dinero_recuperado',{p_desde:(function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01'})()})]);
+      SB.c.rpc('cobrado_mes',{p_desde:(function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01'})()})]);
     if(r[0].error)throw r[0].error;
     var E=r[0].data||[],ids=E.map(function(x){return x.id}),car=[];
     if(ids.length){var c=await SB.c.from('cartera').select('expediente_id,estado,monto,monto_pagado,facturada_at,pagada_at').in('expediente_id',ids.slice(0,500));car=c.data||[]}
     if(AGV.id!==id)return;
     var dr=((r[4]&&r[4].data)||[]).filter(function(z){return z.agency_id===id})[0]||{};
-    AGV.d={E:E,deb:(r[1]&&r[1].data)||[],al:(r[2]&&r[2].data)||[],car:car,rec:{prot:Number(dr.monto_protegido||0),rev:Number(dr.monto_revertido||0),np:Number(dr.protegidos||0),nr:Number(dr.revertidos||0)}};AGV.render();
+    AGV.d={E:E,deb:(r[1]&&r[1].data)||[],al:(r[2]&&r[2].data)||[],car:car,rec:{t:Number(dr.cobrado||0),n:Number(dr.ordenes||0),prea:Number(dr.prea||0),cam:Number(dr.campana||0),srv:Number(dr.servicio||0)}};AGV.render();
   }catch(e){SB.fail(e);el.innerHTML='<div class="pv-empty">No se pudo cargar la agencia.</div>'}
 };
 AGV.mx=function(n){return DEB.mx(n)};
@@ -9780,9 +9784,9 @@ AGV.render=function(){
   el.innerHTML='<div class="ag-w">'+
     '<div class="ag-top"><button type="button" class="xd-back" data-agback>← '+(typeof ROL!=='undefined'&&ROL.on?'Inicio':DN.is()?'Tablero del dueño':'Tablero de grupo')+'</button>'+
       '<button type="button" class="ag-recb'+(AGV.recientes?' on':'')+'" data-agrec aria-expanded="'+AGV.recientes+'">'+svg('file','sm')+'Expedientes recientes<i>'+E.length+'</i></button></div>'+
-    (function(){var R=D.rec||{prot:0,rev:0,np:0,nr:0},t=R.prot+R.rev;
+    (function(){var R=D.rec||{t:0,n:0},t=R.t;
       return '<section class="ag-card ag-money"><span>Dinero recuperado en '+esc(mes)+'</span><b class="'+(t>0?'ok':'')+'">'+EX.money(t)+'</b><small>'+
-        (t>0?[R.prot?EX.money(R.prot)+' protegido antes de cobrar'+(R.np?' ('+R.np+(R.np===1?' expediente':' expedientes')+')':''):'',R.rev?EX.money(R.rev)+' de débitos revertidos'+(R.nr?' ('+R.nr+')':''):''].filter(Boolean).join(' · '):'Todavía no hay dinero recuperado este mes en esta agencia')+'</small></section>'})()+
+        (t>0?'Ya cobrado · '+R.n+(R.n===1?' orden':' órdenes')+' · '+[R.srv?'servicios '+EX.money(R.srv):'',R.cam?'campañas '+EX.money(R.cam):'',R.prea?'PREAs '+EX.money(R.prea):''].filter(Boolean).join(' · '):'Todavía no se ha cobrado nada este mes en esta agencia')+'</small></section>'})()+
     '<section class="ag-card"><div class="ag-ch"><div><b>Expedientes de '+esc(mes)+'</b><span>'+G.tot+(G.tot===1?' expediente':' expedientes')+' · <em>'+G.san+' completos y sanos</em>'+(G.tot?' ('+pct+'%)':'')+'</span></div>'+
       '<span class="ag-ley"><i class="t"></i>Expedientes<i class="s"></i>Completos y sanos</span></div>'+G.html+'</section>'+
     (AGV.recientes?'<section class="ag-card ag-rec">'+(E.length?rec:'<p class="xz-mut">Todavía no hay expedientes en esta agencia.</p>')+'</section>':'')+
@@ -9799,7 +9803,7 @@ AGC.ctx=function(){
   var as={};E.forEach(function(x){var n=(x.profiles&&x.profiles.name)||'Asesor';as[n]=(as[n]||0)+1});
   var L=ab.slice(0,25).map(function(x){var f=x.flujo||{},F=(x.armado&&x.armado.faltantes)||[];return (x.wo||x.folio)+' ('+AH.NOM[AH.tipo(x)][1]+', '+((x.profiles&&x.profiles.name)||'')+'): '+FL.nom(f.etapa,AH.tipo(x)==='srv')+(f.siguiente?' — sigue: '+f.siguiente:'')+(f.vence?' — vence '+f.vence:'')+(f.estado==='bad'?' — VENCIDO':'')+(F.length?' — le falta: '+F.slice(0,3).join('; '):'')+(x.status==='rechazada'?' — PREA rechazada':'')});
   return '[Contexto: eres el AGENTE DE LA AGENCIA '+(a.name||'')+' ('+[a.marca_grupo||a.brand,a.city].filter(Boolean).join(', ')+'). Te escribe '+(SB.user&&SB.user.dueno?'el dueño del grupo':'la dirección')+'. '+
-    'Este mes: '+mes.length+' expedientes, '+mes.filter(AGV.sano).length+' completos y sanos. Abiertos ('+ab.length+'): '+(L.join(' | ')||'ninguno')+'. '+
+    'Este mes: '+mes.length+' expedientes, '+mes.filter(AGV.sano).length+' completos y sanos; recuperado (ya cobrado) '+EX.money((D.rec||{}).t||0)+' en '+((D.rec||{}).n||0)+' órdenes. Abiertos ('+ab.length+'): '+(L.join(' | ')||'ninguno')+'. '+
     'Asesores: '+Object.keys(as).map(function(k){return k+' '+as[k]}).join(', ')+'. Débitos de GM registrados: '+(D.deb||[]).length+'. '+
     'Responde breve y concreto sobre ESTA agencia con estos datos (no inventes); cifras exactas, sin redondear.]\n';
 };
