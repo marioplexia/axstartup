@@ -1256,6 +1256,34 @@ body.ws-rol .sb .nav[data-view="inicio"],body.ws-rol .sb .nav[data-view="exp"]:n
 body.ws-rol .sb-foot{border-top:1px solid var(--sb-line)}
 body.ws-rol .avatar{background:var(--as-ink,#111);color:var(--as-card,#fff)}
 body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
+/* ══ Evidencia visual ══ */
+.ord-tabs button{white-space:nowrap}@media(max-width:600px){.ord-tabs{max-width:100%;overflow-x:auto;scrollbar-width:none}.ord-tabs button{padding:0 11px}}
+.ord-vis[hidden]{display:none}
+.vis{background:var(--as-card,var(--bg));border:1px solid var(--as-line,var(--line));border-radius:16px;box-shadow:var(--as-sh,none);padding:18px;margin-bottom:150px}
+.vis-zone{display:flex;align-items:center;gap:14px;padding:18px;border:1.5px dashed color-mix(in srgb,var(--as-ink,#111) 22%,transparent);border-radius:14px;cursor:pointer;transition:background .15s,border-color .15s}
+.vis-zone:hover,.ord-vis.over .vis-zone{background:var(--as-soft,#f4f4f5);border-color:var(--as-ink,#111)}
+.vis-zone .xd-icon{flex:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--as-ink,#111);color:var(--as-card,#fff)}
+.vis-zone .xd-say{display:flex;flex-direction:column;gap:2px}.vis-zone .xd-say b{font-size:14px;font-weight:600}.vis-zone .xd-say span{font-size:12.5px;color:var(--as-mut,var(--muted))}
+.vis-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:18px 0 12px}.vis-h b{font-size:13px;font-weight:600}
+.vis-f{display:inline-flex;gap:4px}.vis-f button{font:inherit;font-size:12px;padding:4px 10px;border-radius:99px;border:1px solid var(--as-line,var(--line));background:transparent;color:var(--as-mut,var(--muted));cursor:pointer}
+.vis-f button[aria-selected="true"]{background:var(--as-ink,#111);color:var(--as-card,#fff);border-color:transparent}
+.vis-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.vis-c{position:relative;margin:0;border:1px solid var(--as-line,var(--line));border-radius:12px;overflow:hidden;background:var(--as-card,var(--bg))}
+.vis-m{display:block;position:relative;width:100%;aspect-ratio:4/3;border:0;padding:0;background:var(--as-soft,#f1f1f2);cursor:zoom-in;overflow:hidden}
+.vis-c.k-aud .vis-m{cursor:default;aspect-ratio:auto;height:70px}
+.vis-m img,.vis-m video{width:100%;height:100%;object-fit:cover;display:block}
+.vis-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center}.vis-play .ic{width:16px;height:16px}
+.vis-aud{display:grid;place-items:center;height:100%;color:var(--as-mut,var(--muted))}.vis-aud svg{width:34px;height:34px}
+.vis-ph{display:grid;place-items:center;height:100%;font-size:12px;color:var(--as-mut,var(--muted))}
+.vis-c audio{width:100%;height:34px;display:block;padding:0 6px}
+.vis-c figcaption{padding:8px 10px 9px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.vis-c figcaption span{font-size:12.5px;font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vis-c figcaption small{font-size:11px;color:var(--as-mut,var(--muted))}
+.vis-x{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:8px;border:0;background:rgba(255,255,255,.9);color:#111;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .15s}
+.vis-c:hover .vis-x,.vis-x:focus-visible{opacity:1}@media(hover:none){.vis-x{opacity:1}}
+.vis-c.sube .vis-m{opacity:.6}.vis-bar{position:absolute;left:8px;right:8px;bottom:8px;height:4px;border-radius:99px;background:rgba(255,255,255,.6);overflow:hidden}.vis-bar i{display:block;height:100%;background:var(--as-ink,#111);transform-origin:left;transition:transform .3s}
+.vis-vacio{grid-column:1/-1;margin:10px 0;color:var(--as-mut,var(--muted));font-size:13px}
+.vis-lb video{max-width:100%;max-height:84vh;border-radius:10px;background:#000}.vis-lb audio{width:min(420px,90vw)}
+@media(max-width:600px){.vis-g{grid-template-columns:repeat(2,1fr);gap:8px}.vis-zone{padding:14px}}
 /* ══ Bandeja: chat del equipo ══ */
 .eq{display:flex;flex-direction:column}
 .eq-in{flex:1;min-height:0;display:flex}
@@ -7575,7 +7603,7 @@ document.addEventListener('drop',function(e){var z=e.target.closest&&e.target.cl
    Al escribirle, el expediente se oculta y aparece la conversación; «Expediente» lo vuelve a mostrar. */
 var ORD={v:'exp'};
 ORD.nom=function(x){return x.tipo==='Servicio'?'Servicio':x.tipo==='Campaña'?'Campaña':'PREA'};
-ORD.tabs=function(){return '<div class="ord-bar"><div class="ord-tabs" role="tablist" aria-label="Vista de la orden"><button type="button" role="tab" data-ordv="exp" aria-selected="true">Expediente</button><button type="button" role="tab" data-ordv="chat" aria-selected="false">Conversación<i id="ordN"></i></button></div><button type="button" class="ord-upb" data-ordup title="Sube documentos nuevos y el agente los acomoda">'+svg('plus')+'Subir actualización del expediente</button></div>'};
+ORD.tabs=function(){return '<div class="ord-bar"><div class="ord-tabs" role="tablist" aria-label="Vista de la orden"><button type="button" role="tab" data-ordv="exp" aria-selected="true">Expediente</button><button type="button" role="tab" data-ordv="vis" aria-selected="false">Evidencia visual<i id="visN"></i></button><button type="button" role="tab" data-ordv="chat" aria-selected="false">Conversación<i id="ordN"></i></button></div><button type="button" class="ord-upb" data-ordup title="Sube documentos nuevos y el agente los acomoda">'+svg('plus')+'Subir actualización del expediente</button></div>'};
 ORD.chat=function(){return '<div class="ord-chat" id="ordChat" hidden><div class="svc-th" id="svcTh" aria-live="polite"><div class="svc-thi" id="svcThi"></div></div></div>'};
 ORD.comp=function(x){
   var marca=($('#brandLabel')&&$('#brandLabel').textContent)||'General Motors',sv=x.tipo==='Servicio';
@@ -7590,15 +7618,92 @@ ORD.up=function(){return '<section class="xa ord-up" aria-label="Subir documento
   '<div class="xa-zone ord-zone" tabindex="0" role="button" aria-label="Subir archivos del servicio"><span class="xd-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
   '<span class="xd-say"><b>Arrastra aquí la orden, fotos, factura o comprobante</b><span>o haz clic · el agente lo revisa y lo acomoda</span></span><input type="file" multiple hidden accept=".pdf,image/*,.xml"></div></section>'};
 ORD.ver=function(v){
-  ORD.v=v;var e=$('#ordExp'),c=$('#ordChat');if(!e||!c)return;e.hidden=v!=='exp';c.hidden=v!=='chat';
+  ORD.v=v;var e=$('#ordExp'),c=$('#ordChat');if(!e||!c)return;e.hidden=v!=='exp';c.hidden=v!=='chat';var vi=$('#ordVis');if(vi)vi.hidden=v!=='vis';if(v==='vis')VIS.load();
   $$('#exDoc [data-ordv]').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.ordv===v))});
   if(v==='chat'){var t=$('#svcTh');if(t)t.scrollTop=t.scrollHeight}
 };
 ORD.n=function(){var el=$('#ordN');if(!el)return;var n=(SVC.msgs||[]).filter(function(m){return m.role==='user'&&!SVC.viejo(m)}).length;el.textContent=n?String(n):''};
 ORD.listo=function(x){
   var sb=$('#svcSend');if(sb){if(document.body.classList.contains('ws'))sb.innerHTML=svg('up');else if(typeof EYE!=='undefined')EYE.mount(sb)}
-  ORD.ver('exp');SVC.abrir(x).then(ORD.n);
+  ORD.ver('exp');SVC.abrir(x).then(ORD.n);VIS.x=x;VIS.items=null;VIS.load(true);
 };
+/* ══ Evidencia visual: fotos, videos y audios del carro, sin clasificar ══
+   Van a expedientes-docs/<id>/visual/. No entran al armado ni al PDF del expediente: son el respaldo visual. */
+var VIS={x:null,items:null,t:0,MAX:100*1024*1024};
+VIS.html=function(){return '<div class="ord-vis" id="ordVis" hidden><section class="vis">'+
+  '<div class="vis-zone" tabindex="0" role="button" aria-label="Subir evidencia visual"><span class="xd-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg></span>'+
+  '<span class="xd-say"><b>Arrastra aquí fotos, videos o audios del vehículo</b><span>Golpes, fallas, ruidos, la reparación… lo que quieras. No hace falta clasificarlos.</span></span>'+
+  '<input type="file" id="visFile" multiple hidden accept="image/*,video/*,audio/*"></div>'+
+  '<div class="vis-h"><b id="visTot">Evidencia</b><span class="vis-f" role="tablist" aria-label="Filtrar"><button type="button" data-visf="" aria-selected="true">Todo</button><button type="button" data-visf="img" aria-selected="false">Fotos</button><button type="button" data-visf="vid" aria-selected="false">Videos</button><button type="button" data-visf="aud" aria-selected="false">Audios</button></span></div>'+
+  '<div class="vis-g" id="visG"></div></section></div>'};
+VIS.tipo=function(n,mt){mt=mt||'';n=String(n||'').toLowerCase();
+  if(/^video\//.test(mt)||/\.(mp4|mov|m4v|webm|3gp|avi|mkv)$/.test(n))return 'vid';
+  if(/^audio\//.test(mt)||/\.(mp3|m4a|wav|ogg|aac|opus|amr)$/.test(n))return 'aud';return 'img'};
+VIS.nom=function(n){return String(n||'').replace(/^\d{10,}_/,'')};
+VIS.load=async function(silencio){
+  var x=VIS.x;if(!x||!SB.c||x.demo){VIS.items=VIS.items||[];VIS.pintar();return}
+  if(VIS.items&&silencio!==true&&VIS.items._id===x.id){VIS.pintar();return}
+  var my=++VIS.t;
+  try{var r=await SB.c.storage.from(XD.B).list(x.id+'/visual',{limit:500,sortBy:{column:'created_at',order:'desc'}});if(my!==VIS.t)return;
+    var L=(r.data||[]).filter(function(f){return f.id&&f.name&&f.name!=='.emptyFolderPlaceholder'}).map(function(f){return {path:x.id+'/visual/'+f.name,name:f.name,size:f.metadata&&f.metadata.size,mt:f.metadata&&f.metadata.mimetype,at:f.created_at,k:VIS.tipo(f.name,f.metadata&&f.metadata.mimetype)}});
+    if(L.length){var u=await SB.c.storage.from(XD.B).createSignedUrls(L.map(function(f){return f.path}),3600);if(my!==VIS.t)return;(u.data||[]).forEach(function(z,i){if(z&&z.signedUrl)L[i].url=z.signedUrl})}
+    VIS.items=L;VIS.items._id=x.id;
+  }catch(e){console.warn('[evidencia]',e);VIS.items=VIS.items||[]}
+  VIS.pintar();
+};
+VIS.f='';
+VIS.card=function(f){
+  var m=f.k==='img'?(f.url?'<img src="'+ea(f.url)+'" alt="" loading="lazy">':'<span class="vis-ph">Foto</span>'):
+    f.k==='vid'?(f.url?'<video src="'+ea(f.url)+'#t=0.5" preload="metadata" muted playsinline></video><span class="vis-play" aria-hidden="true">'+svg('play')+'</span>':'<span class="vis-ph">Video</span>'):
+    '<span class="vis-aud" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg></span>';
+  return '<figure class="vis-c k-'+f.k+(f.sube?' sube':'')+'" data-vispath="'+ea(f.path||'')+'">'+
+    '<button type="button" class="vis-m" data-visver aria-label="Ver '+ea(VIS.nom(f.name))+'">'+m+(f.sube?'<span class="vis-bar"><i style="transform:scaleX('+(f.p||0)+')"></i></span>':'')+'</button>'+
+    (f.k==='aud'&&f.url?'<audio src="'+ea(f.url)+'" controls preload="none"></audio>':'')+
+    '<figcaption><span>'+esc(VIS.nom(f.name))+'</span><small>'+esc(f.sube?(f.err||'Subiendo…'):[f.size?XD.fmt(f.size):'',f.at?AL.ago(f.at):''].filter(Boolean).join(' · '))+'</small></figcaption>'+
+    (f.sube?'':'<button type="button" class="vis-x" data-visdel aria-label="Quitar '+ea(VIS.nom(f.name))+'">'+svg('trash','sm')+'</button>')+'</figure>'};
+VIS.pintar=function(){
+  var g=$('#visG'),L=VIS.items||[],n=$('#visN');if(n)n.textContent=L.length?String(L.length):'';
+  if(!g)return;var c={img:0,vid:0,aud:0};L.forEach(function(f){c[f.k]++});
+  var t=$('#visTot');if(t)t.textContent=L.length?[c.img?c.img+(c.img===1?' foto':' fotos'):'',c.vid?c.vid+(c.vid===1?' video':' videos'):'',c.aud?c.aud+(c.aud===1?' audio':' audios'):''].filter(Boolean).join(' · '):'Todavía no hay evidencia';
+  $$('#ordVis [data-visf]').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.visf===VIS.f))});
+  var F=L.filter(function(f){return !VIS.f||f.k===VIS.f});
+  g.innerHTML=VIS.items===null?'<p class="vis-vacio">Cargando…</p>':F.length?F.map(VIS.card).join(''):'<p class="vis-vacio">'+(L.length?'No hay de este tipo.':'Sube fotos del vehículo, videos de la reparación o audios de ruidos. Quedan guardados con esta orden.')+'</p>';
+};
+VIS.subir=async function(files){
+  var x=VIS.x;files=[].slice.call(files||[]);if(!x||!files.length)return;
+  if(x.demo){toast('Es la orden de simulación: aquí no se guardan archivos');return}
+  ORD.ver('vis');if(!VIS.items)VIS.items=[];
+  for(var i=0;i<files.length;i++){(function(file){
+    var k=VIS.tipo(file.name,file.type);
+    if(!/^(image|video|audio)\//.test(file.type||'')&&!/\.(jpe?g|png|heic|heif|webp|gif|mp4|mov|m4v|webm|3gp|mp3|m4a|wav|ogg|aac|opus|amr)$/i.test(file.name)){toast(file.name+': solo fotos, videos o audios');return}
+    if(file.size>VIS.MAX){toast(file.name+' pesa más de 100 MB. Recórtalo o mándalo en partes.');return}
+    var it={name:file.name,size:file.size,k:k,sube:1,p:0,at:new Date().toISOString(),path:'tmp'+Date.now()+Math.random()};if(k==='img'||k==='vid')try{it.url=URL.createObjectURL(file)}catch(_){}
+    VIS.items.unshift(it);VIS.pintar();
+    var iv=setInterval(function(){it.p+=(0.9-it.p)*0.07;var c=document.querySelector('.vis-c[data-vispath="'+it.path+'"] .vis-bar i');if(c)c.style.transform='scaleX('+it.p+')'},300);
+    var path=x.id+'/visual/'+Date.now()+'_'+file.name.replace(/[^\w.\-]+/g,'_');
+    SB.c.storage.from(XD.B).upload(path,file,{contentType:file.type||undefined}).then(function(r){
+      clearInterval(iv);if(r.error){it.err=/exceeded|too large|size/i.test(r.error.message||'')?'Muy pesado para subir':'No se pudo subir';VIS.pintar();setTimeout(function(){VIS.items.splice(VIS.items.indexOf(it),1);VIS.pintar()},5000);toast(file.name+': '+it.err);return}
+      VIS.load(true);
+    },function(){clearInterval(iv);it.err='No se pudo subir';VIS.pintar()});
+  })(files[i])}
+};
+VIS.ver=function(f){
+  if(!f||!f.url)return;var o=document.createElement('div');o.className='rf-lb vis-lb';o.setAttribute('role','dialog');o.setAttribute('aria-label',VIS.nom(f.name));
+  o.innerHTML=(f.k==='vid'?'<video src="'+ea(f.url)+'" controls autoplay playsinline></video>':f.k==='aud'?'<audio src="'+ea(f.url)+'" controls autoplay></audio>':'<img src="'+ea(f.url)+'" alt="">')+'<button type="button" aria-label="Cerrar">✕</button><p>'+esc(VIS.nom(f.name))+'</p>';
+  var cerrar=function(){o.remove();document.removeEventListener('keydown',esc1,true)},esc1=function(e){if(e.key==='Escape'){e.stopImmediatePropagation();e.preventDefault();cerrar()}};
+  o.addEventListener('click',function(e){if(e.target===o||e.target.closest('button'))cerrar()});document.addEventListener('keydown',esc1,true);document.body.appendChild(o);
+};
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest||!t.closest('#ordVis'))return;
+  var fb=t.closest('[data-visf]');if(fb){VIS.f=fb.dataset.visf;VIS.pintar();return}
+  if(t.closest('.vis-zone')&&!t.closest('input')){$('#visFile').click();return}
+  var c=t.closest('.vis-c');if(!c)return;var f=(VIS.items||[]).filter(function(z){return z.path===c.dataset.vispath})[0];
+  if(t.closest('[data-visdel]')&&f){if(!confirm('¿Quitar '+VIS.nom(f.name)+' de la evidencia?'))return;SB.c.storage.from(XD.B).remove([f.path]).then(function(r){if(r.error){toast('No se pudo quitar');return}VIS.items.splice(VIS.items.indexOf(f),1);VIS.pintar()});return}
+  if(t.closest('[data-visver]')&&f&&f.k!=='aud')VIS.ver(f);
+});
+document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('#ordVis .vis-zone')){e.preventDefault();$('#visFile').click()}});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='visFile'){VIS.subir(e.target.files);e.target.value=''}});
+['dragover','drop'].forEach(function(ev){document.addEventListener(ev,function(e){var z=e.target.closest&&e.target.closest('#ordVis');if(!z)return;e.preventDefault();e.stopPropagation();
+  if(ev==='dragover'){z.classList.add('over');clearTimeout(VIS.dt);VIS.dt=setTimeout(function(){z.classList.remove('over')},150)}else{z.classList.remove('over');VIS.subir(e.dataTransfer&&e.dataTransfer.files)}},true)});
 /* lo que el agente sabe de la orden cuando le escriben */
 ORD.ctx=async function(x,text){
   if(x.tipo==='Servicio')return SVR.ctx(x,text);
@@ -7628,7 +7733,7 @@ XD.openSrv=function(x,el){
   el.innerHTML='<div class="xd-in xd-simple ord"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(AH.activo()?'← '+(AH.vista?AH.NOM[AH.vista][0]:'Inicio'):'← Servicios')+'</button>'+
     '<div><h2>'+esc(x.wo||x.folio)+'</h2><p>'+esc(['Servicio',x.sys].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts">'+(!x.demo&&XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar servicio</button>':'')+'</div></div>'+
-    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+ORD.up()+'</div>'+ORD.chat()+ORD.comp(x)+'</div>'+
+    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+ORD.up()+'</div>'+ORD.chat()+VIS.html()+ORD.comp(x)+'</div>'+
     '<div class="ord-side"><aside class="svc-ck" aria-label="Lista del servicio"><h4>Lista del servicio</h4><ol id="svcCk">'+SVC.ckHtml(x)+'</ol>'+
       (x.demo?'<button class="bt pri svc-sim" type="button" data-svcsim>▶ Iniciar simulación</button>':'')+'</aside>'+
     '<aside class="svc-side"><h4>Lo que sé de este servicio</h4>'+SVR.box(x)+
@@ -7668,7 +7773,7 @@ XD.open=function(id){
   el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(AH.activo()?'← '+(AH.vista?AH.NOM[AH.vista][0]:'Inicio'):'← Expedientes')+'</button>'+
     '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
     '<div class="xd-acts">'+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
-    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+ORD.chat()+ORD.comp(x)+'</div>'+XD.contHtml()+'</div></div>';
+    '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+ORD.chat()+VIS.html()+ORD.comp(x)+'</div>'+XD.contHtml()+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
   $('.xd-back',el).focus();
   XD.DOCS.forEach(function(d){XD.load(x.id,d[0])});
