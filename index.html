@@ -1256,6 +1256,27 @@ body.ws-rol .sb .nav[data-view="inicio"],body.ws-rol .sb .nav[data-view="exp"]:n
 body.ws-rol .sb-foot{border-top:1px solid var(--sb-line)}
 body.ws-rol .avatar{background:var(--as-ink,#111);color:var(--as-card,#fff)}
 body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
+/* ══ Tu cuenta ══ */
+.acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
+.acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.acc-b:hover,.acc-b[aria-expanded="true"]{background:var(--as-soft,#f4f4f5)}
+.acc-av{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--as-ink,#111);color:var(--as-card,#fff);font-size:12px;font-weight:600}.acc-av.lg{width:38px;height:38px;font-size:13px}
+.acc-t{min-width:0;flex:1;display:flex;flex-direction:column}.acc-t b{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc-t small{font-size:11.5px;color:var(--as-mut,var(--muted));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc-ch{width:15px;height:15px;flex:none;color:var(--as-mut,var(--muted))}
+.acc-m{position:absolute;left:8px;right:8px;bottom:calc(100% - 2px);z-index:60;background:var(--as-card,var(--bg));border:1px solid var(--as-line,var(--line));border-radius:14px;box-shadow:0 12px 40px -10px rgba(0,0,0,.25),0 2px 6px rgba(0,0,0,.06);padding:6px;animation:fadein .14s both}
+.acc-mh{display:flex;gap:10px;align-items:center;padding:8px 8px 10px}
+.acc-sep{height:1px;background:var(--as-line,var(--line));margin:4px 2px}
+.acc-i{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:9px;background:transparent;color:inherit;font:inherit;font-size:13.5px;text-align:left;cursor:pointer}
+.acc-i:hover,.acc-i:focus-visible{background:var(--as-soft,#f4f4f5);outline:0}.acc-i .ic{width:16px;height:16px;color:var(--as-mut,var(--muted))}
+.acc-i.rojo,.acc-i.rojo .ic{color:#d1343a}
+.acc-tema{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;font-size:13.5px}.acc-tema>span{display:flex;align-items:center;gap:10px}.acc-tema .ic{width:16px;height:16px;color:var(--as-mut,var(--muted))}
+.acc-seg{display:inline-flex;padding:2px;border-radius:8px;background:var(--as-soft,#f1f1f2)}
+.acc-seg button{font:inherit;font-size:11.5px;padding:3px 8px;border:0;border-radius:6px;background:transparent;color:var(--as-mut,var(--muted));cursor:pointer}
+.acc-seg button[aria-pressed="true"]{background:var(--as-card,#fff);color:var(--as-ink,#111);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+body.ws-rol .acc-foot>#settings,body.ws-rol .acc-foot>#userBtn{display:none}
+body.ws-rol .acc-foot{padding:0}body.ws-rol .acc{border-top:0}
+body.ws-rol .sb{overflow:clip}
 /* ══ Evidencia visual ══ */
 .ord-tabs button{white-space:nowrap}@media(max-width:600px){.ord-tabs{max-width:100%;overflow-x:auto;scrollbar-width:none}.ord-tabs button{padding:0 11px}}
 .ord-vis[hidden]{display:none}
@@ -7246,6 +7267,43 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   var b=t.closest('[data-prpdf]');if(b&&PRP.x){XA.pdf(PRP.x.id,b);return}
   if(t.closest('[data-prexp]')&&PRP.x){var x=PRP.x;EX.f=XD.esCam(x)?'cam':'prea';showView('exp');EX.load().then(function(){if(!EX.rows.some(function(r){return r.id===x.id}))EX.rows.unshift(x);XD.open(x.id)})}
 });
+/* ══ Tu cuenta: abajo en la barra (asesor, gerente, director y dueño) ══
+   Tarjeta con tu nombre y puesto; al tocarla: tu cuenta, apariencia, aprende, cerrar sesión. */
+var ACC={};
+ACC.puesto=function(u){if(!u)return '';return u.marca?'Administrador de marca':u.dueno?'Dueño del grupo':u.director?'Director regional':u.gerente?'Gerente de posventa':u.role==='admin'?'Administración':u.role==='asesor'?'Asesor de garantías':(u.role||'')};
+ACC.html=function(){var u=SB.user||{},n=u.name||'Tu cuenta';
+  return '<div class="acc" id="acc"><button type="button" class="acc-b" id="accBtn" aria-haspopup="menu" aria-expanded="false"><span class="acc-av">'+esc(EQ.ini(n))+'</span><span class="acc-t"><b>'+esc(n)+'</b><small>'+esc(ACC.puesto(u))+'</small></span>'+
+    '<svg class="acc-ch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></button></div>'};
+ACC.poner=function(){
+  if(!(AS.on||ROL.on)||$('#acc'))return;
+  if(AS.on){var g=$('#gp');if(g)g.insertAdjacentHTML('beforeend',ACC.html())}
+  else{var f=$('.sb-foot');if(f){f.classList.add('acc-foot');f.insertAdjacentHTML('beforeend',ACC.html())}}
+};
+ACC.pintar=function(){var b=$('#accBtn');if(!b)return;var u=SB.user||{},n=u.name||'Tu cuenta';$('.acc-av',b).textContent=EQ.ini(n);$('.acc-t b',b).textContent=n;$('.acc-t small',b).textContent=ACC.puesto(u)};
+ACC.cerrar=function(){var m=$('#accMenu');if(m&&m.parentNode)m.parentNode.removeChild(m);var b=$('#accBtn');if(b)b.setAttribute('aria-expanded','false')};
+ACC.abrir=function(){
+  var a=$('#acc');if(!a)return;if($('#accMenu')){ACC.cerrar();return}
+  var u=SB.user||{},t=CFG.theme(),it=function(k,ic,tx,cls){return '<button type="button" role="menuitem" class="acc-i'+(cls?' '+cls:'')+'" data-acc="'+k+'">'+svg(ic,'sm')+'<span>'+tx+'</span></button>'};
+  a.insertAdjacentHTML('beforeend','<div class="acc-m" id="accMenu" role="menu" aria-label="Tu cuenta">'+
+    '<div class="acc-mh"><span class="acc-av lg">'+esc(EQ.ini(u.name))+'</span><span class="acc-t"><b>'+esc(u.name||'')+'</b><small>'+esc(SB.email||'')+'</small><small>'+esc([ACC.puesto(u),SB.agency].filter(Boolean).join(' · '))+'</small></span></div>'+
+    '<div class="acc-sep"></div>'+
+    it('cfg','settings','Mi cuenta')+
+    (AS.on?it('aprende','present','Aprende Ax AI'):'')+
+    it('eq','inbox','Bandeja del equipo')+
+    '<div class="acc-tema"><span>'+svg('moon','sm')+'Apariencia</span><div class="acc-seg" role="group" aria-label="Tema">'+[['auto','Auto'],['light','Claro'],['dark','Oscuro']].map(function(o){return '<button type="button" data-acct="'+o[0]+'" aria-pressed="'+(t===o[0])+'">'+o[1]+'</button>'}).join('')+'</div></div>'+
+    '<div class="acc-sep"></div>'+
+    it('out','x','Cerrar sesión','rojo')+'</div>');
+  $('#accBtn').setAttribute('aria-expanded','true');var f=$('#accMenu .acc-i');if(f)f.focus({preventScroll:true});
+};
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+  if(t.closest('#accBtn')){e.stopPropagation();ACC.abrir();return}
+  var th=t.closest('[data-acct]');if(th){CFG.setTheme(th.dataset.acct);$$('#accMenu [data-acct]').forEach(function(b){b.setAttribute('aria-pressed',String(b===th))});return}
+  var b=t.closest('[data-acc]');if(b){var k=b.dataset.acc;ACC.cerrar();if(typeof AS!=='undefined')AS.drawer(false);if(XD.cur)XD.close();
+    if(k==='out'){if(confirm('¿Cerrar sesión en este dispositivo?'))SB.signOut();return}
+    showView(k);return}
+  if(!t.closest('#accMenu'))ACC.cerrar();
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('#accMenu')){ACC.cerrar();$('#accBtn').focus()}});
 /* ══ Bandeja: el chat del equipo ══
    Una sala por grupo y marca: los asesores de las agencias de esa marca, sus gerentes de posventa, el director y el dueño.
    Tabla chat_grupo (RLS: chat_puede). Nombre, puesto y agencia los pone la base. En línea: presencia de Realtime. */
@@ -8530,7 +8588,7 @@ SB.enter=async function(user){
     await SB.loadAdvisors();
     $('#lg').hidden=true;
     await SB.pull(true);
-    SB.loadHist();GP.load();AL.load().then(BX.load);if(typeof EQ!=='undefined')EQ.init().then(function(){if(typeof GP!=='undefined')GP.render()});
+    SB.loadHist();GP.load();AL.load().then(BX.load);if(typeof ACC!=='undefined')ACC.poner();if(typeof EQ!=='undefined')EQ.init().then(function(){if(typeof GP!=='undefined')GP.render()});
     MI.loadAgenda().then(MI.startTimer);
     showView(MR.is()?'m_res':ROL.on?'exp':DN.is()?'dueno':SB.user&&SB.user.director?'grp':PV.is()?'pv':AS.on?'exp':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
@@ -8538,7 +8596,7 @@ SB.enter=async function(user){
       if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
       if(p.table==='expedientes'&&typeof AH!=='undefined'&&AH.activo()){clearTimeout(AH.t);AH.t=setTimeout(function(){if(S.view==='exp'&&!XD.cur)EX.load();else if(typeof GP!=='undefined')GP.load()},700)}
-      if(p.table==='profiles'&&p.new&&p.new.id===ME&&SB.user){SB.user.name=p.new.name||SB.user.name;if(typeof AH!=='undefined')AH.tic()}
+      if(p.table==='profiles'&&p.new&&p.new.id===ME&&SB.user){SB.user.name=p.new.name||SB.user.name;if(typeof AH!=='undefined')AH.tic();if(typeof ACC!=='undefined')ACC.pintar()}
       if(p.table==='alertas'){if(p.eventType==='INSERT')AL.onNew(p.new);return}
       if(p.table==='buzon'){if(p.eventType==='INSERT'&&p.new)toast('Correo de tu agente: '+p.new.asunto);clearTimeout(CG.t);CG.t=setTimeout(CG.load,600);return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
