@@ -1339,6 +1339,7 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 .ag-dir select{font:inherit;font-size:13px;padding:6px 10px;border-radius:99px;border:1px solid var(--as-line,#ebebec);background:var(--as-card,#fff);color:var(--as-ink,#111)}
 :root[data-theme="dark"] .rb-n b{color:#5fd896}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rb-n b{color:#5fd896}}
 @media(max-width:600px){.rb-n{grid-template-columns:1fr}.rb-tabs{margin:6px 10px 0}.rb-w{padding:10px}}
+.xd-est{margin:4px 0 0;font-size:13px;color:var(--as-ink,var(--fg))}.xd-est small{color:var(--as-mut,var(--muted))}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -3951,7 +3952,7 @@ function enterChat(title){
   }
   syncCrumb();if(GATE)GATE.sync();
 }
-function resetChat(){if(typeof PRP!=='undefined')PRP.ocultar();
+function resetChat(){if(typeof PRP!=='undefined')PRP.ocultar();if(typeof GP!=='undefined')GP.sinForm=false;
   if(S.ctrl)S.ctrl.aborted=true;S.ctrl=null;S.streaming=false;S.last=null;S.convId=null;S.convP=null;if(MI){MI.msgs=[];MI.pending=null}if(typeof PR!=='undefined'&&PR)PR.msgs=[];if(GP){GP.cur=null;GP.msgs=[];GP.nPrea=0;GP.evid=false;GP.caseText='';GP.lastExpP=null;GP.tipo=null;GP.srv=null}if(typeof CB!=='undefined'&&CB)CB.last=null
   threadIn.innerHTML='';crumb2.textContent='';
   if(stage.dataset.state==='chat'){
@@ -5892,7 +5893,7 @@ document.addEventListener('click',function(e){
 document.addEventListener('click',function(e){var f=e.target.closest&&e.target.closest('.mi-wrap [data-folio]');if(f){EX.q=f.dataset.folio;$('#exQ').value=EX.q;EX.f='prea';showView('exp')}});
 /* ===== Agentes de Garantías y Cobros: panel de conversaciones (título = número de orden) y charla sobre la orden ===== */
 var GP={all:[],q:'',cur:null,msgs:[],t:0,nPrea:0,caseText:'',lastExpP:null};
-GP.COLS='id,folio,status,wo,cliente,vin,sys,rule_id,queja,op,opd,hours,parts,parts_total,labor,codes,created_at,tipo';
+GP.COLS='id,folio,status,wo,cliente,vin,sys,rule_id,queja,op,opd,hours,parts,parts_total,labor,codes,created_at,tipo,estatus_nota,estatus_at,prea_form_at';
 GP.ag=function(){return S.agent==='cobros'?'cobros':'garantias'};
 GP.norm=function(v){
   v=String(v||'').toUpperCase().replace(/\s+/g,'');var m;
@@ -6121,6 +6122,7 @@ GP.armar=async function(text,fobjs){
 };
 $('#gpArmIn').addEventListener('change',function(){var f=[].slice.call(this.files);this.value='';if(f.length)GP.armar('',f)});
 GP.open=async function(id,o){
+  try{var sf=await SB.c.from('expedientes').select('tipo,prea_form_at').eq('conversation_id',id).order('created_at',{ascending:false}).limit(1);var sx=sf.data&&sf.data[0];GP.sinForm=!!(sx&&(sx.tipo==='PREA'||!sx.tipo)&&!sx.prea_form_at)}catch(_){GP.sinForm=false}
   o=o||{};
   if(!SB.c||!SB.entered)return;
   var c=await SB.c.from('conversations').select('id,agent,title,orden,text,messages').eq('id',id).single();
@@ -7796,7 +7798,7 @@ AH.render=function(){
   var sig=mios.filter(function(x){return x.flujo&&!AH.cerrado(x)}).sort(function(a,b){var va=a.flujo.vence||'9999',vb=b.flujo.vence||'9999';return va<vb?-1:va>vb?1:0}).slice(0,8);
   var nomT={prea:'PREA',cam:'Campaña',srv:'Servicio'};
   var fila=function(x){var f=x.flujo||{},k=AH.tipo(x),v=f.vence?FL.vence(f.vence):'';
-    return '<button type="button" class="ah-r" data-ahx="'+ea(x.id)+'"><span class="ah-rt ah-'+k+'">'+nomT[k]+'</span><b>'+esc(x.wo||x.folio||'')+'</b><span class="ah-rs">'+esc(f.siguiente||FL.nom(f.etapa,k==='srv'))+(ROL.on&&x.profiles&&x.profiles.name?' · '+esc(x.profiles.name):'')+'</span>'+(v?'<span class="ah-rv'+(f.estado==='bad'?' bad':f.estado==='warn'?' warn':'')+'">'+esc(v)+'</span>':'<span></span>')+'</button>'};
+    return '<button type="button" class="ah-r" data-ahx="'+ea(x.id)+'"><span class="ah-rt ah-'+k+'">'+nomT[k]+'</span><b>'+esc(x.wo||x.folio||'')+'</b><span class="ah-rs">'+esc(x.estatus_nota&&!x.prea_form_at?'Estatus: '+x.estatus_nota:(f.siguiente||FL.nom(f.etapa,k==='srv')))+(ROL.on&&x.profiles&&x.profiles.name?' · '+esc(x.profiles.name):'')+'</span>'+(v?'<span class="ah-rv'+(f.estado==='bad'?' bad':f.estado==='warn'?' warn':'')+'">'+esc(v)+'</span>':'<span></span>')+'</button>'};
   var tot=mios.length,cer=mios.filter(AH.cerrado).length;
   if(GM.on()&&GM.sel&&GM.cargado){el.innerHTML='<div class="ah-in">'+GM.html()+'</div>';return}
   el.innerHTML='<div class="ah-in"><div class="ah-head"><div><h1><span id="ahHola">'+AH.hola()+'</span>, <span id="ahNom">'+esc(AH.nombre()||'asesor')+'</span></h1>'+
@@ -8230,7 +8232,7 @@ XD.open=function(id){
     crumb.textContent='Inicio';crumbSep.hidden=false;crumb2.hidden=false;crumb2.textContent=AH.vista?AH.NOM[AH.vista][0]+' · '+(x.wo||x.folio||''):(x.wo||x.folio||'')}
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
   el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(AH.activo()?'← '+(AH.vista?AH.NOM[AH.vista][0]:'Inicio'):'← Expedientes')+'</button>'+
-    '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p></div>'+
+    '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p>'+(x.estatus_nota?'<p class="xd-est"><b>Estatus:</b> '+esc(x.estatus_nota)+(x.estatus_at?' <small>· '+esc(AL.ago(x.estatus_at))+'</small>':'')+'</p>':'')+'</div>'+
     '<div class="xd-acts">'+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
     '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+ORD.chat()+VIS.html()+PAG.html()+ORD.comp(x)+'</div>'+XD.contHtml()+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
@@ -11838,11 +11840,44 @@ GP.evMsg=function(ev){
   if(ev.documentos&&ev.documentos.length)t+='\n\n### Lo que revisé\n'+L(ev.documentos.map(function(d){return '**'+d.archivo+'** ('+d.tipo+(d.legible?'':', no se lee')+'): '+d.hallazgos}));
   return t+'\n\nAdjunta lo que falta (todos los archivos, junto con los anteriores) y vuelve a enviar.';
 };
+/* ══ Un estatus para la PREA, nada más ══
+   «Esperando motor», «En espera de autorización»…: el asesor solo anota cómo va. No se arma formulario ni se pide
+   evidencia: se abre (o se actualiza) la PREA de esa orden con ese estatus. Para armarla, se manda la evidencia. */
+GP.esEstatus=function(text){var t=String(text||'').trim(),n=t.split(/\s+/).filter(Boolean).length;if(!t||t.length>160||/\?/.test(t))return false;
+  return n<=8||/\b(esperando|en espera|espera de|pendiente|detenid|en proceso|en taller|lleg[oó]|ya lleg|pieza|refacci|autoriz|cotiza|backorder|en tr[aá]nsito|sin respuesta)/i.test(t)};
+GP.preaEstatus=function(text,files){
+  if(S.agent!=='garantias'||(files&&files.length)||!GP.esEstatus(text))return false;
+  if(!S.convId&&typeof GATE!=='undefined'&&GATE.v&&GATE.v.tipo==='PREA')return true;            /* PREA nueva */
+  return !!(S.convId&&GP.cur&&GP.sinForm);                                                         /* PREA abierta sin formulario */
+};
+GP.abrirPreaEstatus=async function(text){
+  var nueva=!S.convId,ord=nueva?GATE.v.orden:GP.cur,est=String(text).trim().slice(0,160);
+  closeMenu();showView('agent');
+  if(nueva){enterChat(ord);GP.tipo='PREA';GP.cur=ord;GP.msgs=[];var id=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'10000000-1000-4000-8000-100000000000'.replace(/[018]/g,function(c){return (c^Math.random()*16>>c/4).toString(16)});S.convId=id}
+  addUser(text,[]);ta.value='';S.files=[];renderFiles();autosize();updateSend();
+  var w=addAssistant();hideRegen(w);var body=$('.ai-body',w),t='',ex=null;
+  try{
+    if(nueva){S.convP=(async function(){var f=await SB.c.from('conversations').select('id,messages').eq('agent','garantias').eq('orden',ord).limit(1);
+        if(!f.error&&f.data&&f.data[0]){S.convId=f.data[0].id;GP.msgs=Array.isArray(f.data[0].messages)?f.data[0].messages.slice():[];return}
+        var ins=await SB.c.from('conversations').insert({id:S.convId,agent:'garantias',title:ord,text:('Orden '+ord+' (PREA). '+est).slice(0,2000),orden:ord});if(ins.error)throw ins.error})();
+      await S.convP}
+    var q=await SB.c.from('expedientes').select(GP.COLS).eq('conversation_id',S.convId).order('created_at',{ascending:false}).limit(1);ex=q.data&&q.data[0]||null;
+    var ahora=new Date().toISOString();
+    if(ex){var u=await SB.c.from('expedientes').update({estatus_nota:est,estatus_at:ahora}).eq('id',ex.id).select(GP.COLS).single();if(u.error)throw u.error;ex=u.data}
+    else{var ni=await SB.c.from('expedientes').insert({conversation_id:S.convId,folio:ord,wo:ord,tipo:'PREA',brand:S.brand||null,status:'borrador',estatus_nota:est,estatus_at:ahora}).select(GP.COLS).single();if(ni.error)throw ni.error;ex=ni.data}
+    GP.nPrea=1;GP.sinForm=!ex.prea_form_at;if(typeof GATE!=='undefined')GATE.reset();
+    t=nueva?'Listo: abrí la PREA de la orden **'+ord+'** con el estatus **'+est+'**. No armé formulario ni te pido evidencia por ahora.\n\nCuando cambie, escríbeme el nuevo estatus aquí. Para armar la PREA, mándame la evidencia del caso.'
+           :'Anotado: la PREA **'+ord+'** ahora está en **'+est+'**.';
+  }catch(e){SB.fail(e);t='No pude guardar el estatus ('+TR.errTxt(e)+'). Inténtalo otra vez.'}
+  body.innerHTML=md(t,false);w._text=t;$('.ai-actions',w).hidden=false;toBottom(true);
+  GP.remember(text,t);SB.loadHist();GP.load();if(typeof EX!=='undefined'&&EX.load)EX.load();
+};
 function onSend(){
   if(S.streaming){if(S.ctrl)S.ctrl.aborted=true;return}
   var text=ta.value.trim(),files=S.files.slice();
   if(GP.abrirSinPrea()){GP.abrir(text,files);return}
   if(!text&&!files.length)return;
+  if(GP.preaEstatus(text,files)){GP.abrirPreaEstatus(text);return}
   if(S.agent==='garantias'&&files.length&&GP.armaQ(text)){GP.armar(text,files);return}
   if(GP.needsEvidence(text,files)){GP.evBlock();return}
   closeMenu();showView(curView());
