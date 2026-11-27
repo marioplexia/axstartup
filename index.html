@@ -1341,6 +1341,10 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 @media(max-width:600px){.rb-n{grid-template-columns:1fr}.rb-tabs{margin:6px 10px 0}.rb-w{padding:10px}}
 .xd-est{margin:4px 0 0;font-size:13px;color:var(--as-ink,var(--fg))}.xd-est small{color:var(--as-mut,var(--muted))}
 .gp-est{color:var(--as-ink,var(--fg))}.gp-est b{font-weight:600}
+.ah-cob{display:flex;flex-direction:column;gap:2px;margin-bottom:14px;padding:16px 20px;border-radius:16px;background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);box-shadow:var(--as-sh,none)}
+.ah-cob span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut,#8b8b90)}
+.ah-cob b{font-size:32px;font-weight:650;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--as-mut,#a1a1a6)}.ah-cob b.ok{color:#16834a}.ah-cob small{font-size:12.5px;color:var(--as-mut,#8b8b90)}
+:root[data-theme="dark"] .ah-cob b.ok{color:#5fd896}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ah-cob b.ok{color:#5fd896}}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -7781,6 +7785,17 @@ RPT.generar=async function(btn,src){
   RPT.busy=false;if(btn){btn.disabled=false;btn.innerHTML=t0}
 };
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-rptpdf]');if(b)RPT.generar(b)});
+/* lo cobrado a planta en lo que va del mes (cobrado_mes: con los permisos de quien ve; el asesor ve lo suyo) */
+AH.cob=null;AH.cobT=0;
+AH.cobLoad=async function(){if(!SB.c)return;var d=new Date(),first=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';
+  try{var r=await SB.c.rpc('cobrado_mes',{p_desde:first});if(r.error)throw r.error;var o={t:0,n:0,srv:0,cam:0,pre:0};
+    (r.data||[]).forEach(function(z){o.t+=Number(z.cobrado||0);o.n+=Number(z.ordenes||0);o.srv+=Number(z.servicio||0);o.cam+=Number(z.campana||0);o.pre+=Number(z.prea||0)});AH.cob=o}catch(e){console.warn('[cobrado]',e);AH.cob=AH.cob||{t:0,n:0,srv:0,cam:0,pre:0}}
+  AH.cobT=Date.now();if(S.view==='exp'&&!XD.cur&&!AH.vista)AH.render()};
+AH.cobHtml=function(){
+  if(!AH.cob){if(!AH.cobP){AH.cobP=1;AH.cobLoad().then(function(){AH.cobP=0})}return '<section class="ah-cob"><span>Cobrado a planta en '+esc(new Date().toLocaleDateString('es-MX',{month:'long'}))+'</span><b class="carga">…</b></section>'}
+  if(Date.now()-AH.cobT>60000&&!AH.cobP){AH.cobP=1;AH.cobLoad().then(function(){AH.cobP=0})}
+  var o=AH.cob;return '<section class="ah-cob"><span>Cobrado a planta en '+esc(new Date().toLocaleDateString('es-MX',{month:'long'}))+'</span><b class="'+(o.t>0?'ok':'')+'">'+EX.money(o.t)+'</b><small>'+
+    (o.t>0?o.n+(o.n===1?' orden cobrada':' órdenes cobradas')+' · '+[o.srv?'servicios '+EX.money(o.srv):'',o.cam?'campañas '+EX.money(o.cam):'',o.pre?'PREAs '+EX.money(o.pre):''].filter(Boolean).join(' · '):'Todavía no hay cobros de planta este mes')+'</small></section>'};
 AH.render=function(){
   if(AH.vista){var el0=$('#asHome');if(el0)el0.hidden=false;AH.lista(AH.vista);return}
   if(typeof crumb!=='undefined'&&S.view==='exp'){crumb.textContent='Inicio';crumbSep.hidden=true;crumb2.hidden=true}
@@ -7807,7 +7822,7 @@ AH.render=function(){
       (ROL.on?'':'<div class="ah-acts"><button type="button" class="ah-b2" data-apnav>'+svg('present')+'Aprende Ax AI<i>'+AP.total().h+'/'+AP.total().n+'</i></button>'+
       '<button type="button" class="ah-b2" data-svcdemo>'+svg('play')+'Simulación</button>'+
       '<button type="button" class="ah-new" data-ahnew>'+svg('plus')+'Nueva orden</button></div>')+'</div>'+
-    (GM.on()?GM.html():'<div class="ah-grid">'+K.map(tarjeta).join('')+'</div>')+
+    (GM.on()?GM.html():AH.cobHtml()+'<div class="ah-grid">'+K.map(tarjeta).join('')+'</div>')+
     (GM.on()?'':'<section class="ah-box"><div class="ah-bh"><b>Lo que sigue</b><span>'+(sig.length?sig.length+(sig.length===1?' orden abierta':' órdenes abiertas'):'Todo al día')+'</span></div>'+
       (sig.length?'<div class="ah-list">'+sig.map(fila).join('')+'</div>':'<p class="ah-vacio">No tienes órdenes pendientes. Abre una nueva con «Nueva orden».</p>')+'</section>')+'</div>';
 };
@@ -8999,6 +9014,7 @@ SB.enter=async function(user){
       if(p.table==='chat_grupo'){if(typeof EQ!=='undefined')EQ.rt(p);return}
       if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
+      if((p.table==='expedientes'||p.table==='cartera')&&typeof AH!=='undefined'&&!(typeof GM!=='undefined'&&GM.on())){clearTimeout(AH.cobRT);AH.cobRT=setTimeout(AH.cobLoad,1500)}
       if((p.table==='expedientes'||p.table==='debitos'||p.table==='entrenamiento_docs')&&typeof GM!=='undefined'&&GM.on()){clearTimeout(GM.rt);GM.rt=setTimeout(GM.load,1500)}
       if(p.table==='expedientes'&&typeof AH!=='undefined'&&AH.activo()){clearTimeout(AH.t);AH.t=setTimeout(function(){if(S.view==='exp'&&!XD.cur)EX.load();else if(typeof GP!=='undefined')GP.load()},700)}
       if(p.table==='profiles'&&p.new&&p.new.id===ME&&SB.user){SB.user.name=p.new.name||SB.user.name;if(typeof AH!=='undefined')AH.tic();if(typeof ACC!=='undefined')ACC.pintar()}
