@@ -1370,6 +1370,9 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 .cx-t tfoot td{position:sticky;bottom:0;background:var(--as-card,#fff);border-top:2px solid var(--as-line,#ebebec)}
 .cx-vacio{margin:60px auto;max-width:420px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}.cx-vacio b{font-size:16px}.cx-vacio p{margin:0;color:var(--as-mut,#8b8b90);font-size:13.5px}
 @media(max-width:700px){.hj-t{font-size:12px}.hj-f{flex-wrap:wrap}.cx-acc input{min-width:0;flex:1}}
+.ah-dos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.ah-dos .ah-cob{margin-bottom:0}
+.ah-fac b.ok{color:var(--as-ink,#111)}
+@media(max-width:700px){.ah-dos{grid-template-columns:1fr}}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -7818,6 +7821,11 @@ AH.cobLoad=async function(){if(!SB.c)return;var d=new Date(),first=d.getFullYear
   try{var r=await SB.c.rpc('cobrado_mes',{p_desde:first});if(r.error)throw r.error;var o={t:0,n:0,srv:0,cam:0,pre:0};
     (r.data||[]).forEach(function(z){o.t+=Number(z.cobrado||0);o.n+=Number(z.ordenes||0);o.srv+=Number(z.servicio||0);o.cam+=Number(z.campana||0);o.pre+=Number(z.prea||0)});AH.cob=o}catch(e){console.warn('[cobrado]',e);AH.cob=AH.cob||{t:0,n:0,srv:0,cam:0,pre:0}}
   AH.cobT=Date.now();if(S.view==='exp'&&!XD.cur&&!AH.vista)AH.render()};
+AH.facHtml=function(){
+  var d=new Date(),m0=new Date(d.getFullYear(),d.getMonth(),1),L=AH.mios().filter(function(x){if(!Number(x.factura_monto))return false;var f=x.factura_fecha?new Date(x.factura_fecha+'T12:00:00'):new Date(x.updated_at||x.created_at);return f>=m0});
+  var t=L.reduce(function(a,x){return a+Number(x.factura_monto)},0),srv=0,cam=0,pre=0;L.forEach(function(x){var v=Number(x.factura_monto);if(x.tipo==='Servicio')srv+=v;else if(x.tipo==='Campaña')cam+=v;else pre+=v});
+  return '<section class="ah-cob ah-fac"><span>Facturado en '+esc(d.toLocaleDateString('es-MX',{month:'long'}))+'</span><b class="'+(t>0?'ok':'')+'">'+EX.money(t)+'</b><small>'+
+    (t>0?L.length+(L.length===1?' orden facturada':' órdenes facturadas')+' · '+[srv?'servicios '+EX.money(srv):'',cam?'campañas '+EX.money(cam):'',pre?'PREAs '+EX.money(pre):''].filter(Boolean).join(' · '):'Sube tu hoja de facturación y aquí aparece lo facturado')+'</small></section>'};
 AH.cobHtml=function(){
   if(!AH.cob){if(!AH.cobP){AH.cobP=1;AH.cobLoad().then(function(){AH.cobP=0})}return '<section class="ah-cob"><span>Cobrado a planta en '+esc(new Date().toLocaleDateString('es-MX',{month:'long'}))+'</span><b class="carga">…</b></section>'}
   if(Date.now()-AH.cobT>60000&&!AH.cobP){AH.cobP=1;AH.cobLoad().then(function(){AH.cobP=0})}
@@ -7826,6 +7834,7 @@ AH.cobHtml=function(){
 /* ══ La hoja de facturación: foto → el agente lee cada renglón → el asesor confirma → se acomodan las órdenes ══
    Lo FACTURADO (no lo que pagó planta). Las órdenes que no existen se abren sin expediente, solo con los datos de la hoja. */
 var HJ={filas:[],busy:false};
+HJ.k=function(v){var t=String(v||'').toUpperCase().replace(/[\s\-_.]/g,'');return t.replace(/^(SRV|CAM|PREA)(?=[A-Z])/,'')};
 HJ.input=function(){var i=document.getElementById('hjFile');if(!i){document.body.insertAdjacentHTML('beforeend','<input type="file" id="hjFile" accept="image/*,application/pdf" hidden>');i=document.getElementById('hjFile')}return i};
 HJ.ov=function(html){var o=document.getElementById('hjOv');if(!o){document.body.insertAdjacentHTML('beforeend','<div class="hj-ov" id="hjOv" role="dialog" aria-modal="true" aria-label="Hoja de facturación"><div class="hj-box" id="hjBox"></div></div>');o=document.getElementById('hjOv')}
   o.hidden=false;document.getElementById('hjBox').innerHTML=html};
@@ -7834,11 +7843,17 @@ HJ.leer=async function(file){
   if(!file)return;HJ.ov('<div class="hj-h"><b>Leyendo la hoja…</b><button type="button" class="hj-x" data-hjx aria-label="Cerrar">✕</button></div><p class="hj-s"><i class="pag-sp"></i> El agente de facturación está leyendo cada renglón de «'+esc(file.name)+'».</p>');
   try{var f=await TR.prep(file);var r=await SB.ai({file:f},'hoja');
     if(!r||r.se_lee===false){HJ.ov('<div class="hj-h"><b>No pude leer la hoja</b><button type="button" class="hj-x" data-hjx>✕</button></div><p class="hj-s">'+esc((r&&r.motivo)||'Toma la foto más de cerca y con buena luz.')+'</p>');return}
-    if(!(EX.rows||[]).length)try{await EX.load()}catch(_){}
-    var porWo={};(EX.rows||[]).forEach(function(x){var k=String(x.wo||'').toUpperCase();if(k&&!porWo[k])porWo[k]=x});
-    var conv={};(GP.all||[]).forEach(function(c){var k=String(c.orden||'').toUpperCase();if(k&&c.agent==='garantias'&&!conv[k])conv[k]=c});
-    HJ.filas=(r.filas||[]).map(function(z,i){var x=porWo[z.orden]||null,c=conv[z.orden]||null;
-      return Object.assign({},z,{i:i,ex:x,conv:c,accion:x?'actualizar':'abrir',ok:!z.dudoso&&!!z.orden,tipo:x&&x.tipo?x.tipo:(z.tipo==='Otro'?'Servicio':z.tipo)})});
+    /* la orden se compara sin guiones, espacios ni prefijos (GA-4066 = GA4066 = SRV-GA4066) y se busca en la base, no solo en pantalla */
+    var K=HJ.k,ords=[];(r.filas||[]).forEach(function(z){z.orden=K(z.orden);if(z.orden&&ords.indexOf(z.orden)<0)ords.push(z.orden)});
+    var porWo={},conv={},pon=function(x){[x.wo,x.folio].forEach(function(v){var k=K(v);if(k&&!porWo[k])porWo[k]=x})};
+    (EX.rows||[]).forEach(pon);(GP.all||[]).forEach(function(c){var k=K(c.orden);if(k&&c.agent==='garantias'&&!conv[k])conv[k]=c});
+    if(ords.length){var variantes=[];ords.forEach(function(o){variantes.push(o,'SRV-'+o,'CAM-'+o,o.replace(/^([A-Z]+)(\d)/,'$1-$2'))});
+      try{var qe=await SB.c.from('expedientes').select('*').or('wo.in.('+variantes.join(',')+'),folio.in.('+variantes.join(',')+')').limit(500);(qe.data||[]).forEach(pon)}catch(_){}
+      try{var qc=await SB.c.from('conversations').select('id,orden,agent').eq('agent','garantias').in('orden',variantes).limit(500);(qc.data||[]).forEach(function(c){var k=K(c.orden);if(k&&!conv[k])conv[k]=c})}catch(_){}}
+    /* una misma orden repetida en la hoja: solo el primer renglón la toca */
+    var vistas={};
+    HJ.filas=(r.filas||[]).map(function(z,i){var x=porWo[z.orden]||null,c=conv[z.orden]||null,rep=!!vistas[z.orden];vistas[z.orden]=1;
+      return Object.assign({},z,{i:i,ex:x,conv:c,rep:rep,accion:x?'actualizar':'abrir',ok:!z.dudoso&&!!z.orden&&!rep,tipo:x&&x.tipo?x.tipo:(z.tipo==='Otro'?'Servicio':z.tipo)})});
     HJ.nota=r.nota||'';HJ.pintar();
   }catch(e){HJ.ov('<div class="hj-h"><b>No pude leer la hoja</b><button type="button" class="hj-x" data-hjx>✕</button></div><p class="hj-s">'+esc(TR.errTxt(e))+'</p>')}
 };
@@ -7849,7 +7864,7 @@ HJ.pintar=function(){
     (F.length?'<div class="hj-tw"><table class="hj-t"><thead><tr><th></th><th>Orden</th><th>Factura</th><th>Lo que fue</th><th>Tipo</th><th class="r">Facturado</th><th>Qué hago</th></tr></thead><tbody>'+
       F.map(function(f){return '<tr class="'+(f.ok?'':'off')+(f.dudoso?' duda':'')+'"><td><input type="checkbox" data-hjok="'+f.i+'"'+(f.ok?' checked':'')+' aria-label="Incluir '+ea(f.orden)+'"></td><td><b>'+esc(f.orden)+'</b></td><td>'+esc(f.factura||'—')+'</td><td>'+esc(f.concepto||'—')+(f.dudoso?' <em>revisa: no se lee bien</em>':'')+'</td>'+
         '<td><select data-hjtipo="'+f.i+'"'+(f.ex?' disabled':'')+'>'+['Servicio','Campaña','PREA'].map(function(t){return '<option'+(f.tipo===t?' selected':'')+'>'+t+'</option>'}).join('')+'</select></td>'+
-        '<td class="r">'+(f.facturado!=null?EX.money(f.facturado):'—')+'</td><td>'+(f.ex?'<span class="hj-a up">Actualizar la orden</span>':'<span class="hj-a nw">Abrir orden nueva</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="hj-s">No encontré renglones con número de orden.</p>')+
+        '<td class="r">'+(f.facturado!=null?EX.money(f.facturado):'—')+'</td><td>'+(f.rep?'<span class="hj-a">Repetida en la hoja</span>':f.ex?'<span class="hj-a up">Ya existe · actualizar</span>':f.conv?'<span class="hj-a up">Ya existe · completar</span>':'<span class="hj-a nw">Abrir orden nueva</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="hj-s">No encontré renglones con número de orden.</p>')+
     '<div class="hj-f"><span>'+n+' de '+F.length+' · '+ac+(ac===1?' se actualiza':' se actualizan')+' · '+ab+(ab===1?' orden nueva':' órdenes nuevas')+' · facturado '+EX.money(tot)+'</span><button type="button" class="bt" data-hjx>Cancelar</button><button type="button" class="bt pri" data-hjgo'+(n?'':' disabled')+'>Acomodar '+n+(n===1?' orden':' órdenes')+'</button></div>');
 };
 HJ.aplicar=async function(){
@@ -7858,6 +7873,8 @@ HJ.aplicar=async function(){
   for(var i=0;i<F.length;i++){var f=F[i],fac={factura_numero:f.factura,factura_monto:f.facturado,factura_fecha:f.fecha,factura_concepto:f.concepto,factura_src:'hoja'};
     try{
       if(f.ex){var u=await SB.c.from('expedientes').update(fac).eq('id',f.ex.id);if(u.error)throw u.error;hechas++;continue}
+      var dup=await SB.c.from('expedientes').select('id').or('wo.eq.'+f.orden+',folio.eq.'+f.orden+',folio.eq.SRV-'+f.orden+',folio.eq.CAM-'+f.orden).limit(1);
+      if(dup.data&&dup.data[0]){var u2=await SB.c.from('expedientes').update(fac).eq('id',dup.data[0].id);if(u2.error)throw u2.error;hechas++;continue}
       var cid=f.conv&&f.conv.id;
       if(!cid){var ci=await SB.c.from('conversations').insert({agent:'garantias',title:f.orden,orden:f.orden,text:('Orden '+f.orden+' ('+f.tipo+'). '+(f.concepto||'')).trim().slice(0,2000)}).select('id').single();if(ci.error)throw ci.error;cid=ci.data.id}
       var pre=f.tipo==='Servicio'?'SRV-':f.tipo==='Campaña'?'CAM-':'';
@@ -7953,7 +7970,7 @@ AH.render=function(){
       (ROL.on?'':'<div class="ah-acts"><button type="button" class="ah-b2" data-hjup>'+svg('file')+'Subir hoja</button><button type="button" class="ah-b2" data-cxup>'+svg('wallet')+'Subir cartera</button><button type="button" class="ah-b2" data-apnav>'+svg('present')+'Aprende Ax AI<i>'+AP.total().h+'/'+AP.total().n+'</i></button>'+
       '<button type="button" class="ah-b2" data-svcdemo>'+svg('play')+'Simulación</button>'+
       '<button type="button" class="ah-new" data-ahnew>'+svg('plus')+'Nueva orden</button></div>')+'</div>'+
-    (GM.on()?GM.html():AH.cobHtml()+'<div class="ah-grid">'+K.map(tarjeta).join('')+'</div>')+
+    (GM.on()?GM.html():'<div class="ah-dos">'+AH.cobHtml()+AH.facHtml()+'</div><div class="ah-grid">'+K.map(tarjeta).join('')+'</div>')+
     (GM.on()?'':'<section class="ah-box"><div class="ah-bh"><b>Lo que sigue</b><span>'+(sig.length?sig.length+(sig.length===1?' orden abierta':' órdenes abiertas'):'Todo al día')+'</span></div>'+
       (sig.length?'<div class="ah-list">'+sig.map(fila).join('')+'</div>':'<p class="ah-vacio">No tienes órdenes pendientes. Abre una nueva con «Nueva orden».</p>')+'</section>')+'</div>';
 };
