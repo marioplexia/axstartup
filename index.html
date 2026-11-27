@@ -1373,6 +1373,9 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 .ah-dos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.ah-dos .ah-cob{margin-bottom:0}
 .ah-fac b.ok{color:var(--as-ink,#111)}
 @media(max-width:700px){.ah-dos{grid-template-columns:1fr}}
+.gm-dos{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end}.gm-dos>div{display:flex;flex-direction:column;gap:2px}
+.gm-f b{color:var(--as-ink,#111)!important;font-size:28px!important}
+.gm-fc{font-size:11.5px;font-weight:600;color:var(--as-ink,#111);margin-top:2px}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -7623,8 +7626,8 @@ ROL.set=function(me){
   ROL.on=!!(me&&!AS.on&&(me.dueno||me.director||me.gerente));if(!ROL.on)return;
   ROL.tipo=me.dueno?'Dueño del grupo':me.director?'Director regional':'Gerente de posventa';
   document.body.classList.add('ws','ws-rol');VIEWS.exp='Inicio';ORB='<span class="ax-mono">Ax</span>';
-  var sc=$('.sb-scroll');if(sc&&!$('#rolHome')){sc.insertAdjacentHTML('afterbegin','<button class="nav" id="rolHome" data-view="exp" data-i="home">Inicio</button><button class="nav" id="rolEq" data-view="eq" data-i="inbox">Bandeja<span class="nbadge" data-eqn hidden></span></button>');hydrate(sc);
-    sc.querySelectorAll('#rolHome,#rolEq').forEach(function(b){b.addEventListener('click',function(){if(b.id==='rolHome'&&typeof GM!=='undefined')GM.sel=null;showView(b.dataset.view)})});
+  var sc=$('.sb-scroll');if(sc&&!$('#rolHome')){sc.insertAdjacentHTML('afterbegin','<button class="nav" id="rolHome" data-view="exp" data-i="home">Inicio</button><button class="nav" id="rolEq" data-view="eq" data-i="inbox">Bandeja<span class="nbadge" data-eqn hidden></span></button><button class="nav" id="rolCx" data-view="cx" data-i="wallet">Cartera</button>');hydrate(sc);
+    sc.querySelectorAll('#rolHome,#rolEq,#rolCx').forEach(function(b){b.addEventListener('click',function(){if(b.id==='rolHome'&&typeof GM!=='undefined')GM.sel=null;showView(b.dataset.view)})});
     var bxn=sc.querySelector('.nav[data-view="bx"]');if(bxn)[].forEach.call(bxn.childNodes,function(n){if(n.nodeType===3&&/Bandeja/.test(n.nodeValue))n.nodeValue=n.nodeValue.replace('Bandeja','Decisiones')});VIEWS.bx='Decisiones'}
   var hd=$('.sb-head');if(hd&&!$('#rolWs')){var nom=(me.dueno||me.director)?(SB.grupo||SB.agency||'Tu grupo'):(SB.agency||'Tu agencia');
     hd.insertAdjacentHTML('afterend','<div class="as-ws rol-ws" id="rolWs"><span class="as-logo">Ax</span><div><b>'+esc(nom)+'</b><small>'+esc(ROL.tipo)+'</small></div></div>')}
@@ -7671,7 +7674,7 @@ GM.load=async function(){
   try{var r=await Promise.all([
       SB.c.from('agencies').select('id,name,brand,marca_grupo,city,tipo').eq('grupo_id',SB.grupoId).order('name'),
       SB.c.rpc('dinero_recuperado',{p_desde:first}),
-      SB.c.from('expedientes').select('id,flujo,profiles(agency_id)').limit(2000),
+      SB.c.from('expedientes').select('id,flujo,tipo,factura_monto,factura_fecha,updated_at,created_at,profiles(agency_id)').limit(3000),
       SB.c.rpc('cobrado_mes',{p_desde:first})]);
     if(my!==GM.t)return;
     GM.ags=(r[0].data||[]).filter(function(a){return !a.tipo||a.tipo==='agencia'});
@@ -7679,12 +7682,15 @@ GM.load=async function(){
     GM.rec={};var R=function(id){return GM.rec[id]||(GM.rec[id]={m:0,deb:0,n:0})};
     (r[3].data||[]).forEach(function(d){var o=R(d.agency_id);o.m=Number(d.cobrado||0);o.n=Number(d.ordenes||0)});
     (r[1].data||[]).forEach(function(d){R(d.agency_id).deb=Number(d.monto_debitado||0)});
-    GM.abiertas={};(r[2].data||[]).forEach(function(x){var id=x.profiles&&x.profiles.agency_id;if(id&&!(x.flujo&&x.flujo.etapa==='cerrado'))GM.abiertas[id]=(GM.abiertas[id]||0)+1});
+    GM.abiertas={};GM.fac={};var hoy0=new Date(),m0=new Date(hoy0.getFullYear(),hoy0.getMonth(),1);
+    (r[2].data||[]).forEach(function(x){var id=x.profiles&&x.profiles.agency_id;if(!id)return;if(!(x.flujo&&x.flujo.etapa==='cerrado'))GM.abiertas[id]=(GM.abiertas[id]||0)+1;
+      /* facturado del mes según la hoja de facturación (no es lo que pagó planta) */
+      if(Number(x.factura_monto)){var f=x.factura_fecha?new Date(x.factura_fecha+'T12:00:00'):new Date(x.updated_at||x.created_at);if(f>=m0){var o=GM.fac[id]||(GM.fac[id]={t:0,n:0});o.t+=Number(x.factura_monto);o.n++}}});
   }catch(e){console.warn('[mapa del grupo]',e)}
   GM.cargado=true;if(S.view==='exp'&&!XD.cur&&!AH.vista)AH.render();
 };
 GM.mk=function(a){return a.marca_grupo||a.brand||'Otras'};
-GM.marcas=function(){var by={};GM.ags.forEach(function(a){var k=GM.mk(a),o=by[k]||(by[k]={k:k,ags:[],m:0,deb:0,ab:0});o.ags.push(a);var r=GM.rec[a.id]||{};o.m+=r.m||0;o.deb+=r.deb||0;o.ab+=GM.abiertas[a.id]||0});
+GM.marcas=function(){var by={};GM.ags.forEach(function(a){var k=GM.mk(a),o=by[k]||(by[k]={k:k,ags:[],m:0,deb:0,ab:0,fac:0});o.ags.push(a);var r=GM.rec[a.id]||{};o.m+=r.m||0;o.deb+=r.deb||0;o.ab+=GM.abiertas[a.id]||0;o.fac+=((GM.fac||{})[a.id]||{}).t||0});
   return Object.keys(by).map(function(k){return by[k]}).sort(function(a,b){return b.m-a.m||b.ags.length-a.ags.length||a.k.localeCompare(b.k)})};
 /* el verde se intensifica con lo recuperado, relativo al mayor */
 GM.tono=function(m,max){return 0};
@@ -7702,18 +7708,18 @@ GM.html=function(){
   var tile=function(o,w){var n=o.ags.length;
     return '<button type="button" class="gm-t'+(o.k===GM.sel?' on':'')+(o.m>0?' rec':'')+'" data-gmk="'+ea(o.k)+'" style="flex-grow:'+w+'" aria-pressed="'+(o.k===GM.sel)+'">'+
       '<span class="gm-tn">'+esc(o.k)+'</span><span class="gm-ta">'+n+(n===1?' agencia':' agencias')+(o.ab?' · '+o.ab+(o.ab===1?' orden abierta':' órdenes abiertas'):'')+'</span>'+
-      '<span class="gm-tm">'+(o.m>0?EX.money(o.m):'$0')+'</span><span class="gm-tl">'+(o.m>0?'recuperado en '+GM.mes():'sin recuperado este mes')+'</span>'+
+      '<span class="gm-tm">'+(o.m>0?EX.money(o.m):'$0')+'</span><span class="gm-tl">'+(o.m>0?'recuperado en '+GM.mes():'sin recuperado este mes')+'</span>'+(o.fac?'<span class="gm-fc">Facturado '+EX.money(o.fac)+'</span>':'')+
       '<span class="gm-dots" aria-hidden="true">'+o.ags.slice(0,24).map(function(a){var r=GM.rec[a.id]||{};return '<i class="'+(r.m>0?'ok':'')+'"></i>'}).join('')+'</span></button>'};
   var agHtml='';
   if(sel){var maxA=Math.max.apply(null,sel.ags.map(function(a){return (GM.rec[a.id]||{}).m||0}).concat([0]));
     agHtml='<div class="gm-sub"><div class="gm-sh"><b>Agencias de '+esc(sel.k)+'</b><span>toca una para abrirla</span></div>'+
       GM.mosaico(sel.ags.slice().sort(function(a,b){return ((GM.rec[b.id]||{}).m||0)-((GM.rec[a.id]||{}).m||0)||a.name.localeCompare(b.name)}),function(a){var m=(GM.rec[a.id]||{}).m||0;return 1+(maxA?m/maxA:0)},function(a,w){var r=GM.rec[a.id]||{},m=r.m||0,ab=GM.abiertas[a.id]||0;
         return '<button type="button" class="gm-a'+(m>0?' rec':'')+'" data-agv="'+a.id+'" style="flex-grow:'+w+'"><span class="gm-an">'+esc(a.name)+'</span><span class="gm-ac">'+esc(a.city||'')+'</span>'+
-          '<span class="gm-am">'+(m>0?EX.money(m):'$0')+'<small>'+(m>0?'cobrado':'sin cobrar')+'</small></span>'+
+          '<span class="gm-am">'+(m>0?EX.money(m):'$0')+'<small>'+(m>0?'cobrado':'sin cobrar')+'</small></span>'+(((GM.fac||{})[a.id]||{}).t?'<span class="gm-fc">Facturado '+EX.money(GM.fac[a.id].t)+'</span>':'')+
           '<span class="gm-ax">'+(ab?'<i>'+ab+(ab===1?' abierta':' abiertas')+'</i>':'<i>al día</i>')+(r.deb?'<i class="mal">'+DEB.mx(r.deb)+' en débitos</i>':'')+'</span></button>'},'gm-ag',4)+'</div>'}
   if(sel)return '<section class="gm gm-solo"><div class="gm-bar"><button type="button" class="xd-back" data-gmk="'+ea(sel.k)+'">← Todas las marcas</button></div>'+
-    '<div class="gm-hero"><span>'+esc(sel.k)+' · Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(sel.m)+'</b><small>'+sel.ags.length+(sel.ags.length===1?' agencia':' agencias')+(sel.ab?' · '+sel.ab+(sel.ab===1?' orden abierta':' órdenes abiertas'):'')+(sel.deb?' · '+DEB.mx(sel.deb)+' en débitos':'')+'</small></div>'+agHtml+'</section>';
-  return '<section class="gm"><div class="gm-hero">'+(RPT.on()?'<button type="button" class="gm-pdf" data-rptpdf>'+svg('file','sm')+'Descargar reporte PDF</button>':'')+'<span>Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(tot)+'</b><small>'+M.length+(M.length===1?' marca':' marcas')+' · '+GM.ags.length+' agencias · toca una marca para ver sus agencias</small></div>'+
+    '<div class="gm-hero"><div class="gm-dos"><div><span>'+esc(sel.k)+' · Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(sel.m)+'</b></div><div class="gm-f"><span>Facturado en '+GM.mes()+'</span><b>'+EX.money(sel.fac||0)+'</b></div></div><small>'+sel.ags.length+(sel.ags.length===1?' agencia':' agencias')+(sel.ab?' · '+sel.ab+(sel.ab===1?' orden abierta':' órdenes abiertas'):'')+(sel.deb?' · '+DEB.mx(sel.deb)+' en débitos':'')+'</small></div>'+agHtml+'</section>';
+  return '<section class="gm"><div class="gm-hero">'+(RPT.on()?'<button type="button" class="gm-pdf" data-rptpdf>'+svg('file','sm')+'Descargar reporte PDF</button>':'')+'<div class="gm-dos"><div><span>Ax AI recuperó en '+GM.mes()+'</span><b>'+EX.money(tot)+'</b></div><div class="gm-f"><span>Facturado en '+GM.mes()+'</span><b>'+EX.money(M.reduce(function(a,b){return a+(b.fac||0)},0))+'</b></div></div><small>'+M.length+(M.length===1?' marca':' marcas')+' · '+GM.ags.length+' agencias · toca una marca para ver sus agencias</small></div>'+
     GM.mosaico(M,function(o){return 1+Math.min(3,Math.sqrt(o.ags.length))},tile,'gm-map',4)+agHtml+'</section>';
 };
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;var b=t.closest('#asHome [data-gmk]');if(!b)return;
@@ -7913,25 +7919,33 @@ CX.subir=async function(file){
       return {nombre:n,columnas:cols,filas:A.slice(h+1,h+1+4000)}}).filter(function(h){return h.filas.length||h.columnas.length});
     if(!hojas.length)throw new Error('El archivo no trae datos');
     var r=await SB.c.from('cartera_excel').insert({archivo:file.name.slice(0,160),hojas:hojas}).select('*').single();if(r.error)throw r.error;
-    CX.d=r.data;CX.hoja=0;CX.q='';
+    CX.d=r.data;CX.hoja=0;CX.q='';CX.ag=r.data.agency_id;CX.todas=[r.data].concat((CX.todas||[]).filter(function(x){return x.agency_id!==r.data.agency_id}));
     var tot=hojas.reduce(function(a,h){return a+h.filas.length},0);toast('Cartera lista: '+tot+(tot===1?' renglón':' renglones')+' en '+hojas.length+(hojas.length===1?' hoja':' hojas'));
     showView('cx');
   }catch(e){console.warn('[cartera]',e);toast('No se pudo subir la cartera ('+TR.errTxt(e)+')')}
   CX.busy=false;
 };
-CX.load=async function(){var r=await SB.c.from('cartera_excel').select('*').order('created_at',{ascending:false}).limit(1);CX.d=r.data&&r.data[0]||null;CX.cargado=true};
+CX.load=async function(){
+  var r=await SB.c.from('cartera_excel').select('*').order('created_at',{ascending:false}).limit(60);
+  /* la más reciente de cada agencia */
+  var vis={};CX.todas=(r.data||[]).filter(function(x){if(vis[x.agency_id])return false;vis[x.agency_id]=1;return true});
+  if(CX.ag==null||!CX.todas.some(function(x){return x.agency_id===CX.ag}))CX.ag=CX.todas[0]?CX.todas[0].agency_id:null;
+  CX.d=CX.todas.filter(function(x){return x.agency_id===CX.ag})[0]||null;CX.cargado=true};
+CX.puedeSubir=function(){return !!(SB.user&&SB.user.agency_id)};
+CX.nomAg=function(id){var L=(typeof GM!=='undefined'&&GM.ags&&GM.ags.length?GM.ags:(typeof AGV!=='undefined'?AGV.ags:[]))||[];var a=L.filter(function(x){return x.id===id})[0];return a?a.name:(id===(SB.user&&SB.user.agency_id)?SB.agency:'Agencia '+id)};
 CX.abrir=async function(){var el=$('#cxIn');if(!el)return;if(!CX.cargado){el.innerHTML='<p class="xz-mut">Cargando la cartera…</p>';try{await CX.load()}catch(e){console.warn(e)}}CX.pintar()};
 CX.num=function(v){if(typeof v==='number')return v;var t=String(v).replace(/[$,\s]/g,'');return /^-?\d+(\.\d+)?$/.test(t)?Number(t):null};
 CX.pintar=function(){
   var el=$('#cxIn');if(!el)return;var d=CX.d;
-  if(!d){el.innerHTML='<div class="cx-vacio"><b>Todavía no subes tu cartera</b><p>Sube el Excel de tu cartera y aquí la ves igual, con búsqueda y totales.</p><button type="button" class="bt pri" data-cxup>'+svg('wallet','sm')+'Subir cartera (Excel)</button></div>';return}
+  var chips=(CX.todas||[]).length>1||(!CX.puedeSubir()&&(CX.todas||[]).length)?'<div class="cx-tabs cx-ags" role="tablist" aria-label="Agencias">'+(CX.todas||[]).map(function(x){return '<button type="button" role="tab" data-cxag="'+x.agency_id+'" aria-selected="'+(x.agency_id===CX.ag)+'">'+esc(CX.nomAg(x.agency_id))+'</button>'}).join('')+'</div>':'';
+  if(!d){el.innerHTML=CX.puedeSubir()?'<div class="cx-vacio"><b>Todavía no subes tu cartera</b><p>Sube el Excel de tu cartera y aquí la ves igual, con búsqueda y totales.</p><button type="button" class="bt pri" data-cxup>'+svg('wallet','sm')+'Subir cartera (Excel)</button></div>':'<div class="cx-vacio"><b>Todavía no hay carteras</b><p>Cuando los asesores de tus agencias suban su cartera en Excel, aquí la ves por agencia.</p></div>';return}
   var H=d.hojas||[],h=H[Math.min(CX.hoja,H.length-1)]||{columnas:[],filas:[]},q=norm(CX.q);
   var F=h.filas.filter(function(r){return !q||norm(r.join(' ')).indexOf(q)>=0});
   var nc=h.columnas.length,esNum=h.columnas.map(function(_,j){var n=0,t=0;h.filas.forEach(function(r){var v=r[j];if(String(v).trim()==='')return;t++;if(CX.num(v)!==null)n++});return t>0&&n/t>.8});
   var sum=h.columnas.map(function(_,j){return esNum[j]?F.reduce(function(a,r){var v=CX.num(r[j]);return a+(v||0)},0):null});
   var fmt=function(v,j){if(esNum[j]&&CX.num(v)!==null){var x=CX.num(v);return Math.abs(x)>=1000||String(v).indexOf('.')>=0?x.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2}):String(x)}return esc(String(v))};
-  el.innerHTML='<div class="cx-top"><div><h2>Cartera</h2><p>'+esc(d.archivo||'Excel')+' · subida '+esc(AL.ago(d.created_at))+' · '+F.length+(F.length===1?' renglón':' renglones')+'</p></div>'+
-      '<div class="cx-acc"><input type="search" id="cxQ" placeholder="Buscar en la cartera" value="'+ea(CX.q)+'" aria-label="Buscar en la cartera"><button type="button" class="bt" data-cxup>'+svg('wallet','sm')+'Subir nueva cartera</button></div></div>'+
+  el.innerHTML=chips+'<div class="cx-top"><div><h2>Cartera'+(CX.puedeSubir()&&!chips?'':' · '+esc(CX.nomAg(d.agency_id)))+'</h2><p>'+esc(d.archivo||'Excel')+' · subida '+esc(AL.ago(d.created_at))+' · '+F.length+(F.length===1?' renglón':' renglones')+'</p></div>'+
+      '<div class="cx-acc"><input type="search" id="cxQ" placeholder="Buscar en la cartera" value="'+ea(CX.q)+'" aria-label="Buscar en la cartera">'+(CX.puedeSubir()?'<button type="button" class="bt" data-cxup>'+svg('wallet','sm')+'Subir nueva cartera</button>':'')+'</div></div>'+
     (H.length>1?'<div class="cx-tabs" role="tablist">'+H.map(function(x,i){return '<button type="button" role="tab" data-cxh="'+i+'" aria-selected="'+(i===CX.hoja)+'">'+esc(x.nombre)+' <i>'+x.filas.length+'</i></button>'}).join('')+'</div>':'')+
     '<div class="cx-tw"><table class="cx-t"><thead><tr>'+h.columnas.map(function(c,j){return '<th'+(esNum[j]?' class="r"':'')+'>'+esc(c)+'</th>'}).join('')+'</tr></thead><tbody>'+
       F.slice(0,1500).map(function(r){var o='<tr>';for(var j=0;j<nc;j++)o+='<td'+(esNum[j]?' class="r"':'')+'>'+fmt(r[j]==null?'':r[j],j)+'</td>';return o+'</tr>'}).join('')+'</tbody>'+
@@ -7941,6 +7955,7 @@ CX.pintar=function(){
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
   if(t.closest('[data-cxup]')){CX.input().click();return}
   var hb=t.closest('[data-cxh]');if(hb){CX.hoja=Number(hb.dataset.cxh);CX.pintar()}
+  var ab=t.closest('[data-cxag]');if(ab){CX.ag=Number(ab.dataset.cxag);CX.d=(CX.todas||[]).filter(function(x){return x.agency_id===CX.ag})[0]||null;CX.hoja=0;CX.q='';CX.pintar()}
 });
 document.addEventListener('change',function(e){if(e.target&&e.target.id==='cxFile'){var f=e.target.files&&e.target.files[0];e.target.value='';CX.subir(f)}});
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='cxQ'){CX.q=e.target.value;var p=e.target.selectionStart;CX.pintar();var i=$('#cxQ');if(i){i.focus();try{i.setSelectionRange(p,p)}catch(_){}}}});
