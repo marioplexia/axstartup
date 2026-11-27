@@ -8960,7 +8960,7 @@ SB.submit=async function(ev){
   btn.disabled=false;
 };
 SB.loadAdvisors=async function(){
-  var r=await SB.c.from('profiles').select('id,name,role,brand,created_at,agency_id,grupo_id,agencies(name,comparte)').order('created_at');
+  var r=await SB.c.from('profiles').select('id,name,role,brand,created_at,agency_id,grupo_id,agencies!profiles_agency_id_fkey(name,comparte)').order('created_at');
   if(r.error)throw r.error;
   ADVISORS.length=0;
   r.data.forEach(function(p){ADVISORS.push({id:p.id,name:p.name,role:p.role==='marca'?'admin':p.role,tag:p.id===ME?'tú':''})});
@@ -9726,7 +9726,7 @@ BX.nivel=function(p){return p>=50?['alto','bad']:p>=25?['medio','warn']:['bajo',
 BX.load=async function(){
   if(!SB.c||!SB.entered||BX.busy)return;BX.busy=true;
   try{
-    var r=await Promise.all([SB.c.from('expedientes').select('*,profiles(name,agency_id,agencies(name))').order('updated_at',{ascending:false}).limit(400),
+    var r=await Promise.all([SB.c.from('expedientes').select('*,profiles(name,agency_id,agencies!profiles_agency_id_fkey(name))').order('updated_at',{ascending:false}).limit(400),
       SB.c.from('decisiones').select('expediente_id,decision,riesgo,nota,created_at,user_id,profiles(name)').order('created_at',{ascending:false}).limit(800),
       SB.c.from('manual_reglas').select('id,veces').eq('origen','debito'),AL.loaded?null:AL.load()]);
     if(r[0].error)throw r[0].error;
@@ -10437,7 +10437,7 @@ PV.load=async function(quiet){
   if(quiet&&Date.now()-PV.t<1500)return;PV.t=Date.now();
   if(!quiet){PV.loading=true;PV.render()}
   var r=await Promise.all([
-    SB.c.from('expedientes').select('id,folio,wo,vin,user_id,sys,op,queja,status,parts,parts_total,labor,vehicle,km,comentario_fabricante,created_at,updated_at,orden_apertura,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,profiles(name,agency_id,agencies(name))').order('created_at',{ascending:false}).limit(1000),
+    SB.c.from('expedientes').select('id,folio,wo,vin,user_id,sys,op,queja,status,parts,parts_total,labor,vehicle,km,comentario_fabricante,created_at,updated_at,orden_apertura,orden_cierre,gwm_cobrada_at,transaccion_aceptada_at,pra_rechazada_at,pra_corregida_at,wpc_etiqueta_at,wpc_enviada_at,debito_at,debito_resuelto_at,partes_destruidas_at,profiles(name,agency_id,agencies!profiles_agency_id_fkey(name))').order('created_at',{ascending:false}).limit(1000),
     SB.c.from('cartera').select('expediente_id,estado,monto,monto_pagado,facturada_at,pagada_at').limit(2000),
     SB.c.from('debitos').select('id,agency_id,expediente_id,fecha,monto,motivo,estado,monto_revertido,regla_id,regla_nueva,expedientes(folio),profiles(name)').order('created_at',{ascending:false}).limit(300),
     DR.load()]);
