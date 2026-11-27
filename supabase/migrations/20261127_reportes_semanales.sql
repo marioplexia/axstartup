@@ -1,0 +1,11 @@
+-- Agente de reportes: cada lunes 8:00 a.m. (centro de México = 14:00 UTC) cada director recibe en su Bandeja
+-- el reporte del dinero recuperado (ya cobrado) SOLO de las agencias que dirige.
+-- Aplicado en el proyecto con este contenido (más los ajustes de nombres de mes en español y la variable k).
+-- · is_dueno()
+-- · director_agencias(director_id, agency_id) + directores_grupo() + asignar_director(p_agency, p_director): el dueño asigna.
+-- · buzon.para: un mensaje para una sola persona; RLS de buzon: (para is null or para = auth.uid()).
+-- · buzon_agente_check incluye 'reportes'.
+-- · cobrado_de_agencias(p_agencias, p_desde, p_hasta): detalle por orden (solo para el agente; sin permiso a usuarios).
+-- · enviar_reportes_semanales(p_forzar): semana lunes–domingo anterior + acumulado del mes; una vez por director y semana (clave).
+-- · cron: 'reportes-semanales-directores' '0 14 * * 1'.
+-- Ver definiciones vigentes con pg_get_functiondef.

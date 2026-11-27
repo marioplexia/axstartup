@@ -1316,6 +1316,29 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 .ag-chat{flex:1;min-height:180px;overflow:visible;padding:6px 2px 0}
 .ag-dock{position:sticky;bottom:0;max-width:none;width:100%;margin:0;padding:8px 0 16px;background:linear-gradient(to bottom,transparent,var(--as-canvas,var(--bg)) 30%)}.ag-dock::before{display:none}
 .ag-svg{height:190px}
+/* ══ Bandeja · Reportes ══ */
+.rb-tabs{display:inline-flex;gap:2px;padding:3px;margin:6px 24px 0;border-radius:99px;background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);box-shadow:var(--as-sh,none);align-self:flex-start}
+.rb-tabs button{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 14px;border-radius:99px;border:0;background:transparent;font:550 13px var(--f-ui,inherit);color:var(--as-mut,#8b8b90);cursor:pointer}
+.rb-tabs button[aria-selected="true"]{background:var(--as-ink,#111);color:var(--as-card,#fff)}.rb-tabs b{font-size:10.5px;background:#e5484d;color:#fff;border-radius:99px;padding:0 6px}
+#eqIn{flex-direction:column}
+.rb-w{flex:1;overflow:auto;max-width:860px;width:100%;margin:0 auto;padding:12px 24px 40px;display:flex;flex-direction:column;gap:12px}
+.rb-due{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 16px;border-radius:14px;background:var(--as-card,#fff);border:1px dashed var(--as-line,#d9d9dc)}
+.rb-due b{display:block;font-size:13.5px}.rb-due small{font-size:12px;color:var(--as-mut,#8b8b90)}
+.rb-c{background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);border-radius:16px;box-shadow:var(--as-sh,none);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.rb-c.nw{border-color:var(--as-ink,#111)}
+.rb-h{display:flex;align-items:center;gap:10px}.rb-h b{display:block;font-size:13px}.rb-h small{font-size:11.5px;color:var(--as-mut,#8b8b90)}
+.rb-h i{margin-left:auto;font-style:normal;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--as-ink,#111);color:var(--as-card,#fff)}
+.rb-av{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--as-ink,#111);color:var(--as-card,#fff);font-size:12px;font-weight:700}
+.rb-c h4{margin:0;font-size:15px;font-weight:650}
+.rb-n{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--as-line,#ebebec);border:1px solid var(--as-line,#ebebec);border-radius:12px;overflow:hidden}
+.rb-n>div{background:var(--as-card,#fff);padding:12px 14px;display:flex;flex-direction:column;gap:1px}
+.rb-n span{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--as-mut,#8b8b90)}.rb-n b{font-size:22px;font-weight:650;color:#16834a;font-variant-numeric:tabular-nums}.rb-n small{font-size:11.5px;color:var(--as-mut,#8b8b90)}
+.rb-c p{margin:0;font-size:13.5px;line-height:1.5}
+.rb-pdf{align-self:flex-start;display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:550;padding:8px 14px;border-radius:99px;border:0;background:var(--as-ink,#111);color:var(--as-card,#fff);cursor:pointer}.rb-pdf .ic{width:15px;height:15px}.rb-pdf:disabled{opacity:.6}
+.ag-dir{display:inline-flex;align-items:center;gap:8px;margin-left:auto;margin-right:8px;font-size:12.5px;color:var(--as-mut,#8b8b90)}
+.ag-dir select{font:inherit;font-size:13px;padding:6px 10px;border-radius:99px;border:1px solid var(--as-line,#ebebec);background:var(--as-card,#fff);color:var(--as-ink,#111)}
+:root[data-theme="dark"] .rb-n b{color:#5fd896}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rb-n b{color:#5fd896}}
+@media(max-width:600px){.rb-n{grid-template-columns:1fr}.rb-tabs{margin:6px 10px 0}.rb-w{padding:10px}}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -7406,6 +7429,34 @@ document.addEventListener('click',function(e){var t=e.target;if(!t.closest)retur
   if(!t.closest('#accMenu'))ACC.cerrar();
 });
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('#accMenu')){ACC.cerrar();$('#accBtn').focus()}});
+/* ══ Bandeja · Reportes: lo que manda el agente de reportes (cada lunes, a cada director, de SUS agencias) ══ */
+var RB={rows:[],cargado:false};
+RB.on=function(){return !!(typeof ROL!=='undefined'&&ROL.on&&SB.user&&(SB.user.director||SB.user.dueno))};
+RB.nuevos=function(){return RB.rows.filter(function(r){return r.estado==='nuevo'}).length};
+RB.tabs=function(){if(!RB.on())return '';var n=RB.nuevos();
+  return '<div class="rb-tabs" role="tablist" aria-label="Bandeja"><button type="button" role="tab" data-rbv="chat" aria-selected="'+(EQ.vista!=='rep')+'">Equipo</button><button type="button" role="tab" data-rbv="rep" aria-selected="'+(EQ.vista==='rep')+'">Reportes'+(n?'<b>'+n+'</b>':'')+'</button></div>'};
+RB.load=async function(){if(!RB.on()||!SB.c)return;
+  var r=await SB.c.from('buzon').select('id,created_at,asunto,cuerpo,estado,datos').eq('agente','reportes').order('created_at',{ascending:false}).limit(30);
+  RB.rows=r.data||[];RB.cargado=true;EQ.badge();if(S.view==='eq'&&EQ.vista==='rep')RB.pintar()};
+RB.leido=async function(id){var x=RB.rows.filter(function(r){return r.id===id})[0];if(!x||x.estado!=='nuevo')return;x.estado='leido';EQ.badge();
+  try{await SB.c.from('buzon').update({estado:'leido'}).eq('id',id)}catch(_){}if(S.view==='eq'&&EQ.vista==='rep')RB.pintar()};
+RB.pintar=function(){
+  var el=$('#eqIn');if(!el)return;var due=!!(SB.user&&SB.user.dueno);
+  var card=function(r){var d=r.datos||{},se=d.semana||{},me=d.mes||{};
+    return '<article class="rb-c'+(r.estado==='nuevo'?' nw':'')+'"><div class="rb-h"><span class="rb-av">R</span><div><b>Agente de reportes</b><small>'+esc(new Date(r.created_at).toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'}))+' · '+esc(new Date(r.created_at).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'}))+'</small></div>'+(r.estado==='nuevo'?'<i>Nuevo</i>':'')+'</div>'+
+      '<h4>'+esc(r.asunto)+'</h4><div class="rb-n"><div><span>Recuperado en la semana</span><b>'+EX.money(se.total||0)+'</b><small>'+(se.ordenes||0)+((se.ordenes||0)===1?' orden cobrada':' órdenes cobradas')+'</small></div>'+
+      '<div><span>Acumulado del mes</span><b>'+EX.money(me.total||0)+'</b><small>'+(me.ordenes||0)+((me.ordenes||0)===1?' orden':' órdenes')+' · '+(d.agencias||[]).length+((d.agencias||[]).length===1?' agencia':' agencias')+'</small></div></div>'+
+      '<p>'+esc(r.cuerpo||'')+'</p><button type="button" class="rb-pdf" data-rbpdf="'+ea(r.id)+'">'+svg('file','sm')+'Descargar reporte PDF</button></article>'};
+  el.innerHTML=RB.tabs()+'<div class="rb-w">'+
+    (due?'<div class="rb-due"><div><b>Reportes semanales a los directores</b><small>Cada lunes a las 8:00 a.m. el agente de reportes le manda a cada director el dinero recuperado de sus agencias. Asigna el director de cada agencia en la pantalla de la agencia.</small></div><button type="button" class="bt" data-rbsend>Enviar los de esta semana ahora</button></div>':'')+
+    (RB.cargado?(RB.rows.length?RB.rows.map(card).join(''):'<div class="eq-vacio"><b>Todavía no hay reportes</b><p>'+(due?'Los reportes van a los directores. Tú puedes descargar el reporte del grupo desde el Inicio.':'Cada lunes a las 8:00 a.m. el agente de reportes te manda aquí el dinero recuperado de tus agencias.')+'</p></div>'):'<div class="eq-vacio">Cargando…</div>')+'</div>';
+};
+document.addEventListener('click',async function(e){var t=e.target;if(!t.closest)return;
+  var v=t.closest('#eqIn [data-rbv]');if(v){EQ.vista=v.dataset.rbv;if(EQ.vista==='rep'){RB.pintar();RB.load()}else{EQ.pintar();EQ.load()}return}
+  var b=t.closest('[data-rbpdf]');if(b){var r=RB.rows.filter(function(z){return z.id===b.dataset.rbpdf})[0];if(r)RPT.generar(b,Object.assign({_id:r.id,cuerpo:r.cuerpo},r.datos||{}));return}
+  var sd=t.closest('[data-rbsend]');if(sd){sd.disabled=true;var q=await SB.c.rpc('enviar_reportes_semanales',{p_forzar:false});sd.disabled=false;
+    if(q.error){toast('No se pudieron enviar ('+(q.error.message||'error')+')');return}toast(q.data?'Listo: '+q.data+(q.data===1?' reporte enviado':' reportes enviados')+' a los directores':'No hay reportes nuevos que enviar: asigna directores a las agencias o ya se enviaron esta semana');return}
+});
 /* ══ Bandeja: el chat del equipo ══
    Una sala por grupo y marca: los asesores de las agencias de esa marca, sus gerentes de posventa, el director y el dueño.
    Tabla chat_grupo (RLS: chat_puede). Nombre, puesto y agencia los pone la base. En línea: presencia de Realtime. */
@@ -7415,7 +7466,7 @@ EQ.k=function(r){return r?r.grupo_id+'|'+r.marca:''};
 EQ.ini=function(n){return String(n||'?').trim().split(/\s+/).slice(0,2).map(function(w){return w.charAt(0)}).join('').toUpperCase()||'?'};
 EQ.visto=function(k){try{return +localStorage.getItem('ax_eq_'+k)||0}catch(_){return 0}};
 EQ.marcar=function(k){try{localStorage.setItem('ax_eq_'+k,String(Date.now()))}catch(_){}EQ.nuevo[k]=0;EQ.badge()};
-EQ.nuevos=function(){var n=0;for(var k in EQ.nuevo)n+=EQ.nuevo[k]||0;return n};
+EQ.nuevos=function(){var n=0;for(var k in EQ.nuevo)n+=EQ.nuevo[k]||0;return n+(typeof RB!=='undefined'?RB.nuevos():0)};
 EQ.badge=function(){var n=EQ.nuevos();document.querySelectorAll('[data-eqn]').forEach(function(b){b.hidden=!n;b.textContent=n>99?'99+':String(n)})};
 EQ.on=function(){return !!(SB.c&&SB.entered&&(AS.on||ROL.on))};
 EQ.init=async function(){
@@ -7437,8 +7488,10 @@ EQ.presencia=function(){
     .on('broadcast',{event:'escribe'},function(m){var p=m.payload||{};if(p.id===ME)return;EQ.esc=EQ.esc||{};EQ.esc[p.id]={n:p.n,t:Date.now()};EQ.escPintar();setTimeout(EQ.escPintar,3200)})
     .subscribe(function(st){if(st==='SUBSCRIBED')ch.track({n:(SB.user&&SB.user.name)||''})});
 };
+EQ.vista='chat';
 EQ.abrir=async function(){
   var el=$('#eqIn');if(!el)return;
+  if(RB.on()&&EQ.vista==='rep'){RB.pintar();RB.load();return}
   if(!EQ.salas.length){el.innerHTML='<div class="eq-vacio">Cargando la bandeja…</div>';await EQ.init()}
   if(!EQ.sala){el.innerHTML='<div class="eq-vacio"><b>Todavía no tienes sala</b><p>La bandeja junta a los asesores, gerentes, director y dueño de la misma marca de tu grupo. Pide a tu administrador que te asigne agencia.</p></div>';return}
   EQ.presencia();EQ.pintar();await EQ.load();
@@ -7454,7 +7507,7 @@ EQ.load=async function(){
 };
 EQ.pintar=function(){
   var el=$('#eqIn'),x=EQ.sala;if(!el||!x)return;
-  el.innerHTML='<div class="eq-w"><div class="eq-main">'+
+  el.innerHTML=RB.tabs()+'<div class="eq-w"><div class="eq-main">'+
     '<header class="eq-h"><div class="eq-ht"><h2>Bandeja</h2><p id="eqSub">'+esc(x.marca)+' · tu equipo</p></div>'+
       (EQ.salas.length>1?'<div class="eq-salas" role="tablist" aria-label="Marcas">'+EQ.salas.map(function(r){var k=EQ.k(r),n=EQ.nuevo[k]||0;return '<button type="button" role="tab" data-eqsala="'+ea(k)+'" aria-selected="'+(k===EQ.k(x))+'">'+esc(r.marca)+(n?'<b>'+n+'</b>':'')+'</button>'}).join('')+'</div>':'')+
     '</header>'+
@@ -7649,19 +7702,30 @@ RPT.resumenIA=async function(D,tot,M,base){
   try{var r=await Promise.race([SB.ai({rol_agente:'garantias',messages:[{role:'user',content:ctx}],ahora:MI.nowInfo()},'manual'),new Promise(function(_,ko){setTimeout(function(){ko(new Error('tiempo'))},25000)})]);
     var t=RPT.txt(r&&r.text);return t.length>40&&t.indexOf(RPT.txt(EX.money(tot)))>=0?t.slice(0,1400):base}catch(_){return base}
 };
-RPT.generar=async function(btn){
-  if(RPT.busy)return;RPT.busy=true;var t0=btn&&btn.innerHTML;if(btn){btn.disabled=true;btn.innerHTML='Ax AI está armando el reporte…'}
+RPT.f=function(d){return new Date(d+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long'})};
+RPT.generar=async function(btn,src){
+  if(RPT.busy)return;RPT.busy=true;var t0=btn&&btn.innerHTML;if(btn){btn.disabled=true;btn.innerHTML=src?'Armando el PDF…':'Ax AI está armando el reporte…'}
   try{
-    var hoy=new Date(),first=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-01',mes=hoy.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
-    var q=await SB.c.rpc('cobrado_detalle',{p_desde:first});if(q.error)throw q.error;
-    var D=(q.data||[]).map(function(r){r.monto=Number(r.monto||0);return r});
-    if(!GM.ags.length)await GM.load();
+    var hoy=new Date(),first,mes,TIT,PER,D,AGS,DM=null;
+    if(src){/* un reporte que mandó el agente de reportes: sus cifras tal como se generaron */
+      var se=src.semana||{};first=se.desde;TIT='Dinero recuperado · semana del '+RPT.f(se.desde)+' al '+RPT.f(se.hasta);
+      PER='Reporte semanal del agente de reportes · generado el '+new Date(src.generado_at||Date.now()).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+(src.director?' para '+src.director:'')+' · solo tus agencias';
+      D=(se.filas||[]).map(function(r){r.monto=Number(r.monto||0);return r});AGS=(src.agencias||[]).map(function(a){return {id:a.id,name:a.name,city:a.city,marca_grupo:a.marca}});
+      DM=src.mes||null;
+    }else{
+      first=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-01';mes=hoy.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+      TIT='Dinero recuperado · '+mes.charAt(0).toUpperCase()+mes.slice(1);
+      PER=(SB.grupo||'Grupo')+' · del 1 al '+hoy.getDate()+' · generado por Ax AI el '+hoy.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+' a las '+hoy.toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'})+(SB.user&&SB.user.name?' para '+SB.user.name:'');
+      var q=await SB.c.rpc('cobrado_detalle',{p_desde:first});if(q.error)throw q.error;
+      D=(q.data||[]).map(function(r){r.monto=Number(r.monto||0);return r});
+      if(!GM.ags.length)await GM.load();AGS=GM.ags;
+    }
     var tot=D.reduce(function(a,r){return a+r.monto},0);
-    var byM={};GM.ags.forEach(function(a){var k=GM.mk(a);(byM[k]=byM[k]||{k:k,ags:{},m:0,n:0}).ags[a.id]={a:a,m:0,n:0,srv:0,cam:0,pre:0,R:[]}});
+    var byM={};AGS.forEach(function(a){var k=GM.mk(a);(byM[k]=byM[k]||{k:k,ags:{},m:0,n:0}).ags[a.id]={a:a,m:0,n:0,srv:0,cam:0,pre:0,R:[]}});
     D.forEach(function(r){var k=r.marca||'Otras',o=byM[k]||(byM[k]={k:k,ags:{},m:0,n:0}),g=o.ags[r.agency_id]||(o.ags[r.agency_id]={a:{name:r.agencia,city:r.ciudad},m:0,n:0,srv:0,cam:0,pre:0,R:[]});
       o.m+=r.monto;o.n++;g.m+=r.monto;g.n++;g.R.push(r);if(r.tipo==='Servicio')g.srv+=r.monto;else if(r.tipo==='Campaña')g.cam+=r.monto;else g.pre+=r.monto});
     var M=Object.keys(byM).map(function(k){return byM[k]}).sort(function(a,b){return b.m-a.m||a.k.localeCompare(b.k)});
-    var base=RPT.resumenBase(D,tot,M),res=await RPT.resumenIA(D,tot,M,base);
+    var base=RPT.resumenBase(D,tot,M),res=src?(src.cuerpo||base):await RPT.resumenIA(D,tot,M,base);
     var L=await XD.pdfLib(),pdf=await L.PDFDocument.create(),F=await pdf.embedFont(L.StandardFonts.Helvetica),B=await pdf.embedFont(L.StandardFonts.HelveticaBold);
     var W=612,H=792,mx=44,page,y,pg=0,ink=L.rgb(.07,.07,.08),mut=L.rgb(.45,.45,.48),ln=L.rgb(.88,.88,.9),ver=L.rgb(.09,.51,.29);
     var T=function(t){return RPT.txt(t)};
@@ -7680,20 +7744,24 @@ RPT.generar=async function(btn){
         y-=4;page.drawLine({start:{x:mx,y:y},end:{x:W-mx,y:y},thickness:.3,color:ln});y-=rh-4});y-=6};
     var titulo=function(t){cabe(40);y-=8;page.drawText(T(t),{x:mx,y:y,size:12.5,font:B,color:ink});y-=18};
     nueva();
-    page.drawText(T('Dinero recuperado · '+mes.charAt(0).toUpperCase()+mes.slice(1)),{x:mx,y:y,size:20,font:B,color:ink});y-=20;
-    texto((SB.grupo||'Grupo')+' · del 1 al '+hoy.getDate()+' · generado por Ax AI el '+hoy.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})+' a las '+hoy.toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'})+(SB.user&&SB.user.name?' para '+SB.user.name:''),{size:9.5,c:mut});y-=12;
+    texto(TIT,{size:src?16:20,b:1,lh:src?20:22});
+    texto(PER,{size:9.5,c:mut});y-=12;
     page.drawText('RECUPERADO (YA COBRADO)',{x:mx,y:y,size:8.5,font:B,color:mut});y-=30;
     page.drawText(T(EX.money(tot)),{x:mx,y:y,size:32,font:B,color:tot>0?ver:mut});y-=18;
-    texto(D.length+(D.length===1?' orden cobrada':' órdenes cobradas')+' · '+M.filter(function(m){return m.m>0}).length+' de '+M.length+' marcas con recuperado · '+GM.ags.length+' agencias en el grupo',{size:9.5,c:mut});y-=10;
+    texto(D.length+(D.length===1?' orden cobrada':' órdenes cobradas')+' · '+M.filter(function(m){return m.m>0}).length+' de '+M.length+' marcas con recuperado · '+AGS.length+(src?(AGS.length===1?' agencia':' agencias'):' agencias en el grupo')+(DM?' · acumulado del mes: '+EX.money(DM.total)+' en '+DM.ordenes+(DM.ordenes===1?' orden':' órdenes'):''),{size:9.5,c:mut});y-=10;
     titulo('Resumen de Ax AI');texto(res,{size:10.5,lh:15});
     titulo('Por marca');
     tabla([{t:'Marca',w:200},{t:'Agencias',w:70,r:1},{t:'Órdenes cobradas',w:110,r:1},{t:'Recuperado',w:144,r:1,v:1}],
-      M.map(function(m){var f=[m.k,String(Object.keys(m.ags).length),String(m.n),EX.money(m.m)];f.ok=m.m>0;return f}).concat([(function(){var f=['Total del grupo',String(GM.ags.length),String(D.length),EX.money(tot)];f.b=1;f.ok=tot>0;return f})()]),{});
+      M.map(function(m){var f=[m.k,String(Object.keys(m.ags).length),String(m.n),EX.money(m.m)];f.ok=m.m>0;return f}).concat([(function(){var f=[src?'Total de tus agencias':'Total del grupo',String(AGS.length),String(D.length),EX.money(tot)];f.b=1;f.ok=tot>0;return f})()]),{});
     titulo('Por agencia');
     var AG=[];M.forEach(function(m){Object.keys(m.ags).forEach(function(id){var g=m.ags[id];AG.push({m:m.k,g:g})})});AG.sort(function(a,b){return b.g.m-a.g.m||a.g.a.name.localeCompare(b.g.a.name)});
     tabla([{t:'Agencia',w:150},{t:'Marca',w:72},{t:'Órdenes',w:46,r:1},{t:'Servicios',w:70,r:1},{t:'Campañas',w:64,r:1},{t:'PREAs',w:52,r:1},{t:'Recuperado',w:70,r:1,v:1}],
       AG.map(function(o){var g=o.g,f=[g.a.name+(g.a.city&&g.a.name.indexOf(g.a.city)<0?' · '+g.a.city:''),o.m,String(g.n),g.srv?EX.money(g.srv):'—',g.cam?EX.money(g.cam):'—',g.pre?EX.money(g.pre):'—',EX.money(g.m)];f.ok=g.m>0;return f}),{});
-    titulo('Detalle de lo cobrado por agencia');
+    if(DM&&(DM.filas||[]).length){var acc={};(DM.filas||[]).forEach(function(r){var o=acc[r.agency_id]||(acc[r.agency_id]={n:r.agencia,m:0,k:0});o.m+=Number(r.monto||0);o.k++});
+      titulo('Acumulado del mes por agencia');
+      tabla([{t:'Agencia',w:300},{t:'Órdenes cobradas',w:110,r:1},{t:'Recuperado en el mes',w:114,r:1,v:1}],
+        Object.keys(acc).map(function(k){return acc[k]}).sort(function(a,b){return b.m-a.m}).map(function(o){return [o.n,String(o.k),EX.money(o.m)]}).concat([(function(){var f=['Total del mes',String(DM.ordenes),EX.money(DM.total)];f.b=1;return f})()]),{})}
+    titulo(src?'Detalle de lo cobrado en la semana':'Detalle de lo cobrado por agencia');
     var con=AG.filter(function(o){return o.g.R.length});
     if(!con.length)texto('Todavía no hay órdenes cobradas este mes.',{c:mut});
     con.forEach(function(o){var g=o.g;cabe(60);y-=4;page.drawText(T(g.a.name+' · '+o.m),{x:mx,y:y,size:10.5,font:B,color:ink});
@@ -7704,8 +7772,8 @@ RPT.generar=async function(btn){
     texto('Recuperado es lo que ya se cobró en el mes, una vez por orden: la cartera marcada como pagada, o lo que pagó planta según la transacción revisada en la pestaña Pago (si planta la rechazó no cuenta), o lo que pagó planta en el servicio según lo que aprendió el cerebro. Las cifras van exactas, con centavos, y salen de los expedientes en el momento de generar el reporte.',{size:9,c:mut,lh:12.5});
     var n=pdf.getPageCount();pdf.getPages().forEach(function(p,i){var t='Página '+(i+1)+' de '+n+' · Ax AI · confidencial';p.drawText(t,{x:W-mx-F.widthOfTextAtSize(t,8),y:28,size:8,font:F,color:mut})});
     var bytes=await pdf.save(),blob=new Blob([bytes],{type:'application/pdf'}),a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);a.download='Ax AI - Dinero recuperado '+first.slice(0,7)+'.pdf';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.parentNode.removeChild(a)},1500);
-    toast('Reporte listo: '+EX.money(tot)+' recuperados');
+    a.href=URL.createObjectURL(blob);a.download='Ax AI - Dinero recuperado '+(src?'semana '+first:first.slice(0,7))+'.pdf';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.parentNode.removeChild(a)},1500);
+    toast('Reporte listo: '+EX.money(tot)+' recuperados');if(src&&src._id)RB.leido(src._id);
   }catch(e){console.warn('[reporte]',e);toast('No se pudo generar el reporte ('+TR.errTxt(e)+')')}
   RPT.busy=false;if(btn){btn.disabled=false;btn.innerHTML=t0}
 };
@@ -8921,7 +8989,7 @@ SB.enter=async function(user){
     await SB.loadAdvisors();
     $('#lg').hidden=true;
     await SB.pull(true);
-    SB.loadHist();GP.load();AL.load().then(BX.load);if(typeof ACC!=='undefined')ACC.poner();if(typeof EQ!=='undefined')EQ.init().then(function(){if(typeof GP!=='undefined')GP.render()});
+    SB.loadHist();GP.load();AL.load().then(BX.load);if(typeof ACC!=='undefined')ACC.poner();if(typeof RB!=='undefined'&&RB.on())RB.load();if(typeof EQ!=='undefined')EQ.init().then(function(){if(typeof GP!=='undefined')GP.render()});
     MI.loadAgenda().then(MI.startTimer);
     showView(MR.is()?'m_res':ROL.on?'exp':DN.is()?'dueno':SB.user&&SB.user.director?'grp':PV.is()?'pv':AS.on?'exp':'inicio');
     if(!SB.chan)SB.chan=SB.c.channel('axai-sync').on('postgres_changes',{event:'*',schema:'public'},function(p){
@@ -8932,7 +9000,7 @@ SB.enter=async function(user){
       if(p.table==='expedientes'&&typeof AH!=='undefined'&&AH.activo()){clearTimeout(AH.t);AH.t=setTimeout(function(){if(S.view==='exp'&&!XD.cur)EX.load();else if(typeof GP!=='undefined')GP.load()},700)}
       if(p.table==='profiles'&&p.new&&p.new.id===ME&&SB.user){SB.user.name=p.new.name||SB.user.name;if(typeof AH!=='undefined')AH.tic();if(typeof ACC!=='undefined')ACC.pintar()}
       if(p.table==='alertas'){if(p.eventType==='INSERT')AL.onNew(p.new);return}
-      if(p.table==='buzon'){if(p.eventType==='INSERT'&&p.new&&!(typeof ROL!=='undefined'&&ROL.on))toast('Correo de tu agente: '+p.new.asunto);clearTimeout(CG.t);CG.t=setTimeout(CG.load,600);return}
+      if(p.table==='buzon'){if(p.eventType==='INSERT'&&p.new&&p.new.agente==='reportes'&&typeof RB!=='undefined'&&RB.on()){toast('El agente de reportes te mandó: '+p.new.asunto);RB.load()}else if(p.eventType==='INSERT'&&p.new&&!(typeof ROL!=='undefined'&&ROL.on))toast('Correo de tu agente: '+p.new.asunto);clearTimeout(CG.t);CG.t=setTimeout(CG.load,600);return}
       if(p.table==='piezas_pedido'||p.table==='campanas'){if(S.view==='inicio')HM.load();return}
       if(p.table==='expedientes'||p.table==='decisiones'){clearTimeout(BX.t);BX.t=setTimeout(BX.load,800)}
       if(p.table==='decisiones')return;
@@ -9835,6 +9903,7 @@ AGV.load=async function(){
     if(r[0].error)throw r[0].error;
     var E=r[0].data||[],ids=E.map(function(x){return x.id}),car=[];
     if(ids.length){var c=await SB.c.from('cartera').select('expediente_id,estado,monto,monto_pagado,facturada_at,pagada_at').in('expediente_id',ids.slice(0,500));car=c.data||[]}
+    if(SB.user&&SB.user.dueno){try{var dq=await SB.c.rpc('directores_grupo');AGV.dirs=dq.data||[]}catch(_){AGV.dirs=[]}}
     if(AGV.id!==id)return;
     var dr=((r[4]&&r[4].data)||[]).filter(function(z){return z.agency_id===id})[0]||{};
     AGV.d={E:E,deb:(r[1]&&r[1].data)||[],al:(r[2]&&r[2].data)||[],car:car,rec:{t:Number(dr.cobrado||0),n:Number(dr.ordenes||0),prea:Number(dr.prea||0),cam:Number(dr.campana||0),srv:Number(dr.servicio||0)}};AGV.render();
@@ -9869,6 +9938,7 @@ AGV.render=function(){
   var hay=!!(AGC.m[AGV.id]||[]).length;
   el.innerHTML='<div class="ag-w">'+
     '<div class="ag-top"><button type="button" class="xd-back" data-agback>← '+(typeof ROL!=='undefined'&&ROL.on?'Inicio':DN.is()?'Tablero del dueño':'Tablero de grupo')+'</button>'+
+      (SB.user&&SB.user.dueno?'<label class="ag-dir"><span>Director</span><select data-agdir><option value="">Sin asignar</option>'+(AGV.dirs||[]).map(function(d){return '<option value="'+ea(d.id)+'"'+((d.agencias||[]).indexOf(AGV.id)>=0?' selected':'')+'>'+esc(d.name||'Director')+'</option>'}).join('')+'</select></label>':'')+
       '<button type="button" class="ag-recb'+(AGV.recientes?' on':'')+'" data-agrec aria-expanded="'+AGV.recientes+'">'+svg('file','sm')+'Expedientes recientes<i>'+E.length+'</i></button></div>'+
     (function(){var R=D.rec||{t:0,n:0},t=R.t;
       return '<section class="ag-card ag-money"><span>Dinero recuperado en '+esc(mes)+'</span><b class="'+(t>0?'ok':'')+'">'+EX.money(t)+'</b><small>'+
@@ -9920,6 +9990,11 @@ document.addEventListener('submit',function(e){if(e.target&&e.target.id==='agcFo
 document.addEventListener('input',function(e){if(e.target&&e.target.id==='agcTa')AGC.on()});
 document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='agcTa'&&e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();AGC.enviar()}});
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;if(t.closest('#viewAgv [data-agrec]')){AGV.recientes=!AGV.recientes;AGV.render()}});
+document.addEventListener('change',async function(e){var sel=e.target;if(!sel||!sel.matches||!sel.matches('#viewAgv [data-agdir]'))return;var v=sel.value||null,id=AGV.id;sel.disabled=true;
+  var q=await SB.c.rpc('asignar_director',{p_agency:id,p_director:v});sel.disabled=false;
+  if(q.error){toast('No se pudo asignar ('+(q.error.message||'error')+')');return}
+  (AGV.dirs||[]).forEach(function(d){d.agencias=(d.agencias||[]).filter(function(a){return a!==id});if(v&&d.id===v)d.agencias.push(id)});
+  var dn=(AGV.dirs||[]).filter(function(d){return d.id===v})[0];toast(dn?dn.name+' recibirá cada lunes el reporte de esta agencia':'La agencia quedó sin director')});
 AGV.openExp=function(id){
   var x=AGV.d&&AGV.d.E.filter(function(z){return z.id===id})[0];if(!x)return;
   if(!EX.rows.some(function(r){return r.id===x.id}))EX.rows.unshift(x);
