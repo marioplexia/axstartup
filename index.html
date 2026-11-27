@@ -1345,6 +1345,31 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 .ah-cob span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut,#8b8b90)}
 .ah-cob b{font-size:32px;font-weight:650;letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--as-mut,#a1a1a6)}.ah-cob b.ok{color:#16834a}.ah-cob small{font-size:12.5px;color:var(--as-mut,#8b8b90)}
 :root[data-theme="dark"] .ah-cob b.ok{color:#5fd896}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ah-cob b.ok{color:#5fd896}}
+/* ══ Hoja de facturación ══ */
+.hj-ov{position:fixed;inset:0;z-index:300;background:rgba(10,10,12,.45);display:flex;align-items:center;justify-content:center;padding:20px}.hj-ov[hidden]{display:none}
+.hj-box{width:min(980px,100%);max-height:calc(100vh - 40px);display:flex;flex-direction:column;background:var(--as-card,#fff);color:var(--as-ink,#111);border-radius:18px;box-shadow:0 24px 70px -20px rgba(0,0,0,.45);overflow:hidden}
+.hj-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--as-line,#ebebec)}.hj-h b{display:block;font-size:16px}.hj-h small{font-size:12.5px;color:var(--as-mut,#8b8b90)}
+.hj-x{flex:none;width:32px;height:32px;border-radius:50%;border:0;background:var(--as-soft,#f4f4f5);color:inherit;cursor:pointer}
+.hj-s{margin:0;padding:22px 18px;font-size:14px;display:flex;gap:10px;align-items:center}
+.hj-tw{overflow:auto;flex:1}
+.hj-t{width:100%;border-collapse:collapse;font-size:13px}.hj-t th{position:sticky;top:0;background:var(--as-card,#fff);text-align:left;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--as-mut,#8b8b90);padding:9px 10px;border-bottom:1px solid var(--as-line,#ebebec)}
+.hj-t td{padding:8px 10px;border-bottom:1px solid var(--as-line,#ebebec);vertical-align:middle}.hj-t .r{text-align:right;font-variant-numeric:tabular-nums}
+.hj-t tr.off td{opacity:.45}.hj-t em{font-style:normal;font-size:11.5px;color:#b45309}.hj-t select{font:inherit;font-size:12.5px;padding:3px 6px;border-radius:8px;border:1px solid var(--as-line,#ebebec);background:var(--as-card,#fff);color:inherit}
+.hj-a{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}.hj-a.up{background:var(--as-soft,#f1f1f2)}.hj-a.nw{background:#e6f4ec;color:#16723e}
+.hj-f{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid var(--as-line,#ebebec)}.hj-f span{flex:1;font-size:12.5px;color:var(--as-mut,#8b8b90)}
+/* ══ Cartera (Excel) ══ */
+.cx-in{padding-top:10px}
+.cx-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}.cx-top h2{margin:0;font-size:22px}.cx-top p{margin:2px 0 0;font-size:12.5px;color:var(--as-mut,#8b8b90)}
+.cx-acc .bt,.cx-vacio .bt{display:inline-flex;align-items:center;gap:7px}.cx-acc .bt .ic,.cx-vacio .bt .ic{width:15px;height:15px}
+.cx-acc{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cx-acc input{font:inherit;font-size:13px;padding:7px 12px;border-radius:99px;border:1px solid var(--as-line,#ebebec);background:var(--as-card,#fff);color:inherit;min-width:220px}
+.cx-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}.cx-tabs button{font:inherit;font-size:12.5px;padding:5px 12px;border-radius:99px;border:1px solid var(--as-line,#ebebec);background:var(--as-card,#fff);color:var(--as-mut,#8b8b90);cursor:pointer}
+.cx-tabs button[aria-selected="true"]{background:var(--as-ink,#111);color:var(--as-card,#fff);border-color:transparent}.cx-tabs i{font-style:normal;opacity:.7;margin-left:4px}
+.cx-tw{overflow:auto;max-height:calc(100vh - 230px);background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);border-radius:14px;box-shadow:var(--as-sh,none)}
+.cx-t{border-collapse:collapse;font-size:12.5px;min-width:100%}.cx-t th{position:sticky;top:0;z-index:1;background:var(--as-soft,#f6f6f7);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--as-line,#ebebec);white-space:nowrap}
+.cx-t td{padding:7px 10px;border-bottom:1px solid var(--as-line,#ebebec);white-space:nowrap}.cx-t .r{text-align:right;font-variant-numeric:tabular-nums}.cx-t tbody tr:hover td{background:var(--as-soft,#f6f6f7)}
+.cx-t tfoot td{position:sticky;bottom:0;background:var(--as-card,#fff);border-top:2px solid var(--as-line,#ebebec)}
+.cx-vacio{margin:60px auto;max-width:420px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center}.cx-vacio b{font-size:16px}.cx-vacio p{margin:0;color:var(--as-mut,#8b8b90);font-size:13.5px}
+@media(max-width:700px){.hj-t{font-size:12px}.hj-f{flex-wrap:wrap}.cx-acc input{min-width:0;flex:1}}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -3036,6 +3061,7 @@ button.xd-name{cursor:pointer}button.xd-name:hover{text-decoration:underline}
       </div>
     </section>
     <section class="admin ap" id="viewAp" hidden><div class="ad-in" id="apIn"></div></section>
+    <section class="admin cx" id="viewCx" hidden><div class="ad-in cx-in" id="cxIn"></div></section>
     <section class="admin eq" id="viewEq" hidden><div class="eq-in" id="eqIn"></div></section>
     <section class="admin" id="viewBx" hidden>
       <div class="ad-in">
@@ -3267,7 +3293,7 @@ $('#bell').addEventListener('click',function(){RED.f='alertas';showView('red')})
 
 /* secciones ocultas del menú lateral y del buscador (siguen existiendo; se pueden volver a mostrar quitándolas de aquí) */
 var OCULTAS=['cobros','cartera','bitacora','mi','red','pres'];
-var VIEWS={aprende:'Aprende Ax AI',notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Bandeja',bx:'Bandeja',eq:'Bandeja',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
+var VIEWS={aprende:'Aprende Ax AI',notas:'Notas',cfg:'Configuración',agent:'Agente de Garantías',inicio:'Inicio',mi:'Mi Agente',bitacora:'Bitácora',exp:'Expedientes',cobros:'Agente de Cobros',cartera:'Agente de Cartera',pres:'Presentación',admin:'Tablero de agencia',m_res:'Tablero de marca',m_ag:'Agencias de la marca',m_cer:'Cerebro',m_reg:'Catálogo de reglas',m_tp:'PREAs aceptadas',m_tg:'Pagos de planta',prueba:'Agente de pruebas',pv:'Tablero de posventa',posventa:'Agente de Posventa',grp:'Tablero de grupo',red:'Bandeja',bx:'Bandeja',eq:'Bandeja',cx:'Cartera',agv:'Agencia',cg:'Correo del grupo',dueno:'Tablero del dueño'};
 function isMain(id){return id==='agent'||id==='cobros'||id==='mi'||id==='prueba'||id==='posventa'}
 function showView(id){
   if(XD.cur)XD.close();
@@ -3275,13 +3301,14 @@ function showView(id){
   if(main){var ag=id==='cobros'?'cobros':id==='mi'?'mi':id==='prueba'?'prueba':id==='posventa'?'posventa':'garantias';if(ag!==S.agent)setAgent(ag)}
   $$('.nav[data-view]').forEach(function(b){var v=b.dataset.view;var on=main?v===curView():(v===id||(id==='red'&&v==='bx'));b.setAttribute('aria-current',on?'true':'false')});
   if(typeof BXT!=='undefined')BXT.sync(id);if(id!=='eq'&&typeof EQ!=='undefined')EQ.fuera();
-  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros')||document.body.classList.contains('asesor');if(typeof PRP!=='undefined'){if(main)setTimeout(PRP.load,0);else PRP.ocultar()}$('#gp').hidden=!gpOn;if(typeof AS!=='undefined')AS.sync(id);if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='eq'||id==='agv'||id==='cg'||id==='dueno'||id==='aprende';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewEq').hidden=id!=='eq';$('#viewAgv').hidden=id!=='agv';$('#viewCg').hidden=id!=='cg';$('#viewAp').hidden=id!=='aprende';if(typeof AP!=='undefined'){if(id==='aprende')AP.abrir();else AP.run++}$('#viewDueno').hidden=id!=='dueno';
+  var adm=id==='admin'||id.indexOf('m_')===0;stage.hidden=!main;$('#gpRow').hidden=!main;var gpOn=main&&(S.agent==='garantias'||S.agent==='cobros')||document.body.classList.contains('asesor');if(typeof PRP!=='undefined'){if(main)setTimeout(PRP.load,0);else PRP.ocultar()}$('#gp').hidden=!gpOn;if(typeof AS!=='undefined')AS.sync(id);if(typeof GPUI!=='undefined'&&GPUI)GPUI.sync();if(gpOn){GP.render();if(SB.entered&&Date.now()-GP.t>15000)GP.load()}$('#viewNotas').hidden=id!=='notas';$('#viewCfg').hidden=id!=='cfg';$('#settings').setAttribute('aria-current',id==='cfg'?'true':'false');$('#viewPh').hidden=main||adm||id==='notas'||id==='cfg'||id==='exp'||id==='bitacora'||id==='chat'||id==='cartera'||id==='inicio'||id==='pv'||id==='grp'||id==='red'||id==='bx'||id==='eq'||id==='cx'||id==='agv'||id==='cg'||id==='dueno'||id==='aprende';$('#viewHome').hidden=id!=='inicio';$('#viewAdmin').hidden=!adm;if(adm)MR.show(id);$('#viewExp').hidden=id!=='exp';$('#viewBit').hidden=id!=='bitacora';$('#viewChat').hidden=id!=='chat';$('#viewCar').hidden=id!=='cartera';$('#viewPv').hidden=id!=='pv';$('#viewGrp').hidden=id!=='grp';$('#viewRed').hidden=id!=='red';$('#viewBx').hidden=id!=='bx';$('#viewEq').hidden=id!=='eq';$('#viewCx').hidden=id!=='cx';$('#viewAgv').hidden=id!=='agv';$('#viewCg').hidden=id!=='cg';$('#viewAp').hidden=id!=='aprende';if(typeof AP!=='undefined'){if(id==='aprende')AP.abrir();else AP.run++}$('#viewDueno').hidden=id!=='dueno';
   if(!main){$('#phTitle').textContent=VIEWS[id];crumb.textContent=VIEWS[id];crumbSep.hidden=true;crumb2.hidden=true}
   if(adm){adRender();AD.loadExp();PH.count();if(typeof SH!=='undefined'&&SH)SH.load()}
   else if(id==='pv'){crumb.textContent=VIEWS.pv;crumbSep.hidden=true;crumb2.hidden=true;PV.load()}
   else if(id==='grp'){crumb.textContent=VIEWS.grp;crumbSep.hidden=true;crumb2.hidden=true;GRP.load()}
   else if(id==='red'){crumb.textContent=VIEWS.red;crumbSep.hidden=true;crumb2.hidden=true;RED.load()}
   else if(id==='bx'){crumb.textContent=VIEWS.bx;crumbSep.hidden=true;crumb2.hidden=true;BX.render();BX.load()}
+  else if(id==='cx'){crumb.textContent=VIEWS.cx;crumbSep.hidden=true;crumb2.hidden=true;CX.abrir()}
   else if(id==='eq'){crumb.textContent=VIEWS.eq;crumbSep.hidden=true;crumb2.hidden=true;EQ.abrir()}
   else if(id==='agv'){crumb.textContent=VIEWS.agv;crumbSep.hidden=true;crumb2.hidden=true;AGV.load()}
   else if(id==='aprende'){crumb.textContent=VIEWS.aprende;crumbSep.hidden=true;crumb2.hidden=true}
@@ -7796,6 +7823,110 @@ AH.cobHtml=function(){
   if(Date.now()-AH.cobT>60000&&!AH.cobP){AH.cobP=1;AH.cobLoad().then(function(){AH.cobP=0})}
   var o=AH.cob;return '<section class="ah-cob"><span>Cobrado a planta en '+esc(new Date().toLocaleDateString('es-MX',{month:'long'}))+'</span><b class="'+(o.t>0?'ok':'')+'">'+EX.money(o.t)+'</b><small>'+
     (o.t>0?o.n+(o.n===1?' orden cobrada':' órdenes cobradas')+' · '+[o.srv?'servicios '+EX.money(o.srv):'',o.cam?'campañas '+EX.money(o.cam):'',o.pre?'PREAs '+EX.money(o.pre):''].filter(Boolean).join(' · '):'Todavía no hay cobros de planta este mes')+'</small></section>'};
+/* ══ La hoja de facturación: foto → el agente lee cada renglón → el asesor confirma → se acomodan las órdenes ══
+   Lo FACTURADO (no lo que pagó planta). Las órdenes que no existen se abren sin expediente, solo con los datos de la hoja. */
+var HJ={filas:[],busy:false};
+HJ.input=function(){var i=document.getElementById('hjFile');if(!i){document.body.insertAdjacentHTML('beforeend','<input type="file" id="hjFile" accept="image/*,application/pdf" hidden>');i=document.getElementById('hjFile')}return i};
+HJ.ov=function(html){var o=document.getElementById('hjOv');if(!o){document.body.insertAdjacentHTML('beforeend','<div class="hj-ov" id="hjOv" role="dialog" aria-modal="true" aria-label="Hoja de facturación"><div class="hj-box" id="hjBox"></div></div>');o=document.getElementById('hjOv')}
+  o.hidden=false;document.getElementById('hjBox').innerHTML=html};
+HJ.cerrar=function(){var o=document.getElementById('hjOv');if(o)o.hidden=true;HJ.filas=[]};
+HJ.leer=async function(file){
+  if(!file)return;HJ.ov('<div class="hj-h"><b>Leyendo la hoja…</b><button type="button" class="hj-x" data-hjx aria-label="Cerrar">✕</button></div><p class="hj-s"><i class="pag-sp"></i> El agente de facturación está leyendo cada renglón de «'+esc(file.name)+'».</p>');
+  try{var f=await TR.prep(file);var r=await SB.ai({file:f},'hoja');
+    if(!r||r.se_lee===false){HJ.ov('<div class="hj-h"><b>No pude leer la hoja</b><button type="button" class="hj-x" data-hjx>✕</button></div><p class="hj-s">'+esc((r&&r.motivo)||'Toma la foto más de cerca y con buena luz.')+'</p>');return}
+    if(!(EX.rows||[]).length)try{await EX.load()}catch(_){}
+    var porWo={};(EX.rows||[]).forEach(function(x){var k=String(x.wo||'').toUpperCase();if(k&&!porWo[k])porWo[k]=x});
+    var conv={};(GP.all||[]).forEach(function(c){var k=String(c.orden||'').toUpperCase();if(k&&c.agent==='garantias'&&!conv[k])conv[k]=c});
+    HJ.filas=(r.filas||[]).map(function(z,i){var x=porWo[z.orden]||null,c=conv[z.orden]||null;
+      return Object.assign({},z,{i:i,ex:x,conv:c,accion:x?'actualizar':'abrir',ok:!z.dudoso&&!!z.orden,tipo:x&&x.tipo?x.tipo:(z.tipo==='Otro'?'Servicio':z.tipo)})});
+    HJ.nota=r.nota||'';HJ.pintar();
+  }catch(e){HJ.ov('<div class="hj-h"><b>No pude leer la hoja</b><button type="button" class="hj-x" data-hjx>✕</button></div><p class="hj-s">'+esc(TR.errTxt(e))+'</p>')}
+};
+HJ.pintar=function(){
+  var F=HJ.filas,n=F.filter(function(f){return f.ok}).length,tot=F.filter(function(f){return f.ok}).reduce(function(a,f){return a+(f.facturado||0)},0);
+  var ab=F.filter(function(f){return f.ok&&f.accion==='abrir'}).length,ac=F.filter(function(f){return f.ok&&f.accion==='actualizar'}).length;
+  HJ.ov('<div class="hj-h"><div><b>Hoja de facturación</b><small>'+F.length+(F.length===1?' renglón leído':' renglones leídos')+(HJ.nota?' · '+esc(HJ.nota):'')+'</small></div><button type="button" class="hj-x" data-hjx aria-label="Cerrar">✕</button></div>'+
+    (F.length?'<div class="hj-tw"><table class="hj-t"><thead><tr><th></th><th>Orden</th><th>Factura</th><th>Lo que fue</th><th>Tipo</th><th class="r">Facturado</th><th>Qué hago</th></tr></thead><tbody>'+
+      F.map(function(f){return '<tr class="'+(f.ok?'':'off')+(f.dudoso?' duda':'')+'"><td><input type="checkbox" data-hjok="'+f.i+'"'+(f.ok?' checked':'')+' aria-label="Incluir '+ea(f.orden)+'"></td><td><b>'+esc(f.orden)+'</b></td><td>'+esc(f.factura||'—')+'</td><td>'+esc(f.concepto||'—')+(f.dudoso?' <em>revisa: no se lee bien</em>':'')+'</td>'+
+        '<td><select data-hjtipo="'+f.i+'"'+(f.ex?' disabled':'')+'>'+['Servicio','Campaña','PREA'].map(function(t){return '<option'+(f.tipo===t?' selected':'')+'>'+t+'</option>'}).join('')+'</select></td>'+
+        '<td class="r">'+(f.facturado!=null?EX.money(f.facturado):'—')+'</td><td>'+(f.ex?'<span class="hj-a up">Actualizar la orden</span>':'<span class="hj-a nw">Abrir orden nueva</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="hj-s">No encontré renglones con número de orden.</p>')+
+    '<div class="hj-f"><span>'+n+' de '+F.length+' · '+ac+(ac===1?' se actualiza':' se actualizan')+' · '+ab+(ab===1?' orden nueva':' órdenes nuevas')+' · facturado '+EX.money(tot)+'</span><button type="button" class="bt" data-hjx>Cancelar</button><button type="button" class="bt pri" data-hjgo'+(n?'':' disabled')+'>Acomodar '+n+(n===1?' orden':' órdenes')+'</button></div>');
+};
+HJ.aplicar=async function(){
+  if(HJ.busy)return;HJ.busy=true;var F=HJ.filas.filter(function(f){return f.ok}),hechas=0,nuevas=0,mal=[];
+  var b=document.querySelector('[data-hjgo]');if(b){b.disabled=true;b.textContent='Acomodando…'}
+  for(var i=0;i<F.length;i++){var f=F[i],fac={factura_numero:f.factura,factura_monto:f.facturado,factura_fecha:f.fecha,factura_concepto:f.concepto,factura_src:'hoja'};
+    try{
+      if(f.ex){var u=await SB.c.from('expedientes').update(fac).eq('id',f.ex.id);if(u.error)throw u.error;hechas++;continue}
+      var cid=f.conv&&f.conv.id;
+      if(!cid){var ci=await SB.c.from('conversations').insert({agent:'garantias',title:f.orden,orden:f.orden,text:('Orden '+f.orden+' ('+f.tipo+'). '+(f.concepto||'')).trim().slice(0,2000)}).select('id').single();if(ci.error)throw ci.error;cid=ci.data.id}
+      var pre=f.tipo==='Servicio'?'SRV-':f.tipo==='Campaña'?'CAM-':'';
+      var row=Object.assign({conversation_id:cid,folio:pre+f.orden,wo:f.orden,tipo:f.tipo,brand:S.brand||null,status:'borrador'},fac);
+      if(f.tipo==='Servicio'&&f.concepto)row.sys=f.concepto.slice(0,80);else if(f.concepto)row.queja=f.concepto.slice(0,600);
+      var ni=await SB.c.from('expedientes').insert(row);if(ni.error)throw ni.error;nuevas++;
+    }catch(e){console.warn('[hoja]',f.orden,e);mal.push(f.orden)}}
+  HJ.busy=false;HJ.cerrar();
+  toast('Listo: '+hechas+(hechas===1?' orden actualizada':' órdenes actualizadas')+', '+nuevas+(nuevas===1?' orden nueva':' órdenes nuevas')+(mal.length?' · no se pudo: '+mal.join(', '):''));
+  try{await EX.load()}catch(_){}GP.load();if(S.view==='exp'&&!XD.cur)AH.render();
+};
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+  if(t.closest('[data-hjup]')){HJ.input().click();return}
+  if(t.closest('[data-hjx]')){HJ.cerrar();return}
+  if(t.closest('[data-hjgo]')){HJ.aplicar();return}
+  if(t.id==='hjOv'){HJ.cerrar()}
+});
+document.addEventListener('change',function(e){var t=e.target;if(!t)return;
+  if(t.id==='hjFile'){var f=t.files&&t.files[0];t.value='';HJ.leer(f);return}
+  if(t.dataset&&t.dataset.hjok!=null){var f2=HJ.filas[Number(t.dataset.hjok)];if(f2){f2.ok=t.checked;HJ.pintar()}return}
+  if(t.dataset&&t.dataset.hjtipo!=null){var f3=HJ.filas[Number(t.dataset.hjtipo)];if(f3){f3.tipo=t.value}}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){var o=document.getElementById('hjOv');if(o&&!o.hidden){e.stopImmediatePropagation();HJ.cerrar()}}},true);
+
+/* ══ Cartera: el Excel del asesor, replicado tal cual en «Cartera» (se reemplaza con cada archivo) ══ */
+var CX={d:null,hoja:0,q:'',busy:false};
+CX.lib=function(){if(window.XLSX)return Promise.resolve(window.XLSX);return new Promise(function(ok,ko){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=function(){ok(window.XLSX)};s.onerror=function(){ko(new Error('No cargó el lector de Excel'))};document.head.appendChild(s)})};
+CX.input=function(){var i=document.getElementById('cxFile');if(!i){document.body.insertAdjacentHTML('beforeend','<input type="file" id="cxFile" accept=".xlsx,.xls,.xlsm,.csv" hidden>');i=document.getElementById('cxFile')}return i};
+CX.subir=async function(file){
+  if(!file||CX.busy)return;CX.busy=true;toast('Leyendo «'+file.name+'»…');
+  try{var X=await CX.lib(),wb=X.read(await file.arrayBuffer(),{type:'array',cellDates:true});
+    var hojas=wb.SheetNames.slice(0,12).map(function(n){var A=X.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:'',blankrows:false});
+      A=A.map(function(r){return r.slice(0,40).map(function(v){return v instanceof Date?v.toISOString().slice(0,10):v})}).filter(function(r){return r.some(function(v){return String(v).trim()!==''})});
+      var h=0;for(var i=0;i<Math.min(A.length,15);i++){if(A[i].filter(function(v){return String(v).trim()!==''}).length>=2){h=i;break}}
+      var cols=(A[h]||[]).map(function(v,j){return String(v).trim()||('Columna '+(j+1))});
+      return {nombre:n,columnas:cols,filas:A.slice(h+1,h+1+4000)}}).filter(function(h){return h.filas.length||h.columnas.length});
+    if(!hojas.length)throw new Error('El archivo no trae datos');
+    var r=await SB.c.from('cartera_excel').insert({archivo:file.name.slice(0,160),hojas:hojas}).select('*').single();if(r.error)throw r.error;
+    CX.d=r.data;CX.hoja=0;CX.q='';
+    var tot=hojas.reduce(function(a,h){return a+h.filas.length},0);toast('Cartera lista: '+tot+(tot===1?' renglón':' renglones')+' en '+hojas.length+(hojas.length===1?' hoja':' hojas'));
+    showView('cx');
+  }catch(e){console.warn('[cartera]',e);toast('No se pudo subir la cartera ('+TR.errTxt(e)+')')}
+  CX.busy=false;
+};
+CX.load=async function(){var r=await SB.c.from('cartera_excel').select('*').order('created_at',{ascending:false}).limit(1);CX.d=r.data&&r.data[0]||null;CX.cargado=true};
+CX.abrir=async function(){var el=$('#cxIn');if(!el)return;if(!CX.cargado){el.innerHTML='<p class="xz-mut">Cargando la cartera…</p>';try{await CX.load()}catch(e){console.warn(e)}}CX.pintar()};
+CX.num=function(v){if(typeof v==='number')return v;var t=String(v).replace(/[$,\s]/g,'');return /^-?\d+(\.\d+)?$/.test(t)?Number(t):null};
+CX.pintar=function(){
+  var el=$('#cxIn');if(!el)return;var d=CX.d;
+  if(!d){el.innerHTML='<div class="cx-vacio"><b>Todavía no subes tu cartera</b><p>Sube el Excel de tu cartera y aquí la ves igual, con búsqueda y totales.</p><button type="button" class="bt pri" data-cxup>'+svg('wallet','sm')+'Subir cartera (Excel)</button></div>';return}
+  var H=d.hojas||[],h=H[Math.min(CX.hoja,H.length-1)]||{columnas:[],filas:[]},q=norm(CX.q);
+  var F=h.filas.filter(function(r){return !q||norm(r.join(' ')).indexOf(q)>=0});
+  var nc=h.columnas.length,esNum=h.columnas.map(function(_,j){var n=0,t=0;h.filas.forEach(function(r){var v=r[j];if(String(v).trim()==='')return;t++;if(CX.num(v)!==null)n++});return t>0&&n/t>.8});
+  var sum=h.columnas.map(function(_,j){return esNum[j]?F.reduce(function(a,r){var v=CX.num(r[j]);return a+(v||0)},0):null});
+  var fmt=function(v,j){if(esNum[j]&&CX.num(v)!==null){var x=CX.num(v);return Math.abs(x)>=1000||String(v).indexOf('.')>=0?x.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2}):String(x)}return esc(String(v))};
+  el.innerHTML='<div class="cx-top"><div><h2>Cartera</h2><p>'+esc(d.archivo||'Excel')+' · subida '+esc(AL.ago(d.created_at))+' · '+F.length+(F.length===1?' renglón':' renglones')+'</p></div>'+
+      '<div class="cx-acc"><input type="search" id="cxQ" placeholder="Buscar en la cartera" value="'+ea(CX.q)+'" aria-label="Buscar en la cartera"><button type="button" class="bt" data-cxup>'+svg('wallet','sm')+'Subir nueva cartera</button></div></div>'+
+    (H.length>1?'<div class="cx-tabs" role="tablist">'+H.map(function(x,i){return '<button type="button" role="tab" data-cxh="'+i+'" aria-selected="'+(i===CX.hoja)+'">'+esc(x.nombre)+' <i>'+x.filas.length+'</i></button>'}).join('')+'</div>':'')+
+    '<div class="cx-tw"><table class="cx-t"><thead><tr>'+h.columnas.map(function(c,j){return '<th'+(esNum[j]?' class="r"':'')+'>'+esc(c)+'</th>'}).join('')+'</tr></thead><tbody>'+
+      F.slice(0,1500).map(function(r){var o='<tr>';for(var j=0;j<nc;j++)o+='<td'+(esNum[j]?' class="r"':'')+'>'+fmt(r[j]==null?'':r[j],j)+'</td>';return o+'</tr>'}).join('')+'</tbody>'+
+      (sum.some(function(x){return x!==null})?'<tfoot><tr>'+sum.map(function(x,j){return '<td'+(esNum[j]?' class="r"':'')+'>'+(j===0&&x===null?'<b>Total</b>':x!==null?'<b>'+x.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})+'</b>':'')+'</td>'}).join('')+'</tr></tfoot>':'')+'</table></div>'+
+    (F.length>1500?'<p class="xz-mut">Se muestran 1,500 de '+F.length+' renglones; usa la búsqueda.</p>':'');
+};
+document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
+  if(t.closest('[data-cxup]')){CX.input().click();return}
+  var hb=t.closest('[data-cxh]');if(hb){CX.hoja=Number(hb.dataset.cxh);CX.pintar()}
+});
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='cxFile'){var f=e.target.files&&e.target.files[0];e.target.value='';CX.subir(f)}});
+document.addEventListener('input',function(e){if(e.target&&e.target.id==='cxQ'){CX.q=e.target.value;var p=e.target.selectionStart;CX.pintar();var i=$('#cxQ');if(i){i.focus();try{i.setSelectionRange(p,p)}catch(_){}}}});
 AH.render=function(){
   if(AH.vista){var el0=$('#asHome');if(el0)el0.hidden=false;AH.lista(AH.vista);return}
   if(typeof crumb!=='undefined'&&S.view==='exp'){crumb.textContent='Inicio';crumbSep.hidden=true;crumb2.hidden=true}
@@ -7819,7 +7950,7 @@ AH.render=function(){
   if(GM.on()&&GM.sel&&GM.cargado){el.innerHTML='<div class="ah-in">'+GM.html()+'</div>';return}
   el.innerHTML='<div class="ah-in"><div class="ah-head"><div><h1><span id="ahHola">'+AH.hola()+'</span>, <span id="ahNom">'+esc(AH.nombre()||'asesor')+'</span></h1>'+
       '<p><span id="ahFecha">'+esc(AH.fecha())+'</span> · '+(ROL.on?esc(ROL.tipo)+' · ':'')+tot+(tot===1?' orden':' órdenes')+', '+cer+(cer===1?' cerrada':' cerradas')+(ROL.on?' en lo que ves':'')+'</p></div>'+
-      (ROL.on?'':'<div class="ah-acts"><button type="button" class="ah-b2" data-apnav>'+svg('present')+'Aprende Ax AI<i>'+AP.total().h+'/'+AP.total().n+'</i></button>'+
+      (ROL.on?'':'<div class="ah-acts"><button type="button" class="ah-b2" data-hjup>'+svg('file')+'Subir hoja</button><button type="button" class="ah-b2" data-cxup>'+svg('wallet')+'Subir cartera</button><button type="button" class="ah-b2" data-apnav>'+svg('present')+'Aprende Ax AI<i>'+AP.total().h+'/'+AP.total().n+'</i></button>'+
       '<button type="button" class="ah-b2" data-svcdemo>'+svg('play')+'Simulación</button>'+
       '<button type="button" class="ah-new" data-ahnew>'+svg('plus')+'Nueva orden</button></div>')+'</div>'+
     (GM.on()?GM.html():AH.cobHtml()+'<div class="ah-grid">'+K.map(tarjeta).join('')+'</div>')+
@@ -7898,15 +8029,16 @@ SIM.run=async function(){
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
   if(t.closest('[data-svcsim]')){SIM.run();return}
   if(t.closest('[data-svcdemo]')){e.stopPropagation();SIM.abrir(false);return}
+  if(t.closest('[data-cxnav]')){e.stopPropagation();if(XD.cur)XD.close();showView('cx');if(typeof AS!=='undefined')AS.drawer(false);return}
   if(t.closest('[data-eqnav]')){e.stopPropagation();if(XD.cur)XD.close();showView('eq');if(typeof AS!=='undefined')AS.drawer(false);return}
   if(t.closest('[data-ahome]')){e.stopPropagation();if(typeof AH!=='undefined')AH.vista=null;if(XD.cur)XD.close();showView('exp');if(typeof AS!=='undefined')AS.drawer(false)}
 },true);
-document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-apnav]')){e.preventDefault();e.target.closest('[data-apnav]').click();return}if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-svcdemo]')){e.preventDefault();e.stopPropagation();SIM.abrir(false)}if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-eqnav],[data-ahome]')){e.preventDefault();e.target.closest('[data-eqnav],[data-ahome]').click()}},true);
+document.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-apnav]')){e.preventDefault();e.target.closest('[data-apnav]').click();return}if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-svcdemo]')){e.preventDefault();e.stopPropagation();SIM.abrir(false)}if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-eqnav],[data-ahome],[data-cxnav]')){e.preventDefault();e.target.closest('[data-eqnav],[data-ahome],[data-cxnav]').click()}},true);
 /* la orden de simulación, fija arriba de la lista de órdenes */
 (function(){var r0=GP.render;GP.render=function(){r0.apply(this,arguments);var b=$('#gpList');if(!b||GP.ag()==='cobros')return;
-  if(AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-home" role="listitem" tabindex="0" data-ahome'+(S.view==='exp'&&!XD.cur?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('home','sm')+'</span><span>Inicio</span></div></div><div class="gp-i gp-home gp-eq" role="listitem" tabindex="0" data-eqnav'+(S.view==='eq'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('inbox','sm')+'</span><span>Bandeja</span><b class="eq-nb" data-eqn'+(EQ.nuevos()?'':' hidden')+'>'+EQ.nuevos()+'</b></div></div>');
+  if(AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-home" role="listitem" tabindex="0" data-ahome'+(S.view==='exp'&&!XD.cur?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('home','sm')+'</span><span>Inicio</span></div></div><div class="gp-i gp-home gp-eq" role="listitem" tabindex="0" data-eqnav'+(S.view==='eq'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('inbox','sm')+'</span><span>Bandeja</span><b class="eq-nb" data-eqn'+(EQ.nuevos()?'':' hidden')+'>'+EQ.nuevos()+'</b></div></div><div class="gp-i gp-home gp-cx" role="listitem" tabindex="0" data-cxnav'+(S.view==='cx'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('wallet','sm')+'</span><span>Cartera</span></div></div>');
   var T=AP.total();if(!AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-ap" role="listitem" tabindex="0" data-apnav'+(S.view==='aprende'?' aria-current="true"':'')+'><div class="gp-t"><span class="gp-api">'+svg('present','sm')+'</span><span>Aprende Ax AI</span><span class="gp-x">'+T.h+'/'+T.n+'</span></div><div class="gp-q">Cursos de la plataforma para asesores</div></div>');
-  if(!AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild);var ex=b.querySelector('.gp-eq');if(ex)b.insertBefore(ex,b.firstChild);var hx=b.querySelector('.gp-home:not(.gp-eq)');if(hx)b.insertBefore(hx,b.firstChild)}})();
+  if(!AS.on)b.insertAdjacentHTML('afterbegin','<div class="gp-i gp-demo" role="listitem" tabindex="0" data-svcdemo'+(XD.cur&&XD.cur.demo?' aria-current="true"':'')+'><div class="gp-t"><i class="gp-st sinprea"></i><span>GA9999</span><span class="gp-x">Simulación</span></div><div class="gp-q">Servicio de prueba · dale play y míralo en vivo</div></div>');var apx=b.querySelector('.gp-ap');if(apx)b.insertBefore(apx,b.firstChild);var cxn=b.querySelector('.gp-cx');if(cxn)b.insertBefore(cxn,b.firstChild);var ex=b.querySelector('.gp-eq');if(ex)b.insertBefore(ex,b.firstChild);var hx=b.querySelector('.gp-home:not(.gp-eq):not(.gp-cx)');if(hx)b.insertBefore(hx,b.firstChild)}})();
 SVC.ck=function(){var el=$('#svcCk');if(el&&SVC.x)el.innerHTML=SVC.ckHtml(SVC.x);var c=el&&el.closest('.svc-ck');if(!c)return;var n=el.children.length,h=el.querySelectorAll('li.ok').length,p=n?Math.round(h*100/n):0,g=c.querySelector('.wf-pg');if(!g){c.querySelector('ol').insertAdjacentHTML('afterend','<div class="wf-pg"><span>Progreso</span><b></b><i><i></i></i></div>');g=c.querySelector('.wf-pg')}g.querySelector('b').textContent=p+'%';g.querySelector('i>i').style.width=p+'%';g.classList.toggle('full',p===100);g.querySelector('span').innerHTML=p===100?'<span class="ok-ck">'+svg('check')+'</span>Completo':'Progreso'};
 SVC.ACC='<div class="ai-actions"><button class="fb" type="button" data-sva="copy" aria-label="Copiar">'+svg('copy','sm')+'</button><button class="fb" type="button" data-sva="up" aria-label="Buena respuesta">'+svg('tup','sm')+'</button><button class="fb" type="button" data-sva="down" aria-label="Mala respuesta">'+svg('tdown','sm')+'</button></div>';
 SVC.msgAI=function(){var d=document.createElement('div');d.className='msg-ai';d.innerHTML='<div class="ai-mark" aria-hidden="true">'+ORB+'</div><div class="ai-col"><div class="ai-body"></div>'+SVC.ACC+'</div>';$('.ai-actions',d).hidden=true;$('#svcThi').appendChild(d);var sc=$('#svcTh');if(sc)sc.scrollTop=sc.scrollHeight;return d};
@@ -8248,7 +8380,7 @@ XD.open=function(id){
     crumb.textContent='Inicio';crumbSep.hidden=false;crumb2.hidden=false;crumb2.textContent=AH.vista?AH.NOM[AH.vista][0]+' · '+(x.wo||x.folio||''):(x.wo||x.folio||'')}
   if(x.tipo==='Servicio'){XD.openSrv(x,el);return}
   el.innerHTML='<div class="xd-in xd-simple"><div class="xd-top"><button class="xd-back" type="button" data-xdclose>'+(AH.activo()?'← '+(AH.vista?AH.NOM[AH.vista][0]:'Inicio'):'← Expedientes')+'</button>'+
-    '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p>'+(x.estatus_nota?'<p class="xd-est"><b>Estatus:</b> '+esc(x.estatus_nota)+(x.estatus_at?' <small>· '+esc(AL.ago(x.estatus_at))+'</small>':'')+'</p>':'')+'</div>'+
+    '<div><h2>'+esc(x.folio||'Expediente')+'</h2><p>'+esc([x.tipo&&x.tipo!=='PREA'?x.tipo:'',x.queja,x.sys,x.wo?'Orden '+x.wo:''].filter(Boolean).join(' · '))+'</p>'+(x.factura_monto?'<p class="xd-est"><b>Facturado:</b> '+EX.money(x.factura_monto)+(x.factura_numero?' · factura '+esc(x.factura_numero):'')+'</p>':'')+(x.estatus_nota?'<p class="xd-est"><b>Estatus:</b> '+esc(x.estatus_nota)+(x.estatus_at?' <small>· '+esc(AL.ago(x.estatus_at))+'</small>':'')+'</p>':'')+'</div>'+
     '<div class="xd-acts">'+(XD.esCam(x)?'':'<button class="bt" type="button" data-xdmv title="Mover de etapa en el pipeline de PREAs">Etapa: <b>'+esc(EX.nomE(EX.etapa(x)))+'</b> ▾</button>')+(XDEL.puede(x)?'<button class="xd-del" type="button" data-xddel>Eliminar expediente</button>':'')+'</div></div>'+
     '<div class="xd-body"><div class="xd-main ord-main">'+ORD.tabs()+'<div class="ord-exp" id="ordExp">'+FL.html(x)+XA.html()+'<section class="xb" id="xdBrain" aria-label="Lo que aprendió el cerebro" hidden></section><section class="xp" id="xdPlan" aria-label="Plan para corregir la PREA" hidden></section><section class="xf" id="xdForm" aria-label="Formulario de la PREA"></section><section class="xz" id="xdCtl" aria-label="Control del manual GM"><p class="xz-mut">Revisando plazos y preautorización…</p></section>'+XD.qHtml()+'</div>'+ORD.chat()+VIS.html()+PAG.html()+ORD.comp(x)+'</div>'+XD.contHtml()+'</div></div>';
   $('#viewExp').hidden=true;el.hidden=false;el.scrollTop=0;
