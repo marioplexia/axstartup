@@ -1340,6 +1340,7 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 :root[data-theme="dark"] .rb-n b{color:#5fd896}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rb-n b{color:#5fd896}}
 @media(max-width:600px){.rb-n{grid-template-columns:1fr}.rb-tabs{margin:6px 10px 0}.rb-w{padding:10px}}
 .xd-est{margin:4px 0 0;font-size:13px;color:var(--as-ink,var(--fg))}.xd-est small{color:var(--as-mut,var(--muted))}
+.gp-est{color:var(--as-ink,var(--fg))}.gp-est b{font-weight:600}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -5916,7 +5917,7 @@ GP.mine=function(){var a=GP.ag();return GP.all.filter(function(c){return c.agent
 GP.sib=function(c){return c&&c.orden?GP.all.filter(function(x){return x.agent!==c.agent&&x.orden===c.orden})[0]||null:null};
 GP.load=async function(){
   if(!SB.c||!SB.entered)return;
-  var r=await SB.c.from('conversations').select('id,agent,title,orden,text,created_at,expedientes(status,folio,tipo,flujo)').in('agent',['garantias','cobros']).order('created_at',{ascending:false}).limit(300);
+  var r=await SB.c.from('conversations').select('id,agent,title,orden,text,created_at,expedientes(status,folio,tipo,flujo,estatus_nota,prea_form_at)').in('agent',['garantias','cobros']).order('created_at',{ascending:false}).limit(300);
   if(r.error){SB.fail(r.error);return}
   GP.all=r.data;GP.t=Date.now();GP.render();
 };
@@ -5933,7 +5934,7 @@ GP.render=function(){
     var label=c.orden||(c.title&&c.title!=='Sin orden'?c.title:'Sin orden');
     html+='<div class="gp-i" role="listitem" tabindex="0" data-id="'+ea(c.id)+'"'+(S.convId===c.id?' aria-current="true"':'')+'>'+
       '<div class="gp-t'+(c.orden||label!=='Sin orden'?'':' no')+'"><i class="gp-st '+st+'" title="'+ea(stl[st])+'"></i><span>'+esc(label)+'</span>'+(sb?'<span class="gp-x" role="button" tabindex="0" data-gpopen="'+ea(sb.id)+'" title="Abrir su conversación de '+(sb.agent==='cobros'?'Cobros':'Garantías')+'">'+(sb.agent==='cobros'?'Cobros':'Garantías')+' ↗</span>':'')+'</div>'+
-      '<div class="gp-q">'+esc(MI.cl(c.text||'',70))+'</div>'+
+      (ex&&ex.estatus_nota?'<div class="gp-q gp-est"><b>Estatus:</b> '+esc(MI.cl(ex.estatus_nota,60))+'</div>':'<div class="gp-q">'+esc(MI.cl(c.text||'',70))+'</div>')+
       '<span class="gp-a"><button type="button" class="gp-b" data-gp="ren" aria-label="Cambiar número de orden" title="Cambiar número de orden">✎</button><button type="button" class="gp-b" data-gp="del" aria-label="Eliminar conversación" title="Eliminar">×</button></span></div>';
   });
   box.innerHTML=html;
@@ -7614,7 +7615,7 @@ AH.lista=function(k){
   V=V.slice().sort(function(a,b){var ca=AH.cerrado(a),cb=AH.cerrado(b);if(ca!==cb)return ca?1:-1;var va=(a.flujo&&a.flujo.vence)||'9999',vb=(b.flujo&&b.flujo.vence)||'9999';if(va!==vb)return va<vb?-1:1;return String(b.created_at||'')<String(a.created_at||'')?-1:1});
   var fila=function(x){var f=x.flujo||{},c=AH.cerrado(x),v=!c&&f.vence?FL.vence(f.vence):'',det=[x.sys,x.vehicle].filter(Boolean).join(' · ');
     return '<button type="button" class="ahl-r" data-ahx="'+ea(x.id)+'"><span class="ahl-dot'+(c?' ok':f.estado==='bad'?' bad':'')+'">'+(c?svg('check'):'')+'</span>'+
-      '<span class="ahl-m"><b>'+esc(x.wo||x.folio||'')+'</b><small>'+esc([x.folio&&x.folio!==x.wo?x.folio:'',det,ROL.on&&x.profiles?x.profiles.name:''].filter(Boolean).join(' · ')||N[1])+'</small></span>'+
+      '<span class="ahl-m"><b>'+esc(x.wo||x.folio||'')+'</b><small>'+esc([x.estatus_nota?'Estatus: '+x.estatus_nota:'',x.folio&&x.folio!==x.wo?x.folio:'',det,ROL.on&&x.profiles?x.profiles.name:''].filter(Boolean).join(' · ')||N[1])+'</small></span>'+
       '<span class="ahl-e">'+esc(c?'Cerrada':FL.nom(f.etapa||'',k==='srv'))+'<small>'+esc(c?'':(f.siguiente||''))+'</small></span>'+
       '<span class="ahl-v'+(f.estado==='bad'?' bad':f.estado==='warn'?' warn':'')+'">'+esc(v)+'</span><span class="ahl-go">'+svg('chev')+'</span></button>'};
   var chip=function(v,t,n){return '<button type="button" class="ahl-f" data-alf="'+v+'" aria-pressed="'+(AH.filtro===v)+'">'+t+'<i>'+n+'</i></button>'};
