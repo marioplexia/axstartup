@@ -1359,6 +1359,7 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 .hj-f{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid var(--as-line,#ebebec)}.hj-f span{flex:1;font-size:12.5px;color:var(--as-mut,#8b8b90)}
 /* ══ Cartera (Excel) ══ */
 .cx-in{padding-top:10px}
+.cx-top h3{margin:0;font-size:15px}
 .cx-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}.cx-top h2{margin:0;font-size:22px}.cx-top p{margin:2px 0 0;font-size:12.5px;color:var(--as-mut,#8b8b90)}
 .cx-acc .bt,.cx-vacio .bt{display:inline-flex;align-items:center;gap:7px}.cx-acc .bt .ic,.cx-vacio .bt .ic{width:15px;height:15px}
 .cx-acc{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cx-acc input{font:inherit;font-size:13px;padding:7px 12px;border-radius:99px;border:1px solid var(--as-line,#ebebec);background:var(--as-card,#fff);color:inherit;min-width:220px}
@@ -1376,6 +1377,17 @@ body.ws-rol .nbadge{background:var(--as-ink,#111);color:#fff}
 .gm-dos{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end}.gm-dos>div{display:flex;flex-direction:column;gap:2px}
 .gm-f b{color:var(--as-ink,#111)!important;font-size:28px!important}
 .gm-fc{font-size:11.5px;font-weight:600;color:var(--as-ink,#111);margin-top:2px}
+/* ══ Cartera: por cobrar a planta ══ */
+.cx-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}.cx-head h2{margin:0;font-size:22px}
+.cx-vt{margin:0 0 12px}
+.cx-sum{display:flex;gap:12px;margin-bottom:12px}.cx-sum>div{flex:1;display:flex;flex-direction:column;gap:2px;padding:14px 18px;border-radius:14px;background:var(--as-card,#fff);border:1px solid var(--as-line,#ebebec);box-shadow:var(--as-sh,none)}
+.cx-sum span{font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--as-mut,#8b8b90)}.cx-sum b{font-size:28px;font-weight:650;font-variant-numeric:tabular-nums}.cx-sum small{font-size:12.5px;color:var(--as-mut,#8b8b90)}.cx-sum em{font-style:normal;color:#b45309;font-weight:600}
+.cx-p td{vertical-align:top;white-space:normal}.cx-p td:not(.cx-cm){white-space:nowrap}.cx-p .warn{color:#b45309;font-weight:600}.cx-p .mal{color:#b42a2f;font-weight:600}
+.cx-cm{min-width:280px;max-width:420px}.cx-cm p{margin:0;font-size:12.5px;line-height:1.45}.cx-cm small{display:block;font-size:11px;color:var(--as-mut,#8b8b90);margin-top:2px}.cx-sin{color:#b45309!important}
+.cx-cb{margin-top:4px;font:inherit;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px;border:1px solid var(--as-line,#ebebec);background:var(--as-card,#fff);color:inherit;cursor:pointer}
+.cx-ed textarea{width:100%;font:inherit;font-size:12.5px;padding:7px 9px;border-radius:8px;border:1px solid var(--as-ink,#111);background:var(--as-card,#fff);color:inherit;resize:vertical}.cx-ed span{display:flex;gap:6px;justify-content:flex-end;margin-top:4px}.cx-ed .bt{font-size:12px;padding:4px 10px}
+.cx-o{font:inherit;font-weight:600;background:none;border:0;padding:0;color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.hj-n{display:block;font-size:11px;color:var(--as-mut,#8b8b90)}
 /* ══ Tu cuenta ══ */
 .acc{position:relative;flex:none;padding:8px 8px 10px;border-top:1px solid var(--as-line,var(--line))}
 .acc-b{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -7849,6 +7861,11 @@ HJ.leer=async function(file){
   if(!file)return;HJ.ov('<div class="hj-h"><b>Leyendo la hoja…</b><button type="button" class="hj-x" data-hjx aria-label="Cerrar">✕</button></div><p class="hj-s"><i class="pag-sp"></i> El agente de facturación está leyendo cada renglón de «'+esc(file.name)+'».</p>');
   try{var f=await TR.prep(file);var r=await SB.ai({file:f},'hoja');
     if(!r||r.se_lee===false){HJ.ov('<div class="hj-h"><b>No pude leer la hoja</b><button type="button" class="hj-x" data-hjx>✕</button></div><p class="hj-s">'+esc((r&&r.motivo)||'Toma la foto más de cerca y con buena luz.')+'</p>');return}
+    HJ.titulo='Hoja de facturación';await HJ.revisar(r.filas||[],r.nota||'');
+  }catch(e){HJ.ov('<div class="hj-h"><b>No pude leer la hoja</b><button type="button" class="hj-x" data-hjx>✕</button></div><p class="hj-s">'+esc(TR.errTxt(e))+'</p>')}
+};
+HJ.revisar=async function(filasIn,nota){
+    var r={filas:filasIn};
     /* la orden se compara sin guiones, espacios ni prefijos (GA-4066 = GA4066 = SRV-GA4066) y se busca en la base, no solo en pantalla */
     var K=HJ.k,ords=[];(r.filas||[]).forEach(function(z){z.orden=K(z.orden);if(z.orden&&ords.indexOf(z.orden)<0)ords.push(z.orden)});
     var porWo={},conv={},pon=function(x){[x.wo,x.folio].forEach(function(v){var k=K(v);if(k&&!porWo[k])porWo[k]=x})};
@@ -7860,15 +7877,14 @@ HJ.leer=async function(file){
     var vistas={};
     HJ.filas=(r.filas||[]).map(function(z,i){var x=porWo[z.orden]||null,c=conv[z.orden]||null,rep=!!vistas[z.orden];vistas[z.orden]=1;
       return Object.assign({},z,{i:i,ex:x,conv:c,rep:rep,accion:x?'actualizar':'abrir',ok:!z.dudoso&&!!z.orden&&!rep,tipo:x&&x.tipo?x.tipo:(z.tipo==='Otro'?'Servicio':z.tipo)})});
-    HJ.nota=r.nota||'';HJ.pintar();
-  }catch(e){HJ.ov('<div class="hj-h"><b>No pude leer la hoja</b><button type="button" class="hj-x" data-hjx>✕</button></div><p class="hj-s">'+esc(TR.errTxt(e))+'</p>')}
+    HJ.nota=nota||'';HJ.pintar();
 };
 HJ.pintar=function(){
   var F=HJ.filas,n=F.filter(function(f){return f.ok}).length,tot=F.filter(function(f){return f.ok}).reduce(function(a,f){return a+(f.facturado||0)},0);
   var ab=F.filter(function(f){return f.ok&&f.accion==='abrir'}).length,ac=F.filter(function(f){return f.ok&&f.accion==='actualizar'}).length;
-  HJ.ov('<div class="hj-h"><div><b>Hoja de facturación</b><small>'+F.length+(F.length===1?' renglón leído':' renglones leídos')+(HJ.nota?' · '+esc(HJ.nota):'')+'</small></div><button type="button" class="hj-x" data-hjx aria-label="Cerrar">✕</button></div>'+
+  HJ.ov('<div class="hj-h"><div><b>'+esc(HJ.titulo||'Hoja de facturación')+'</b><small>'+F.length+(F.length===1?' renglón leído':' renglones leídos')+(HJ.nota?' · '+esc(HJ.nota):'')+'</small></div><button type="button" class="hj-x" data-hjx aria-label="Cerrar">✕</button></div>'+
     (F.length?'<div class="hj-tw"><table class="hj-t"><thead><tr><th></th><th>Orden</th><th>Factura</th><th>Lo que fue</th><th>Tipo</th><th class="r">Facturado</th><th>Qué hago</th></tr></thead><tbody>'+
-      F.map(function(f){return '<tr class="'+(f.ok?'':'off')+(f.dudoso?' duda':'')+'"><td><input type="checkbox" data-hjok="'+f.i+'"'+(f.ok?' checked':'')+' aria-label="Incluir '+ea(f.orden)+'"></td><td><b>'+esc(f.orden)+'</b></td><td>'+esc(f.factura||'—')+'</td><td>'+esc(f.concepto||'—')+(f.dudoso?' <em>revisa: no se lee bien</em>':'')+'</td>'+
+      F.map(function(f){return '<tr class="'+(f.ok?'':'off')+(f.dudoso?' duda':'')+'"><td><input type="checkbox" data-hjok="'+f.i+'"'+(f.ok?' checked':'')+' aria-label="Incluir '+ea(f.orden)+'"></td><td><b>'+esc(f.orden)+'</b></td><td>'+esc(f.factura||'—')+'</td><td>'+esc(f.concepto||'—')+(f.dudoso?' <em>revisa: no se lee bien</em>':'')+(f.nota?'<small class="hj-n">Comentario: '+esc(f.nota)+'</small>':'')+'</td>'+
         '<td><select data-hjtipo="'+f.i+'"'+(f.ex?' disabled':'')+'>'+['Servicio','Campaña','PREA'].map(function(t){return '<option'+(f.tipo===t?' selected':'')+'>'+t+'</option>'}).join('')+'</select></td>'+
         '<td class="r">'+(f.facturado!=null?EX.money(f.facturado):'—')+'</td><td>'+(f.rep?'<span class="hj-a">Repetida en la hoja</span>':f.ex?'<span class="hj-a up">Ya existe · actualizar</span>':f.conv?'<span class="hj-a up">Ya existe · completar</span>':'<span class="hj-a nw">Abrir orden nueva</span>')+'</td></tr>'}).join('')+'</tbody></table></div>':'<p class="hj-s">No encontré renglones con número de orden.</p>')+
     '<div class="hj-f"><span>'+n+' de '+F.length+' · '+ac+(ac===1?' se actualiza':' se actualizan')+' · '+ab+(ab===1?' orden nueva':' órdenes nuevas')+' · facturado '+EX.money(tot)+'</span><button type="button" class="bt" data-hjx>Cancelar</button><button type="button" class="bt pri" data-hjgo'+(n?'':' disabled')+'>Acomodar '+n+(n===1?' orden':' órdenes')+'</button></div>');
@@ -7876,7 +7892,9 @@ HJ.pintar=function(){
 HJ.aplicar=async function(){
   if(HJ.busy)return;HJ.busy=true;var F=HJ.filas.filter(function(f){return f.ok}),hechas=0,nuevas=0,mal=[];
   var b=document.querySelector('[data-hjgo]');if(b){b.disabled=true;b.textContent='Acomodando…'}
-  for(var i=0;i<F.length;i++){var f=F[i],fac={factura_numero:f.factura,factura_monto:f.facturado,factura_fecha:f.fecha,factura_concepto:f.concepto,factura_src:'hoja'};
+  for(var i=0;i<F.length;i++){var f=F[i],fac={factura_numero:f.factura,factura_monto:f.facturado,factura_fecha:f.fecha,factura_concepto:f.concepto,factura_src:HJ.src||'hoja'};
+    Object.keys(fac).forEach(function(k){if(fac[k]==null||fac[k]==='')delete fac[k]});
+    if(f.nota){fac.cartera_nota=String(f.nota).slice(0,600);fac.cartera_nota_at=new Date().toISOString();fac.cartera_nota_por=(SB.user&&SB.user.name)||null}
     try{
       if(f.ex){var u=await SB.c.from('expedientes').update(fac).eq('id',f.ex.id);if(u.error)throw u.error;hechas++;continue}
       var dup=await SB.c.from('expedientes').select('id').or('wo.eq.'+f.orden+',folio.eq.'+f.orden+',folio.eq.SRV-'+f.orden+',folio.eq.CAM-'+f.orden).limit(1);
@@ -7890,10 +7908,10 @@ HJ.aplicar=async function(){
     }catch(e){console.warn('[hoja]',f.orden,e);mal.push(f.orden)}}
   HJ.busy=false;HJ.cerrar();
   toast('Listo: '+hechas+(hechas===1?' orden actualizada':' órdenes actualizadas')+', '+nuevas+(nuevas===1?' orden nueva':' órdenes nuevas')+(mal.length?' · no se pudo: '+mal.join(', '):''));
-  try{await EX.load()}catch(_){}GP.load();if(S.view==='exp'&&!XD.cur)AH.render();
+  try{await EX.load()}catch(_){}GP.load();if(S.view==='exp'&&!XD.cur)AH.render();if(S.view==='cx'&&typeof CX!=='undefined'){CX.pend=null;CX.abrir()}
 };
 document.addEventListener('click',function(e){var t=e.target;if(!t.closest)return;
-  if(t.closest('[data-hjup]')){HJ.input().click();return}
+  if(t.closest('[data-hjup]')){HJ.src='hoja';HJ.input().click();return}
   if(t.closest('[data-hjx]')){HJ.cerrar();return}
   if(t.closest('[data-hjgo]')){HJ.aplicar();return}
   if(t.id==='hjOv'){HJ.cerrar()}
@@ -7919,9 +7937,12 @@ CX.subir=async function(file){
       return {nombre:n,columnas:cols,filas:A.slice(h+1,h+1+4000)}}).filter(function(h){return h.filas.length||h.columnas.length});
     if(!hojas.length)throw new Error('El archivo no trae datos');
     var r=await SB.c.from('cartera_excel').insert({archivo:file.name.slice(0,160),hojas:hojas}).select('*').single();if(r.error)throw r.error;
-    CX.d=r.data;CX.hoja=0;CX.q='';CX.ag=r.data.agency_id;CX.todas=[r.data].concat((CX.todas||[]).filter(function(x){return x.agency_id!==r.data.agency_id}));
+    CX.d=r.data;CX.hoja=0;CX.q='';CX.vista='xls';CX.ag=r.data.agency_id;CX.todas=[r.data].concat((CX.todas||[]).filter(function(x){return x.agency_id!==r.data.agency_id}));
     var tot=hojas.reduce(function(a,h){return a+h.filas.length},0);toast('Cartera lista: '+tot+(tot===1?' renglón':' renglones')+' en '+hojas.length+(hojas.length===1?' hoja':' hojas'));
     showView('cx');
+    /* si el Excel trae orden y factura o importe, sus renglones alimentan la cartera de la plataforma (sin duplicar órdenes) */
+    var filas=CX.aFilas(hojas);
+    if(filas.length){HJ.titulo='Cartera en Excel · '+file.name;HJ.src='cartera';HJ.ov('<div class="hj-h"><b>Revisando la cartera…</b></div><p class="hj-s"><i class="pag-sp"></i> Buscando cada orden en la plataforma.</p>');await HJ.revisar(filas,filas.length+' renglones con orden en el Excel')}
   }catch(e){console.warn('[cartera]',e);toast('No se pudo subir la cartera ('+TR.errTxt(e)+')')}
   CX.busy=false;
 };
@@ -7931,21 +7952,64 @@ CX.load=async function(){
   var vis={};CX.todas=(r.data||[]).filter(function(x){if(vis[x.agency_id])return false;vis[x.agency_id]=1;return true});
   if(CX.ag==null||!CX.todas.some(function(x){return x.agency_id===CX.ag}))CX.ag=CX.todas[0]?CX.todas[0].agency_id:null;
   CX.d=CX.todas.filter(function(x){return x.agency_id===CX.ag})[0]||null;CX.cargado=true};
+CX.aFilas=function(hojas){var out=[];
+  (hojas||[]).forEach(function(h){var C=h.columnas.map(function(c){return norm(c)}),col=function(re,no){for(var j=0;j<C.length;j++)if(re.test(C[j])&&!(no&&no.test(C[j])))return j;return -1};
+    var jo=col(/\b(orden|o\.?\s?r\.?|ot|wo|no\.?\s?de\s?orden)\b/),jf=col(/factura|folio/),ji=col(/importe|monto|facturad|total|cantidad|saldo/),jc=col(/concepto|descrip|servicio|trabajo|campana/),jd=col(/fecha/),jn=col(/coment|observ|nota|actualiz|seguimiento/);
+    if(jo<0||(jf<0&&ji<0))return;
+    h.filas.forEach(function(r){var o=String(r[jo]==null?'':r[jo]).trim();if(!o)return;var imp=ji>=0?CX.num(r[ji]):null,fe=jd>=0?String(r[jd]||'').slice(0,10):'';
+      out.push({orden:o,factura:jf>=0?String(r[jf]||'').trim()||null:null,facturado:imp&&imp>0?Math.round(imp*100)/100:null,concepto:jc>=0?String(r[jc]||'').trim()||null:null,
+        fecha:/^\d{4}-\d{2}-\d{2}$/.test(fe)?fe:null,nota:jn>=0?String(r[jn]||'').trim()||null:null,tipo:/campa/i.test(jc>=0?String(r[jc]||''):'')?'Campaña':'Servicio'})})});
+  return out.slice(0,400)};
 CX.puedeSubir=function(){return !!(SB.user&&SB.user.agency_id)};
 CX.nomAg=function(id){var L=(typeof GM!=='undefined'&&GM.ags&&GM.ags.length?GM.ags:(typeof AGV!=='undefined'?AGV.ags:[]))||[];var a=L.filter(function(x){return x.id===id})[0];return a?a.name:(id===(SB.user&&SB.user.agency_id)?SB.agency:'Agencia '+id)};
-CX.abrir=async function(){var el=$('#cxIn');if(!el)return;if(!CX.cargado){el.innerHTML='<p class="xz-mut">Cargando la cartera…</p>';try{await CX.load()}catch(e){console.warn(e)}}CX.pintar()};
+CX.vista='pend';CX.pend=null;CX.edit=null;
+CX.abrir=async function(){var el=$('#cxIn');if(!el)return;
+  if(!CX.cargado||CX.pend===null){el.innerHTML='<p class="xz-mut">Cargando la cartera…</p>';
+    try{var r=await Promise.all([CX.cargado?null:CX.load(),SB.c.rpc('cartera_pendiente')]);CX.pend=(r[1]&&r[1].data)||[]}catch(e){console.warn(e);CX.pend=CX.pend||[]}}
+  CX.pintar()};
+CX.puedeComentar=function(x){return !!(SB.user&&(x.user_id===ME||(SB.user.agency_id&&SB.user.agency_id===x.agency_id&&!SB.user.dueno&&!SB.user.director)))};
+CX.pendHtml=function(){
+  var q=norm(CX.q),todas=CX.pend||[],ver=!CX.puedeSubir();
+  var ags={};todas.forEach(function(x){ags[x.agency_id]=x.agencia||('Agencia '+x.agency_id)});
+  var L=todas.filter(function(x){return (!ver||CX.pa==null||CX.pa==='todas'||x.agency_id===CX.pa)&&(!q||norm([x.wo,x.folio,x.factura,x.concepto,x.asesor,x.nota].join(' ')).indexOf(q)>=0)});
+  var tot=L.reduce(function(a,x){return a+Number(x.facturado||0)},0),sin=L.filter(function(x){return !x.nota}).length;
+  var chips=ver&&Object.keys(ags).length>1?'<div class="cx-tabs cx-ags" role="tablist"><button type="button" data-cxpa="todas" aria-selected="'+(CX.pa==null||CX.pa==='todas')+'">Todas</button>'+Object.keys(ags).map(function(k){return '<button type="button" data-cxpa="'+k+'" aria-selected="'+(String(CX.pa)===k)+'">'+esc(ags[k])+'</button>'}).join('')+'</div>':'';
+  return chips+'<div class="cx-sum"><div><span>Por cobrar a planta</span><b>'+EX.money(tot)+'</b><small>'+L.length+(L.length===1?' factura pendiente':' facturas pendientes')+(sin?' · <em>'+sin+' sin comentario</em>':'')+'</small></div></div>'+
+    (L.length?'<div class="cx-tw"><table class="cx-t cx-p"><thead><tr><th>Orden</th><th>Factura</th><th>Lo que fue</th><th class="r">Facturado</th><th>Facturada</th><th class="r">Días</th>'+(ver?'<th>Agencia</th>':'')+'<th>Asesor</th><th class="cx-cm">Comentario para el grupo</th></tr></thead><tbody>'+
+      L.map(function(x){var ed=CX.edit===x.id,puede=CX.puedeComentar(x);
+        return '<tr><td><button type="button" class="cx-o" data-cxo="'+ea(x.id)+'">'+esc(x.wo||x.folio||'')+'</button></td><td>'+esc(x.factura||'—')+'</td><td>'+esc(x.concepto||'')+'</td><td class="r"><b>'+EX.money(x.facturado)+'</b></td><td>'+esc(x.factura_fecha?new Date(x.factura_fecha+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'—')+'</td>'+
+          '<td class="r'+(x.dias>30?' mal':x.dias>15?' warn':'')+'">'+(x.dias!=null?x.dias:'')+'</td>'+(ver?'<td>'+esc(x.agencia||'')+'</td>':'')+'<td>'+esc(x.asesor||'')+'</td>'+
+          '<td class="cx-cm">'+(ed?'<div class="cx-ed"><textarea id="cxNota" rows="2" maxlength="600" placeholder="¿Cómo va esta orden? Ej. Planta pidió corregir la mano de obra, se reenvía el lunes">'+esc(x.nota||'')+'</textarea><span><button type="button" class="bt" data-cxcan>Cancelar</button><button type="button" class="bt pri" data-cxsave="'+ea(x.id)+'">Guardar</button></span></div>':
+            (x.nota?'<p>'+esc(x.nota)+'</p><small>'+esc([x.nota_por,x.nota_at?AL.ago(x.nota_at):''].filter(Boolean).join(' · '))+'</small>':'<p class="cx-sin">Sin comentario</p>')+(puede?'<button type="button" class="cx-cb" data-cxedit="'+ea(x.id)+'">'+(x.nota?'Actualizar':'Comentar')+'</button>':''))+'</td></tr>'}).join('')+'</tbody></table></div>'
+      :'<div class="cx-vacio"><b>Nada por cobrar</b><p>'+(todas.length?'Sin resultados.':'Aquí aparecen las órdenes facturadas que planta todavía no paga. Se llenan con tu hoja de facturación o tu Excel de cartera; cuando planta paga, salen solas.')+'</p></div>');
+};
+document.addEventListener('click',async function(e){var t=e.target;if(!t.closest||!t.closest('#cxIn'))return;
+  var v=t.closest('[data-cxv]');if(v){CX.vista=v.dataset.cxv;CX.pintar();return}
+  var pa=t.closest('[data-cxpa]');if(pa){CX.pa=pa.dataset.cxpa==='todas'?'todas':Number(pa.dataset.cxpa);CX.pintar();return}
+  var ed=t.closest('[data-cxedit]');if(ed){CX.edit=ed.dataset.cxedit;CX.pintar();var a=$('#cxNota');if(a){a.focus();a.setSelectionRange(a.value.length,a.value.length)}return}
+  if(t.closest('[data-cxcan]')){CX.edit=null;CX.pintar();return}
+  var sv=t.closest('[data-cxsave]');if(sv){var id=sv.dataset.cxsave,tx=($('#cxNota')||{}).value||'';sv.disabled=true;
+    var q=await SB.c.rpc('comentar_cartera',{p_id:id,p_texto:tx});if(q.error){sv.disabled=false;toast('No se guardó el comentario ('+(q.error.message||'error')+')');return}
+    var x=(CX.pend||[]).filter(function(z){return z.id===id})[0];if(x){x.nota=tx.trim()||null;x.nota_at=new Date().toISOString();x.nota_por=(SB.user&&SB.user.name)||''}CX.edit=null;CX.pintar();toast('Comentario guardado: lo ve todo el grupo');return}
+  var o=t.closest('[data-cxo]');if(o){var id2=o.dataset.cxo;showView('exp');EX.load().then(function(){XD.open(id2)});return}
+});
+document.addEventListener('keydown',function(e){if(e.target&&e.target.id==='cxNota'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)){var b=document.querySelector('[data-cxsave]');if(b)b.click()}});
 CX.num=function(v){if(typeof v==='number')return v;var t=String(v).replace(/[$,\s]/g,'');return /^-?\d+(\.\d+)?$/.test(t)?Number(t):null};
 CX.pintar=function(){
   var el=$('#cxIn');if(!el)return;var d=CX.d;
+  var tabs='<div class="cx-head"><h2>Cartera</h2><div class="cx-acc">'+(CX.vista==='pend'?'<input type="search" id="cxQ" placeholder="Buscar orden, factura, asesor o comentario" value="'+ea(CX.q)+'" aria-label="Buscar en la cartera">':'')+(CX.puedeSubir()?'<button type="button" class="bt" data-cxup>'+svg('wallet','sm')+'Subir cartera (Excel)</button>':'')+'</div></div>'+
+    '<div class="rb-tabs cx-vt" role="tablist"><button type="button" role="tab" data-cxv="pend" aria-selected="'+(CX.vista!=='xls')+'">Por cobrar a planta</button><button type="button" role="tab" data-cxv="xls" aria-selected="'+(CX.vista==='xls')+'">Excel subido</button></div>';
+  if(CX.vista!=='xls'){el.innerHTML=tabs+CX.pendHtml();return}
+  el.insertAdjacentHTML('afterbegin','');
   var chips=(CX.todas||[]).length>1||(!CX.puedeSubir()&&(CX.todas||[]).length)?'<div class="cx-tabs cx-ags" role="tablist" aria-label="Agencias">'+(CX.todas||[]).map(function(x){return '<button type="button" role="tab" data-cxag="'+x.agency_id+'" aria-selected="'+(x.agency_id===CX.ag)+'">'+esc(CX.nomAg(x.agency_id))+'</button>'}).join('')+'</div>':'';
-  if(!d){el.innerHTML=CX.puedeSubir()?'<div class="cx-vacio"><b>Todavía no subes tu cartera</b><p>Sube el Excel de tu cartera y aquí la ves igual, con búsqueda y totales.</p><button type="button" class="bt pri" data-cxup>'+svg('wallet','sm')+'Subir cartera (Excel)</button></div>':'<div class="cx-vacio"><b>Todavía no hay carteras</b><p>Cuando los asesores de tus agencias suban su cartera en Excel, aquí la ves por agencia.</p></div>';return}
+  if(!d){el.innerHTML=tabs+(CX.puedeSubir()?'<div class="cx-vacio"><b>Todavía no subes tu cartera</b><p>Sube el Excel de tu cartera y aquí la ves igual, con búsqueda y totales.</p><button type="button" class="bt pri" data-cxup>'+svg('wallet','sm')+'Subir cartera (Excel)</button></div>':'<div class="cx-vacio"><b>Todavía no hay carteras</b><p>Cuando los asesores de tus agencias suban su cartera en Excel, aquí la ves por agencia.</p></div>');return}
   var H=d.hojas||[],h=H[Math.min(CX.hoja,H.length-1)]||{columnas:[],filas:[]},q=norm(CX.q);
   var F=h.filas.filter(function(r){return !q||norm(r.join(' ')).indexOf(q)>=0});
   var nc=h.columnas.length,esNum=h.columnas.map(function(_,j){var n=0,t=0;h.filas.forEach(function(r){var v=r[j];if(String(v).trim()==='')return;t++;if(CX.num(v)!==null)n++});return t>0&&n/t>.8});
   var sum=h.columnas.map(function(_,j){return esNum[j]?F.reduce(function(a,r){var v=CX.num(r[j]);return a+(v||0)},0):null});
   var fmt=function(v,j){if(esNum[j]&&CX.num(v)!==null){var x=CX.num(v);return Math.abs(x)>=1000||String(v).indexOf('.')>=0?x.toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2}):String(x)}return esc(String(v))};
-  el.innerHTML=chips+'<div class="cx-top"><div><h2>Cartera'+(CX.puedeSubir()&&!chips?'':' · '+esc(CX.nomAg(d.agency_id)))+'</h2><p>'+esc(d.archivo||'Excel')+' · subida '+esc(AL.ago(d.created_at))+' · '+F.length+(F.length===1?' renglón':' renglones')+'</p></div>'+
-      '<div class="cx-acc"><input type="search" id="cxQ" placeholder="Buscar en la cartera" value="'+ea(CX.q)+'" aria-label="Buscar en la cartera">'+(CX.puedeSubir()?'<button type="button" class="bt" data-cxup>'+svg('wallet','sm')+'Subir nueva cartera</button>':'')+'</div></div>'+
+  el.innerHTML=tabs+chips+'<div class="cx-top"><div><h3>'+esc(CX.nomAg(d.agency_id))+'</h3><p>'+esc(d.archivo||'Excel')+' · subida '+esc(AL.ago(d.created_at))+' · '+F.length+(F.length===1?' renglón':' renglones')+'</p></div>'+
+      '<div class="cx-acc"><input type="search" id="cxQ" placeholder="Buscar en el Excel" value="'+ea(CX.q)+'" aria-label="Buscar en el Excel"></div></div>'+
     (H.length>1?'<div class="cx-tabs" role="tablist">'+H.map(function(x,i){return '<button type="button" role="tab" data-cxh="'+i+'" aria-selected="'+(i===CX.hoja)+'">'+esc(x.nombre)+' <i>'+x.filas.length+'</i></button>'}).join('')+'</div>':'')+
     '<div class="cx-tw"><table class="cx-t"><thead><tr>'+h.columnas.map(function(c,j){return '<th'+(esNum[j]?' class="r"':'')+'>'+esc(c)+'</th>'}).join('')+'</tr></thead><tbody>'+
       F.slice(0,1500).map(function(r){var o='<tr>';for(var j=0;j<nc;j++)o+='<td'+(esNum[j]?' class="r"':'')+'>'+fmt(r[j]==null?'':r[j],j)+'</td>';return o+'</tr>'}).join('')+'</tbody>'+
@@ -9178,6 +9242,7 @@ SB.enter=async function(user){
       if(p.table==='chat_grupo'){if(typeof EQ!=='undefined')EQ.rt(p);return}
       if(p.table==='cartera'){if(XD.mode==='cartera'&&XD.cur&&p.new&&String(p.new.expediente_id)===String(XD.cur.id))CC.refresh();if(S.view==='cartera')CAR.load();if(S.view==='inicio')HM.load();return}
       if(p.table==='agenda'){MI.loadAgenda();return}
+      if((p.table==='expedientes'||p.table==='cartera')&&typeof CX!=='undefined'&&S.view==='cx'&&!CX.edit){clearTimeout(CX.rt);CX.rt=setTimeout(function(){CX.pend=null;CX.abrir()},1200)}
       if((p.table==='expedientes'||p.table==='cartera')&&typeof AH!=='undefined'&&!(typeof GM!=='undefined'&&GM.on())){clearTimeout(AH.cobRT);AH.cobRT=setTimeout(AH.cobLoad,1500)}
       if((p.table==='expedientes'||p.table==='debitos'||p.table==='entrenamiento_docs')&&typeof GM!=='undefined'&&GM.on()){clearTimeout(GM.rt);GM.rt=setTimeout(GM.load,1500)}
       if(p.table==='expedientes'&&typeof AH!=='undefined'&&AH.activo()){clearTimeout(AH.t);AH.t=setTimeout(function(){if(S.view==='exp'&&!XD.cur)EX.load();else if(typeof GP!=='undefined')GP.load()},700)}
